@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: Ecommerce-Graybee
+  datasource:
+    url: jdbc:mysql://localhost:3306/graybee?useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
+api:
+  version: 1
+  prefix: /api/v${api.version}
+  users: ${api.prefix}/users
+  categories: ${api.prefix}/categories
+  manufacturers: ${api.prefix}/manufacturers
+  products: ${api.prefix}/products
+  rams: ${api.prefix}/rams
+  orders: ${api.prefix}/orders
+  order-details: ${api.prefix}/order-details
