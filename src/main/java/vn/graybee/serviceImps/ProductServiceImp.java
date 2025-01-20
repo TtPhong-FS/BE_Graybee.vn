@@ -1,16 +1,18 @@
 package vn.graybee.serviceImps;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.models.Category;
-import vn.graybee.models.Manufacturer;
-import vn.graybee.models.Product;
-import vn.graybee.repositories.CategoryRepository;
-import vn.graybee.repositories.ManufacturerRepository;
-import vn.graybee.repositories.ProductRepository;
-import vn.graybee.requests.products.ProductCreateRequest;
-import vn.graybee.services.ProductService;
+import vn.graybee.models.business.Category;
+import vn.graybee.models.business.Manufacturer;
+import vn.graybee.models.business.Product;
+import vn.graybee.repositories.business.CategoryRepository;
+import vn.graybee.repositories.business.ManufacturerRepository;
+import vn.graybee.repositories.business.ProductRepository;
+import vn.graybee.requests.product.ProductCreateRequest;
+import vn.graybee.response.ProductResponseByCategoryId;
+import vn.graybee.services.business.ProductService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,24 +31,38 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public void createProduct(ProductCreateRequest request) {
+    public Product createProduct(ProductCreateRequest request) {
         Optional<Category> category = categoryRepository.findById(request.getCategoryId());
         Optional<Manufacturer> manufacturer = manufacturerRepository.findById(request.getManufacturerId());
 
         Product product = new Product(
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                category.get(),
-                manufacturer.get(),
+                request.getModel(),
+                request.getProductType().toUpperCase(),
                 request.getName(),
-                request.getConditions(),
+                request.getConditions().toUpperCase(),
                 request.getWarranty(),
+                request.getWeight(),
+                request.getDimension(),
                 request.getPrice(),
                 request.getColor(),
                 request.getDescription(),
                 request.getThumbnail()
         );
-        productRepository.save(product);
+        product.setCategory(category.get());
+        product.setManufacturer(manufacturer.get());
+        return productRepository.save(product);
+    }
+
+    @Override
+    public Optional<Product> getById(Long id) {
+        return productRepository.findById(id);
+    }
+
+    @Override
+    public List<ProductResponseByCategoryId> findProductsByCategoryId(long id) {
+        return productRepository.findProductByCategory_Id(id);
     }
 
 }

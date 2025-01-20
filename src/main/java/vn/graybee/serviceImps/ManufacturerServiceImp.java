@@ -1,12 +1,10 @@
 package vn.graybee.serviceImps;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.models.Manufacturer;
-import vn.graybee.repositories.ManufacturerRepository;
-import vn.graybee.requests.manufacturers.ManufacturerCreateRequest;
-import vn.graybee.services.ManufacturerService;
-
-import java.time.LocalDateTime;
+import vn.graybee.models.business.Manufacturer;
+import vn.graybee.repositories.business.ManufacturerRepository;
+import vn.graybee.requests.manufacturer.ManufacturerCreateRequest;
+import vn.graybee.services.business.ManufacturerService;
 
 @Service
 public class ManufacturerServiceImp implements ManufacturerService {
@@ -20,9 +18,7 @@ public class ManufacturerServiceImp implements ManufacturerService {
     @Override
     public void insertManufacturer(ManufacturerCreateRequest request) {
         Manufacturer manufacturer = new Manufacturer(
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                request.getName()
+                request.getName().toUpperCase()
         );
         manufacturerRepository.save(manufacturer);
     }
