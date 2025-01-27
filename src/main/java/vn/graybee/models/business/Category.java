@@ -18,11 +18,16 @@ public class Category {
     @Column(nullable = false, length = 50, unique = true)
     private String name;
 
+    @Column(name = "is_delete", length = 20)
+    private String isDelete;
+
+
     public Category() {
     }
 
-    public Category(String name) {
+    public Category(String name, String isDelete) {
         this.name = name;
+        this.isDelete = isDelete;
     }
 
     public Long getId() {
@@ -39,6 +44,14 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(String isDelete) {
+        this.isDelete = isDelete;
     }
 
 }

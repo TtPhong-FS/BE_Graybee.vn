@@ -1,6 +1,6 @@
 package vn.graybee.response;
 
-public class ProductResponseByCategoryId {
+public class ProductResponseByCategoryName {
 
     private long id;
 
@@ -9,6 +9,13 @@ public class ProductResponseByCategoryId {
     private float price;
 
     private String thumbnail;
+
+    public ProductResponseByCategoryName(long id, String name, float price, String thumbnail) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.thumbnail = thumbnail;
+    }
 
     public long getId() {
         return id;
@@ -39,13 +46,6 @@ public class ProductResponseByCategoryId {
     }
 
     public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public ProductResponseByCategoryId(long id, String name, float price, String thumbnail) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
         this.thumbnail = thumbnail;
     }
 

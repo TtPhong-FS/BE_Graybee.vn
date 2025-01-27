@@ -2,8 +2,15 @@ package vn.graybee.exceptions;
 
 public class BusinessCustomException extends RuntimeException {
 
-    public BusinessCustomException(String message) {
+    private final String field;
+
+    public BusinessCustomException(String field, String message) {
         super(message);
+        this.field = field;
+    }
+
+    public String getField() {
+        return field;
     }
 
 }

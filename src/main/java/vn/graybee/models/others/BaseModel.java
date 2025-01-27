@@ -16,6 +16,14 @@ public class BaseModel {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public BaseModel() {
+    }
+
+    public BaseModel(LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -25,14 +33,6 @@ public class BaseModel {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public BaseModel() {
-    }
-
-    public BaseModel(LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public LocalDateTime getCreatedAt() {

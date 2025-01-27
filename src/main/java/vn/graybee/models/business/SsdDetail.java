@@ -14,14 +14,32 @@ import jakarta.persistence.Table;
 public class SsdDetail {
 
     @Id
-    @Column(name = "hard_drive_id")
+    @Column(name = "product_id")
     private Long id;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @MapsId
     @OneToOne
-    @JoinColumn(name = "hard_drive_id")
-    private HardDriveDetail hardDrive;
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @Column(name = "communication_standard", length = 50, nullable = false)
+    private String communicationStandard;
+
+    @Column(name = "capacity", nullable = false)
+    private int capacity;
+
+    @Column(name = "hours_to_failure")
+    private int hoursToFailure;
+
+    @Column(name = "reading_speed", nullable = false)
+    private int readingSpeed;
+
+    @Column(name = "writing_speed", nullable = false)
+    private int writingSpeed;
+
+    @Column(name = "memory_technology", nullable = false, length = 50)
+    private String memoryTechnology;
 
     @Column(name = "storage_temperature", length = 50)
     private String storageTemperature;
@@ -41,15 +59,6 @@ public class SsdDetail {
     public SsdDetail() {
     }
 
-    public SsdDetail(Long id, String storageTemperature, String operatingTemperature, int randomReadingSpeed, int randomWritingSpeed, String software) {
-        this.id = id;
-        this.storageTemperature = storageTemperature;
-        this.operatingTemperature = operatingTemperature;
-        this.randomReadingSpeed = randomReadingSpeed;
-        this.randomWritingSpeed = randomWritingSpeed;
-        this.software = software;
-    }
-
     public Long getId() {
         return id;
     }
@@ -58,12 +67,60 @@ public class SsdDetail {
         this.id = id;
     }
 
-    public HardDriveDetail getHardDrive() {
-        return hardDrive;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setHardDrive(HardDriveDetail hardDrive) {
-        this.hardDrive = hardDrive;
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public String getCommunicationStandard() {
+        return communicationStandard;
+    }
+
+    public void setCommunicationStandard(String communicationStandard) {
+        this.communicationStandard = communicationStandard;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public int getHoursToFailure() {
+        return hoursToFailure;
+    }
+
+    public void setHoursToFailure(int hoursToFailure) {
+        this.hoursToFailure = hoursToFailure;
+    }
+
+    public int getReadingSpeed() {
+        return readingSpeed;
+    }
+
+    public void setReadingSpeed(int readingSpeed) {
+        this.readingSpeed = readingSpeed;
+    }
+
+    public int getWritingSpeed() {
+        return writingSpeed;
+    }
+
+    public void setWritingSpeed(int writingSpeed) {
+        this.writingSpeed = writingSpeed;
+    }
+
+    public String getMemoryTechnology() {
+        return memoryTechnology;
+    }
+
+    public void setMemoryTechnology(String memoryTechnology) {
+        this.memoryTechnology = memoryTechnology;
     }
 
     public String getStorageTemperature() {
@@ -103,6 +160,21 @@ public class SsdDetail {
     }
 
     public void setSoftware(String software) {
+        this.software = software;
+    }
+
+    public SsdDetail(Product product, String communicationStandard, int capacity, int hoursToFailure, int readingSpeed, int writingSpeed, String memoryTechnology, String storageTemperature, String operatingTemperature, int randomReadingSpeed, int randomWritingSpeed, String software) {
+        this.product = product;
+        this.communicationStandard = communicationStandard;
+        this.capacity = capacity;
+        this.hoursToFailure = hoursToFailure;
+        this.readingSpeed = readingSpeed;
+        this.writingSpeed = writingSpeed;
+        this.memoryTechnology = memoryTechnology;
+        this.storageTemperature = storageTemperature;
+        this.operatingTemperature = operatingTemperature;
+        this.randomReadingSpeed = randomReadingSpeed;
+        this.randomWritingSpeed = randomWritingSpeed;
         this.software = software;
     }
 

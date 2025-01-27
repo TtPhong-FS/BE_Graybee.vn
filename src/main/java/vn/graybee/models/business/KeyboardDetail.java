@@ -137,8 +137,8 @@ public class KeyboardDetail {
         this.led = led;
     }
 
-    public KeyboardDetail(Long id, String keyMaterial, int design, String connect, String keyCap, String switchType, String compatible, String feature, String support, String led) {
-        this.id = id;
+    public KeyboardDetail(Product product, String keyMaterial, int design, String connect, String keyCap, String switchType, String compatible, String feature, String support, String led) {
+        this.product = product;
         this.keyMaterial = keyMaterial;
         this.design = design;
         this.connect = connect;

@@ -71,13 +71,13 @@ public class Order extends BaseModel {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "is_active")
-    private boolean isActive;
+    @Column(name = "is_delete", length = 20)
+    private String isDelete;
 
     public Order() {
     }
 
-    public Order(LocalDateTime createdAt, LocalDateTime updatedAt, User user, boolean isGuest, String fullName, String phoneNumber, String address, String note, String discountCode, float totalMoney, LocalDateTime orderDate, boolean issueInvoices, String trackingNumber, String shippingMethod, String shippingAddress, Date shippingDate, String paymentMethod, String status, boolean isActive) {
+    public Order(LocalDateTime createdAt, LocalDateTime updatedAt, User user, boolean isGuest, String fullName, String phoneNumber, String address, String note, String discountCode, float totalMoney, LocalDateTime orderDate, boolean issueInvoices, String trackingNumber, String shippingMethod, String shippingAddress, Date shippingDate, String paymentMethod, String status, String isDelete) {
         super(createdAt, updatedAt);
         this.user = user;
         this.isGuest = isGuest;
@@ -95,7 +95,7 @@ public class Order extends BaseModel {
         this.shippingDate = shippingDate;
         this.paymentMethod = paymentMethod;
         this.status = status;
-        this.isActive = isActive;
+        this.isDelete = isDelete;
     }
 
     public Long getId() {
@@ -234,12 +234,12 @@ public class Order extends BaseModel {
         this.status = status;
     }
 
-    public boolean isActive() {
-        return isActive;
+    public String getIsDelete() {
+        return isDelete;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setIsDelete(String isDelete) {
+        this.isDelete = isDelete;
     }
 
 }

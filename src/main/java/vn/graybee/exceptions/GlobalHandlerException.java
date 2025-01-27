@@ -28,7 +28,7 @@ public class GlobalHandlerException {
     @ExceptionHandler(BusinessCustomException.class)
     public Map<String, String> handlerBusinessException(BusinessCustomException ex) {
         Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("error", ex.getMessage());
+        errorMap.put(ex.getField(), ex.getMessage());
         return errorMap;
     }
 

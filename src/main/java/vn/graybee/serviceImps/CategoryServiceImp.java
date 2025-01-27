@@ -6,6 +6,7 @@ import vn.graybee.repositories.business.CategoryRepository;
 import vn.graybee.requests.category.CategoryCreateRequest;
 import vn.graybee.response.CategoryResponse;
 import vn.graybee.services.business.CategoryService;
+import vn.graybee.validation.CategoryValidation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +17,38 @@ public class CategoryServiceImp implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public CategoryServiceImp(CategoryRepository categoryRepository) {
+    private final CategoryValidation categoryValidation;
+
+    public CategoryServiceImp(CategoryRepository categoryRepository, CategoryValidation categoryValidation) {
         this.categoryRepository = categoryRepository;
+        this.categoryValidation = categoryValidation;
     }
 
     @Override
-    public void insertCategory(CategoryCreateRequest request) {
+    public Category insertCategory(CategoryCreateRequest request) {
+        categoryValidation.ensureCategoryNameBeforeCreate(request.getName());
         Category category = new Category(
-                request.getName().toUpperCase()
+                request.getName().toUpperCase(),
+                request.getIsDelete()
         );
+        return categoryRepository.save(category);
+    }
+
+    @Override
+    public void deleteCategoryById(long id) {
+        categoryValidation.ensureExistsById(id);
+        categoryValidation.checkProductExistsByCategoryId(id);
+        categoryRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateStatusDeleteRecord(long id) {
+        Category category = categoryValidation.findToUpdateStatusDelete(id);
+        if (category.getIsDelete().equals("false")) {
+            category.setIsDelete("true");
+        } else {
+            category.setIsDelete("false");
+        }
         categoryRepository.save(category);
     }
 
@@ -38,7 +62,7 @@ public class CategoryServiceImp implements CategoryService {
         List<Category> categories = categoryRepository.findAll();
         List<CategoryResponse> categoryResponses = new ArrayList<>();
         for (Category category : categories) {
-            categoryResponses.add(new CategoryResponse(category.getId(), category.getName()));
+            categoryResponses.add(new CategoryResponse(category.getId(), category.getName(), category.getIsDelete()));
         }
         return categoryResponses;
     }

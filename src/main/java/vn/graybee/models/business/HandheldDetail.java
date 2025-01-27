@@ -26,16 +26,16 @@ public class HandheldDetail {
     @Column(name = "connect_mode", nullable = false, length = 50)
     private String connectMode;
 
-    @Column(name = "number_of_nodes")
+    @Column(name = "number_of_nodes", nullable = false)
     private int numberOfNodes;
 
     @Column(length = 50)
     private String support;
 
-    @Column(name = "usage_time")
+    @Column(name = "usage_time", nullable = false)
     private int usageTime;
 
-    @Column(length = 40)
+    @Column(length = 40, nullable = false)
     private String battery;
 
     @Column(length = 50)
@@ -119,7 +119,8 @@ public class HandheldDetail {
     public HandheldDetail() {
     }
 
-    public HandheldDetail(String connectMode, int numberOfNodes, String support, int usageTime, String battery, String charging, String led, Long id) {
+    public HandheldDetail(Product product, String connectMode, int numberOfNodes, String support, int usageTime, String battery, String charging, String led) {
+        this.product = product;
         this.connectMode = connectMode;
         this.numberOfNodes = numberOfNodes;
         this.support = support;
@@ -127,7 +128,6 @@ public class HandheldDetail {
         this.battery = battery;
         this.charging = charging;
         this.led = led;
-        this.id = id;
     }
 
 }

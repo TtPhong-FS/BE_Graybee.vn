@@ -32,8 +32,8 @@ public class HeatDissipationDetail {
     @Column(name = "heat_sink_material", length = 40)
     private String heatSinkMaterial;
 
-    @Column(length = 30, nullable = false)
-    private String speed;
+    @Column(nullable = false)
+    private int speed;
 
     private float airflow;
 
@@ -89,11 +89,11 @@ public class HeatDissipationDetail {
         this.heatSinkMaterial = heatSinkMaterial;
     }
 
-    public String getSpeed() {
+    public int getSpeed() {
         return speed;
     }
 
-    public void setSpeed(String speed) {
+    public void setSpeed(int speed) {
         this.speed = speed;
     }
 
@@ -137,8 +137,8 @@ public class HeatDissipationDetail {
         this.led = led;
     }
 
-    public HeatDissipationDetail(Long id, String cpuSocket, String series, String heatSinkMaterial, String speed, float airflow, float airPressure, int noiseLevel, boolean isApplicationControl, String led) {
-        this.id = id;
+    public HeatDissipationDetail(Product product, String cpuSocket, String series, String heatSinkMaterial, int speed, float airflow, float airPressure, int noiseLevel, boolean isApplicationControl, String led) {
+        this.product = product;
         this.cpuSocket = cpuSocket;
         this.series = series;
         this.heatSinkMaterial = heatSinkMaterial;

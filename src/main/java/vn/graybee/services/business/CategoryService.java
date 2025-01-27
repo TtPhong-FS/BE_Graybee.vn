@@ -9,7 +9,11 @@ import java.util.Optional;
 
 public interface CategoryService {
 
-    void insertCategory(CategoryCreateRequest request);
+    Category insertCategory(CategoryCreateRequest request);
+
+    void deleteCategoryById(long id);
+
+    void updateStatusDeleteRecord(long id);
 
     Optional<Category> findById(Long id);
 

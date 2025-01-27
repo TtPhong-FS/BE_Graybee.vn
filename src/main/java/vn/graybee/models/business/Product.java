@@ -1,6 +1,7 @@
 package vn.graybee.models.business;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,8 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import vn.graybee.models.others.BaseModel;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "products")
 public class Product extends BaseModel {
@@ -22,16 +21,16 @@ public class Product extends BaseModel {
     private Long id;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "category_id")
     private Category category;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "manufacturer_id")
     private Manufacturer manufacturer;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String model;
 
     @Column(name = "product_type", nullable = false, length = 30)
@@ -62,11 +61,13 @@ public class Product extends BaseModel {
     @Column(length = 300)
     private String thumbnail;
 
+    @Column(name = "is_delete", length = 20)
+    private String isDelete;
+
     public Product() {
     }
 
-    public Product(LocalDateTime createdAt, LocalDateTime updatedAt, String model, String productType, String name, String conditions, int warranty, float weight, String dimension, float price, String color, String description, String thumbnail) {
-        super(createdAt, updatedAt);
+    public Product(String model, String productType, String name, String conditions, int warranty, float weight, String dimension, float price, String color, String description, String thumbnail, String isDelete) {
         this.model = model;
         this.productType = productType;
         this.name = name;
@@ -78,6 +79,7 @@ public class Product extends BaseModel {
         this.color = color;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.isDelete = isDelete;
     }
 
     public Long getId() {
@@ -190,6 +192,14 @@ public class Product extends BaseModel {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(String isDelete) {
+        this.isDelete = isDelete;
     }
 
 }

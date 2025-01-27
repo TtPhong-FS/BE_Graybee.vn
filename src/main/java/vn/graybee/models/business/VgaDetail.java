@@ -174,8 +174,8 @@ public class VgaDetail {
         isApplicationSupport = applicationSupport;
     }
 
-    public VgaDetail(Long id, int memorySpeed, int memoryProtocol, String maximumResolution, int multipleScreen, String protocols, int gpuClock, String busStandard, int numberOfProcessingUnit, int powerConsumption, int psuRecommend, int directx, boolean isApplicationSupport) {
-        this.id = id;
+    public VgaDetail(Product product, int memorySpeed, int memoryProtocol, String maximumResolution, int multipleScreen, String protocols, int gpuClock, String busStandard, int numberOfProcessingUnit, int powerConsumption, int psuRecommend, int directx, boolean isApplicationSupport) {
+        this.product = product;
         this.memorySpeed = memorySpeed;
         this.memoryProtocol = memoryProtocol;
         this.maximumResolution = maximumResolution;

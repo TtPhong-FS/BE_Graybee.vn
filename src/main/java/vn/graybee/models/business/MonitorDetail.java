@@ -23,33 +23,34 @@ public class MonitorDetail {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(name = "screen_size")
+    @Column(name = "screen_size", nullable = false)
     private int screenSize;
 
-    @Column(name = "screen_type", length = 20)
+    @Column(name = "screen_type", length = 20, nullable = false)
     private String screenType;
 
+    @Column(nullable = false, length = 30)
     private String panels;
 
-    @Column(name = "aspect_ratio", length = 10)
+    @Column(name = "aspect_ratio", length = 10, nullable = false)
     private String aspectRatio;
 
     @Column(name = "is_speaker")
     private boolean isSpeaker;
 
-    @Column(length = 40)
+    @Column(length = 40, nullable = false)
     private String resolution;
 
-    @Column(name = "color_display")
+    @Column(name = "color_display", nullable = false)
     private int colorDisplay;
 
-    @Column(name = "percent_color")
+    @Column(name = "percent_color", nullable = false)
     private int percentColor;
 
     @Column(name = "refresh_rate")
     private int refreshRate;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String ports;
 
     @Column(name = "power_consumption")
@@ -69,7 +70,7 @@ public class MonitorDetail {
     @Column(name = "hours_to_failure")
     private int hoursToFailure;
 
-    @Column(name = "accessory", length = 100)
+    @Column(length = 100)
     private String accessory;
 
     public Long getId() {
@@ -224,8 +225,8 @@ public class MonitorDetail {
         this.accessory = accessory;
     }
 
-    public MonitorDetail(Long id, int screenSize, String screenType, String panels, String aspectRatio, boolean isSpeaker, String resolution, int colorDisplay, int percentColor, int refreshRate, String ports, int powerConsumption, int powerSaveMode, float powerOffMode, float voltage, String specialFeature, int hoursToFailure, String accessory) {
-        this.id = id;
+    public MonitorDetail(Product product, int screenSize, String screenType, String panels, String aspectRatio, boolean isSpeaker, String resolution, int colorDisplay, int percentColor, int refreshRate, String ports, int powerConsumption, int powerSaveMode, float powerOffMode, float voltage, String specialFeature, int hoursToFailure, String accessory) {
+        this.product = product;
         this.screenSize = screenSize;
         this.screenType = screenType;
         this.panels = panels;

@@ -5,9 +5,9 @@ import vn.graybee.requests.ram.RamDetailCreateRequest;
 
 import java.util.Optional;
 
-public interface RamDetailService {
+public interface RamService {
 
-    void createRamDetail(RamDetailCreateRequest request);
+    RamDetail createRamDetail(RamDetailCreateRequest request);
 
     Optional<RamDetail> findById(long id);
 

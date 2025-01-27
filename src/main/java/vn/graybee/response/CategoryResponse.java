@@ -6,9 +6,14 @@ public class CategoryResponse {
 
     private String name;
 
-    public CategoryResponse(long id, String name) {
+    private String isDelete;
+
+
+    public CategoryResponse(long id, String name, String isDelete) {
         this.id = id;
         this.name = name;
+        this.isDelete = isDelete;
+
     }
 
     public long getId() {
@@ -25,6 +30,14 @@ public class CategoryResponse {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(String isDelete) {
+        this.isDelete = isDelete;
     }
 
 }

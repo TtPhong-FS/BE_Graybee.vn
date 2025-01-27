@@ -23,7 +23,7 @@ public class PsuDetail {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(name = "maximum_capacity")
+    @Column(name = "maximum_capacity", nullable = false)
     private int maximumCapacity;
 
     @Column(length = 30)
@@ -41,7 +41,7 @@ public class PsuDetail {
     @Column(name = "fan_size")
     private int fanSize;
 
-    @Column(name = "fan_speed")
+    @Column(name = "fan_speed", nullable = false)
     private int fanSpeed;
 
     @Column(name = "operating_temperature", length = 20)
@@ -50,6 +50,7 @@ public class PsuDetail {
     @Column(length = 20)
     private String signal;
 
+    @Column(nullable = false)
     private int standing;
 
     @Column(name = "hours_to_failure")
@@ -58,7 +59,7 @@ public class PsuDetail {
     @Column(name = "noise_level")
     private float noiseLevel;
 
-    @Column(name = "percent_efficiency")
+    @Column(name = "percent_efficiency", nullable = false)
     private float percentEfficiency;
 
     public Long getId() {
@@ -181,8 +182,8 @@ public class PsuDetail {
         this.percentEfficiency = percentEfficiency;
     }
 
-    public PsuDetail(Long id, int maximumCapacity, String material, String inputVoltage, int inputCurrent, String inputFrequency, int fanSize, int fanSpeed, String operatingTemperature, String signal, int standing, int hoursToFailure, float noiseLevel, float percentEfficiency) {
-        this.id = id;
+    public PsuDetail(Product product, int maximumCapacity, String material, String inputVoltage, int inputCurrent, String inputFrequency, int fanSize, int fanSpeed, String operatingTemperature, String signal, int standing, int hoursToFailure, float noiseLevel, float percentEfficiency) {
+        this.product = product;
         this.maximumCapacity = maximumCapacity;
         this.material = material;
         this.inputVoltage = inputVoltage;

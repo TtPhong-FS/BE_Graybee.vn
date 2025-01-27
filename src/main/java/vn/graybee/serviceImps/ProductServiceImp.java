@@ -1,43 +1,53 @@
 package vn.graybee.serviceImps;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import vn.graybee.models.business.Category;
 import vn.graybee.models.business.Manufacturer;
 import vn.graybee.models.business.Product;
-import vn.graybee.repositories.business.CategoryRepository;
-import vn.graybee.repositories.business.ManufacturerRepository;
 import vn.graybee.repositories.business.ProductRepository;
 import vn.graybee.requests.product.ProductCreateRequest;
-import vn.graybee.response.ProductResponseByCategoryId;
+import vn.graybee.response.ProductResponseByCategoryName;
 import vn.graybee.services.business.ProductService;
+import vn.graybee.validation.CategoryValidation;
+import vn.graybee.validation.ManufactureValidation;
+import vn.graybee.validation.ProductValidation;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProductServiceImp implements ProductService {
 
-    private final CategoryRepository categoryRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
-    private final ManufacturerRepository manufacturerRepository;
+    private final CategoryValidation categoryValidation;
+
+    private final ManufactureValidation manufactureValidation;
+
+    private final ProductValidation productValidation;
 
     private final ProductRepository productRepository;
 
-    public ProductServiceImp(CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository, ProductRepository productRepository) {
-        this.categoryRepository = categoryRepository;
-        this.manufacturerRepository = manufacturerRepository;
+    public ProductServiceImp(CategoryValidation categoryValidation, ManufactureValidation manufactureValidation, ProductValidation productValidation, ProductRepository productRepository) {
+        this.categoryValidation = categoryValidation;
+        this.manufactureValidation = manufactureValidation;
+        this.productValidation = productValidation;
         this.productRepository = productRepository;
     }
 
     @Override
     public Product createProduct(ProductCreateRequest request) {
-        Optional<Category> category = categoryRepository.findById(request.getCategoryId());
-        Optional<Manufacturer> manufacturer = manufacturerRepository.findById(request.getManufacturerId());
+
+        productValidation.ensureProductNameBeforeCreate(request.getName());
+        productValidation.checkProductModelExists(request.getModel());
+        Category category = categoryValidation.ensureCategoryBeforeCreateProduct(request.getCategoryId());
+        Manufacturer manufacturer = manufactureValidation.ensureManufactureBeforeCreateProduct(request.getManufacturerId());
+
+        logger.info("Creating product with model: " + request.getModel() + "name: " + request.getName());
 
         Product product = new Product(
-                LocalDateTime.now(),
-                LocalDateTime.now(),
                 request.getModel(),
                 request.getProductType().toUpperCase(),
                 request.getName(),
@@ -48,11 +58,14 @@ public class ProductServiceImp implements ProductService {
                 request.getPrice(),
                 request.getColor(),
                 request.getDescription(),
-                request.getThumbnail()
+                request.getThumbnail(),
+                request.getIsDelete()
         );
-        product.setCategory(category.get());
-        product.setManufacturer(manufacturer.get());
-        return productRepository.save(product);
+        product.setCategory(category);
+        product.setManufacturer(manufacturer);
+        Product savedProduct = productRepository.save(product);
+        logger.info("Creating product successfully with ID: {}", savedProduct.getId());
+        return savedProduct;
     }
 
     @Override
@@ -61,8 +74,8 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public List<ProductResponseByCategoryId> findProductsByCategoryId(long id) {
-        return productRepository.findProductByCategory_Id(id);
+    public List<ProductResponseByCategoryName> findProductsByCategoryName(String name) {
+        return productRepository.findProductByCategory_Name(name);
     }
 
 }

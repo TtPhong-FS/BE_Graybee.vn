@@ -1,37 +1,42 @@
 package vn.graybee.requests.ram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import vn.graybee.requests.product.ProductCreateRequest;
 
 public class RamDetailCreateRequest extends ProductCreateRequest {
 
-    @NotEmpty(message = "Ram's ram type cannot be empty")
-    @Size(min = 1, max = 5, message = "Ram Type must be between 2 and 5 characters")
+    @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 5, message = "Must be between 1 and 5 characters")
     @JsonProperty("ram_type")
     private String ramType;
 
-    @NotEmpty(message = "Ram's series cannot be empty")
-    @Size(min = 1, max = 100, message = "Ram Type must be between 0 and 100 characters")
+    @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     private String series;
 
-    @NotNull(message = "Ram's capacity cannot be null")
-    @PositiveOrZero(message = "Capacity cannot be negative")
+    @Positive(message = "Must be a positive number")
+    @NotNull(message = "Cannot be null")
+    @PositiveOrZero(message = "Cannot be a negative number")
     private int capacity;
 
-    @NotEmpty(message = "Ram's type cannot be empty")
+    @Size(min = 1, max = 10, message = "Must be between 1 and 10 characters")
+    @NotBlank(message = "Cannot be blank")
     private String type;
 
-    @NotNull(message = "Ram's speed cannot be null")
-    @PositiveOrZero(message = "Speed cannot be negative")
+    @Positive(message = "Must be a positive number")
+    @NotNull(message = "Cannot be null")
+    @PositiveOrZero(message = "Cannot be a negative number")
     private int speed;
 
-    @Size(min = 1, max = 50, message = "Latency must be between 0 and 50 characters")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String latency = "unknown";
 
+    @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("voltage")
     private float voltage = 0;
 
@@ -40,6 +45,7 @@ public class RamDetailCreateRequest extends ProductCreateRequest {
     @JsonProperty("heat_dissipation")
     private boolean heatDissipation = false;
 
+    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     private String led = "unknown";
 
     public String getRamType() {

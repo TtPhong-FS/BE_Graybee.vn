@@ -2,35 +2,36 @@ package vn.graybee.serviceImps;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.business.Product;
 import vn.graybee.models.business.RamDetail;
 import vn.graybee.repositories.business.RamRepository;
 import vn.graybee.requests.ram.RamDetailCreateRequest;
 import vn.graybee.services.business.ProductService;
-import vn.graybee.services.business.RamDetailService;
+import vn.graybee.services.business.RamService;
 
 import java.util.Optional;
 
 @Service
-public class RamDetailServiceImp implements RamDetailService {
+public class RamServiceImp implements RamService {
 
     private final RamRepository ramRepository;
 
     private final ProductService productService;
 
-    public RamDetailServiceImp(RamRepository ramRepository, ProductService productService) {
+    public RamServiceImp(RamRepository ramRepository, ProductService productService) {
         this.ramRepository = ramRepository;
         this.productService = productService;
     }
 
     @Override
     @Transactional
-    public void createRamDetail(RamDetailCreateRequest request) {
+    public RamDetail createRamDetail(RamDetailCreateRequest request) {
 
         Product product = productService.createProduct(request);
         if (!product.getProductType().equals("RAM")) {
-            throw new BusinessCustomException("Invalid Type: Product is not Ram");
+            throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_RAM_TYPE);
         }
 
         RamDetail ramDetail = new RamDetail(
@@ -46,7 +47,7 @@ public class RamDetailServiceImp implements RamDetailService {
                 request.isHeatDissipation(),
                 request.getLed()
         );
-        ramRepository.save(ramDetail);
+        return ramRepository.save(ramDetail);
     }
 
     @Override

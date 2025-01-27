@@ -26,16 +26,16 @@ public class MouseDetail {
     @Column(length = 50)
     private String sensors;
 
-    @Column(name = "number_of_nodes")
+    @Column(name = "number_of_nodes", nullable = false)
     private int numberOfNodes;
 
     @Column(name = "switch_type", length = 30)
     private String switchType;
 
-    @Column(name = "switch_life", length = 30)
+    @Column(name = "switch_life", length = 30, nullable = false)
     private String switchLife;
 
-    @Column(name = "polling_rate")
+    @Column(name = "polling_rate", nullable = false)
     private int pollingRate;
 
     @Column(length = 100)
@@ -149,8 +149,8 @@ public class MouseDetail {
         this.led = led;
     }
 
-    public MouseDetail(Long id, String sensors, int numberOfNodes, String switchType, String switchLife, int pollingRate, String software, String connect, boolean isWirelessConnect, String battery, String led) {
-        this.id = id;
+    public MouseDetail(Product product, String sensors, int numberOfNodes, String switchType, String switchLife, int pollingRate, String software, String connect, boolean isWirelessConnect, String battery, String led) {
+        this.product = product;
         this.sensors = sensors;
         this.numberOfNodes = numberOfNodes;
         this.switchType = switchType;
