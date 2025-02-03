@@ -27,7 +27,7 @@ public class PcServiceImp implements PcService {
     @Transactional
     public void createPcDetail(PcDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("PC")) {
+        if (!product.getCategory().getCategoryName().equals("PC")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_PC_TYPE);
         }
         PcDetail pc = new PcDetail(

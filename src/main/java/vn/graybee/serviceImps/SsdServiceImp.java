@@ -27,7 +27,7 @@ public class SsdServiceImp implements SsdService {
     @Transactional
     public void createSsdDetail(SsdDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("SSD")) {
+        if (!product.getCategory().getCategoryName().equals("SSD")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_SSD_TYPE);
         }
         SsdDetail ssd = new SsdDetail(

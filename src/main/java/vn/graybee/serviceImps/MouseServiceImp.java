@@ -27,7 +27,7 @@ public class MouseServiceImp implements MouseService {
     @Transactional
     public void createMouseDetail(MouseDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("MOUSE")) {
+        if (!product.getCategory().getCategoryName().equals("MOUSE")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_MOUSE_TYPE);
         }
         MouseDetail mouse = new MouseDetail(

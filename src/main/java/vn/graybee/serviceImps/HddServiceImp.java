@@ -27,7 +27,7 @@ public class HddServiceImp implements HddService {
     @Transactional
     public void createHddDetail(HddDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("HDD")) {
+        if (!product.getCategory().getCategoryName().equals("HDD")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_HDD_TYPE);
         }
         HddDetail hdd = new HddDetail(

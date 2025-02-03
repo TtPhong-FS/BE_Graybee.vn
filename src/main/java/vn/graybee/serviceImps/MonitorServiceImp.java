@@ -27,7 +27,7 @@ public class MonitorServiceImp implements MonitorService {
     @Transactional
     public void createMonitorDetail(MonitorDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("MONITOR")) {
+        if (!product.getCategory().getCategoryName().equals("MONITOR")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_MONITOR_TYPE);
         }
         MonitorDetail monitor = new MonitorDetail(

@@ -27,7 +27,7 @@ public class CpuServiceImp implements CpuService {
     @Transactional
     public void createCpuDetail(CpuDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("CPU")) {
+        if (!product.getCategory().getCategoryName().equals("CPU")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_CPU_TYPE);
         }
         CpuDetail cpu = new CpuDetail(

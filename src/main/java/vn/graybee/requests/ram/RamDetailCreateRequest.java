@@ -6,9 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.product.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class RamDetailCreateRequest extends ProductCreateRequest {
+public class RamDetailCreateRequest extends DetailDtoRequest {
+
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 5, message = "Must be between 1 and 5 characters")
@@ -19,17 +20,17 @@ public class RamDetailCreateRequest extends ProductCreateRequest {
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     private String series;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int capacity;
 
-    @Size(min = 1, max = 10, message = "Must be between 1 and 10 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 10, message = "Must be between 1 and 10 characters")
     private String type;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int speed;
 
@@ -47,6 +48,7 @@ public class RamDetailCreateRequest extends ProductCreateRequest {
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     private String led = "unknown";
+
 
     public String getRamType() {
         return ramType;

@@ -15,8 +15,8 @@ public class Manufacturer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50, unique = true)
-    private String name;
+    @Column(name = "manufacturer_name", nullable = false, length = 50, unique = true)
+    private String manufacturerName;
 
     @Column(name = "is_delete", length = 20)
     private String isDelete;
@@ -24,8 +24,8 @@ public class Manufacturer {
     public Manufacturer() {
     }
 
-    public Manufacturer(String name, String isDelete) {
-        this.name = name;
+    public Manufacturer(String manufacturerName, String isDelete) {
+        this.manufacturerName = manufacturerName;
         this.isDelete = isDelete;
     }
 
@@ -37,12 +37,12 @@ public class Manufacturer {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getManufacturerName() {
+        return manufacturerName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setManufacturerName(String manufacturerName) {
+        this.manufacturerName = manufacturerName;
     }
 
     public String getIsDelete() {

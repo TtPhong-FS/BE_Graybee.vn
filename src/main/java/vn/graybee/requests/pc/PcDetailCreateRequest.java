@@ -3,7 +3,7 @@ package vn.graybee.requests.pc;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.product.ProductCreateRequest;
+import vn.graybee.requests.ProductCreateRequest;
 
 public class PcDetailCreateRequest extends ProductCreateRequest {
 

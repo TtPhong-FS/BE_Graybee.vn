@@ -27,7 +27,7 @@ public class MotherboardServiceImp implements MotherboardService {
     @Transactional
     public void createMotherboardDetail(MotherboardDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("MOTHERBOARD")) {
+        if (!product.getCategory().getCategoryName().equals("MOTHERBOARD")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_MOTHERBOARD_TYPE);
         }
         MotherBoardDetail motherboard = new MotherBoardDetail(

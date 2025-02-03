@@ -2,6 +2,10 @@ package vn.graybee.constants.others;
 
 public class ErrorGeneralConstants {
 
+    public static final String DETAIL_TYPE_ERROR = "detailType";
+
+    public static final String MISSING_DETAIL_TYPE = "Invalid detailType to call service create Detail Information. Check getService in ProductDetailFactory";
+
     public static final String PRODUCT_TYPE_ERROR = "product_type";
 
     public static final String MISSING_RAM_TYPE = "The Product type must be a Ram";

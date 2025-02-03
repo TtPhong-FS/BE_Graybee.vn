@@ -7,6 +7,8 @@ import vn.graybee.requests.manufacturer.ManufacturerCreateRequest;
 import vn.graybee.services.business.ManufacturerService;
 import vn.graybee.validation.ManufactureValidation;
 
+import java.util.List;
+
 @Service
 public class ManufacturerServiceImp implements ManufacturerService {
 
@@ -21,13 +23,18 @@ public class ManufacturerServiceImp implements ManufacturerService {
 
     @Override
     public Manufacturer insertManufacturer(ManufacturerCreateRequest request) {
-        manufactureValidation.ensureManufactureNameBeforeCreate(request.getName());
+        manufactureValidation.ensureManufactureNameBeforeCreate(request.getManufacturerName());
         Manufacturer manufacturer = new Manufacturer(
-                request.getName().toUpperCase(),
+                request.getManufacturerName().toUpperCase(),
                 request.getIsDelete()
 
         );
         return manufacturerRepository.save(manufacturer);
+    }
+
+    @Override
+    public List<Manufacturer> getAllManufacturer() {
+        return manufacturerRepository.findAll();
     }
 
     @Override

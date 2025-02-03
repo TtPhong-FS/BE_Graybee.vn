@@ -3,12 +3,17 @@ package vn.graybee.serviceImps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.constants.others.ErrorGeneralConstants;
+import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.business.Category;
 import vn.graybee.models.business.Manufacturer;
 import vn.graybee.models.business.Product;
 import vn.graybee.repositories.business.ProductRepository;
-import vn.graybee.requests.product.ProductCreateRequest;
+import vn.graybee.requests.ProductCreateRequest;
 import vn.graybee.response.ProductResponseByCategoryName;
+import vn.graybee.services.ProductDetailFactory;
+import vn.graybee.services.business.ProductDetailService;
 import vn.graybee.services.business.ProductService;
 import vn.graybee.validation.CategoryValidation;
 import vn.graybee.validation.ManufactureValidation;
@@ -30,27 +35,30 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepository;
 
-    public ProductServiceImp(CategoryValidation categoryValidation, ManufactureValidation manufactureValidation, ProductValidation productValidation, ProductRepository productRepository) {
+    private final ProductDetailFactory productDetailFactory;
+
+    public ProductServiceImp(CategoryValidation categoryValidation, ManufactureValidation manufactureValidation, ProductValidation productValidation, ProductRepository productRepository, ProductDetailFactory productDetailFactory) {
         this.categoryValidation = categoryValidation;
         this.manufactureValidation = manufactureValidation;
         this.productValidation = productValidation;
         this.productRepository = productRepository;
+        this.productDetailFactory = productDetailFactory;
     }
 
     @Override
+    @Transactional
     public Product createProduct(ProductCreateRequest request) {
 
-        productValidation.ensureProductNameBeforeCreate(request.getName());
+        productValidation.ensureProductNameBeforeCreate(request.getProductName());
         productValidation.checkProductModelExists(request.getModel());
         Category category = categoryValidation.ensureCategoryBeforeCreateProduct(request.getCategoryId());
         Manufacturer manufacturer = manufactureValidation.ensureManufactureBeforeCreateProduct(request.getManufacturerId());
 
-        logger.info("Creating product with model: " + request.getModel() + "name: " + request.getName());
+        logger.info("Creating product with model: " + request.getModel() + ", name: " + request.getProductName());
 
         Product product = new Product(
                 request.getModel(),
-                request.getProductType().toUpperCase(),
-                request.getName(),
+                request.getProductName(),
                 request.getConditions().toUpperCase(),
                 request.getWarranty(),
                 request.getWeight(),
@@ -63,8 +71,21 @@ public class ProductServiceImp implements ProductService {
         );
         product.setCategory(category);
         product.setManufacturer(manufacturer);
+        
         Product savedProduct = productRepository.save(product);
         logger.info("Creating product successfully with ID: {}", savedProduct.getId());
+
+        if (request.getDetail() != null) {
+            String detailKey = request.getDetail().getClass().getSimpleName();
+            System.out.println(detailKey);
+            ProductDetailService service = productDetailFactory.getService(detailKey);
+            System.out.println(service);
+            if (service != null) {
+                service.saveDetail(savedProduct, request.getDetail());
+            }
+            throw new BusinessCustomException(ErrorGeneralConstants.DETAIL_TYPE_ERROR, ErrorGeneralConstants.MISSING_DETAIL_TYPE);
+        }
+
         return savedProduct;
     }
 
@@ -75,7 +96,7 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public List<ProductResponseByCategoryName> findProductsByCategoryName(String name) {
-        return productRepository.findProductByCategory_Name(name);
+        return null;
     }
 
 }

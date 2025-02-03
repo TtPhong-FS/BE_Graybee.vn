@@ -15,16 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.MessageResponse;
 import vn.graybee.models.business.Category;
 import vn.graybee.requests.category.CategoryCreateRequest;
-import vn.graybee.response.CategoryResponse;
 import vn.graybee.response.ProductResponseByCategoryName;
 import vn.graybee.services.business.CategoryService;
 import vn.graybee.services.business.ProductService;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/admin")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -38,9 +37,9 @@ public class CategoryController {
 
     @GetMapping("/categories")
     public ResponseEntity<MessageResponse> getCategories(@RequestParam("limit") int limit, @RequestParam("page") int page) {
-        List<CategoryResponse> categories = categoryService.getCategories();
+        List<Category> categories = categoryService.getCategories();
         return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(
-                "200", "List Categories: ", categories
+                "200", "List Categories ", categories
         ));
     }
 

@@ -27,7 +27,7 @@ public class PsuServiceImp implements PsuService {
     @Transactional
     public void createPsuDetail(PsuDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("PSU")) {
+        if (!product.getCategory().getCategoryName().equals("PSU")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_PSU_TYPE);
         }
         PsuDetail psu = new PsuDetail(

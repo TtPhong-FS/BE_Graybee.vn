@@ -4,11 +4,9 @@ import org.springframework.stereotype.Service;
 import vn.graybee.models.business.Category;
 import vn.graybee.repositories.business.CategoryRepository;
 import vn.graybee.requests.category.CategoryCreateRequest;
-import vn.graybee.response.CategoryResponse;
 import vn.graybee.services.business.CategoryService;
 import vn.graybee.validation.CategoryValidation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,9 +24,9 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     public Category insertCategory(CategoryCreateRequest request) {
-        categoryValidation.ensureCategoryNameBeforeCreate(request.getName());
+        categoryValidation.ensureCategoryNameBeforeCreate(request.getCategoryName());
         Category category = new Category(
-                request.getName().toUpperCase(),
+                request.getCategoryName().toUpperCase(),
                 request.getIsDelete()
         );
         return categoryRepository.save(category);
@@ -58,13 +56,8 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
-    public List<CategoryResponse> getCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        List<CategoryResponse> categoryResponses = new ArrayList<>();
-        for (Category category : categories) {
-            categoryResponses.add(new CategoryResponse(category.getId(), category.getName(), category.getIsDelete()));
-        }
-        return categoryResponses;
+    public List<Category> getCategories() {
+        return categoryRepository.findAll();
     }
 
 }

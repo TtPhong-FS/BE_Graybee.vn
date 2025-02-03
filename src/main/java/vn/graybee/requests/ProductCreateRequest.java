@@ -1,4 +1,4 @@
-package vn.graybee.requests.product;
+package vn.graybee.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.MappedSuperclass;
@@ -24,18 +24,14 @@ public class ProductCreateRequest {
     @NotNull(message = "Cannot be null")
     private long manufacturerId;
 
-    @JsonProperty("product_type")
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    @NotNull(message = "Cannot be null")
-    private String productType;
-
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     private String model;
 
+    @JsonProperty("product_name")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
-    private String name;
+    private String productName;
 
     @Pattern(regexp = "^(new|old)$", message = "Condition must match 'new' or 'old' ")
     @NotBlank(message = "Cannot be blank")
@@ -71,6 +67,16 @@ public class ProductCreateRequest {
     @JsonProperty("is_delete")
     private String isDelete = "false";
 
+    private DetailDtoRequest detail;
+
+    public DetailDtoRequest getDetail() {
+        return detail;
+    }
+
+    public void setDetail(DetailDtoRequest detail) {
+        this.detail = detail;
+    }
+
     public long getCategoryId() {
         return categoryId;
     }
@@ -87,14 +93,6 @@ public class ProductCreateRequest {
         this.manufacturerId = manufacturerId;
     }
 
-    public String getProductType() {
-        return productType;
-    }
-
-    public void setProductType(String productType) {
-        this.productType = productType;
-    }
-
     public String getModel() {
         return model;
     }
@@ -103,12 +101,12 @@ public class ProductCreateRequest {
         this.model = model;
     }
 
-    public String getName() {
-        return name;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public String getConditions() {

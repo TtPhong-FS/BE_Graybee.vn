@@ -33,11 +33,8 @@ public class Product extends BaseModel {
     @Column(nullable = false, length = 100, unique = true)
     private String model;
 
-    @Column(name = "product_type", nullable = false, length = 30)
-    private String productType;
-
-    @Column(unique = true, nullable = false, length = 200)
-    private String name;
+    @Column(name = "product_name", unique = true, nullable = false, length = 200)
+    private String productName;
 
     @Column(name = "conditions", length = 5, nullable = false)
     private String conditions;
@@ -67,10 +64,9 @@ public class Product extends BaseModel {
     public Product() {
     }
 
-    public Product(String model, String productType, String name, String conditions, int warranty, float weight, String dimension, float price, String color, String description, String thumbnail, String isDelete) {
+    public Product(String model, String productName, String conditions, int warranty, float weight, String dimension, float price, String color, String description, String thumbnail, String isDelete) {
         this.model = model;
-        this.productType = productType;
-        this.name = name;
+        this.productName = productName;
         this.conditions = conditions;
         this.warranty = warranty;
         this.weight = weight;
@@ -114,20 +110,12 @@ public class Product extends BaseModel {
         this.model = model;
     }
 
-    public String getProductType() {
-        return productType;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProductType(String productType) {
-        this.productType = productType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public String getConditions() {

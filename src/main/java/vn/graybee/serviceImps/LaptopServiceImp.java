@@ -27,7 +27,7 @@ public class LaptopServiceImp implements LaptopService {
     @Transactional
     public void createLaptopDetail(LaptopDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("LAPTOP")) {
+        if (!product.getCategory().getCategoryName().equals("LAPTOP")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_LAPTOP_TYPE);
         }
         LaptopDetail laptop = new LaptopDetail(

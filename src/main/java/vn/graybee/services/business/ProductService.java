@@ -1,7 +1,7 @@
 package vn.graybee.services.business;
 
 import vn.graybee.models.business.Product;
-import vn.graybee.requests.product.ProductCreateRequest;
+import vn.graybee.requests.ProductCreateRequest;
 import vn.graybee.response.ProductResponseByCategoryName;
 
 import java.util.List;

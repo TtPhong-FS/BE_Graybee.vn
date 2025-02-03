@@ -27,7 +27,7 @@ public class KeyboardServiceImp implements KeyboardService {
     @Transactional
     public void createKeyboardDetail(KeyboardDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("KEYBOARD")) {
+        if (!product.getCategory().getCategoryName().equals("KEYBOARD")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_KEYBOARD_TYPE);
         }
         KeyboardDetail keyboard = new KeyboardDetail(

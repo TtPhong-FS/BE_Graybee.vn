@@ -27,7 +27,7 @@ public class HandheldServiceImp implements HandheldService {
     @Transactional
     public void createHandheldDetail(HandheldDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("HANDHELD")) {
+        if (!product.getCategory().getCategoryName().equals("HANDHELD")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_HANDHELD_TYPE);
         }
         HandheldDetail handheld = new HandheldDetail(

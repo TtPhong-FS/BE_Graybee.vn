@@ -15,8 +15,8 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50, unique = true)
-    private String name;
+    @Column(name = "category_name", nullable = false, length = 50, unique = true)
+    private String categoryName;
 
     @Column(name = "is_delete", length = 20)
     private String isDelete;
@@ -25,8 +25,8 @@ public class Category {
     public Category() {
     }
 
-    public Category(String name, String isDelete) {
-        this.name = name;
+    public Category(String categoryName, String isDelete) {
+        this.categoryName = categoryName;
         this.isDelete = isDelete;
     }
 
@@ -38,12 +38,12 @@ public class Category {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public String getIsDelete() {

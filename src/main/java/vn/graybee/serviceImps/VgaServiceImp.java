@@ -27,7 +27,7 @@ public class VgaServiceImp implements VgaService {
     @Transactional
     public void createVgaDetail(VgaDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("VGA")) {
+        if (!product.getCategory().getCategoryName().equals("VGA")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_VGA_TYPE);
         }
         VgaDetail vga = new VgaDetail(

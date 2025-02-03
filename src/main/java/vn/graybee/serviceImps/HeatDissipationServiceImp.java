@@ -27,7 +27,7 @@ public class HeatDissipationServiceImp implements HeatDissipationService {
     @Transactional
     public void createHeatDissipationDetail(HeatDissipationDetailCreateRequest request) {
         Product product = productService.createProduct(request);
-        if (!product.getProductType().equals("HEAT DISSIPATION")) {
+        if (!product.getCategory().getCategoryName().equals("HEAT DISSIPATION")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_HEAT_DISSIPATION_TYPE);
         }
         HeatDissipationDetail heatDissipation = new HeatDissipationDetail(
