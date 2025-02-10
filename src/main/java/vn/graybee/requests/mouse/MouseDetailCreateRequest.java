@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class MouseDetailCreateRequest extends ProductCreateRequest {
+public class MouseDetailCreateRequest extends DetailDtoRequest {
 
     private String sensors;
 
@@ -20,10 +20,10 @@ public class MouseDetailCreateRequest extends ProductCreateRequest {
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     @JsonProperty("switch_type")
-    private String switchType;
+    private String switchType = "";
 
-    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     @JsonProperty("switch_life")
     private String switchLife;
 
@@ -34,20 +34,20 @@ public class MouseDetailCreateRequest extends ProductCreateRequest {
     private int pollingRate;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String software;
+    private String software = "";
 
     @Size(min = 1, max = 40, message = "Must be between 1 and 40 characters")
     @NotBlank(message = "Cannot be blank")
     private String connect;
 
     @JsonProperty("is_wireless_connect")
-    private boolean isWirelessConnect;
+    private boolean isWirelessConnect = false;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String battery;
+    private String battery = "";
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    private String led;
+    private String led = "";
 
     public String getSensors() {
         return sensors;

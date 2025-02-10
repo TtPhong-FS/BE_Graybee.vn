@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class SsdDetailCreateRequest extends ProductCreateRequest {
+public class SsdDetailCreateRequest extends DetailDtoRequest {
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
@@ -41,12 +41,12 @@ public class SsdDetailCreateRequest extends ProductCreateRequest {
     @JsonProperty("storage_temperature")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String storageTemperature = "unknown";
+    private String storageTemperature = "";
 
     @JsonProperty("operating_temperature")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String operatingTemperature = "unknown";
+    private String operatingTemperature = "";
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @Positive(message = "Must be a positive number")
@@ -60,7 +60,7 @@ public class SsdDetailCreateRequest extends ProductCreateRequest {
 
     @JsonProperty("software")
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String software = "unknown";
+    private String software = "";
 
     public String getCommunicationStandard() {
         return communicationStandard;

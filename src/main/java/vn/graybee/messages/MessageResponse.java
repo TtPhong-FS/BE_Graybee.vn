@@ -1,18 +1,49 @@
 package vn.graybee.messages;
 
-public class MessageResponse {
+import vn.graybee.messages.other.PaginationInfo;
+import vn.graybee.messages.other.SortInfo;
 
-    private String status;
+public class MessageResponse<T> {
+
+    private int status;
 
     private String message;
 
-    private Object data;
+    private T data;
 
-    public String getStatus() {
+    private PaginationInfo paginationInfo;
+
+    private SortInfo sortInfo;
+
+    public MessageResponse(int status, String message, T data, PaginationInfo paginationInfo, SortInfo sortInfo) {
+        this.status = status;
+        this.message = message;
+        this.data = data;
+        this.paginationInfo = paginationInfo;
+        this.sortInfo = sortInfo;
+    }
+
+    public PaginationInfo getPaginationInfo() {
+        return paginationInfo;
+    }
+
+    public void setPaginationInfo(PaginationInfo paginationInfo) {
+        this.paginationInfo = paginationInfo;
+    }
+
+    public SortInfo getSortInfo() {
+        return sortInfo;
+    }
+
+    public void setSortInfo(SortInfo sortInfo) {
+        this.sortInfo = sortInfo;
+    }
+
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
@@ -24,17 +55,11 @@ public class MessageResponse {
         this.message = message;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Object data) {
-        this.data = data;
-    }
-
-    public MessageResponse(String status, String message, Object data) {
-        this.status = status;
-        this.message = message;
+    public void setData(T data) {
         this.data = data;
     }
 

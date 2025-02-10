@@ -17,12 +17,12 @@ public class ManufactureValidation {
         this.manufacturerRepository = manufacturerRepository;
     }
 
-    public Manufacturer ensureManufactureBeforeCreateProduct(long manufacturerId) {
-        Optional<Manufacturer> manufacturer = manufacturerRepository.findById(manufacturerId);
+    public Manufacturer findToCreateProduct(String manufacturerName) {
+        Optional<Manufacturer> manufacturer = manufacturerRepository.findByManufacturerName(manufacturerName);
         if (manufacturer.isEmpty()) {
             throw new BusinessCustomException(ErrorManufacturerConstants.GENERAL_ERROR, ErrorManufacturerConstants.MANUFACTURER_DOES_NOT_EXIST);
         }
-        if (manufacturer.get().getIsDelete().equals("true")) {
+        if (manufacturer.get().isDeleted()) {
             throw new BusinessCustomException(ErrorManufacturerConstants.GENERAL_ERROR, ErrorManufacturerConstants.MANUFACTURER_TEMPORARILY_FLAGGED);
         }
         return manufacturer.get();
@@ -36,19 +36,19 @@ public class ManufactureValidation {
         return manufacturer.get();
     }
 
-    public void ensureManufactureNameBeforeCreate(String manufacturerName) {
-        if (manufacturerRepository.ensureManufactureNameBeforeCreate(manufacturerName).isPresent()) {
+    public void checkManufacturerNameExists(String manufacturerName) {
+        if (manufacturerRepository.checkManufacturerNameExists(manufacturerName).isPresent()) {
             throw new BusinessCustomException(ErrorManufacturerConstants.NAME_ERROR, ErrorManufacturerConstants.MANUFACTURER_NAME_EXISTS);
         }
     }
 
-    public void checkProductExistsByManufacturerId(long manufacturerId) {
-        if (manufacturerRepository.checkProductIdExistsByManufacturerId(manufacturerId).isPresent()) {
+    public void checkProductExists(long manufacturerId) {
+        if (manufacturerRepository.checkProductIdExists(manufacturerId).isPresent()) {
             throw new BusinessCustomException(ErrorManufacturerConstants.GENERAL_ERROR, ErrorManufacturerConstants.MANUFACTURER_ID_USED_IN_PRODUCT);
         }
     }
 
-    public void ensureExistsById(long id) {
+    public void checkExists(long id) {
         if (manufacturerRepository.findById(id).isEmpty()) {
             throw new BusinessCustomException(ErrorManufacturerConstants.GENERAL_ERROR, ErrorManufacturerConstants.MANUFACTURER_DOES_NOT_EXIST);
         }

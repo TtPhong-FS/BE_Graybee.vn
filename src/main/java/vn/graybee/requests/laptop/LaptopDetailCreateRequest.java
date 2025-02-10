@@ -6,58 +6,58 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class LaptopDetailCreateRequest extends ProductCreateRequest {
+public class LaptopDetailCreateRequest extends DetailDtoRequest {
 
-    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     private String demand;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     private String cpu;
 
-    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     private String ram;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     private String storage;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("operating_system")
     private String operatingSystem;
 
-    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     private String vga;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     private String monitor;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     private String ports;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String keyboard;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("wireless_connectivity")
     private String wirelessConnectivity;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String audio;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String webcam;
 
     @NotNull(message = "Cannot be null")
@@ -66,10 +66,10 @@ public class LaptopDetailCreateRequest extends ProductCreateRequest {
     private int battery;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    private String material = "unknown";
+    private String material = "";
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String confidentiality = "unknown";
+    private String confidentiality = "";
 
     public String getDemand() {
         return demand;

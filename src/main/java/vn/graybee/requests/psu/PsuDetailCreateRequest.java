@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class PsuDetailCreateRequest extends ProductCreateRequest {
+public class PsuDetailCreateRequest extends DetailDtoRequest {
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
@@ -17,7 +17,7 @@ public class PsuDetailCreateRequest extends ProductCreateRequest {
     private int maximumCapacity;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    private String material = "unknown";
+    private String material = "";
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
@@ -31,7 +31,7 @@ public class PsuDetailCreateRequest extends ProductCreateRequest {
 
     @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
     @JsonProperty("input_frequency")
-    private String inputFrequency = "unknown";
+    private String inputFrequency = "";
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
@@ -46,10 +46,10 @@ public class PsuDetailCreateRequest extends ProductCreateRequest {
 
     @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
     @JsonProperty("operating_temperature")
-    private String operatingTemperature = "unknown";
+    private String operatingTemperature = "";
 
     @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
-    private String signal = "unknown";
+    private String signal = "";
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")

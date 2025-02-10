@@ -6,26 +6,26 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class HeatDissipationDetailCreateRequest extends ProductCreateRequest {
+public class HeatDissipationDetailCreateRequest extends DetailDtoRequest {
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("cpu_socket")
     private String cpuSocket;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String series;
 
     @Size(min = 1, max = 40, message = "Must be between 1 and 40 characters")
     @JsonProperty("heat_sink_material")
-    private String heatSinkMaterial = "unknown";
+    private String heatSinkMaterial = "";
 
+    @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @NotNull(message = "Cannot be null")
     private int speed;
 
     @Positive(message = "Must be a positive number")
@@ -46,7 +46,7 @@ public class HeatDissipationDetailCreateRequest extends ProductCreateRequest {
     private boolean isApplicationControl = false;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    private String led = "unknown";
+    private String led = "";
 
     public String getCpuSocket() {
         return cpuSocket;

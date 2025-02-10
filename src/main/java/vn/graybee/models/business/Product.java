@@ -58,16 +58,15 @@ public class Product extends BaseModel {
     @Column(length = 300)
     private String thumbnail;
 
-    @Column(name = "is_delete", length = 20)
-    private String isDelete;
+    @Column(name = "is_deleted", length = 20)
+    private boolean isDeleted;
 
     public Product() {
     }
 
-    public Product(String model, String productName, String conditions, int warranty, float weight, String dimension, float price, String color, String description, String thumbnail, String isDelete) {
+    public Product(String model, String productName, int warranty, float weight, String dimension, float price, String color, String description, String thumbnail) {
         this.model = model;
         this.productName = productName;
-        this.conditions = conditions;
         this.warranty = warranty;
         this.weight = weight;
         this.dimension = dimension;
@@ -75,7 +74,6 @@ public class Product extends BaseModel {
         this.color = color;
         this.description = description;
         this.thumbnail = thumbnail;
-        this.isDelete = isDelete;
     }
 
     public Long getId() {
@@ -182,12 +180,12 @@ public class Product extends BaseModel {
         this.thumbnail = thumbnail;
     }
 
-    public String getIsDelete() {
-        return isDelete;
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
-    public void setIsDelete(String isDelete) {
-        this.isDelete = isDelete;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
 }

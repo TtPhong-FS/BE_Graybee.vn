@@ -1,48 +1,52 @@
 package vn.graybee.serviceImps;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.business.HddDetail;
 import vn.graybee.models.business.Product;
 import vn.graybee.repositories.business.HddRepository;
+import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.hdd.HddDetailCreateRequest;
-import vn.graybee.services.business.HddService;
-import vn.graybee.services.business.ProductService;
+import vn.graybee.services.business.ProductDetailService;
 
 @Service
-public class HddServiceImp implements HddService {
-
-    private final ProductService productService;
+public class HddServiceImp implements ProductDetailService {
 
     private final HddRepository hddRepository;
 
-    public HddServiceImp(ProductService productService, HddRepository hddRepository) {
-        this.productService = productService;
+    public HddServiceImp(HddRepository hddRepository) {
         this.hddRepository = hddRepository;
     }
 
     @Override
-    @Transactional
-    public void createHddDetail(HddDetailCreateRequest request) {
-        Product product = productService.createProduct(request);
-        if (!product.getCategory().getCategoryName().equals("HDD")) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void saveDetail(Product product, DetailDtoRequest request) {
+
+        if (!product.getCategory().getCategoryName().equalsIgnoreCase("hdd")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_HDD_TYPE);
         }
+        HddDetailCreateRequest hddDto = (HddDetailCreateRequest) request;
         HddDetail hdd = new HddDetail(
                 product,
-                request.getCommunicationStandard(),
-                request.getCapacity(),
-                request.getHoursToFailure(),
-                request.getReadingSpeed(),
-                request.getWritingSpeed(),
-                request.getCommunicationStandard(),
-                request.getNoiseLevel(),
-                request.getCache(),
-                request.getRevolutionPerMinutes()
+                hddDto.getCommunicationStandard(),
+                hddDto.getCapacity(),
+                hddDto.getHoursToFailure(),
+                hddDto.getReadingSpeed(),
+                hddDto.getWritingSpeed(),
+                hddDto.getCommunicationStandard(),
+                hddDto.getNoiseLevel(),
+                hddDto.getCache(),
+                hddDto.getRevolutionPerMinutes()
         );
         hddRepository.save(hdd);
+    }
+
+    @Override
+    public String getDetailType() {
+        return "HddDetailCreateRequest";
     }
 
 }

@@ -6,34 +6,34 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class HddDetailCreateRequest extends ProductCreateRequest {
+public class HddDetailCreateRequest extends DetailDtoRequest {
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("communication_standard")
     private String communicationStandard;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int capacity;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @JsonProperty("hours_to_failure")
     @PositiveOrZero(message = "Cannot be a negative number")
-    private int hoursToFailure = 0;
+    private int hoursToFailure;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @JsonProperty("reading_speed")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int readingSpeed;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @JsonProperty("writing_speed")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int writingSpeed;
@@ -43,13 +43,13 @@ public class HddDetailCreateRequest extends ProductCreateRequest {
     @JsonProperty("noise_level")
     private float noiseLevel;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int cache;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("revolution_per_minutes")
     private int revolutionPerMinutes;

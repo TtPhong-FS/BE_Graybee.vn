@@ -6,10 +6,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import vn.graybee.models.others.BaseModel;
 
 @Entity
 @Table(name = "manufacturers")
-public class Manufacturer {
+public class Manufacturer extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,15 +19,14 @@ public class Manufacturer {
     @Column(name = "manufacturer_name", nullable = false, length = 50, unique = true)
     private String manufacturerName;
 
-    @Column(name = "is_delete", length = 20)
-    private String isDelete;
+    @Column(name = "is_deleted", length = 20)
+    private boolean isDeleted;
 
     public Manufacturer() {
     }
 
-    public Manufacturer(String manufacturerName, String isDelete) {
+    public Manufacturer(String manufacturerName) {
         this.manufacturerName = manufacturerName;
-        this.isDelete = isDelete;
     }
 
     public Long getId() {
@@ -45,12 +45,12 @@ public class Manufacturer {
         this.manufacturerName = manufacturerName;
     }
 
-    public String getIsDelete() {
-        return isDelete;
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
-    public void setIsDelete(String isDelete) {
-        this.isDelete = isDelete;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
 }

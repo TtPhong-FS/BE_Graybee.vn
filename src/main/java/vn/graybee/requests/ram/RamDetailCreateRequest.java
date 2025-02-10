@@ -35,7 +35,7 @@ public class RamDetailCreateRequest extends DetailDtoRequest {
     private int speed;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String latency = "unknown";
+    private String latency = "";
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("voltage")
@@ -47,7 +47,7 @@ public class RamDetailCreateRequest extends DetailDtoRequest {
     private boolean heatDissipation = false;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    private String led = "unknown";
+    private String led = "";
 
 
     public String getRamType() {

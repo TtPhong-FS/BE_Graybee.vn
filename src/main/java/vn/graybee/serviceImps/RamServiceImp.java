@@ -11,6 +11,7 @@ import vn.graybee.repositories.business.RamRepository;
 import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.ram.RamDetailCreateRequest;
 import vn.graybee.services.business.ProductDetailService;
+import vn.graybee.utils.TextUtils;
 
 @Service
 public class RamServiceImp implements ProductDetailService {
@@ -25,15 +26,13 @@ public class RamServiceImp implements ProductDetailService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveDetail(Product product, DetailDtoRequest request) {
-        String name = product.getCategory().getCategoryName().toLowerCase();
-        System.out.println(name);
         if (!product.getCategory().getCategoryName().equalsIgnoreCase("ram")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_RAM_TYPE);
         }
         RamDetailCreateRequest ramDto = (RamDetailCreateRequest) request;
         RamDetail ram = new RamDetail(
                 product,
-                ramDto.getRamType().toUpperCase(),
+                TextUtils.capitalize(ramDto.getRamType()),
                 ramDto.getSeries(),
                 ramDto.getCapacity(),
                 ramDto.getType().toUpperCase(),

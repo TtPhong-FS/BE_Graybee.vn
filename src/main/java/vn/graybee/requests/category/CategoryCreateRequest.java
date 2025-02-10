@@ -11,9 +11,6 @@ public class CategoryCreateRequest {
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String categoryName;
 
-    @Size(min = 0, max = 20, message = "Must be between 0 and 20 characters")
-    @JsonProperty("is_delete")
-    private String isDelete = "false";
 
     public String getCategoryName() {
         return categoryName;
@@ -21,14 +18,6 @@ public class CategoryCreateRequest {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
-    }
-
-    public String getIsDelete() {
-        return isDelete;
-    }
-
-    public void setIsDelete(String isDelete) {
-        this.isDelete = isDelete;
     }
 
 }

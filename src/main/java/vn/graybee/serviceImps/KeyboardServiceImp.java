@@ -1,48 +1,54 @@
 package vn.graybee.serviceImps;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.business.KeyboardDetail;
 import vn.graybee.models.business.Product;
 import vn.graybee.repositories.business.KeyboardRepository;
+import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.keyboard.KeyboardDetailCreateRequest;
-import vn.graybee.services.business.KeyboardService;
-import vn.graybee.services.business.ProductService;
+import vn.graybee.services.business.ProductDetailService;
 
 @Service
-public class KeyboardServiceImp implements KeyboardService {
+public class KeyboardServiceImp implements ProductDetailService {
 
-    private final ProductService productService;
 
     private final KeyboardRepository keyboardRepository;
 
-    public KeyboardServiceImp(ProductService productService, KeyboardRepository keyboardRepository) {
-        this.productService = productService;
+    public KeyboardServiceImp(KeyboardRepository keyboardRepository) {
         this.keyboardRepository = keyboardRepository;
     }
 
+
     @Override
-    @Transactional
-    public void createKeyboardDetail(KeyboardDetailCreateRequest request) {
-        Product product = productService.createProduct(request);
-        if (!product.getCategory().getCategoryName().equals("KEYBOARD")) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void saveDetail(Product product, DetailDtoRequest request) {
+        if (!product.getCategory().getCategoryName().equalsIgnoreCase("keyboard")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_KEYBOARD_TYPE);
         }
+        KeyboardDetailCreateRequest keyboardDto = (KeyboardDetailCreateRequest) request;
         KeyboardDetail keyboard = new KeyboardDetail(
                 product,
-                request.getKeyMaterial(),
-                request.getDesign(),
-                request.getConnect(),
-                request.getKeyCap(),
-                request.getSwitchType(),
-                request.getCompatible(),
-                request.getFeature(),
-                request.getSupport(),
-                request.getLed()
+                keyboardDto.getKeyMaterial(),
+                keyboardDto.getDesign(),
+                keyboardDto.getConnect(),
+                keyboardDto.getKeyCap(),
+                keyboardDto.getSwitchType(),
+                keyboardDto.getCompatible(),
+                keyboardDto.getFeature(),
+                keyboardDto.getSupport(),
+                keyboardDto.getLed()
         );
         keyboardRepository.save(keyboard);
+
+    }
+
+    @Override
+    public String getDetailType() {
+        return "KeyboardDetailCreateRequest";
     }
 
 }

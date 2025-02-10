@@ -6,23 +6,21 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import vn.graybee.enums.Condition;
 
 @MappedSuperclass
 public class ProductCreateRequest {
 
-    @JsonProperty("category_id")
-    @Positive(message = "Must be a positive number")
-    @NotNull(message = "Cannot be null")
-    private long categoryId;
+    @JsonProperty("category_name")
+    @NotBlank(message = "Cannot be blank")
+    private String categoryName;
 
-    @JsonProperty("manufacturer_id")
-    @Positive(message = "Must be a positive number")
-    @NotNull(message = "Cannot be null")
-    private long manufacturerId;
+    @JsonProperty("manufacturer_name")
+    @NotBlank(message = "Cannot be blank")
+    private String manufacturerName;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
@@ -33,10 +31,9 @@ public class ProductCreateRequest {
     @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
     private String productName;
 
-    @Pattern(regexp = "^(new|old)$", message = "Condition must match 'new' or 'old' ")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 5, message = "Must be 'new' or 'old' ")
-    private String conditions;
+    private Condition conditions;
 
     @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
@@ -48,7 +45,7 @@ public class ProductCreateRequest {
     private float weight = 0;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String dimension = "unknown";
+    private String dimension = "";
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @DecimalMax(value = "100000000.0", message = "Must be between 0 and 100.000.000VND")
@@ -56,16 +53,12 @@ public class ProductCreateRequest {
     private float price = 0;
 
     @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
-    private String color = "unknown";
+    private String color = "";
 
     @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
-    private String thumbnail = "unknown";
+    private String thumbnail = "";
 
-    private String description = "unknown";
-
-    @Size(min = 0, max = 20, message = "Must be between 0 and 20 characters")
-    @JsonProperty("is_delete")
-    private String isDelete = "false";
+    private String description = "";
 
     private DetailDtoRequest detail;
 
@@ -77,20 +70,20 @@ public class ProductCreateRequest {
         this.detail = detail;
     }
 
-    public long getCategoryId() {
-        return categoryId;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setCategoryId(long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
-    public long getManufacturerId() {
-        return manufacturerId;
+    public String getManufacturerName() {
+        return manufacturerName;
     }
 
-    public void setManufacturerId(long manufacturerId) {
-        this.manufacturerId = manufacturerId;
+    public void setManufacturerName(String manufacturerName) {
+        this.manufacturerName = manufacturerName;
     }
 
     public String getModel() {
@@ -109,11 +102,11 @@ public class ProductCreateRequest {
         this.productName = productName;
     }
 
-    public String getConditions() {
+    public Condition getConditions() {
         return conditions;
     }
 
-    public void setConditions(String conditions) {
+    public void setConditions(Condition conditions) {
         this.conditions = conditions;
     }
 
@@ -171,14 +164,6 @@ public class ProductCreateRequest {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getIsDelete() {
-        return isDelete;
-    }
-
-    public void setIsDelete(String isDelete) {
-        this.isDelete = isDelete;
     }
 
 }

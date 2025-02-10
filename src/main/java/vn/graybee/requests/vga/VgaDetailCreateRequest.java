@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class VgaDetailCreateRequest extends ProductCreateRequest {
+public class VgaDetailCreateRequest extends DetailDtoRequest {
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")

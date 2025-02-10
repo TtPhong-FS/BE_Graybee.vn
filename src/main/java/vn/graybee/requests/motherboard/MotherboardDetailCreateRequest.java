@@ -6,130 +6,130 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class MotherboardDetailCreateRequest extends ProductCreateRequest {
+public class MotherboardDetailCreateRequest extends DetailDtoRequest {
 
-    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     private String chipset;
 
-    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     private String socket;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @JsonProperty("cpu_support")
     private String cpuSupport;
 
-    @Size(min = 1, max = 80, message = "Must be between 1 and 80 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 80, message = "Must be between 1 and 80 characters")
     @JsonProperty("technology_support")
     private String technologySupport;
 
-    @Size(min = 1, max = 500, message = "Must be between 1 and 500 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 500, message = "Must be between 1 and 500 characters")
     @JsonProperty("memory_support")
     private String memorySupport;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("slot_memory_support")
     private String slotMemorySupport;
 
+    @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @NotNull(message = "Cannot be null")
     @JsonProperty("maximum_memory_support")
     private int maximumMemorySupport;
 
-    @Size(min = 1, max = 500, message = "Must be between 1 and 500 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 500, message = "Must be between 1 and 500 characters")
     @JsonProperty("integrated_graphics")
     private String integratedGraphics;
 
-    @Size(min = 1, max = 800, message = "Must be between 1 and 800 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 800, message = "Must be between 1 and 800 characters")
     @JsonProperty("sound_support")
     private String soundSupport;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("lan_support")
     private String lanSupport;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @JsonProperty("expansion_slots")
     private String expansionSlots;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @JsonProperty("storage_support")
     private String storageSupport;
 
-    @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
     @JsonProperty("usb_support")
     private String usbSupport;
 
     @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @JsonProperty("wireless_connectivity")
-    private String wirelessConnectivity = "none";
+    private String wirelessConnectivity = "";
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("operating_system_support")
     private String operatingSystemSupport;
 
-    @Size(min = 1, max = 500, message = "Must be between 1 and 500 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 500, message = "Must be between 1 and 500 characters")
     @JsonProperty("internal_input_output_connectivity")
     private String internalInputOutputConnectivity;
 
-    @Size(min = 1, max = 800, message = "Must be between 1 and 800 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 800, message = "Must be between 1 and 800 characters")
     @JsonProperty("internal_input_connectivity")
     private String internalInputConnectivity;
 
-    @Size(min = 1, max = 800, message = "Must be between 1 and 800 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 800, message = "Must be between 1 and 800 characters")
     @JsonProperty("internal_output_connectivity")
     private String internalOutputConnectivity;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @JsonProperty("rear_input_connectivity")
     private String rearInputConnectivity;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @JsonProperty("rear_output_connectivity")
     private String rearOutputConnectivity;
 
-    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
     @JsonProperty("rear_input_output_connectivity")
     private String rearInputOutputConnectivity;
 
     @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
     @JsonProperty("system_monitoring_application")
-    private String systemMonitoringApplication = "unknown";
+    private String systemMonitoringApplication = "";
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String bios = "unknown";
+    private String bios = "";
 
     @Size(min = 1, max = 1000, message = "Must be between 1 and 1000 characters")
     @JsonProperty("special_features")
-    private String specialFeatures = "unknown";
+    private String specialFeatures = "";
 
     @Size(min = 1, max = 1000, message = "Must be between 1 and 1000 characters")
     @JsonProperty("unique_features")
-    private String uniqueFeatures = "unknown";
+    private String uniqueFeatures = "";
 
     @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
-    private String accessory = "unknown";
+    private String accessory = "";
 
     public String getChipset() {
         return chipset;

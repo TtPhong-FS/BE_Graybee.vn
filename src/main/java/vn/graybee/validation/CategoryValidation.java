@@ -17,13 +17,13 @@ public class CategoryValidation {
         this.categoryRepository = categoryRepository;
     }
 
-    public Category ensureCategoryBeforeCreateProduct(long categoryId) {
-        Optional<Category> category = categoryRepository.findById(categoryId);
-        if (category.get().getIsDelete().equals("true")) {
-            throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_TEMPORARILY_FLAGGED);
-        }
+    public Category findToCreateProduct(String categoryName) {
+        Optional<Category> category = categoryRepository.findCategoryByCategoryName(categoryName);
         if (category.isEmpty()) {
             throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST);
+        }
+        if (category.get().isDeleted()) {
+            throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_TEMPORARILY_FLAGGED);
         }
         return category.get();
     }
@@ -36,20 +36,20 @@ public class CategoryValidation {
         return category.get();
     }
 
-    public void ensureCategoryNameBeforeCreate(String categoryName) {
-        if (categoryRepository.ensureCategoryNameBeforeCreate(categoryName).isPresent()) {
+    public void checkCategoryNameExists(String categoryName) {
+        if (categoryRepository.checkCategoryNameExists(categoryName).isPresent()) {
             throw new BusinessCustomException(ErrorCategoryConstants.NAME_ERROR, ErrorCategoryConstants.CATEGORY_NAME_EXISTS);
         }
     }
 
-    public void ensureExistsById(long id) {
+    public void checkExists(long id) {
         if (categoryRepository.findById(id).isEmpty()) {
             throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST);
         }
     }
 
-    public void checkProductExistsByCategoryId(long categoryId) {
-        if (categoryRepository.checkProductIdExistsByCategoryId(categoryId).isPresent()) {
+    public void checkProductExists(long categoryId) {
+        if (categoryRepository.checkProductIdExists(categoryId).isPresent()) {
             throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_ID_USED_IN_PRODUCT);
         }
     }

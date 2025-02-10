@@ -3,9 +3,9 @@ package vn.graybee.requests.pc;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class PcDetailCreateRequest extends ProductCreateRequest {
+public class PcDetailCreateRequest extends DetailDtoRequest {
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     @NotBlank(message = "Cannot be blank")
@@ -57,7 +57,7 @@ public class PcDetailCreateRequest extends ProductCreateRequest {
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("case_name")
-    private String caseName = "unknown";
+    private String caseName = "";
 
     public String getDemand() {
         return demand;

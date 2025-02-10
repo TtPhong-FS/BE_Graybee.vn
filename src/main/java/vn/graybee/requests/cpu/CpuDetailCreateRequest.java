@@ -6,22 +6,22 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class CpuDetailCreateRequest extends ProductCreateRequest {
+public class CpuDetailCreateRequest extends DetailDtoRequest {
 
-    @Size(min = 1, max = 35, message = "Must be between 1 and 35 characters")
     @NotBlank(message = "Socket cannot be blank")
+    @Size(min = 1, max = 35, message = "Must be between 1 and 35 characters")
     private String socket;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("multiplier")
     private int multiplier;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("number_of_streams")
     private int numberOfStreams;
@@ -46,35 +46,35 @@ public class CpuDetailCreateRequest extends ProductCreateRequest {
     @JsonProperty("base_efficiency_core")
     private float baseEfficiencyCore;
 
-    @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
     @JsonProperty("consumption")
     private String consumption;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int cache;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("motherboard_compatible")
     private String motherboardCompatible;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("maximum_support_memory")
     private int maximumSupportMemory;
 
-    @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
+    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("maximum_bandwidth")
     private int maximumBandwidth;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("memory_type")
     private String memoryType;
 
@@ -83,11 +83,11 @@ public class CpuDetailCreateRequest extends ProductCreateRequest {
 
     @Size(min = 1, max = 35, message = "Must be between 1 and 35 characters")
     @JsonProperty("pci_edition")
-    private String pciEdition = "unknown";
+    private String pciEdition = "";
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("pci_configuration")
-    private String pciConfiguration = "unknown";
+    private String pciConfiguration = "";
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")

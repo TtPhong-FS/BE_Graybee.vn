@@ -1,51 +1,56 @@
 package vn.graybee.serviceImps;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.business.Product;
 import vn.graybee.models.business.VgaDetail;
 import vn.graybee.repositories.business.VgaRepository;
+import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.vga.VgaDetailCreateRequest;
-import vn.graybee.services.business.ProductService;
-import vn.graybee.services.business.VgaService;
+import vn.graybee.services.business.ProductDetailService;
 
 @Service
-public class VgaServiceImp implements VgaService {
+public class VgaServiceImp implements ProductDetailService {
 
-    private final ProductService productService;
 
     private final VgaRepository vgaRepository;
 
-    public VgaServiceImp(ProductService productService, VgaRepository vgaRepository) {
-        this.productService = productService;
+    public VgaServiceImp(VgaRepository vgaRepository) {
         this.vgaRepository = vgaRepository;
     }
 
     @Override
-    @Transactional
-    public void createVgaDetail(VgaDetailCreateRequest request) {
-        Product product = productService.createProduct(request);
-        if (!product.getCategory().getCategoryName().equals("VGA")) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void saveDetail(Product product, DetailDtoRequest request) {
+
+        if (!product.getCategory().getCategoryName().equalsIgnoreCase("vga")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_VGA_TYPE);
         }
+        VgaDetailCreateRequest vgaDto = (VgaDetailCreateRequest) request;
         VgaDetail vga = new VgaDetail(
                 product,
-                request.getMemorySpeed(),
-                request.getMemoryProtocol(),
-                request.getMaximumResolution(),
-                request.getMultipleScreen(),
-                request.getProtocols(),
-                request.getGpuClock(),
-                request.getBusStandard(),
-                request.getNumberOfProcessingUnit(),
-                request.getPowerConsumption(),
-                request.getPsuRecommend(),
-                request.getDirectx(),
-                request.isApplicationSupport()
+                vgaDto.getMemorySpeed(),
+                vgaDto.getMemoryProtocol(),
+                vgaDto.getMaximumResolution(),
+                vgaDto.getMultipleScreen(),
+                vgaDto.getProtocols(),
+                vgaDto.getGpuClock(),
+                vgaDto.getBusStandard(),
+                vgaDto.getNumberOfProcessingUnit(),
+                vgaDto.getPowerConsumption(),
+                vgaDto.getPsuRecommend(),
+                vgaDto.getDirectx(),
+                vgaDto.isApplicationSupport()
         );
         vgaRepository.save(vga);
+    }
+
+    @Override
+    public String getDetailType() {
+        return "VgaDetailCreateRequest";
     }
 
 }

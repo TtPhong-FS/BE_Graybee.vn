@@ -6,86 +6,86 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.ProductCreateRequest;
+import vn.graybee.requests.DetailDtoRequest;
 
-public class MonitorDetailCreateRequest extends ProductCreateRequest {
+public class MonitorDetailCreateRequest extends DetailDtoRequest {
 
+    @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @NotNull(message = "Cannot be null")
     @JsonProperty("screen_size")
     private int screenSize;
 
-    @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
     @JsonProperty("screen_type")
     private String screenType;
 
-    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     private String panels;
 
-    @Size(min = 1, max = 10, message = "Must be between 1 and 10 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 10, message = "Must be between 1 and 10 characters")
     @JsonProperty("aspect_ratio")
     private String aspectRatio;
 
     @JsonProperty("is_speaker")
     private boolean isSpeaker = false;
 
-    @Size(min = 1, max = 40, message = "Must be between 1 and 40 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 40, message = "Must be between 1 and 40 characters")
     private String resolution;
 
+    @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @NotNull(message = "Cannot be null")
     @JsonProperty("color_display")
     private int colorDisplay;
 
+    @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @NotNull(message = "Cannot be null")
     @JsonProperty("percent_color")
     private int percentColor;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("refresh_rate")
-    private int refreshRate;
+    private int refreshRate = 0;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
+    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String ports;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("power_consumption")
-    private int powerConsumption;
+    private int powerConsumption = 0;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("power_save_mode")
-    private int powerSaveMode;
+    private int powerSaveMode = 0;
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("power_off_mode")
-    private float powerOffMode;
+    private float powerOffMode = 0;
 
     @PositiveOrZero(message = "Cannot be a negative number")
-    private float voltage;
+    private float voltage = 0;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("special_feature")
-    private String specialFeature;
+    private String specialFeature = "";
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("hours_to_failure")
-    private int hoursToFailure;
+    private int hoursToFailure = 0;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String accessory;
+    private String accessory = "";
 
     public int getScreenSize() {
         return screenSize;

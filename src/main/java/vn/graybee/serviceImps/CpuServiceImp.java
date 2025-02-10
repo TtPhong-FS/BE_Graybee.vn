@@ -1,56 +1,59 @@
 package vn.graybee.serviceImps;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.business.CpuDetail;
 import vn.graybee.models.business.Product;
 import vn.graybee.repositories.business.CpuRepository;
+import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.cpu.CpuDetailCreateRequest;
-import vn.graybee.services.business.CpuService;
-import vn.graybee.services.business.ProductService;
+import vn.graybee.services.business.ProductDetailService;
 
 @Service
-public class CpuServiceImp implements CpuService {
+public class CpuServiceImp implements ProductDetailService {
 
-    private final ProductService productService;
 
     private final CpuRepository cpuRepository;
 
-    public CpuServiceImp(ProductService productService, CpuRepository cpuRepository) {
-        this.productService = productService;
+    public CpuServiceImp(CpuRepository cpuRepository) {
         this.cpuRepository = cpuRepository;
     }
 
+
     @Override
-    @Transactional
-    public void createCpuDetail(CpuDetailCreateRequest request) {
-        Product product = productService.createProduct(request);
+    public void saveDetail(Product product, DetailDtoRequest request) {
         if (!product.getCategory().getCategoryName().equals("CPU")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_CPU_TYPE);
         }
+        CpuDetailCreateRequest cpuDto = (CpuDetailCreateRequest) request;
         CpuDetail cpu = new CpuDetail(
                 product,
-                request.getSocket(),
-                request.getMultiplier(),
-                request.getNumberOfStreams(),
-                request.getMaximumPerformanceCore(),
-                request.getMaximumEfficiencyCore(),
-                request.getBasePerformanceCore(),
-                request.getBaseEfficiencyCore(),
-                request.getConsumption(),
-                request.getCache(),
-                request.getMotherboardCompatible(),
-                request.getMaximumSupportMemory(),
-                request.getMaximumBandwidth(),
-                request.getMemoryType(),
-                request.isGraphicsCore(),
-                request.getPciEdition(),
-                request.getPciConfiguration(),
-                request.getMaximumPciPorts()
+                cpuDto.getSocket(),
+                cpuDto.getMultiplier(),
+                cpuDto.getNumberOfStreams(),
+                cpuDto.getMaximumPerformanceCore(),
+                cpuDto.getMaximumEfficiencyCore(),
+                cpuDto.getBasePerformanceCore(),
+                cpuDto.getBaseEfficiencyCore(),
+                cpuDto.getConsumption(),
+                cpuDto.getCache(),
+                cpuDto.getMotherboardCompatible(),
+                cpuDto.getMaximumSupportMemory(),
+                cpuDto.getMaximumBandwidth(),
+                cpuDto.getMemoryType(),
+                cpuDto.isGraphicsCore(),
+                cpuDto.getPciEdition(),
+                cpuDto.getPciConfiguration(),
+                cpuDto.getMaximumPciPorts()
         );
         cpuRepository.save(cpu);
+
+    }
+
+    @Override
+    public String getDetailType() {
+        return "CpuDetailCreateRequest";
     }
 
 }

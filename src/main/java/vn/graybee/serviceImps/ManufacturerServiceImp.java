@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 import vn.graybee.models.business.Manufacturer;
 import vn.graybee.repositories.business.ManufacturerRepository;
 import vn.graybee.requests.manufacturer.ManufacturerCreateRequest;
+import vn.graybee.response.ManufacturerResponse;
 import vn.graybee.services.business.ManufacturerService;
+import vn.graybee.utils.TextUtils;
 import vn.graybee.validation.ManufactureValidation;
 
 import java.util.List;
@@ -23,25 +25,27 @@ public class ManufacturerServiceImp implements ManufacturerService {
 
     @Override
     public Manufacturer insertManufacturer(ManufacturerCreateRequest request) {
-        manufactureValidation.ensureManufactureNameBeforeCreate(request.getManufacturerName());
+        manufactureValidation.checkManufacturerNameExists(request.getManufacturerName());
         Manufacturer manufacturer = new Manufacturer(
-                request.getManufacturerName().toUpperCase(),
-                request.getIsDelete()
-
+                TextUtils.capitalize(request.getManufacturerName())
         );
+        manufacturer.setDeleted(false);
         return manufacturerRepository.save(manufacturer);
     }
 
     @Override
-    public List<Manufacturer> getAllManufacturer() {
-        return manufacturerRepository.findAll();
+    public List<ManufacturerResponse> getAllManufacturer() {
+        return manufacturerRepository.findAllManufacturers()
+                .stream()
+                .map(m -> new ManufacturerResponse(m.getId(), m.getManufacturerName(), m.isDeleted(), m.getCreatedAt(), m.getUpdatedAt()))
+                .toList();
     }
 
     @Override
     public void deleteManufacturerById(long id) {
-        manufactureValidation.ensureExistsById(id);
+        manufactureValidation.checkExists(id);
 
-        manufactureValidation.checkProductExistsByManufacturerId(id);
+        manufactureValidation.checkProductExists(id);
 
         manufacturerRepository.deleteById(id);
     }
@@ -49,11 +53,7 @@ public class ManufacturerServiceImp implements ManufacturerService {
     @Override
     public void updateStatusDeleteRecord(long id) {
         Manufacturer manufacturer = manufactureValidation.findToUpdateStatusDelete(id);
-        if (manufacturer.getIsDelete().equals("false")) {
-            manufacturer.setIsDelete("true");
-        } else {
-            manufacturer.setIsDelete("false");
-        }
+        manufacturer.setDeleted(!manufacturer.isDeleted());
         manufacturerRepository.save(manufacturer);
     }
 

@@ -15,6 +15,7 @@ import vn.graybee.response.ProductResponseByCategoryName;
 import vn.graybee.services.ProductDetailFactory;
 import vn.graybee.services.business.ProductDetailService;
 import vn.graybee.services.business.ProductService;
+import vn.graybee.utils.TextUtils;
 import vn.graybee.validation.CategoryValidation;
 import vn.graybee.validation.ManufactureValidation;
 import vn.graybee.validation.ProductValidation;
@@ -51,27 +52,27 @@ public class ProductServiceImp implements ProductService {
 
         productValidation.ensureProductNameBeforeCreate(request.getProductName());
         productValidation.checkProductModelExists(request.getModel());
-        Category category = categoryValidation.ensureCategoryBeforeCreateProduct(request.getCategoryId());
-        Manufacturer manufacturer = manufactureValidation.ensureManufactureBeforeCreateProduct(request.getManufacturerId());
+        Category category = categoryValidation.findToCreateProduct(request.getCategoryName());
+        Manufacturer manufacturer = manufactureValidation.findToCreateProduct(request.getManufacturerName());
 
         logger.info("Creating product with model: " + request.getModel() + ", name: " + request.getProductName());
 
         Product product = new Product(
-                request.getModel(),
-                request.getProductName(),
-                request.getConditions().toUpperCase(),
+                TextUtils.capitalize(request.getModel()),
+                TextUtils.capitalizeEachWord(request.getProductName()),
                 request.getWarranty(),
                 request.getWeight(),
                 request.getDimension(),
                 request.getPrice(),
                 request.getColor(),
                 request.getDescription(),
-                request.getThumbnail(),
-                request.getIsDelete()
+                request.getThumbnail()
         );
+        product.setConditions(request.getConditions().getDescription());
+        product.setDeleted(false);
         product.setCategory(category);
         product.setManufacturer(manufacturer);
-        
+
         Product savedProduct = productRepository.save(product);
         logger.info("Creating product successfully with ID: {}", savedProduct.getId());
 
@@ -82,8 +83,9 @@ public class ProductServiceImp implements ProductService {
             System.out.println(service);
             if (service != null) {
                 service.saveDetail(savedProduct, request.getDetail());
+            } else {
+                throw new BusinessCustomException(ErrorGeneralConstants.DETAIL_TYPE_ERROR, ErrorGeneralConstants.MISSING_DETAIL_TYPE);
             }
-            throw new BusinessCustomException(ErrorGeneralConstants.DETAIL_TYPE_ERROR, ErrorGeneralConstants.MISSING_DETAIL_TYPE);
         }
 
         return savedProduct;

@@ -1,14 +1,16 @@
 package vn.graybee.services.business;
 
+import vn.graybee.messages.MessageResponse;
 import vn.graybee.models.business.Category;
 import vn.graybee.requests.category.CategoryCreateRequest;
+import vn.graybee.response.CategoryResponse;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CategoryService {
 
-    Category insertCategory(CategoryCreateRequest request);
+    CategoryResponse insertCategory(CategoryCreateRequest request);
 
     void deleteCategoryById(long id);
 
@@ -16,6 +18,6 @@ public interface CategoryService {
 
     Optional<Category> findById(Long id);
 
-    List<Category> getCategories();
+    MessageResponse<List<CategoryResponse>> getCategories(int page, int size, String sortBy, String order);
 
 }
