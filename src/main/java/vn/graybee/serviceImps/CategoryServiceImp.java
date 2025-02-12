@@ -1,15 +1,21 @@
 package vn.graybee.serviceImps;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import vn.graybee.constants.categories.ErrorCategoryConstants;
+import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.exceptions.CustomNotFoundException;
+import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
 import vn.graybee.messages.other.PaginationInfo;
 import vn.graybee.messages.other.SortInfo;
 import vn.graybee.models.business.Category;
 import vn.graybee.projections.CategoryProjection;
+import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.repositories.business.CategoryRepository;
 import vn.graybee.requests.category.CategoryCreateRequest;
 import vn.graybee.response.CategoryResponse;
@@ -18,7 +24,6 @@ import vn.graybee.utils.TextUtils;
 import vn.graybee.validation.CategoryValidation;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryServiceImp implements CategoryService {
@@ -34,17 +39,20 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     public CategoryResponse insertCategory(CategoryCreateRequest request) {
-        categoryValidation.checkCategoryNameExists(request.getCategoryName());
-        Category category = new Category(
-                TextUtils.capitalizeEachWord(request.getCategoryName())
-        );
-        category.setDeleted(false);
-        Category savedCategory = categoryRepository.save(category);
+        try {
+            Category category = new Category(
+                    TextUtils.capitalizeEachWord(request.getCategoryName())
+            );
+            category.setDeleted(false);
+            Category savedCategory = categoryRepository.save(category);
 
-        return new CategoryResponse(savedCategory.getId(), savedCategory.getCategoryName(),
-                savedCategory.isDeleted(),
-                savedCategory.getCreatedAt(),
-                savedCategory.getUpdatedAt());
+            return new CategoryResponse(savedCategory.getId(), savedCategory.getCategoryName(),
+                    savedCategory.isDeleted(),
+                    savedCategory.getCreatedAt(),
+                    savedCategory.getUpdatedAt());
+        } catch (DataIntegrityViolationException ex) {
+            throw new BusinessCustomException(ErrorCategoryConstants.NAME_ERROR, ErrorCategoryConstants.CATEGORY_NAME_EXISTS);
+        }
     }
 
     @Override
@@ -62,30 +70,31 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
-    public Optional<Category> findById(Long id) {
-        return categoryRepository.findById(id);
+    public Category findById(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new CustomNotFoundException(ErrorCategoryConstants.CATEGORY, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST));
     }
 
     @Override
-    public MessageResponse<List<CategoryResponse>> getCategories(int page, int size, String sortBy, String order) {
+    public MessageResponse<List<CategoryProjection>> getCategories(int page, int size, String sortBy, String order) {
 
         Sort.Direction direction = order.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(direction, sortBy));
 
         Page<CategoryProjection> categoryPage = categoryRepository.findAllCategories(pageable);
 
-
-        List<CategoryResponse> categoryResponses = categoryPage.getContent()
-                .stream()
-                .map(c -> new CategoryResponse(c.getId(), c.getCategoryName(), c.isDeleted(), c.getCreatedAt(), c.getUpdatedAt()))
-                .toList();
-
         PaginationInfo paginationInfo = new PaginationInfo(categoryPage.getNumber() + 1, categoryPage.getTotalPages(),
                 categoryPage.getTotalElements(), categoryPage.getSize());
 
         SortInfo sortInfo = new SortInfo(sortBy, order);
 
-        return new MessageResponse<>(200, "List categories: ", categoryResponses, paginationInfo, sortInfo);
+        return new MessageResponse<>(200, "List categories: ", categoryPage.getContent(), paginationInfo, sortInfo);
+    }
+
+    @Override
+    public BasicMessageResponse<List<CategoryBasicInfoProjection>> getCategories_public() {
+        List<CategoryBasicInfoProjection> categories = categoryRepository.findAllCategories_public();
+
+        return new BasicMessageResponse<>(200, "List categories: ", categories);
     }
 
 }

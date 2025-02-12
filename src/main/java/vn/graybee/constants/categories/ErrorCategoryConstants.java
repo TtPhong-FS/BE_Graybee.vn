@@ -2,6 +2,8 @@ package vn.graybee.constants.categories;
 
 public class ErrorCategoryConstants {
 
+    public static final String CATEGORY = "Category";
+
     public static final String GENERAL_ERROR = "general";
 
     public static final String NAME_ERROR = "name";

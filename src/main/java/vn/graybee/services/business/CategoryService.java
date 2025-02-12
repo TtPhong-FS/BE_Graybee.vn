@@ -1,14 +1,17 @@
 package vn.graybee.services.business;
 
+import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
 import vn.graybee.models.business.Category;
+import vn.graybee.projections.CategoryProjection;
+import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.requests.category.CategoryCreateRequest;
 import vn.graybee.response.CategoryResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CategoryService {
+
 
     CategoryResponse insertCategory(CategoryCreateRequest request);
 
@@ -16,8 +19,11 @@ public interface CategoryService {
 
     void updateStatusDeleteRecord(long id);
 
-    Optional<Category> findById(Long id);
+    Category findById(Long id);
 
-    MessageResponse<List<CategoryResponse>> getCategories(int page, int size, String sortBy, String order);
+    MessageResponse<List<CategoryProjection>> getCategories(int page, int size, String sortBy, String order);
+
+    //    public
+    BasicMessageResponse<List<CategoryBasicInfoProjection>> getCategories_public();
 
 }

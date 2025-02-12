@@ -18,7 +18,7 @@ public class CategoryValidation {
     }
 
     public Category findToCreateProduct(String categoryName) {
-        Optional<Category> category = categoryRepository.findCategoryByCategoryName(categoryName);
+        Optional<Category> category = categoryRepository.findToCreateProduct(categoryName);
         if (category.isEmpty()) {
             throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST);
         }

@@ -1,10 +1,12 @@
 package vn.graybee.exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import vn.graybee.utils.DatetimeFormatted;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,16 @@ public class GlobalHandlerException {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put(ex.getField(), ex.getMessage());
         return errorMap;
+    }
+
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(CustomNotFoundException.class)
+    public ProblemDetail handlerResourceNotFoundException(CustomNotFoundException ex) {
+        CustomNotFoundProblemDetail problemDetail = new CustomNotFoundProblemDetail(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getResource());
+        problemDetail.setProperty("detail", ex.getMessage());
+        problemDetail.setProperty("timestamp", DatetimeFormatted.formatted_datetime());
+        return problemDetail;
     }
 
 }
