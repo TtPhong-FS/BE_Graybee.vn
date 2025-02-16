@@ -1,17 +1,21 @@
 package vn.graybee.projections;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 
 public interface ManufacturerProjection {
 
-    Long getId();
+    int getId();
 
-    String getManufacturerName();
+    String getName();
 
     boolean isDeleted();
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime getCreatedAt();
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime getUpdatedAt();
 
 }

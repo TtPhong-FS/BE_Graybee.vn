@@ -4,16 +4,18 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
-import vn.graybee.models.business.Category;
+import vn.graybee.models.categories.Category;
 import vn.graybee.projections.CategoryProjection;
 import vn.graybee.requests.category.CategoryCreateRequest;
 import vn.graybee.response.CategoryResponse;
@@ -35,9 +37,9 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<MessageResponse<List<CategoryProjection>>> getCategories(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String order) {
+            @RequestParam(defaultValue = "ascend") String order) {
         MessageResponse<List<CategoryProjection>> response = categoryService.getCategories(page, size, sortBy, order);
         return ResponseEntity.ok(response);
     }
@@ -58,22 +60,21 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> createCategory(@PathVariable long id) {
+    public ResponseEntity<Category> createCategory(@RequestParam int id) {
         Category savedCategory = categoryService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(savedCategory);
     }
 
-//    @DeleteMapping("/delete-category")
-//    public ResponseEntity<MessageResponse> deleteCategoryById(@RequestParam("id") long id) {
-//        categoryService.deleteCategoryById(id);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("200", "Delete category successfully", null));
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Integer>> deleteCategoryById(@RequestParam("id") int id) {
+        return ResponseEntity.ok(categoryService.deleteCategoryById(id));
+    }
 
-//    @PutMapping("/update-category_status-delete")
-//    public ResponseEntity<MessageResponse> updateStatusDeleteRecord(@RequestParam("id") long id) {
-//        categoryService.updateStatusDeleteRecord(id);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("200", "Update status delete for Category with id = " + id + " successful", null));
-//    }
+    @PutMapping("/status-delete/{id}")
+    public ResponseEntity<BasicMessageResponse> updateStatusDeleteRecord(@PathVariable("id") int id) {
+        categoryService.updateStatusDeleteRecord(id);
+        return ResponseEntity.status(HttpStatus.OK).body(new BasicMessageResponse(200, "Update status delete for Category with id = " + id + " successful", null));
+    }
 
 
 }

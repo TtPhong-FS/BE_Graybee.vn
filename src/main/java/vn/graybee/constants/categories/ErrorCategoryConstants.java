@@ -8,7 +8,7 @@ public class ErrorCategoryConstants {
 
     public static final String NAME_ERROR = "name";
 
-    public static final String CATEGORY_TEMPORARILY_FLAGGED = "Category temporarily flagged for deletion. Cannot add Product";
+    public static final String CATEGORY_TEMPORARILY_FLAGGED = "Category temporarily flagged for deletion. Could not be executed";
 
     public static final String CATEGORY_DOES_NOT_EXIST = "Category does not exist";
 

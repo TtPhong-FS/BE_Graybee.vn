@@ -5,10 +5,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.models.business.HandheldDetail;
-import vn.graybee.models.business.Product;
+import vn.graybee.models.collections.HandheldDetail;
+import vn.graybee.models.products.Product;
 import vn.graybee.repositories.business.HandheldRepository;
 import vn.graybee.requests.DetailDtoRequest;
+import vn.graybee.requests.DetailDtoResponse;
 import vn.graybee.requests.handheld.HandheldDetailCreateRequest;
 import vn.graybee.services.business.ProductDetailService;
 
@@ -27,7 +28,7 @@ public class HandheldServiceImp implements ProductDetailService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveDetail(Product product, DetailDtoRequest request) {
 
-        if (!product.getCategory().getCategoryName().equalsIgnoreCase("handheld")) {
+        if (!product.getCategory().getName().equalsIgnoreCase("handheld")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_HANDHELD_TYPE);
         }
         HandheldDetailCreateRequest handheldDto = (HandheldDetailCreateRequest) request;
@@ -43,6 +44,12 @@ public class HandheldServiceImp implements ProductDetailService {
         );
         handheldRepository.save(handheld);
     }
+
+    @Override
+    public DetailDtoResponse getDetail(Product product) {
+        return null;
+    }
+
 
     @Override
     public String getDetailType() {

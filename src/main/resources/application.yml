@@ -10,6 +10,7 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+
   
   servlet:
     multipart:
@@ -27,4 +28,4 @@ logging:
 
 api:
   version: v1
-  prefix: /api/${api.version}
+  endpoint: /api/${api.version}

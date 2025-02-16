@@ -3,10 +3,11 @@ package vn.graybee.serviceImps;
 import org.springframework.stereotype.Service;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.models.business.CpuDetail;
-import vn.graybee.models.business.Product;
+import vn.graybee.models.collections.CpuDetail;
+import vn.graybee.models.products.Product;
 import vn.graybee.repositories.business.CpuRepository;
 import vn.graybee.requests.DetailDtoRequest;
+import vn.graybee.requests.DetailDtoResponse;
 import vn.graybee.requests.cpu.CpuDetailCreateRequest;
 import vn.graybee.services.business.ProductDetailService;
 
@@ -23,7 +24,7 @@ public class CpuServiceImp implements ProductDetailService {
 
     @Override
     public void saveDetail(Product product, DetailDtoRequest request) {
-        if (!product.getCategory().getCategoryName().equals("CPU")) {
+        if (!product.getCategory().getName().equals("CPU")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_CPU_TYPE);
         }
         CpuDetailCreateRequest cpuDto = (CpuDetailCreateRequest) request;
@@ -49,6 +50,11 @@ public class CpuServiceImp implements ProductDetailService {
         );
         cpuRepository.save(cpu);
 
+    }
+
+    @Override
+    public DetailDtoResponse getDetail(Product product) {
+        return null;
     }
 
     @Override

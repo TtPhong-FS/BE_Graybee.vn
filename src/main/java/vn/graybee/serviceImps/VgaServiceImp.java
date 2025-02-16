@@ -5,10 +5,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.models.business.Product;
-import vn.graybee.models.business.VgaDetail;
+import vn.graybee.models.collections.VgaDetail;
+import vn.graybee.models.products.Product;
 import vn.graybee.repositories.business.VgaRepository;
 import vn.graybee.requests.DetailDtoRequest;
+import vn.graybee.requests.DetailDtoResponse;
 import vn.graybee.requests.vga.VgaDetailCreateRequest;
 import vn.graybee.services.business.ProductDetailService;
 
@@ -26,7 +27,7 @@ public class VgaServiceImp implements ProductDetailService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveDetail(Product product, DetailDtoRequest request) {
 
-        if (!product.getCategory().getCategoryName().equalsIgnoreCase("vga")) {
+        if (!product.getCategory().getName().equalsIgnoreCase("vga")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_VGA_TYPE);
         }
         VgaDetailCreateRequest vgaDto = (VgaDetailCreateRequest) request;
@@ -47,6 +48,12 @@ public class VgaServiceImp implements ProductDetailService {
         );
         vgaRepository.save(vga);
     }
+
+    @Override
+    public DetailDtoResponse getDetail(Product product) {
+        return null;
+    }
+
 
     @Override
     public String getDetailType() {

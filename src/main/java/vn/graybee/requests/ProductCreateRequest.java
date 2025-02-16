@@ -26,13 +26,12 @@ public class ProductCreateRequest {
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     private String model;
 
-    @JsonProperty("product_name")
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
-    private String productName;
 
     @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 5, message = "Must be 'new' or 'old' ")
+    @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
+    private String name;
+
+    @NotNull(message = "Cannot be null")
     private Condition conditions;
 
     @Positive(message = "Must be a positive number")
@@ -94,12 +93,12 @@ public class ProductCreateRequest {
         this.model = model;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getName() {
+        return name;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Condition getConditions() {

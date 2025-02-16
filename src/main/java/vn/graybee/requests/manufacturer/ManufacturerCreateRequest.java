@@ -6,17 +6,16 @@ import jakarta.validation.constraints.Size;
 
 public class ManufacturerCreateRequest {
 
-    @JsonProperty("manufacturer_name")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 2, max = 50, message = "Must be between 2 and 50 characters")
-    private String manufacturerName;
+    private String name;
 
-    public String getManufacturerName() {
-        return manufacturerName;
+    public String getName() {
+        return name;
     }
 
-    public void setManufacturerName(String manufacturerName) {
-        this.manufacturerName = manufacturerName;
+    public void setName(String name) {
+        this.name = name;
     }
-    
+
 }

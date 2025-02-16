@@ -5,10 +5,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.models.business.MonitorDetail;
-import vn.graybee.models.business.Product;
+import vn.graybee.models.collections.MonitorDetail;
+import vn.graybee.models.products.Product;
 import vn.graybee.repositories.business.MonitorRepository;
 import vn.graybee.requests.DetailDtoRequest;
+import vn.graybee.requests.DetailDtoResponse;
 import vn.graybee.requests.monitor.MonitorDetailCreateRequest;
 import vn.graybee.services.business.ProductDetailService;
 
@@ -26,7 +27,7 @@ public class MonitorServiceImp implements ProductDetailService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveDetail(Product product, DetailDtoRequest request) {
 
-        if (!product.getCategory().getCategoryName().equalsIgnoreCase("monitor")) {
+        if (!product.getCategory().getName().equalsIgnoreCase("monitor")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_MONITOR_TYPE);
         }
         MonitorDetailCreateRequest monitorDto = (MonitorDetailCreateRequest) request;
@@ -52,6 +53,13 @@ public class MonitorServiceImp implements ProductDetailService {
         );
         monitorRepository.save(monitor);
     }
+
+    @Override
+    public DetailDtoResponse getDetail(Product product) {
+        return null;
+    }
+
+
 
     @Override
     public String getDetailType() {

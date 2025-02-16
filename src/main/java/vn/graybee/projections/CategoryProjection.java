@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 
 public interface CategoryProjection {
 
-    Long getId();
+    int getId();
 
-    String getCategoryName();
+    String getName();
 
     boolean isDeleted();
 

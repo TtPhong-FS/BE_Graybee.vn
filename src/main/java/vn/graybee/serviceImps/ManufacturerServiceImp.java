@@ -1,10 +1,15 @@
 package vn.graybee.serviceImps;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import vn.graybee.models.business.Manufacturer;
+import vn.graybee.constants.manufacturers.ErrorManufacturerConstants;
+import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.models.categories.Manufacturer;
+import vn.graybee.projections.ManufacturerProjection;
 import vn.graybee.repositories.business.ManufacturerRepository;
 import vn.graybee.requests.manufacturer.ManufacturerCreateRequest;
-import vn.graybee.response.ManufacturerResponse;
+import vn.graybee.response.manufacturer.ManufacturerResponse;
 import vn.graybee.services.business.ManufacturerService;
 import vn.graybee.utils.TextUtils;
 import vn.graybee.validation.ManufactureValidation;
@@ -24,34 +29,47 @@ public class ManufacturerServiceImp implements ManufacturerService {
     }
 
     @Override
-    public Manufacturer insertManufacturer(ManufacturerCreateRequest request) {
-        manufactureValidation.checkManufacturerNameExists(request.getManufacturerName());
-        Manufacturer manufacturer = new Manufacturer(
-                TextUtils.capitalize(request.getManufacturerName())
-        );
-        manufacturer.setDeleted(false);
-        return manufacturerRepository.save(manufacturer);
+    public BasicMessageResponse<ManufacturerResponse> insertManufacturer(ManufacturerCreateRequest request) {
+
+        try {
+            Manufacturer manufacturer = new Manufacturer(
+                    TextUtils.capitalize(request.getName())
+            );
+            manufacturer.setDeleted(false);
+            Manufacturer savedManufacturer = manufacturerRepository.save(manufacturer);
+            ManufacturerResponse manufacturerResponse = new ManufacturerResponse(
+                    savedManufacturer.getCreatedAt(),
+                    savedManufacturer.getCreatedAt(),
+                    savedManufacturer.getId(),
+                    savedManufacturer.getName(),
+                    savedManufacturer.isDeleted());
+            return new BasicMessageResponse<>(201, "Create Manufacturer success: ", manufacturerResponse);
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new BusinessCustomException(ErrorManufacturerConstants.NAME_ERROR, ErrorManufacturerConstants.MANUFACTURER_NAME_EXISTS);
+        }
     }
 
     @Override
-    public List<ManufacturerResponse> getAllManufacturer() {
-        return manufacturerRepository.findAllManufacturers()
-                .stream()
-                .map(m -> new ManufacturerResponse(m.getId(), m.getManufacturerName(), m.isDeleted(), m.getCreatedAt(), m.getUpdatedAt()))
-                .toList();
+    public BasicMessageResponse<List<ManufacturerResponse>> getAllManufacturer() {
+        List<ManufacturerProjection> manufacturerProjectionList = manufacturerRepository.findAllManufacturers();
+
+        List<ManufacturerResponse> manufacturerResponses = manufacturerProjectionList.stream().map(m -> new ManufacturerResponse(m.getCreatedAt(), m.getUpdatedAt(), m.getId(), m.getName(), m.isDeleted())).toList();
+
+        return new BasicMessageResponse<>(200, "List manufacturer: ", manufacturerResponses);
+
     }
 
     @Override
-    public void deleteManufacturerById(long id) {
+    public void deleteManufacturerById(int id) {
         manufactureValidation.checkExists(id);
 
-        manufactureValidation.checkProductExists(id);
 
         manufacturerRepository.deleteById(id);
     }
 
     @Override
-    public void updateStatusDeleteRecord(long id) {
+    public void updateStatusDeleteRecord(int id) {
         Manufacturer manufacturer = manufactureValidation.findToUpdateStatusDelete(id);
         manufacturer.setDeleted(!manufacturer.isDeleted());
         manufacturerRepository.save(manufacturer);

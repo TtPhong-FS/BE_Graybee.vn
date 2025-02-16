@@ -43,8 +43,8 @@ public class RamDetailCreateRequest extends DetailDtoRequest {
 
     private boolean ecc = false;
 
-    @JsonProperty("heat_dissipation")
-    private boolean heatDissipation = false;
+    @JsonProperty("is_heat_dissipation")
+    private boolean isHeatDissipation = false;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     private String led = "";
@@ -115,11 +115,11 @@ public class RamDetailCreateRequest extends DetailDtoRequest {
     }
 
     public boolean isHeatDissipation() {
-        return heatDissipation;
+        return isHeatDissipation;
     }
 
     public void setHeatDissipation(boolean heatDissipation) {
-        this.heatDissipation = heatDissipation;
+        isHeatDissipation = heatDissipation;
     }
 
     public String getLed() {

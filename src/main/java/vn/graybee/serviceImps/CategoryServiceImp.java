@@ -13,7 +13,7 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
 import vn.graybee.messages.other.PaginationInfo;
 import vn.graybee.messages.other.SortInfo;
-import vn.graybee.models.business.Category;
+import vn.graybee.models.categories.Category;
 import vn.graybee.projections.CategoryProjection;
 import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.repositories.business.CategoryRepository;
@@ -41,43 +41,49 @@ public class CategoryServiceImp implements CategoryService {
     public CategoryResponse insertCategory(CategoryCreateRequest request) {
         try {
             Category category = new Category(
-                    TextUtils.capitalizeEachWord(request.getCategoryName())
+                    TextUtils.capitalizeEachWord(request.getName())
             );
             category.setDeleted(false);
             Category savedCategory = categoryRepository.save(category);
 
-            return new CategoryResponse(savedCategory.getId(), savedCategory.getCategoryName(),
-                    savedCategory.isDeleted(),
+            return new CategoryResponse(
                     savedCategory.getCreatedAt(),
-                    savedCategory.getUpdatedAt());
+                    savedCategory.getUpdatedAt(),
+                    savedCategory.getId(),
+                    savedCategory.getName(),
+                    savedCategory.isDeleted());
         } catch (DataIntegrityViolationException ex) {
             throw new BusinessCustomException(ErrorCategoryConstants.NAME_ERROR, ErrorCategoryConstants.CATEGORY_NAME_EXISTS);
         }
     }
 
     @Override
-    public void deleteCategoryById(long id) {
-        categoryValidation.checkExists(id);
-        categoryValidation.checkProductExists(id);
+    public BasicMessageResponse<Integer> deleteCategoryById(int id) {
+        try{
+            categoryValidation.checkExists(id);
         categoryRepository.deleteById(id);
+        }catch (DataIntegrityViolationException ex){
+            throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_ID_USED_IN_PRODUCT);
+        }
+        return new BasicMessageResponse<>(200, "Deleted category success with id " +id, id);
     }
 
     @Override
-    public void updateStatusDeleteRecord(long id) {
-        Category category = categoryValidation.findToUpdateStatusDelete(id);
+    public void updateStatusDeleteRecord(int id) {
+        Category category = categoryValidation.validateCategoryExistsById(id);
         category.setDeleted(!category.isDeleted());
         categoryRepository.save(category);
     }
 
     @Override
-    public Category findById(Long id) {
+    public Category findById(int id) {
         return categoryRepository.findById(id).orElseThrow(() -> new CustomNotFoundException(ErrorCategoryConstants.CATEGORY, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST));
     }
 
     @Override
     public MessageResponse<List<CategoryProjection>> getCategories(int page, int size, String sortBy, String order) {
 
-        Sort.Direction direction = order.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort.Direction direction = order.equals("ascend") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(direction, sortBy));
 
         Page<CategoryProjection> categoryPage = categoryRepository.findAllCategories(pageable);

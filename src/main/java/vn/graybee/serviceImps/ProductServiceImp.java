@@ -6,12 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.models.business.Category;
-import vn.graybee.models.business.Manufacturer;
-import vn.graybee.models.business.Product;
+import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.models.categories.Category;
+import vn.graybee.models.categories.Manufacturer;
+import vn.graybee.models.products.Product;
 import vn.graybee.repositories.business.ProductRepository;
+import vn.graybee.requests.DetailDtoResponse;
 import vn.graybee.requests.ProductCreateRequest;
 import vn.graybee.response.ProductResponseByCategoryName;
+import vn.graybee.response.products.ProductResponse;
 import vn.graybee.services.ProductDetailFactory;
 import vn.graybee.services.business.ProductDetailService;
 import vn.graybee.services.business.ProductService;
@@ -48,18 +51,18 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     @Transactional
-    public Product createProduct(ProductCreateRequest request) {
+    public BasicMessageResponse<ProductResponse> createProduct(ProductCreateRequest request) {
 
-        productValidation.ensureProductNameBeforeCreate(request.getProductName());
-        productValidation.checkProductModelExists(request.getModel());
-        Category category = categoryValidation.findToCreateProduct(request.getCategoryName());
+        productValidation.validateModelExists(request.getModel());
+        productValidation.validateNameExists(request.getName());
+        Category category = categoryValidation.validateCategoryExistsByName(request.getCategoryName());
         Manufacturer manufacturer = manufactureValidation.findToCreateProduct(request.getManufacturerName());
 
-        logger.info("Creating product with model: " + request.getModel() + ", name: " + request.getProductName());
+        logger.info("Creating product with model: " + request.getModel() + ", name: " + request.getName());
 
         Product product = new Product(
                 TextUtils.capitalize(request.getModel()),
-                TextUtils.capitalizeEachWord(request.getProductName()),
+                TextUtils.capitalizeEachWord(request.getName()),
                 request.getWarranty(),
                 request.getWeight(),
                 request.getDimension(),
@@ -74,8 +77,10 @@ public class ProductServiceImp implements ProductService {
         product.setManufacturer(manufacturer);
 
         Product savedProduct = productRepository.save(product);
+
         logger.info("Creating product successfully with ID: {}", savedProduct.getId());
 
+        DetailDtoResponse detailDto = null;
         if (request.getDetail() != null) {
             String detailKey = request.getDetail().getClass().getSimpleName();
             System.out.println(detailKey);
@@ -83,12 +88,16 @@ public class ProductServiceImp implements ProductService {
             System.out.println(service);
             if (service != null) {
                 service.saveDetail(savedProduct, request.getDetail());
+
+                detailDto = service.getDetail(savedProduct);
             } else {
                 throw new BusinessCustomException(ErrorGeneralConstants.DETAIL_TYPE_ERROR, ErrorGeneralConstants.MISSING_DETAIL_TYPE);
             }
         }
 
-        return savedProduct;
+        ProductResponse productResponse = new ProductResponse(savedProduct, detailDto);
+
+        return new BasicMessageResponse<>(201, "Create Product success ", productResponse);
     }
 
     @Override

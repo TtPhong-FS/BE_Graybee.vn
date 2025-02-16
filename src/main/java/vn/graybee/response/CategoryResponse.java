@@ -1,45 +1,36 @@
 package vn.graybee.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDateTime;
 
-public class CategoryResponse {
+public class CategoryResponse extends BaseResponse {
 
-    private long id;
+    private int id;
 
-    private String categoryName;
+    private String name;
 
     private boolean isDeleted;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
-
-    public CategoryResponse(long id, String categoryName, boolean isDeleted, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CategoryResponse(LocalDateTime createdAt, LocalDateTime updatedAt, int id, String name, boolean isDeleted) {
+        super(createdAt, updatedAt);
         this.id = id;
-        this.categoryName = categoryName;
+        this.name = name;
         this.isDeleted = isDeleted;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getName() {
+        return name;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isDeleted() {
@@ -48,22 +39,6 @@ public class CategoryResponse {
 
     public void setDeleted(boolean delete) {
         isDeleted = delete;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
 }

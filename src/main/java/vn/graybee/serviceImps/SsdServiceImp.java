@@ -5,10 +5,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.models.business.Product;
-import vn.graybee.models.business.SsdDetail;
+import vn.graybee.models.collections.SsdDetail;
+import vn.graybee.models.products.Product;
 import vn.graybee.repositories.business.SsdRepository;
 import vn.graybee.requests.DetailDtoRequest;
+import vn.graybee.requests.DetailDtoResponse;
 import vn.graybee.requests.ssd.SsdDetailCreateRequest;
 import vn.graybee.services.business.ProductDetailService;
 
@@ -24,7 +25,7 @@ public class SsdServiceImp implements ProductDetailService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveDetail(Product product, DetailDtoRequest request) {
-        if (!product.getCategory().getCategoryName().equalsIgnoreCase("ssd")) {
+        if (!product.getCategory().getName().equalsIgnoreCase("ssd")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_SSD_TYPE);
         }
         SsdDetailCreateRequest ssdDto = (SsdDetailCreateRequest) request;
@@ -44,6 +45,11 @@ public class SsdServiceImp implements ProductDetailService {
         );
         ssdRepository.save(ssd);
 
+    }
+
+    @Override
+    public DetailDtoResponse getDetail(Product product) {
+        return null;
     }
 
     @Override

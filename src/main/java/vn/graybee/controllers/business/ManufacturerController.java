@@ -1,11 +1,24 @@
 package vn.graybee.controllers.business;
 
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.requests.manufacturer.ManufacturerCreateRequest;
+import vn.graybee.response.manufacturer.ManufacturerResponse;
 import vn.graybee.services.business.ManufacturerService;
 
+import java.util.List;
+
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/v1/admin")
+@RequestMapping("/api/v1/admin/manufacturers")
 public class ManufacturerController {
 
     private final ManufacturerService manufacturerService;
@@ -14,22 +27,19 @@ public class ManufacturerController {
         this.manufacturerService = manufacturerService;
     }
 
-//    @GetMapping("/manufacturers")
-//    public ResponseEntity<MessageResponse<List<ManufacturerResponse>>> createManufacturer() {
-//        List<ManufacturerResponse> manufacturers = manufacturerService.getAllManufacturer();
-//        return ResponseEntity.status(HttpStatus.CREATED).body(
-//                new MessageResponse<>(200, "List Manufacturers", manufacturers, , "")
-//        );
-//    }
-//
-//
-//    @PostMapping("/add-manufacturer")
-//    public ResponseEntity<MessageResponse> createManufacturer(@RequestBody @Valid ManufacturerCreateRequest request) {
-//        Manufacturer savedmanufacturer = manufacturerService.insertManufacturer(request);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(
-//                new MessageResponse("201", "Create Manufacturer successfully", savedmanufacturer)
-//        );
-//    }
+    @GetMapping
+    public ResponseEntity<BasicMessageResponse<List<ManufacturerResponse>>> getAllManufacturers() {
+        BasicMessageResponse<List<ManufacturerResponse>> manufacturers = manufacturerService.getAllManufacturer();
+        return ResponseEntity.ok(manufacturers);
+    }
+
+
+    @PostMapping
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> createManufacturer(@RequestBody @Valid ManufacturerCreateRequest request) {
+        BasicMessageResponse<ManufacturerResponse> manufacturerResponse = manufacturerService.insertManufacturer(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                manufacturerResponse);
+    }
 //
 //    @DeleteMapping("/delete-manufacturer")
 //    public ResponseEntity<MessageResponse> deleteManufacturerById(@RequestParam("id") long id) {

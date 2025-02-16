@@ -5,10 +5,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.others.ErrorGeneralConstants;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.models.business.LaptopDetail;
-import vn.graybee.models.business.Product;
+import vn.graybee.models.collections.LaptopDetail;
+import vn.graybee.models.products.Product;
 import vn.graybee.repositories.business.LaptopRepository;
 import vn.graybee.requests.DetailDtoRequest;
+import vn.graybee.requests.DetailDtoResponse;
 import vn.graybee.requests.laptop.LaptopDetailCreateRequest;
 import vn.graybee.services.business.ProductDetailService;
 
@@ -24,7 +25,7 @@ public class LaptopServiceImp implements ProductDetailService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveDetail(Product product, DetailDtoRequest request) {
-        if (!product.getCategory().getCategoryName().equalsIgnoreCase("laptop")) {
+        if (!product.getCategory().getName().equalsIgnoreCase("laptop")) {
             throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_LAPTOP_TYPE);
         }
         LaptopDetailCreateRequest laptopDto = (LaptopDetailCreateRequest) request;
@@ -48,6 +49,12 @@ public class LaptopServiceImp implements ProductDetailService {
         );
         laptopRepository.save(laptop);
     }
+
+    @Override
+    public DetailDtoResponse getDetail(Product product) {
+        return null;
+    }
+
 
     @Override
     public String getDetailType() {
