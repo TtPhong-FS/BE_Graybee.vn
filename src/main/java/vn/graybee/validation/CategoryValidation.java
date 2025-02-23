@@ -5,9 +5,7 @@ import vn.graybee.constants.categories.ErrorCategoryConstants;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.models.categories.Category;
-import vn.graybee.repositories.business.CategoryRepository;
-
-import java.util.Optional;
+import vn.graybee.repositories.categories.CategoryRepository;
 
 @Service
 public class CategoryValidation {
@@ -34,8 +32,14 @@ public class CategoryValidation {
     }
 
     public void checkExists(int id) {
-        if (categoryRepository.findById(id).isEmpty()) {
+        if (categoryRepository.checkExistsById(id).isEmpty()) {
             throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST);
+        }
+    }
+
+    public void validateNameExists(String name) {
+        if (categoryRepository.validateNameExists(name).isPresent()) {
+            throw new BusinessCustomException(ErrorCategoryConstants.NAME_ERROR, ErrorCategoryConstants.CATEGORY_NAME_EXISTS);
         }
     }
 

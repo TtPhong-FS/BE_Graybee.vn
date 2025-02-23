@@ -1,23 +1,36 @@
 package vn.graybee.response.products;
 
 import vn.graybee.models.products.Product;
-import vn.graybee.requests.DetailDtoResponse;
+import vn.graybee.response.DetailDtoResponse;
 
 public class ProductResponse {
 
     private long id;
+
     private String model;
+
     private String name;
+
     private int warranty;
+
     private float weight;
+
     private String dimension;
+
     private float price;
+
     private String color;
+
     private String description;
+
     private String thumbnail;
+
     private String conditions;
+
     private int categoryId;
+
     private int manufacturerId;
+
     private DetailDtoResponse detail;
 
     public ProductResponse() {
@@ -48,6 +61,10 @@ public class ProductResponse {
         this.id = id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getModel() {
         return model;
     }
@@ -72,6 +89,9 @@ public class ProductResponse {
         this.warranty = warranty;
     }
 
+    public void setWarranty(int warranty) {
+        this.warranty = warranty;
+    }
 
     public String getDimension() {
         return dimension;
@@ -79,14 +99,6 @@ public class ProductResponse {
 
     public void setDimension(String dimension) {
         this.dimension = dimension;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setWarranty(int warranty) {
-        this.warranty = warranty;
     }
 
     public float getWeight() {

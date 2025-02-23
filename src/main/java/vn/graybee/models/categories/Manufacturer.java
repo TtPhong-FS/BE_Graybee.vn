@@ -16,10 +16,10 @@ public class Manufacturer extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", nullable = false, length = 50, unique = true)
+    @Column(nullable = false, length = 50, unique = true)
     private String name;
 
-    @Column(name = "is_deleted", length = 20)
+    @Column(name = "is_deleted")
     private boolean isDeleted;
 
     public Manufacturer() {

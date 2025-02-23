@@ -1,7 +1,7 @@
 package vn.graybee.services;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.services.business.ProductDetailService;
+import vn.graybee.services.products.ProductDetailService;
 
 import java.util.HashMap;
 import java.util.List;

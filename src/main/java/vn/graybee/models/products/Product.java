@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,12 +24,12 @@ public class Product extends BaseModel {
     private Long id;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinColumn(name = "manufacturer_id")
     private Manufacturer manufacturer;
 
@@ -51,7 +52,11 @@ public class Product extends BaseModel {
 
     private float price;
 
-    @Column(length = 50)
+    private int discount_percent;
+
+    private float newPrice;
+
+    @Column(length = 35)
     private String color;
 
     @Column(name = "description")
@@ -66,13 +71,15 @@ public class Product extends BaseModel {
     public Product() {
     }
 
-    public Product(String model, String name, int warranty, float weight, String dimension, float price, String color, String description, String thumbnail) {
+    public Product(String model, String name, int warranty, float weight, String dimension, float price, int discount_percent, float newPrice, String color, String description, String thumbnail) {
         this.model = model;
         this.name = name;
         this.warranty = warranty;
         this.weight = weight;
         this.dimension = dimension;
         this.price = price;
+        this.discount_percent = discount_percent;
+        this.newPrice = newPrice;
         this.color = color;
         this.description = description;
         this.thumbnail = thumbnail;
@@ -156,6 +163,22 @@ public class Product extends BaseModel {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+
+    public int getDiscount_percent() {
+        return discount_percent;
+    }
+
+    public void setDiscount_percent(int discount_percent) {
+        this.discount_percent = discount_percent;
+    }
+
+    public float getNewPrice() {
+        return newPrice;
+    }
+
+    public void setNewPrice(float newPrice) {
+        this.newPrice = newPrice;
     }
 
     public String getColor() {

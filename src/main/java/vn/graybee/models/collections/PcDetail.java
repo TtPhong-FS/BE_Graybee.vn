@@ -36,8 +36,11 @@ public class PcDetail {
     @Column(length = 100, nullable = false)
     private String ram;
 
-    @Column(length = 200, nullable = false)
-    private String storage;
+    @Column(length = 150, nullable = false)
+    private String ssd;
+
+    @Column(length = 100, nullable = false)
+    private String hdd;
 
     @Column(name = "operating_system", length = 50, nullable = false)
     private String operatingSystem;
@@ -45,28 +48,29 @@ public class PcDetail {
     @Column(length = 150, nullable = false)
     private String vga;
 
-    @Column(name = "input_port", length = 100, nullable = false)
+    @Column(name = "input_port", length = 100)
     private String inputPort;
 
-    @Column(name = "output_port", length = 100, nullable = false)
+    @Column(name = "output_port", length = 100)
     private String outputPort;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100)
     private String cooling;
 
-    @Column(length = 150, nullable = false)
+    @Column(length = 150)
     private String psu;
 
     @Column(name = "case_name", length = 200)
     private String caseName;
 
-    public PcDetail(Product product, String demand, String cpu, String motherboard, String ram, String storage, String operatingSystem, String vga, String inputPort, String outputPort, String cooling, String psu, String caseName) {
+    public PcDetail(Product product, String demand, String cpu, String motherboard, String ram, String ssd, String hdd, String operatingSystem, String vga, String inputPort, String outputPort, String cooling, String psu, String caseName) {
         this.product = product;
         this.demand = demand;
         this.cpu = cpu;
         this.motherboard = motherboard;
         this.ram = ram;
-        this.storage = storage;
+        this.ssd = ssd;
+        this.hdd = hdd;
         this.operatingSystem = operatingSystem;
         this.vga = vga;
         this.inputPort = inputPort;
@@ -77,6 +81,22 @@ public class PcDetail {
     }
 
     public PcDetail() {
+    }
+
+    public String getSsd() {
+        return ssd;
+    }
+
+    public void setSsd(String ssd) {
+        this.ssd = ssd;
+    }
+
+    public String getHdd() {
+        return hdd;
+    }
+
+    public void setHdd(String hdd) {
+        this.hdd = hdd;
     }
 
     public Long getId() {
@@ -127,13 +147,6 @@ public class PcDetail {
         this.ram = ram;
     }
 
-    public String getStorage() {
-        return storage;
-    }
-
-    public void setStorage(String storage) {
-        this.storage = storage;
-    }
 
     public String getOperatingSystem() {
         return operatingSystem;

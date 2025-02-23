@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.categories.SubCategory;
 import vn.graybee.repositories.categories.SubCategoryRepository;
-import vn.graybee.requests.category.SubCategoryCreateRequest;
-import vn.graybee.requests.category.SubCategoryUpdateRequest;
+import vn.graybee.requests.categories.SubCategoryCreateRequest;
+import vn.graybee.requests.categories.SubCategoryUpdateRequest;
 import vn.graybee.services.categories.SubCategoryServices;
 
 import java.util.Optional;

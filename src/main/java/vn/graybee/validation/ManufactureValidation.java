@@ -1,10 +1,10 @@
 package vn.graybee.validation;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.manufacturers.ErrorManufacturerConstants;
+import vn.graybee.constants.categories.ErrorManufacturerConstants;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.categories.Manufacturer;
-import vn.graybee.repositories.business.ManufacturerRepository;
+import vn.graybee.repositories.categories.ManufacturerRepository;
 
 import java.util.Optional;
 
@@ -40,6 +40,12 @@ public class ManufactureValidation {
     public void checkExists(int id) {
         if (manufacturerRepository.findById(id).isEmpty()) {
             throw new BusinessCustomException(ErrorManufacturerConstants.GENERAL_ERROR, ErrorManufacturerConstants.MANUFACTURER_DOES_NOT_EXIST);
+        }
+    }
+
+    public void validateNameExists(String name) {
+        if (manufacturerRepository.validateNameExists(name).isPresent()) {
+            throw new BusinessCustomException(ErrorManufacturerConstants.NAME_ERROR, ErrorManufacturerConstants.MANUFACTURER_NAME_EXISTS);
         }
     }
 

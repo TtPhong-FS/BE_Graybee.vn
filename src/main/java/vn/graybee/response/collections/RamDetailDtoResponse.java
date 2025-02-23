@@ -1,13 +1,13 @@
 package vn.graybee.response.collections;
 
 import vn.graybee.models.collections.RamDetail;
-import vn.graybee.requests.DetailDtoResponse;
+import vn.graybee.response.DetailDtoResponse;
 
 public class RamDetailDtoResponse extends DetailDtoResponse {
 
     private long productId;
 
-    private String ramType;
+    private String suitableFor;
 
     private String series;
 
@@ -29,7 +29,7 @@ public class RamDetailDtoResponse extends DetailDtoResponse {
 
     public RamDetailDtoResponse(RamDetail ramDetail) {
         this.productId = ramDetail.getId();
-        this.ramType = ramDetail.getRamType();
+        this.suitableFor = ramDetail.getSuitableFor();
         this.series = ramDetail.getSeries();
         this.capacity = ramDetail.getCapacity();
         this.type = ramDetail.getType();
@@ -49,12 +49,12 @@ public class RamDetailDtoResponse extends DetailDtoResponse {
         this.productId = productId;
     }
 
-    public String getRamType() {
-        return ramType;
+    public String getSuitableFor() {
+        return suitableFor;
     }
 
-    public void setRamType(String ramType) {
-        this.ramType = ramType;
+    public void setSuitableFor(String suitableFor) {
+        this.suitableFor = suitableFor;
     }
 
     public String getSeries() {

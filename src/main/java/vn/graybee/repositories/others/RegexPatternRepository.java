@@ -5,7 +5,7 @@ import vn.graybee.models.others.RegexPattern;
 
 import java.util.Optional;
 
-public interface RegexPatternRepository extends JpaRepository<RegexPattern, Long> {
+public interface RegexPatternRepository extends JpaRepository<RegexPattern, Integer> {
 
     Optional<RegexPattern> findByType(String type);
 

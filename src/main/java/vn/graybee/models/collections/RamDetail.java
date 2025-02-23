@@ -24,8 +24,8 @@ public class RamDetail {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(nullable = false, length = 5, name = "ram_type")
-    private String ramType;
+    @Column(nullable = false, length = 5, name = "suitable_for")
+    private String suitableFor;
 
     @Column(nullable = false, length = 100, name = "series")
     private String series;
@@ -56,9 +56,9 @@ public class RamDetail {
     public RamDetail() {
     }
 
-    public RamDetail(Product product, String ramType, String series, int capacity, String type, int speed, String latency, float voltage, boolean ecc, boolean isHeatDissipation, String led) {
+    public RamDetail(Product product, String suitableFor, String series, int capacity, String type, int speed, String latency, float voltage, boolean ecc, boolean isHeatDissipation, String led) {
         this.product = product;
-        this.ramType = ramType;
+        this.suitableFor = suitableFor;
         this.series = series;
         this.capacity = capacity;
         this.type = type;
@@ -86,12 +86,12 @@ public class RamDetail {
         this.product = product;
     }
 
-    public String getRamType() {
-        return ramType;
+    public String getSuitableFor() {
+        return suitableFor;
     }
 
-    public void setRamType(String ramType) {
-        this.ramType = ramType;
+    public void setSuitableFor(String suitableFor) {
+        this.suitableFor = suitableFor;
     }
 
     public String getSeries() {

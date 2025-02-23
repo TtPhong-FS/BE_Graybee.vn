@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.projections.publics.CategoryBasicInfoProjection;
-import vn.graybee.services.business.CategoryService;
+import vn.graybee.services.categories.CategoryService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/public")
+@RequestMapping("/api/v1/public/categories")
 public class PublicCategoryController {
 
     private final CategoryService categoryService;
@@ -20,7 +20,7 @@ public class PublicCategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/categories")
+    @GetMapping
     public ResponseEntity<BasicMessageResponse<List<CategoryBasicInfoProjection>>> getCategories() {
         BasicMessageResponse<List<CategoryBasicInfoProjection>> response = categoryService.getCategories_public();
         return ResponseEntity.ok(response);

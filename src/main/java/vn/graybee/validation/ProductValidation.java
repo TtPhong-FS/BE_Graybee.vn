@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import vn.graybee.constants.products.ErrorProductConstants;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.repositories.business.ProductRepository;
+import vn.graybee.repositories.products.ProductRepository;
 
 @Service
 public class ProductValidation {
@@ -18,17 +18,18 @@ public class ProductValidation {
         this.productRepository = productRepository;
     }
 
-    public void validateNameExists(String name){
-       if(productRepository.validateNameExists(name).isPresent()){
-           logger.info("Product was exists with name " + name);
-           throw new BusinessCustomException(ErrorProductConstants.NAME, ErrorProductConstants.PRODUCT_NAME_ALREADY_EXISTS);
-       }
+    public void validateNameExists(String name) {
+        if (productRepository.validateNameExists(name).isPresent()) {
+            logger.info("Product was exists with name " + name);
+            throw new BusinessCustomException(ErrorProductConstants.NAME, ErrorProductConstants.PRODUCT_NAME_ALREADY_EXISTS);
+        }
     }
 
-    public void validateModelExists(String model){
-        if(productRepository.validateModelExists(model).isPresent()){
+    public void validateModelExists(String model) {
+        if (productRepository.validateModelExists(model).isPresent()) {
             logger.info("Product was exists with model " + model);
             throw new BusinessCustomException(ErrorProductConstants.MODEL, ErrorProductConstants.MODEL);
         }
     }
+
 }

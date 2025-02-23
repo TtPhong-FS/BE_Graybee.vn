@@ -2,8 +2,8 @@ package vn.graybee.projections.publics;
 
 public interface CategoryBasicInfoProjection {
 
-    long getId();
+    int getId();
 
-    String getCategoryName();
+    String getName();
 
 }
