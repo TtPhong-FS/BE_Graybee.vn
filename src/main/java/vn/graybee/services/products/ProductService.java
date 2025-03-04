@@ -16,4 +16,8 @@ public interface ProductService {
 
     PcSummaryResponse findPCByCategoryName_PUBLIC(String categoryName);
 
+    void updateProductCountCategory(int CategoryId, boolean isIncrease);
+
+    void updateProductCountManufacturer(int ManufacturerId, boolean isIncrease);
+
 }

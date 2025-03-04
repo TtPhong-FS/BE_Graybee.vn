@@ -15,13 +15,13 @@ public interface CategoryService {
 
     BasicMessageResponse<CategoryResponse> createCategory(CategoryCreateRequest request);
 
-    CategoryResponse createCategoryWithSubCategory(CategoryCreateRequest request);
-
     BasicMessageResponse<Integer> deleteCategoryById(int id);
 
     BasicMessageResponse<CategoryStatusResponse> updateStatusDeleteRecord(int id);
 
-    Category findById(int id);
+    BasicMessageResponse<CategoryResponse> createCategoryWithSubCategory(CategoryCreateRequest request);
+
+    BasicMessageResponse<Category> getCategoryById(int id);
 
     BasicMessageResponse<List<CategoryProjection>> getCategories();
 

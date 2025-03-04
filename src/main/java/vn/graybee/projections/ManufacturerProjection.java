@@ -10,7 +10,9 @@ public interface ManufacturerProjection {
 
     String getName();
 
-    boolean isDeleted();
+    String getStatus();
+
+    int getProductCount();
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime getCreatedAt();

@@ -43,7 +43,7 @@ public class ProductCreateRequest {
     @DecimalMax(value = "100.0", message = "Must be between 0 and 100kg")
     private float weight;
 
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
+    @Size(max = 50, message = "Độ dài không vượt quá 50 ký tự")
     private String dimension;
 
     @PositiveOrZero(message = "Cannot be a negative number")
@@ -51,7 +51,6 @@ public class ProductCreateRequest {
     @DecimalMin(value = "0.0", message = "Cannot be a negative number")
     private float price;
 
-    @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int discount_percent;
 

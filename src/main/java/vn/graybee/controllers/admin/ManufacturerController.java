@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.projections.ManufacturerProjection;
 import vn.graybee.requests.categories.ManufacturerCreateRequest;
 import vn.graybee.response.categories.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
@@ -28,8 +29,8 @@ public class ManufacturerController {
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<ManufacturerResponse>>> getAllManufacturers() {
-        BasicMessageResponse<List<ManufacturerResponse>> manufacturers = manufacturerService.getAllManufacturer();
+    public ResponseEntity<BasicMessageResponse<List<ManufacturerProjection>>> getAllManufacturers() {
+        BasicMessageResponse<List<ManufacturerProjection>> manufacturers = manufacturerService.getAllManufacturer();
         return ResponseEntity.ok(manufacturers);
     }
 

@@ -19,19 +19,21 @@ public class SubCategory extends BaseModel {
     @Column(length = 50, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "is_deleted")
-    private boolean isDeleted;
+    private String status;
+
+    public SubCategory() {
+    }
 
     public SubCategory(String name) {
         this.name = name;
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
+    public String getStatus() {
+        return status;
     }
 
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Integer getId() {

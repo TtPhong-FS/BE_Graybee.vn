@@ -7,8 +7,8 @@ import java.util.List;
 
 public class SubCategoryCreateRequest {
 
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
+    @NotBlank(message = "Không được để trống")
+    @Size(max = 100, message = "Độ dài không được vượt quá 100 ký tự")
     private String name;
 
     private List<String> subcategoryDetails;

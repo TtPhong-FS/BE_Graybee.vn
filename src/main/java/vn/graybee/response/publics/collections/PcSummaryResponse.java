@@ -13,7 +13,7 @@ public class PcSummaryResponse extends ProductBasicResponse {
 
     private String vga;
 
-    private String storage;
+    private String ssd;
 
     public PcSummaryResponse(long id, String name, float price, String thumbnail, PcResponse product, HardwareExtractor extractor) {
         super(id, name, price, thumbnail);
@@ -21,15 +21,7 @@ public class PcSummaryResponse extends ProductBasicResponse {
         this.motherboard = extractor.extract(product.getMotherboard(), "motherboard");
         this.ram = extractor.extract(product.getRam(), "ram");
         this.vga = extractor.extract(product.getVga(), "vga");
-        this.storage = extractor.extract(product.getSsd(), "storage");
-    }
-
-    public String getStorage() {
-        return storage;
-    }
-
-    public void setStorage(String storage) {
-        this.storage = storage;
+        this.ssd = extractor.extract(product.getSsd(), "ssd");
     }
 
     public String getCpu() {
@@ -62,6 +54,14 @@ public class PcSummaryResponse extends ProductBasicResponse {
 
     public void setVga(String vga) {
         this.vga = vga;
+    }
+
+    public String getSsd() {
+        return ssd;
+    }
+
+    public void setSsd(String ssd) {
+        this.ssd = ssd;
     }
 
 }

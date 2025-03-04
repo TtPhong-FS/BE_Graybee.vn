@@ -19,14 +19,26 @@ public class Manufacturer extends BaseModel {
     @Column(nullable = false, length = 50, unique = true)
     private String name;
 
-    @Column(name = "is_deleted")
-    private boolean isDeleted;
+    private String status;
+
+    @Column(name = "product_count")
+    private int productCount;
 
     public Manufacturer() {
     }
 
     public Manufacturer(String name) {
         this.name = name;
+    }
+
+    public void increaseProductCount() {
+        this.productCount++;
+    }
+
+    public void decreaseProductCount() {
+        if (this.productCount > 0) {
+            this.productCount--;
+        }
     }
 
     public Integer getId() {
@@ -45,12 +57,20 @@ public class Manufacturer extends BaseModel {
         this.name = name;
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
+    public String getStatus() {
+        return status;
     }
 
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getProductCount() {
+        return productCount;
+    }
+
+    public void setProductCount(int productCount) {
+        this.productCount = productCount;
     }
 
 }

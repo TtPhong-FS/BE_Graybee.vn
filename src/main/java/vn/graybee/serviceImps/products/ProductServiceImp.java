@@ -12,6 +12,8 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.categories.Category;
 import vn.graybee.models.categories.Manufacturer;
 import vn.graybee.models.products.Product;
+import vn.graybee.repositories.categories.CategoryRepository;
+import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.repositories.products.ProductRepository;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.response.DetailDtoResponse;
@@ -43,20 +45,24 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductDetailFactory productDetailFactory;
 
-    public ProductServiceImp(CategoryValidation categoryValidation, ManufactureValidation manufactureValidation, ProductValidation productValidation, ProductRepository productRepository, ProductDetailFactory productDetailFactory) {
+    private final CategoryRepository categoryRepository;
+
+    private final ManufacturerRepository manufacturerRepository;
+
+    public ProductServiceImp(CategoryValidation categoryValidation, ManufactureValidation manufactureValidation, ProductValidation productValidation, ProductRepository productRepository, ProductDetailFactory productDetailFactory, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository) {
         this.categoryValidation = categoryValidation;
         this.manufactureValidation = manufactureValidation;
         this.productValidation = productValidation;
         this.productRepository = productRepository;
         this.productDetailFactory = productDetailFactory;
+        this.categoryRepository = categoryRepository;
+        this.manufacturerRepository = manufacturerRepository;
     }
 
     @Override
     @Transactional
     public BasicMessageResponse<ProductResponse> createProduct(ProductCreateRequest request) {
 
-        productValidation.validateModelExists(request.getModel());
-        productValidation.validateNameExists(request.getName());
         Category category = categoryValidation.validateCategoryExistsByName(request.getCategoryName());
         Manufacturer manufacturer = manufactureValidation.findToCreateProduct(request.getManufacturerName());
 
@@ -76,11 +82,15 @@ public class ProductServiceImp implements ProductService {
                 request.getThumbnail()
         );
         product.setConditions(request.getConditions().getDescription());
-        product.setDeleted(false);
+        product.setStatus("ACTIVE");
         product.setCategory(category);
         product.setManufacturer(manufacturer);
 
         Product savedProduct = productRepository.save(product);
+
+        updateProductCountCategory(product.getCategory().getId(), true);
+
+        updateProductCountManufacturer(product.getManufacturer().getId(), true);
 
         logger.info("Creating product successfully with ID: {}", savedProduct.getId());
 
@@ -116,6 +126,32 @@ public class ProductServiceImp implements ProductService {
 
 
         return null;
+    }
+
+    @Override
+    public void updateProductCountManufacturer(int ManufacturerId, boolean isIncrease) {
+        Manufacturer manufacturer = manufactureValidation.findToUpdateStatusDelete(ManufacturerId);
+        if (isIncrease) {
+            manufacturer.increaseProductCount();
+        } else {
+            manufacturer.decreaseProductCount();
+        }
+
+        manufacturerRepository.save(manufacturer);
+
+    }
+
+    @Override
+    public void updateProductCountCategory(int CategoryId, boolean isIncrease) {
+        Category category = categoryValidation.validateCategoryExistsById(CategoryId);
+
+        if (isIncrease) {
+            category.increaseProductCount();
+        } else {
+            category.decreaseProductCount();
+        }
+
+        categoryRepository.save(category);
     }
 
 }

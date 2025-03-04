@@ -32,26 +32,25 @@ public class ManufacturerServiceImp implements ManufacturerService {
         Manufacturer manufacturer = new Manufacturer(
                 TextUtils.capitalize(request.getName())
         );
-        manufacturer.setDeleted(false);
+        manufacturer.setStatus("ACTIVE");
         Manufacturer savedManufacturer = manufacturerRepository.save(manufacturer);
         ManufacturerResponse manufacturerResponse = new ManufacturerResponse(
                 savedManufacturer.getCreatedAt(),
                 savedManufacturer.getCreatedAt(),
                 savedManufacturer.getId(),
                 savedManufacturer.getName(),
-                savedManufacturer.isDeleted());
+                savedManufacturer.getStatus(),
+                savedManufacturer.getProductCount());
         return new BasicMessageResponse<>(201, "Create Manufacturer success: ", manufacturerResponse);
 
 
     }
 
     @Override
-    public BasicMessageResponse<List<ManufacturerResponse>> getAllManufacturer() {
+    public BasicMessageResponse<List<ManufacturerProjection>> getAllManufacturer() {
         List<ManufacturerProjection> manufacturerProjectionList = manufacturerRepository.findAllManufacturers();
 
-        List<ManufacturerResponse> manufacturerResponses = manufacturerProjectionList.stream().map(m -> new ManufacturerResponse(m.getCreatedAt(), m.getUpdatedAt(), m.getId(), m.getName(), m.isDeleted())).toList();
-
-        return new BasicMessageResponse<>(200, "List manufacturer: ", manufacturerResponses);
+        return new BasicMessageResponse<>(200, "List manufacturer: ", manufacturerProjectionList);
 
     }
 
@@ -66,7 +65,7 @@ public class ManufacturerServiceImp implements ManufacturerService {
     @Override
     public void updateStatusDeleteRecord(int id) {
         Manufacturer manufacturer = manufactureValidation.findToUpdateStatusDelete(id);
-        manufacturer.setDeleted(!manufacturer.isDeleted());
+
         manufacturerRepository.save(manufacturer);
     }
 

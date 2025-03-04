@@ -2,9 +2,9 @@ package vn.graybee.constants.categories;
 
 public class ErrorManufacturerConstants {
 
-    public static final String NAME_ERROR = "name";
+    public static final String NAME_ERROR = "manufacturer_name";
 
-    public static final String GENERAL_ERROR = "general";
+    public static final String GENERAL_ERROR = "manufacturer_name";
 
     public static final String MANUFACTURER_TEMPORARILY_FLAGGED = "Không thể thực hiện, thương hiệu đang tạm thời bị xoá";
 

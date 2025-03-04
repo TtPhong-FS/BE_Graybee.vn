@@ -65,8 +65,8 @@ public class Product extends BaseModel {
     @Column(length = 300)
     private String thumbnail;
 
-    @Column(name = "is_deleted", length = 20)
-    private boolean isDeleted;
+    @Column(length = 20)
+    private String status;
 
     public Product() {
     }
@@ -205,12 +205,12 @@ public class Product extends BaseModel {
         this.thumbnail = thumbnail;
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
+    public String getStatus() {
+        return status;
     }
 
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

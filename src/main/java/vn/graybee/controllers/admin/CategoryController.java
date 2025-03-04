@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.models.categories.Category;
 import vn.graybee.projections.CategoryProjection;
 import vn.graybee.requests.categories.CategoryCreateRequest;
 import vn.graybee.response.categories.CategoryResponse;
@@ -40,7 +40,14 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<BasicMessageResponse<List<CategoryProjection>>> getCategories() {
+
         return ResponseEntity.ok(categoryService.getCategories());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Category>> getCategoryById(@PathVariable("id") int id) {
+
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
     //
@@ -54,11 +61,11 @@ public class CategoryController {
 //
     @PostMapping
     public ResponseEntity<BasicMessageResponse<CategoryResponse>> createCategory(@RequestBody @Valid CategoryCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategoryWithSubCategory(request));
     }
 
-    @DeleteMapping
-    public ResponseEntity<BasicMessageResponse<Integer>> deleteCategoryById(@RequestParam("id") int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Integer>> deleteCategoryById(@PathVariable("id") int id) {
         return ResponseEntity.ok(categoryService.deleteCategoryById(id));
     }
 

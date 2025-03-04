@@ -1,6 +1,5 @@
 package vn.graybee.serviceImps.categories;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.categories.ErrorCategoryConstants;
@@ -8,6 +7,8 @@ import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.categories.Category;
+import vn.graybee.models.categories.CategorySubCategory;
+import vn.graybee.models.categories.SubCategory;
 import vn.graybee.projections.CategoryProjection;
 import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.repositories.categories.CategoryRepository;
@@ -29,6 +30,7 @@ public class CategoryServiceImp implements CategoryService {
 
     private final CategorySubCategoryRepository categorySubCategoryRepository;
 
+
     private final CategoryRepository categoryRepository;
 
     private final CategoryValidation categoryValidation;
@@ -47,7 +49,7 @@ public class CategoryServiceImp implements CategoryService {
         Category category = new Category(
                 TextUtils.capitalizeEachWord(request.getName())
         );
-        category.setDeleted(false);
+        category.setStatus("ACTIVE");
 
         Category savedCategory = categoryRepository.save(category);
 
@@ -56,25 +58,69 @@ public class CategoryServiceImp implements CategoryService {
                 savedCategory.getUpdatedAt(),
                 savedCategory.getId(),
                 savedCategory.getName(),
-                savedCategory.isDeleted());
+                savedCategory.getStatus(),
+                savedCategory.getProductCount()
+        );
 
-        return new BasicMessageResponse<>(201, "Create Category success. Response after create", categoryResponse);
+        return new BasicMessageResponse<>(201, "Danh mục đã được tạo thành công! Kiểm tra dữ liệu dưới bảng", categoryResponse);
     }
 
     @Override
-    public CategoryResponse createCategoryWithSubCategory(CategoryCreateRequest request) {
-        return null;
-    }
+    @Transactional
+    public BasicMessageResponse<CategoryResponse> createCategoryWithSubCategory(CategoryCreateRequest request) {
+        categoryValidation.validateNameExists(request.getName());
 
-    @Override
-    public BasicMessageResponse<Integer> deleteCategoryById(int id) {
-        try {
-            categoryValidation.checkExists(id);
-            categoryRepository.deleteById(id);
-        } catch (DataIntegrityViolationException ex) {
-            throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_ID_USED_IN_PRODUCT);
+        Category category = new Category(request.getName());
+        category.setStatus("ACTIVE");
+        category = categoryRepository.save(category);
+
+        if (!request.getSubCategories().isEmpty()) {
+            Category finalCategory = category;
+            request.getSubCategories().forEach(subName -> {
+                SubCategory subCategory = subCategoryRepository.findByName(subName)
+                        .orElseThrow(() -> new BusinessCustomException(
+                                ErrorCategoryConstants.GENERAL_ERROR,
+                                ErrorCategoryConstants.SUBCATEGORY_DOES_NOT_EXIST
+                        ));
+
+                // Tạo quan hệ CategorySubCategory
+                CategorySubCategory categorySubCategory = new CategorySubCategory();
+                categorySubCategory.setCategory(finalCategory);
+                categorySubCategory.setSubCategory(subCategory);
+
+                // Lưu quan hệ vào DB
+                categorySubCategoryRepository.save(categorySubCategory);
+            });
         }
-        return new BasicMessageResponse<>(200, "Deleted category success with id " + id, id);
+
+        CategoryResponse categoryResponse = new CategoryResponse(
+                category.getCreatedAt(),
+                category.getUpdatedAt(),
+                category.getId(),
+                category.getName(),
+                category.getStatus(),
+                category.getProductCount()
+        );
+
+        return new BasicMessageResponse<>(201, "Danh mục đã được tạo thành công! Kiểm tra dữ liệu dưới bảng", categoryResponse);
+    }
+
+    @Override
+    public BasicMessageResponse<Category> getCategoryById(int id) {
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new CustomNotFoundException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST));
+
+        return new BasicMessageResponse<>(200, "Tìm danh mục thành công", category);
+    }
+
+    @Override
+    @Transactional
+    public BasicMessageResponse<Integer> deleteCategoryById(int id) {
+
+        categoryValidation.checkExists(id);
+        categoryValidation.checkUsedProduct(id);
+        categoryRepository.deleteByCategoryId(id);
+
+        return new BasicMessageResponse<>(200, "Danh mục đã được xoá thành công!", id);
     }
 
     @Override
@@ -82,35 +128,30 @@ public class CategoryServiceImp implements CategoryService {
     public BasicMessageResponse<CategoryStatusResponse> updateStatusDeleteRecord(int id) {
         Category category = categoryValidation.validateCategoryExistsById(id);
 
-        category.setDeleted(!category.isDeleted());
 
         categoryRepository.save(category);
 
         CategoryStatusResponse categoryResponse = new CategoryStatusResponse(
                 id,
-                category.isDeleted()
+                false
         );
 
-        return new BasicMessageResponse<>(200, "Update status category success", categoryResponse);
+        return new BasicMessageResponse<>(200, "Cập nhật danh mục thành công!", categoryResponse);
     }
 
     @Override
-    public Category findById(int id) {
-        return categoryRepository.findById(id).orElseThrow(() -> new CustomNotFoundException(ErrorCategoryConstants.CATEGORY, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST));
-    }
-
-    @Override
+    @Transactional
     public BasicMessageResponse<List<CategoryProjection>> getCategories() {
         List<CategoryProjection> categories = categoryRepository.fetchCategories();
 
-        return new BasicMessageResponse<>(200, "List categories: ", categories);
+        return new BasicMessageResponse<>(200, "", categories);
     }
 
     @Override
     public BasicMessageResponse<List<CategoryBasicInfoProjection>> getCategories_public() {
         List<CategoryBasicInfoProjection> categories = categoryRepository.findAllCategories_public();
 
-        return new BasicMessageResponse<>(200, "Public: This is list categories: ", categories);
+        return new BasicMessageResponse<>(200, "", categories);
     }
 
 }

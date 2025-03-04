@@ -10,13 +10,16 @@ public class CategoryResponse extends BaseResponse {
 
     private String name;
 
-    private boolean isDeleted;
+    private String status;
 
-    public CategoryResponse(LocalDateTime createdAt, LocalDateTime updatedAt, int id, String name, boolean isDeleted) {
+    private int productCount;
+
+    public CategoryResponse(LocalDateTime createdAt, LocalDateTime updatedAt, int id, String name, String status, int productCount) {
         super(createdAt, updatedAt);
         this.id = id;
         this.name = name;
-        this.isDeleted = isDeleted;
+        this.status = status;
+        this.productCount = productCount;
     }
 
     public int getId() {
@@ -35,12 +38,20 @@ public class CategoryResponse extends BaseResponse {
         this.name = name;
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
+    public String getStatus() {
+        return status;
     }
 
-    public void setDeleted(boolean delete) {
-        isDeleted = delete;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getProductCount() {
+        return productCount;
+    }
+
+    public void setProductCount(int productCount) {
+        this.productCount = productCount;
     }
 
 }

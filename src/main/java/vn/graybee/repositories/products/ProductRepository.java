@@ -10,6 +10,9 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+
+    boolean existsByCategoryId(int categoryId);
+
     @Query(value = "Select p.name from Product p where p.name = :name")
     Optional<String> validateNameExists(@Param("name") String name);
 

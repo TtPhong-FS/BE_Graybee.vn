@@ -22,7 +22,7 @@ public class ManufactureValidation {
         if (manufacturer.isEmpty()) {
             throw new BusinessCustomException(ErrorManufacturerConstants.GENERAL_ERROR, ErrorManufacturerConstants.MANUFACTURER_DOES_NOT_EXIST);
         }
-        if (manufacturer.get().isDeleted()) {
+        if (manufacturer.get().getStatus().equals("DELETED")) {
             throw new BusinessCustomException(ErrorManufacturerConstants.GENERAL_ERROR, ErrorManufacturerConstants.MANUFACTURER_TEMPORARILY_FLAGGED);
         }
         return manufacturer.get();

@@ -3,22 +3,23 @@ package vn.graybee.requests.categories;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CategoryCreateRequest {
 
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
+    @NotBlank(message = "Không được để trống")
+    @Size(max = 50, message = "Độ dài không được vượt quá 50 ký tự")
     private String name;
 
-    private List<String> subCategoryNames;
+    private List<String> subCategories;
 
-    public List<String> getSubCategoryNames() {
-        return subCategoryNames;
+    public List<String> getSubCategories() {
+        return subCategories != null ? subCategories : Collections.emptyList();
     }
 
-    public void setSubCategoryNames(List<String> subCategoryNames) {
-        this.subCategoryNames = subCategoryNames;
+    public void setSubCategories(List<String> subCategories) {
+        this.subCategories = subCategories;
     }
 
     public String getName() {

@@ -8,6 +8,9 @@ public class BasicMessageResponse<T> {
 
     private T data;
 
+    public BasicMessageResponse() {
+    }
+
     public BasicMessageResponse(int status, String message, T data) {
         this.status = status;
         this.message = message;

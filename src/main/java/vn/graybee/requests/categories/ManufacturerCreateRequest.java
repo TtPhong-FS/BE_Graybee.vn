@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Size;
 
 public class ManufacturerCreateRequest {
 
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 2, max = 50, message = "Must be between 2 and 50 characters")
+    @NotBlank(message = "Không được để trống")
+    @Size(max = 50, message = "Độ dài không được vượt quá 50 ký tự")
     private String name;
 
     public String getName() {
