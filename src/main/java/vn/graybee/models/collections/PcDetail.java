@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -14,13 +14,13 @@ import vn.graybee.models.products.Product;
 @Table(name = "pc_details")
 public class PcDetail {
 
+
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -63,8 +63,8 @@ public class PcDetail {
     @Column(name = "case_name", length = 200)
     private String caseName;
 
-    public PcDetail(Product product, String demand, String cpu, String motherboard, String ram, String ssd, String hdd, String operatingSystem, String vga, String inputPort, String outputPort, String cooling, String psu, String caseName) {
-        this.product = product;
+    public PcDetail(Long productId, String demand, String cpu, String motherboard, String ram, String ssd, String hdd, String operatingSystem, String vga, String inputPort, String outputPort, String cooling, String psu, String caseName) {
+        this.productId = productId;
         this.demand = demand;
         this.cpu = cpu;
         this.motherboard = motherboard;
@@ -83,6 +83,14 @@ public class PcDetail {
     public PcDetail() {
     }
 
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     public String getSsd() {
         return ssd;
     }
@@ -99,20 +107,12 @@ public class PcDetail {
         this.hdd = hdd;
     }
 
-    public Long getId() {
-        return id;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getDemand() {

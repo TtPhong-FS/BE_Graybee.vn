@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -14,13 +14,13 @@ import vn.graybee.models.products.Product;
 @Table(name = "cpu_details")
 public class CpuDetail {
 
+
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -45,17 +45,14 @@ public class CpuDetail {
     @Column(name = "base_efficiency_core", nullable = false)
     private float baseEfficiencyCore;
 
-    @Column(name = "consumption", length = 20, nullable = false)
-    private String consumption;
+    @Column(name = "power_consumption", nullable = false)
+    private float powerConsumption;
 
     @Column(nullable = false)
     private int cache;
 
     @Column(name = "motherboard_compatible", length = 50, nullable = false)
     private String motherboardCompatible;
-
-    @Column(name = "maximum_support_memory", nullable = false)
-    private int maximumSupportMemory;
 
     @Column(name = "maximum_bandwidth", nullable = false)
     private int maximumBandwidth;
@@ -66,20 +63,11 @@ public class CpuDetail {
     @Column(name = "is_graphics_core")
     private boolean isGraphicsCore;
 
-    @Column(name = "pci_edition", length = 35)
-    private String pciEdition;
-
-    @Column(name = "pci_configuration", length = 50)
-    private String pciConfiguration;
-
-    @Column(name = "maximum_pci_ports")
-    private int maximumPciPorts;
-
     public CpuDetail() {
     }
 
-    public CpuDetail(Product product, String socket, int multiplier, int numberOfStreams, float maximumPerformanceCore, float maximumEfficiencyCore, float basePerformanceCore, float baseEfficiencyCore, String consumption, int cache, String motherboardCompatible, int maximumSupportMemory, int maximumBandwidth, String memoryType, boolean isGraphicsCore, String pciEdition, String pciConfiguration, int maximumPciPorts) {
-        this.product = product;
+    public CpuDetail(Long productId, String socket, int multiplier, int numberOfStreams, float maximumPerformanceCore, float maximumEfficiencyCore, float basePerformanceCore, float baseEfficiencyCore, float powerConsumption, int cache, String motherboardCompatible, int maximumBandwidth, String memoryType, boolean isGraphicsCore) {
+        this.productId = productId;
         this.socket = socket;
         this.multiplier = multiplier;
         this.numberOfStreams = numberOfStreams;
@@ -87,24 +75,12 @@ public class CpuDetail {
         this.maximumEfficiencyCore = maximumEfficiencyCore;
         this.basePerformanceCore = basePerformanceCore;
         this.baseEfficiencyCore = baseEfficiencyCore;
-        this.consumption = consumption;
+        this.powerConsumption = powerConsumption;
         this.cache = cache;
         this.motherboardCompatible = motherboardCompatible;
-        this.maximumSupportMemory = maximumSupportMemory;
         this.maximumBandwidth = maximumBandwidth;
         this.memoryType = memoryType;
         this.isGraphicsCore = isGraphicsCore;
-        this.pciEdition = pciEdition;
-        this.pciConfiguration = pciConfiguration;
-        this.maximumPciPorts = maximumPciPorts;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Product getProduct() {
@@ -113,6 +89,14 @@ public class CpuDetail {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getSocket() {
@@ -171,12 +155,12 @@ public class CpuDetail {
         this.baseEfficiencyCore = baseEfficiencyCore;
     }
 
-    public String getConsumption() {
-        return consumption;
+    public float getPowerConsumption() {
+        return powerConsumption;
     }
 
-    public void setConsumption(String consumption) {
-        this.consumption = consumption;
+    public void setPowerConsumption(float powerConsumption) {
+        this.powerConsumption = powerConsumption;
     }
 
     public int getCache() {
@@ -193,14 +177,6 @@ public class CpuDetail {
 
     public void setMotherboardCompatible(String motherboardCompatible) {
         this.motherboardCompatible = motherboardCompatible;
-    }
-
-    public int getMaximumSupportMemory() {
-        return maximumSupportMemory;
-    }
-
-    public void setMaximumSupportMemory(int maximumSupportMemory) {
-        this.maximumSupportMemory = maximumSupportMemory;
     }
 
     public int getMaximumBandwidth() {
@@ -225,30 +201,6 @@ public class CpuDetail {
 
     public void setGraphicsCore(boolean graphicsCore) {
         isGraphicsCore = graphicsCore;
-    }
-
-    public String getPciEdition() {
-        return pciEdition;
-    }
-
-    public void setPciEdition(String pciEdition) {
-        this.pciEdition = pciEdition;
-    }
-
-    public String getPciConfiguration() {
-        return pciConfiguration;
-    }
-
-    public void setPciConfiguration(String pciConfiguration) {
-        this.pciConfiguration = pciConfiguration;
-    }
-
-    public int getMaximumPciPorts() {
-        return maximumPciPorts;
-    }
-
-    public void setMaximumPciPorts(int maximumPciPorts) {
-        this.maximumPciPorts = maximumPciPorts;
     }
 
 }

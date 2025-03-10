@@ -1,9 +1,10 @@
 package vn.graybee.serviceImps.categories;
 
 import org.springframework.stereotype.Service;
+import vn.graybee.enums.CategoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.categories.Manufacturer;
-import vn.graybee.projections.ManufacturerProjection;
+import vn.graybee.projections.category.ManufacturerProjection;
 import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.requests.categories.ManufacturerCreateRequest;
 import vn.graybee.response.categories.ManufacturerResponse;
@@ -26,14 +27,14 @@ public class ManufacturerServiceImp implements ManufacturerService {
     }
 
     @Override
-    public BasicMessageResponse<ManufacturerResponse> insertManufacturer(ManufacturerCreateRequest request) {
-        manufactureValidation.validateNameExists(request.getName());
+    public BasicMessageResponse<ManufacturerResponse> create(ManufacturerCreateRequest request) {
+        manufactureValidation.checkExistByName(request.getName());
 
-        Manufacturer manufacturer = new Manufacturer(
-                TextUtils.capitalize(request.getName())
+        Manufacturer manufacturer = new Manufacturer(TextUtils.capitalize(request.getName())
         );
-        manufacturer.setStatus("ACTIVE");
+        manufacturer.setStatus(CategoryStatus.ACTIVE);
         Manufacturer savedManufacturer = manufacturerRepository.save(manufacturer);
+
         ManufacturerResponse manufacturerResponse = new ManufacturerResponse(
                 savedManufacturer.getCreatedAt(),
                 savedManufacturer.getCreatedAt(),
@@ -41,25 +42,25 @@ public class ManufacturerServiceImp implements ManufacturerService {
                 savedManufacturer.getName(),
                 savedManufacturer.getStatus(),
                 savedManufacturer.getProductCount());
-        return new BasicMessageResponse<>(201, "Create Manufacturer success: ", manufacturerResponse);
 
+        return new BasicMessageResponse<>(201, "Tạo nhà sản xuất thành công!", manufacturerResponse);
 
     }
 
     @Override
     public BasicMessageResponse<List<ManufacturerProjection>> getAllManufacturer() {
-        List<ManufacturerProjection> manufacturerProjectionList = manufacturerRepository.findAllManufacturers();
+        List<ManufacturerProjection> manufacturerProjectionList = manufacturerRepository.fetchAll();
 
         return new BasicMessageResponse<>(200, "List manufacturer: ", manufacturerProjectionList);
 
     }
 
     @Override
-    public void deleteManufacturerById(int id) {
-        manufactureValidation.checkExists(id);
-
+    public BasicMessageResponse<Integer> deleteById(int id) {
+        manufactureValidation.countProductById(id);
 
         manufacturerRepository.deleteById(id);
+        return new BasicMessageResponse<>(200, "Nhà sản xuất đã được xoá thành công!", id);
     }
 
     @Override

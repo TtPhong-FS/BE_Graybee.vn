@@ -22,9 +22,9 @@ public class SsdDetailCreateRequest extends DetailDtoRequest {
 
     @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("hours_to_failure")
+    @JsonProperty("life_span")
     @PositiveOrZero(message = "Cannot be a negative number")
-    private int hoursToFailure = 0;
+    private int lifeSpan;
 
     @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
@@ -41,12 +41,12 @@ public class SsdDetailCreateRequest extends DetailDtoRequest {
     @JsonProperty("storage_temperature")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String storageTemperature = "";
+    private String storageTemperature;
 
     @JsonProperty("operating_temperature")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String operatingTemperature = "";
+    private String operatingTemperature;
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @Positive(message = "Must be a positive number")
@@ -60,7 +60,7 @@ public class SsdDetailCreateRequest extends DetailDtoRequest {
 
     @JsonProperty("software")
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String software = "";
+    private String software;
 
     public String getCommunicationStandard() {
         return communicationStandard;
@@ -78,12 +78,12 @@ public class SsdDetailCreateRequest extends DetailDtoRequest {
         this.capacity = capacity;
     }
 
-    public int getHoursToFailure() {
-        return hoursToFailure;
+    public int getLifeSpan() {
+        return lifeSpan;
     }
 
-    public void setHoursToFailure(int hoursToFailure) {
-        this.hoursToFailure = hoursToFailure;
+    public void setLifeSpan(int lifeSpan) {
+        this.lifeSpan = lifeSpan;
     }
 
     public int getReadingSpeed() {

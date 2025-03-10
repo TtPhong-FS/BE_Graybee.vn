@@ -8,7 +8,7 @@ import java.util.List;
 public class SubCategoryUpdateRequest {
 
     @NotBlank(message = "Không được để trống")
-    @Size(max = 100, message = "Độ dài không được vượt quá 100 ký tự")
+    @Size(max = 35, message = "Độ dài không được vượt quá 35 ký tự")
     private String name;
 
     private List<String> subcategoryDetails;

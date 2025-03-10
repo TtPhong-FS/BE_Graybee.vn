@@ -4,14 +4,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.graybee.models.categories.CategorySubCategory;
-import vn.graybee.response.categories.SubCategorySummaryResponse;
+import vn.graybee.projections.category.CategorySubcategoryProjection;
 
 import java.util.List;
 
 public interface CategorySubCategoryRepository extends JpaRepository<CategorySubCategory, Integer> {
 
-    @Query("SELECT new vn.graybee.response.categories.SubCategorySummaryResponse(cs.subCategory.id, cs.subCategory.name) " +
-            "FROM CategorySubCategory cs WHERE cs.category.id = :categoryId")
-    List<SubCategorySummaryResponse> findByCategoryId(@Param("categoryId") int categoryId);
+    @Query("SELECT cs FROM CategorySubCategory cs")
+    List<CategorySubcategoryProjection> fetchAll();
+
+
+    @Query("SELECT cs.subCategoryId FROM CategorySubCategory cs WHERE cs.categoryId = :categoryId AND cs.subCategoryId IN :subCategoryIds")
+    List<Integer> findExistingSubCategoryIds(@Param("categoryId") Integer categoryId, @Param("subCategoryIds") List<Integer> subCategoryIds);
+
 
 }

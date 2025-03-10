@@ -3,96 +3,72 @@ package vn.graybee.requests.collections;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import vn.graybee.requests.DetailDtoRequest;
 
 public class CpuDetailCreateRequest extends DetailDtoRequest {
 
-    @NotBlank(message = "Socket cannot be blank")
-    @Size(min = 1, max = 35, message = "Must be between 1 and 35 characters")
+    @NotBlank(message = "Socket không thể trống")
+    @Size(min = 5, max = 35, message = "Độ dài ít nhất từ 5 đến 35 ký tự")
     private String socket;
 
-    @NotNull(message = "Cannot be null")
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Nhập số nhân")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     @JsonProperty("multiplier")
     private int multiplier;
 
-    @NotNull(message = "Cannot be null")
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Nhập số luồng")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     @JsonProperty("number_of_streams")
     private int numberOfStreams;
 
-    @NotNull(message = "Cannot be null")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Nhập hiệu suất tối đa P-Core")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     @JsonProperty("maximum_performance_core")
     private float maximumPerformanceCore;
 
-    @NotNull(message = "Cannot be null")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Nhập hiệu suất tối đa E-Core")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     @JsonProperty("maximum_efficiency_core")
     private float maximumEfficiencyCore;
 
-    @NotNull(message = "Cannot be null")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Nhập hiệu suất ca bản P-Core")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     @JsonProperty("base_performance_core")
     private float basePerformanceCore;
 
-    @NotNull(message = "Cannot be null")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Nhập hiệu suất ca bản E-Core")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     @JsonProperty("base_efficiency_core")
     private float baseEfficiencyCore;
 
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
-    @JsonProperty("consumption")
-    private String consumption;
+    @NotNull(message = "Nhập nguồn điện tiêu hao")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
+    @JsonProperty("power_consumption")
+    private float powerConsumption;
 
-    @NotNull(message = "Cannot be null")
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Nhập bộ nhớ đệm")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     private int cache;
 
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
+    @NotBlank(message = "Nhập series bo mạch chủ tương thích")
+    @Size(min = 5, max = 50, message = "Độ dài ít nhất từ 5 đến 50 ký tự")
     @JsonProperty("motherboard_compatible")
     private String motherboardCompatible;
 
-    @NotNull(message = "Cannot be null")
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("maximum_support_memory")
-    private int maximumSupportMemory;
-
-    @NotNull(message = "Cannot be null")
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Nhập bộ nhớ tối đa")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     @JsonProperty("maximum_bandwidth")
     private int maximumBandwidth;
 
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
+    @NotBlank(message = "Nhập loại RAM")
+    @Size(min = 1, max = 50, message = "Độ dài ít nhất từ 5 đến 50 ký tự")
     @JsonProperty("memory_type")
     private String memoryType;
 
     @JsonProperty("is_graphics_core")
-    private boolean isGraphicsCore = false;
-
-    @Size(min = 1, max = 35, message = "Must be between 1 and 35 characters")
-    @JsonProperty("pci_edition")
-    private String pciEdition = "";
-
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    @JsonProperty("pci_configuration")
-    private String pciConfiguration = "";
-
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("maximum_pci_ports")
-    private int maximumPciPorts = 0;
+    private boolean isGraphicsCore;
 
     public String getSocket() {
         return socket;
@@ -150,12 +126,12 @@ public class CpuDetailCreateRequest extends DetailDtoRequest {
         this.baseEfficiencyCore = baseEfficiencyCore;
     }
 
-    public String getConsumption() {
-        return consumption;
+    public float getPowerConsumption() {
+        return powerConsumption;
     }
 
-    public void setConsumption(String consumption) {
-        this.consumption = consumption;
+    public void setPowerConsumption(float powerConsumption) {
+        this.powerConsumption = powerConsumption;
     }
 
     public int getCache() {
@@ -172,14 +148,6 @@ public class CpuDetailCreateRequest extends DetailDtoRequest {
 
     public void setMotherboardCompatible(String motherboardCompatible) {
         this.motherboardCompatible = motherboardCompatible;
-    }
-
-    public int getMaximumSupportMemory() {
-        return maximumSupportMemory;
-    }
-
-    public void setMaximumSupportMemory(int maximumSupportMemory) {
-        this.maximumSupportMemory = maximumSupportMemory;
     }
 
     public int getMaximumBandwidth() {
@@ -204,30 +172,6 @@ public class CpuDetailCreateRequest extends DetailDtoRequest {
 
     public void setGraphicsCore(boolean graphicsCore) {
         isGraphicsCore = graphicsCore;
-    }
-
-    public String getPciEdition() {
-        return pciEdition;
-    }
-
-    public void setPciEdition(String pciEdition) {
-        this.pciEdition = pciEdition;
-    }
-
-    public String getPciConfiguration() {
-        return pciConfiguration;
-    }
-
-    public void setPciConfiguration(String pciConfiguration) {
-        this.pciConfiguration = pciConfiguration;
-    }
-
-    public int getMaximumPciPorts() {
-        return maximumPciPorts;
-    }
-
-    public void setMaximumPciPorts(int maximumPciPorts) {
-        this.maximumPciPorts = maximumPciPorts;
     }
 
 }

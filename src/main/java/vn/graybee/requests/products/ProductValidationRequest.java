@@ -7,19 +7,15 @@ import jakarta.validation.constraints.Size;
 public class ProductValidationRequest {
 
     @JsonProperty("category_name")
-    @NotBlank(message = "Cannot be blank")
+    @NotBlank(message = "Tên danh mục không thể trống")
     private String categoryName;
 
     @JsonProperty("manufacturer_name")
-    @NotBlank(message = "Cannot be blank")
+    @NotBlank(message = "Tên nhà sản xuất không thể trống")
     private String manufacturerName;
 
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String model;
-
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
+    @NotBlank(message = "Tên sản phẩm không thể trống")
+    @Size(min = 5, max = 300, message = "Độ dài ít nhất từ 5 đến 300 ký tự")
     private String name;
 
     public String getCategoryName() {
@@ -37,15 +33,7 @@ public class ProductValidationRequest {
     public void setManufacturerName(String manufacturerName) {
         this.manufacturerName = manufacturerName;
     }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
+    
     public String getName() {
         return name;
     }

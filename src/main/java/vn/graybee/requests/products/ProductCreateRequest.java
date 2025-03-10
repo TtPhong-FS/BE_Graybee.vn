@@ -6,63 +6,51 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.enums.Condition;
 import vn.graybee.requests.DetailDtoRequest;
 
 @MappedSuperclass
 public class ProductCreateRequest {
 
     @JsonProperty("category_name")
-    @NotBlank(message = "Cannot be blank")
+    @NotBlank(message = "Tên danh mục không thể trống")
     private String categoryName;
 
     @JsonProperty("manufacturer_name")
-    @NotBlank(message = "Cannot be blank")
+    @NotBlank(message = "Tên nhà sản xuất không thể trống")
     private String manufacturerName;
 
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String model;
-
-    @NotBlank(message = "Cannot be blank")
-    @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
+    @NotBlank(message = "Tên sản phẩm không thể trống")
+    @Size(min = 5, max = 300, message = "Độ dài ít nhất từ 5 đến 300 ký tự")
     private String name;
 
-    @NotNull(message = "Cannot be null")
-    private Condition conditions;
+    @NotNull(message = "Tình trạng không thể trống")
+    private String conditions;
 
-    @Positive(message = "Must be a positive number")
-    @NotNull(message = "Cannot be null")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Bảo hành không thể trống")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     private int warranty;
 
-    @PositiveOrZero(message = "Cannot be a negative number")
-    @DecimalMax(value = "100.0", message = "Must be between 0 and 100kg")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
+    @DecimalMax(value = "100.0", message = "Đã vượt quá cân nặng tối đa là 100kg")
     private float weight;
 
     @Size(max = 50, message = "Độ dài không vượt quá 50 ký tự")
     private String dimension;
 
-    @PositiveOrZero(message = "Cannot be a negative number")
-    @DecimalMax(value = "100000000.0", message = "Must be between 0 and 100.000.000VND")
-    @DecimalMin(value = "0.0", message = "Cannot be a negative number")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
+    @DecimalMax(value = "100000000.0", message = "Giá tối đa là 100.000.000VND")
+    @DecimalMin(value = "0.0", message = "Giá thấp nhất là 0VND")
     private float price;
 
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
     private int discount_percent;
 
-    @PositiveOrZero(message = "Cannot be a negative number")
-    @DecimalMax(value = "100000000.0", message = "Must be between 0 and 100.000.000VND")
-    @DecimalMin(value = "0.0", message = "Cannot be a negative number")
-    private float newPrice;
-
-    @Size(min = 1, max = 35, message = "Must be between 1 and 35 characters")
+    @Size(max = 35, message = "Độ dài tối đa 35 ký tự")
     private String color;
 
-    @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
+    @Size(max = 300, message = "Độ dài tối đa 300 ký tự")
     private String thumbnail;
 
     private String description;
@@ -84,15 +72,7 @@ public class ProductCreateRequest {
     public void setDiscount_percent(int discount_percent) {
         this.discount_percent = discount_percent;
     }
-
-    public float getNewPrice() {
-        return newPrice;
-    }
-
-    public void setNewPrice(float newPrice) {
-        this.newPrice = newPrice;
-    }
-
+    
     public String getCategoryName() {
         return categoryName;
     }
@@ -109,14 +89,6 @@ public class ProductCreateRequest {
         this.manufacturerName = manufacturerName;
     }
 
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
     public String getName() {
         return name;
     }
@@ -125,11 +97,11 @@ public class ProductCreateRequest {
         this.name = name;
     }
 
-    public Condition getConditions() {
+    public String getConditions() {
         return conditions;
     }
 
-    public void setConditions(Condition conditions) {
+    public void setConditions(String conditions) {
         this.conditions = conditions;
     }
 

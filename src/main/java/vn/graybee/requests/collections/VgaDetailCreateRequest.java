@@ -19,8 +19,18 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("memory_protocol")
-    private int memoryProtocol;
+    @JsonProperty("memory_bus")
+    private int memoryBus;
+
+    @Size(min = 1, max = 30, message = "Must be between 1 and 20 characters")
+    @NotBlank(message = "Cannot be blank")
+    private String memory;
+
+    @Positive(message = "Must be a positive number")
+    @PositiveOrZero(message = "Cannot be a negative number")
+    @NotNull(message = "Cannot be null")
+    @JsonProperty("cuda_kernel")
+    private int cudaKernel;
 
     @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
     @NotBlank(message = "Cannot be blank")
@@ -29,30 +39,16 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("multiple_screen")
-    private int multipleScreen = 3;
+    @JsonProperty("maximum_screen")
+    private int maximumScreen;
 
-    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 100 characters")
     @NotBlank(message = "Cannot be blank")
-    @JsonProperty("protocols")
-    private String protocols;
+    private String ports;
 
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
+    @Size(min = 1, max = 200, message = "Must be between 1 and 100 characters")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("gpu_clock")
-    private int gpuClock;
-
-    @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    @NotBlank(message = "Cannot be blank")
-    @JsonProperty("bus_standard")
-    private String busStandard;
-
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
-    @NotNull(message = "Cannot be null")
-    @JsonProperty("number_of_processing_unit")
-    private int numberOfProcessingUnit;
+    private String clock;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
@@ -66,13 +62,8 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
     @JsonProperty("psu_recommend")
     private int psuRecommend;
 
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("directx")
-    private int directx = 11;
-
     @JsonProperty("is_application_support")
-    private boolean isApplicationSupport = false;
+    private boolean isApplicationSupport;
 
     public int getMemorySpeed() {
         return memorySpeed;
@@ -82,12 +73,28 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
         this.memorySpeed = memorySpeed;
     }
 
-    public int getMemoryProtocol() {
-        return memoryProtocol;
+    public int getMemoryBus() {
+        return memoryBus;
     }
 
-    public void setMemoryProtocol(int memoryProtocol) {
-        this.memoryProtocol = memoryProtocol;
+    public void setMemoryBus(int memoryBus) {
+        this.memoryBus = memoryBus;
+    }
+
+    public String getMemory() {
+        return memory;
+    }
+
+    public void setMemory(String memory) {
+        this.memory = memory;
+    }
+
+    public int getCudaKernel() {
+        return cudaKernel;
+    }
+
+    public void setCudaKernel(int cudaKernel) {
+        this.cudaKernel = cudaKernel;
     }
 
     public String getMaximumResolution() {
@@ -98,44 +105,28 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
         this.maximumResolution = maximumResolution;
     }
 
-    public int getMultipleScreen() {
-        return multipleScreen;
+    public int getMaximumScreen() {
+        return maximumScreen;
     }
 
-    public void setMultipleScreen(int multipleScreen) {
-        this.multipleScreen = multipleScreen;
+    public void setMaximumScreen(int maximumScreen) {
+        this.maximumScreen = maximumScreen;
     }
 
-    public String getProtocols() {
-        return protocols;
+    public String getPorts() {
+        return ports;
     }
 
-    public void setProtocols(String protocols) {
-        this.protocols = protocols;
+    public void setPorts(String ports) {
+        this.ports = ports;
     }
 
-    public int getGpuClock() {
-        return gpuClock;
+    public String getClock() {
+        return clock;
     }
 
-    public void setGpuClock(int gpuClock) {
-        this.gpuClock = gpuClock;
-    }
-
-    public String getBusStandard() {
-        return busStandard;
-    }
-
-    public void setBusStandard(String busStandard) {
-        this.busStandard = busStandard;
-    }
-
-    public int getNumberOfProcessingUnit() {
-        return numberOfProcessingUnit;
-    }
-
-    public void setNumberOfProcessingUnit(int numberOfProcessingUnit) {
-        this.numberOfProcessingUnit = numberOfProcessingUnit;
+    public void setClock(String clock) {
+        this.clock = clock;
     }
 
     public int getPowerConsumption() {
@@ -152,14 +143,6 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
 
     public void setPsuRecommend(int psuRecommend) {
         this.psuRecommend = psuRecommend;
-    }
-
-    public int getDirectx() {
-        return directx;
-    }
-
-    public void setDirectx(int directx) {
-        this.directx = directx;
     }
 
     public boolean isApplicationSupport() {

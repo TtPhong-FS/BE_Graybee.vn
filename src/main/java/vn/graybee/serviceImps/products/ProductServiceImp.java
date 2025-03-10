@@ -1,24 +1,21 @@
 package vn.graybee.serviceImps.products;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.constants.collections.ErrorGeneralConstants;
-import vn.graybee.constants.products.ErrorProductConstants;
+import vn.graybee.constants.categories.ConstantCategory;
+import vn.graybee.constants.collections.ConstantCollections;
+import vn.graybee.enums.GeneralStatus;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.categories.Category;
 import vn.graybee.models.categories.Manufacturer;
 import vn.graybee.models.products.Product;
+import vn.graybee.projections.product.ProductProjection;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.repositories.products.ProductRepository;
 import vn.graybee.requests.products.ProductCreateRequest;
-import vn.graybee.response.DetailDtoResponse;
 import vn.graybee.response.products.ProductResponse;
-import vn.graybee.response.publics.ProductBasicResponse;
 import vn.graybee.response.publics.collections.PcSummaryResponse;
 import vn.graybee.services.ProductDetailFactory;
 import vn.graybee.services.products.ProductDetailService;
@@ -28,12 +25,11 @@ import vn.graybee.validation.CategoryValidation;
 import vn.graybee.validation.ManufactureValidation;
 import vn.graybee.validation.ProductValidation;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProductServiceImp implements ProductService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     private final CategoryValidation categoryValidation;
 
@@ -60,58 +56,90 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    @Transactional
-    public BasicMessageResponse<ProductResponse> createProduct(ProductCreateRequest request) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<ProductResponse> create(ProductCreateRequest request) {
 
-        Category category = categoryValidation.validateCategoryExistsByName(request.getCategoryName());
-        Manufacturer manufacturer = manufactureValidation.findToCreateProduct(request.getManufacturerName());
+        String detailKey = request.getDetail().getClass().getSimpleName();
+        ProductDetailService service = productDetailFactory.getService(detailKey);
 
-        logger.info("Creating product with model: " + request.getModel() + ", name: " + request.getName());
+        if (service == null) {
+            throw new BusinessCustomException(ConstantCollections.DETAIL_TYPE_ERROR, ConstantCollections.MISSING_DETAIL_TYPE);
+        }
+
+        productValidation.validateNameExists(request.getName());
+
+        int category = categoryValidation.getIdByName(request.getCategoryName());
+        int manufacturer = manufactureValidation.getIdByName(request.getManufacturerName());
+
+        float newPrice = 0;
+
+        if (request.getPrice() != 0) {
+            float price = request.getPrice();
+            int discount = request.getDiscount_percent();
+
+            newPrice = price - (price * discount / 100);
+
+        }
 
         Product product = new Product(
-                TextUtils.capitalize(request.getModel()),
                 TextUtils.capitalizeEachWord(request.getName()),
                 request.getWarranty(),
                 request.getWeight(),
                 request.getDimension(),
                 request.getPrice(),
                 request.getDiscount_percent(),
-                request.getNewPrice(),
                 request.getColor(),
                 request.getDescription(),
                 request.getThumbnail()
         );
-        product.setConditions(request.getConditions().getDescription());
-        product.setStatus("ACTIVE");
-        product.setCategory(category);
-        product.setManufacturer(manufacturer);
+        product.setNewPrice(newPrice);
+        product.setConditions(request.getConditions().toUpperCase());
+        product.setStatus(GeneralStatus.ACTIVE);
+        product.setCategoryId(category);
+        product.setManufacturerId(manufacturer);
 
         Product savedProduct = productRepository.save(product);
 
-        updateProductCountCategory(product.getCategory().getId(), true);
-
-        updateProductCountManufacturer(product.getManufacturer().getId(), true);
-
-        logger.info("Creating product successfully with ID: {}", savedProduct.getId());
-
-        DetailDtoResponse detailDto = null;
         if (request.getDetail() != null) {
-            String detailKey = request.getDetail().getClass().getSimpleName();
-            System.out.println(detailKey);
-            ProductDetailService service = productDetailFactory.getService(detailKey);
-            System.out.println(service);
-            if (service != null) {
-                service.saveDetail(savedProduct, request.getDetail());
+            long productId = savedProduct.getId();
 
-                detailDto = service.getDetail(savedProduct);
-            } else {
-                throw new BusinessCustomException(ErrorGeneralConstants.DETAIL_TYPE_ERROR, ErrorGeneralConstants.MISSING_DETAIL_TYPE);
-            }
+            service.saveDetail(productId, request.getCategoryName(), request.getDetail());
+
         }
 
-        ProductResponse productResponse = new ProductResponse(savedProduct, detailDto);
+        updateProductCountCategory(category, true);
 
-        return new BasicMessageResponse<>(201, "Create Product success ", productResponse);
+        updateProductCountManufacturer(manufacturer, true);
+
+
+        ProductResponse productResponse = new ProductResponse(
+                savedProduct.getCreatedAt(),
+                savedProduct.getUpdatedAt(),
+                savedProduct.getId(),
+                savedProduct.getCategoryId(),
+                savedProduct.getManufacturerId(),
+                savedProduct.getName(),
+                savedProduct.getWarranty(),
+                savedProduct.getWeight(),
+                savedProduct.getDimension(),
+                savedProduct.getPrice(),
+                savedProduct.getDiscount_percent(),
+                savedProduct.getNewPrice(),
+                savedProduct.getColor(),
+                savedProduct.getDescription(),
+                savedProduct.getThumbnail(),
+                savedProduct.getConditions()
+        );
+
+        return new BasicMessageResponse<>(201, "Tạo sản phẩm thành công", productResponse);
+    }
+
+    @Override
+    @Transactional
+    public BasicMessageResponse<List<ProductProjection>> fetchAll() {
+        List<ProductProjection> products = productRepository.fetchAll();
+
+        return new BasicMessageResponse<>(200, "Danh sách sản phẩm", products);
     }
 
     @Override
@@ -121,8 +149,8 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public PcSummaryResponse findPCByCategoryName_PUBLIC(String categoryName) {
-        ProductBasicResponse product = productRepository.findByCategoryName_PUBLIC(categoryName)
-                .orElseThrow(() -> new CustomNotFoundException(ErrorProductConstants.GENERAL, ErrorProductConstants.PRODUCT_DOES_NOT_EXISTS));
+//        ProductBasicResponse product = productRepository.findByCategoryName_PUBLIC(categoryName)
+//                .orElseThrow(() -> new CustomNotFoundException(ConstantProduct.GENERAL, ConstantProduct.PRODUCT_DOES_NOT_EXISTS));
 
 
         return null;
@@ -130,7 +158,9 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public void updateProductCountManufacturer(int ManufacturerId, boolean isIncrease) {
-        Manufacturer manufacturer = manufactureValidation.findToUpdateStatusDelete(ManufacturerId);
+        Manufacturer manufacturer = manufacturerRepository.findById(ManufacturerId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.MANUFACTURER_NAME
+                        , ConstantCategory.MANUFACTURER_DOES_NOT_EXIST));
         if (isIncrease) {
             manufacturer.increaseProductCount();
         } else {
@@ -143,7 +173,8 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public void updateProductCountCategory(int CategoryId, boolean isIncrease) {
-        Category category = categoryValidation.validateCategoryExistsById(CategoryId);
+        Category category = categoryRepository.findById(CategoryId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.CATEGORY_NAME, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
 
         if (isIncrease) {
             category.increaseProductCount();

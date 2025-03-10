@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -14,18 +14,15 @@ import vn.graybee.models.products.Product;
 @Table(name = "keyboard_details")
 public class KeyboardDetail {
 
+
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
-
-    @Column(name = "key_material", length = 30)
-    private String keyMaterial;
 
     private int design;
 
@@ -38,7 +35,7 @@ public class KeyboardDetail {
     @Column(name = "switch_type", length = 30)
     private String switchType;
 
-    @Column(length = 30)
+    @Column(length = 50)
     private String compatible;
 
     @Column(length = 100)
@@ -50,9 +47,8 @@ public class KeyboardDetail {
     @Column(length = 30)
     private String led;
 
-    public KeyboardDetail(Product product, String keyMaterial, int design, String connect, String keyCap, String switchType, String compatible, String feature, String support, String led) {
-        this.product = product;
-        this.keyMaterial = keyMaterial;
+    public KeyboardDetail(Long productId, int design, String connect, String keyCap, String switchType, String compatible, String feature, String support, String led) {
+        this.productId = productId;
         this.design = design;
         this.connect = connect;
         this.keyCap = keyCap;
@@ -66,14 +62,6 @@ public class KeyboardDetail {
     public KeyboardDetail() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Product getProduct() {
         return product;
     }
@@ -82,12 +70,12 @@ public class KeyboardDetail {
         this.product = product;
     }
 
-    public String getKeyMaterial() {
-        return keyMaterial;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setKeyMaterial(String keyMaterial) {
-        this.keyMaterial = keyMaterial;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public int getDesign() {

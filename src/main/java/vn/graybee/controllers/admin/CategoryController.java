@@ -13,14 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.models.categories.Category;
-import vn.graybee.projections.CategoryProjection;
+import vn.graybee.projections.category.CategoryProjection;
+import vn.graybee.projections.category.SubCategorySummaryProject;
 import vn.graybee.requests.categories.CategoryCreateRequest;
+import vn.graybee.requests.categories.CategoryUpdateRequest;
 import vn.graybee.response.categories.CategoryResponse;
-import vn.graybee.response.categories.CategoryStatusResponse;
-import vn.graybee.response.categories.SubCategorySummaryResponse;
 import vn.graybee.services.categories.CategoryService;
-import vn.graybee.services.categories.CategorySubCategoryServices;
+import vn.graybee.services.categories.SubCategoryServices;
 
 import java.util.List;
 
@@ -31,23 +30,21 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    private final CategorySubCategoryServices categorySubCategoryServices;
+    private final SubCategoryServices subCategoryServices;
 
-    public CategoryController(CategoryService categoryService, CategorySubCategoryServices categorySubCategoryServices) {
+    public CategoryController(CategoryService categoryService, SubCategoryServices subCategoryServices) {
         this.categoryService = categoryService;
-        this.categorySubCategoryServices = categorySubCategoryServices;
+        this.subCategoryServices = subCategoryServices;
     }
 
     @GetMapping
     public ResponseEntity<BasicMessageResponse<List<CategoryProjection>>> getCategories() {
-
         return ResponseEntity.ok(categoryService.getCategories());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<Category>> getCategoryById(@PathVariable("id") int id) {
-
-        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> getCategoryById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(categoryService.findById(id));
     }
 
     //
@@ -61,7 +58,7 @@ public class CategoryController {
 //
     @PostMapping
     public ResponseEntity<BasicMessageResponse<CategoryResponse>> createCategory(@RequestBody @Valid CategoryCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategoryWithSubCategory(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(request));
     }
 
     @DeleteMapping("/{id}")
@@ -69,14 +66,14 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.deleteCategoryById(id));
     }
 
-    @PutMapping("/{id}/status-delete")
-    public ResponseEntity<BasicMessageResponse<CategoryStatusResponse>> updateStatusDeleteRecord(@PathVariable("id") int id) {
-        return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateStatusDeleteRecord(id));
+    @PutMapping("/{id}/update")
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> updateCategory(@PathVariable("id") int id, @RequestBody @Valid CategoryUpdateRequest request) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, request));
     }
 
     @GetMapping("/{id}/subcategories")
-    public ResponseEntity<BasicMessageResponse<List<SubCategorySummaryResponse>>> fetchSubCategoryByCategoryId(@PathVariable int id) {
-        return ResponseEntity.status(HttpStatus.OK).body(categorySubCategoryServices.findByCategoryId(id));
+    public ResponseEntity<BasicMessageResponse<List<SubCategorySummaryProject>>> fetchSubCategoryByCategoryId(@PathVariable int id) {
+        return ResponseEntity.status(HttpStatus.OK).body(subCategoryServices.findByCategoryId(id));
     }
 
 }

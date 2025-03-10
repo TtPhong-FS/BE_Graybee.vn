@@ -4,13 +4,15 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.ManufacturerProjection;
+import vn.graybee.projections.category.ManufacturerProjection;
 import vn.graybee.requests.categories.ManufacturerCreateRequest;
 import vn.graybee.response.categories.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
@@ -36,20 +38,16 @@ public class ManufacturerController {
 
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> createManufacturer(@RequestBody @Valid ManufacturerCreateRequest request) {
-        BasicMessageResponse<ManufacturerResponse> manufacturerResponse = manufacturerService.insertManufacturer(request);
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> create(@RequestBody @Valid ManufacturerCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                manufacturerResponse);
+                manufacturerService.create(request));
     }
-//
-//    @DeleteMapping("/delete-manufacturer")
-//    public ResponseEntity<MessageResponse> deleteManufacturerById(@RequestParam("id") long id) {
-//        manufacturerService.deleteManufacturerById(id);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(
-//                new MessageResponse("200", "Delete Manufacturer successfully", null)
-//        );
-//    }
-//
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Integer>> deleteManufacturerById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(manufacturerService.deleteById(id));
+    }
+
 //    @PutMapping("/update-manufacturer")
 //    public ResponseEntity<MessageResponse> updateStatusDeleteRecord(@RequestParam("id") long id) {
 //        manufacturerService.updateStatusDeleteRecord(id);

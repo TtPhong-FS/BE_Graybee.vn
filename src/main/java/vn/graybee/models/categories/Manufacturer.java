@@ -2,10 +2,13 @@ package vn.graybee.models.categories;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import vn.graybee.enums.CategoryStatus;
 import vn.graybee.models.others.BaseModel;
 
 @Entity
@@ -19,7 +22,9 @@ public class Manufacturer extends BaseModel {
     @Column(nullable = false, length = 50, unique = true)
     private String name;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private CategoryStatus status;
 
     @Column(name = "product_count")
     private int productCount;
@@ -57,11 +62,11 @@ public class Manufacturer extends BaseModel {
         this.name = name;
     }
 
-    public String getStatus() {
+    public CategoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(CategoryStatus status) {
         this.status = status;
     }
 

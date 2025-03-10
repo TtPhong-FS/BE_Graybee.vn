@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -14,13 +14,13 @@ import vn.graybee.models.products.Product;
 @Table(name = "motherboard_details")
 public class MotherBoardDetail {
 
+
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -75,8 +75,8 @@ public class MotherBoardDetail {
     public MotherBoardDetail() {
     }
 
-    public MotherBoardDetail(Product product, String chipset, String socket, String cpuSupport, String memorySupport, String integratedGraphics, String soundSupport, String expansionSlots, String storageSupport, String usbSupport, String wirelessConnectivity, String operatingSystemSupport, String internalInputOutputConnectivity, String rearInputOutputConnectivity, String supportingSoftware, String bios, String accessory) {
-        this.product = product;
+    public MotherBoardDetail(Long productId, String chipset, String socket, String cpuSupport, String memorySupport, String integratedGraphics, String soundSupport, String expansionSlots, String storageSupport, String usbSupport, String wirelessConnectivity, String operatingSystemSupport, String internalInputOutputConnectivity, String rearInputOutputConnectivity, String supportingSoftware, String bios, String accessory) {
+        this.productId = productId;
         this.chipset = chipset;
         this.socket = socket;
         this.cpuSupport = cpuSupport;
@@ -95,20 +95,20 @@ public class MotherBoardDetail {
         this.accessory = accessory;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Product getProduct() {
         return product;
     }
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getChipset() {

@@ -1,18 +1,14 @@
 package vn.graybee.models.products;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import vn.graybee.models.categories.Category;
-import vn.graybee.models.categories.Manufacturer;
+import vn.graybee.enums.GeneralStatus;
 import vn.graybee.models.others.BaseModel;
 
 @Entity
@@ -23,18 +19,11 @@ public class Product extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @Column(name = "category_id")
+    private Integer categoryId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinColumn(name = "manufacturer_id")
-    private Manufacturer manufacturer;
-
-    @Column(nullable = false, length = 100, unique = true)
-    private String model;
+    @Column(name = "manufacturer_id")
+    private Integer manufacturerId;
 
     @Column(unique = true, nullable = false, length = 200)
     private String name;
@@ -65,21 +54,20 @@ public class Product extends BaseModel {
     @Column(length = 300)
     private String thumbnail;
 
-    @Column(length = 20)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private GeneralStatus status;
 
     public Product() {
     }
 
-    public Product(String model, String name, int warranty, float weight, String dimension, float price, int discount_percent, float newPrice, String color, String description, String thumbnail) {
-        this.model = model;
+    public Product(String name, int warranty, float weight, String dimension, float price, int discount_percent, String color, String description, String thumbnail) {
         this.name = name;
         this.warranty = warranty;
         this.weight = weight;
         this.dimension = dimension;
         this.price = price;
         this.discount_percent = discount_percent;
-        this.newPrice = newPrice;
         this.color = color;
         this.description = description;
         this.thumbnail = thumbnail;
@@ -93,28 +81,20 @@ public class Product extends BaseModel {
         this.id = id;
     }
 
-    public Category getCategory() {
-        return category;
+    public Integer getManufacturerId() {
+        return manufacturerId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setManufacturerId(Integer manufacturerId) {
+        this.manufacturerId = manufacturerId;
     }
 
-    public Manufacturer getManufacturer() {
-        return manufacturer;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setManufacturer(Manufacturer manufacturer) {
-        this.manufacturer = manufacturer;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getName() {
@@ -205,11 +185,11 @@ public class Product extends BaseModel {
         this.thumbnail = thumbnail;
     }
 
-    public String getStatus() {
+    public GeneralStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(GeneralStatus status) {
         this.status = status;
     }
 

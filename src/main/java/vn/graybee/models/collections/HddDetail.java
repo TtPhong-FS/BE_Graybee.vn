@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -14,13 +14,13 @@ import vn.graybee.models.products.Product;
 @Table(name = "hdd_details")
 public class HddDetail {
 
+
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -30,8 +30,8 @@ public class HddDetail {
     @Column(name = "capacity", nullable = false)
     private int capacity;
 
-    @Column(name = "hours_to_failure")
-    private int hoursToFailure;
+    @Column(name = "life_span")
+    private int lifeSpan;
 
     @Column(name = "reading_speed", nullable = false)
     private int readingSpeed;
@@ -39,39 +39,24 @@ public class HddDetail {
     @Column(name = "writing_speed", nullable = false)
     private int writingSpeed;
 
-    @Column(name = "memory_technology", nullable = false, length = 50)
-    private String memoryTechnology;
-
     @Column(name = "noise_level", nullable = false)
     private float noiseLevel;
 
     private int cache;
 
-    @Column(name = "revolution_per_minutes")
-    private int revolutionPerMinutes;
 
     public HddDetail() {
     }
 
-    public HddDetail(Product product, String communicationStandard, int capacity, int hoursToFailure, int readingSpeed, int writingSpeed, String memoryTechnology, float noiseLevel, int cache, int revolutionPerMinutes) {
-        this.product = product;
+    public HddDetail(Long productId, String communicationStandard, int capacity, int lifeSpan, int readingSpeed, int writingSpeed, float noiseLevel, int cache) {
+        this.productId = productId;
         this.communicationStandard = communicationStandard;
         this.capacity = capacity;
-        this.hoursToFailure = hoursToFailure;
+        this.lifeSpan = lifeSpan;
         this.readingSpeed = readingSpeed;
         this.writingSpeed = writingSpeed;
-        this.memoryTechnology = memoryTechnology;
         this.noiseLevel = noiseLevel;
         this.cache = cache;
-        this.revolutionPerMinutes = revolutionPerMinutes;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Product getProduct() {
@@ -81,6 +66,15 @@ public class HddDetail {
     public void setProduct(Product product) {
         this.product = product;
     }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
 
     public String getCommunicationStandard() {
         return communicationStandard;
@@ -98,12 +92,12 @@ public class HddDetail {
         this.capacity = capacity;
     }
 
-    public int getHoursToFailure() {
-        return hoursToFailure;
+    public int getLifeSpan() {
+        return lifeSpan;
     }
 
-    public void setHoursToFailure(int hoursToFailure) {
-        this.hoursToFailure = hoursToFailure;
+    public void setLifeSpan(int lifeSpan) {
+        this.lifeSpan = lifeSpan;
     }
 
     public int getReadingSpeed() {
@@ -122,14 +116,6 @@ public class HddDetail {
         this.writingSpeed = writingSpeed;
     }
 
-    public String getMemoryTechnology() {
-        return memoryTechnology;
-    }
-
-    public void setMemoryTechnology(String memoryTechnology) {
-        this.memoryTechnology = memoryTechnology;
-    }
-
     public float getNoiseLevel() {
         return noiseLevel;
     }
@@ -144,14 +130,6 @@ public class HddDetail {
 
     public void setCache(int cache) {
         this.cache = cache;
-    }
-
-    public int getRevolutionPerMinutes() {
-        return revolutionPerMinutes;
-    }
-
-    public void setRevolutionPerMinutes(int revolutionPerMinutes) {
-        this.revolutionPerMinutes = revolutionPerMinutes;
     }
 
 }

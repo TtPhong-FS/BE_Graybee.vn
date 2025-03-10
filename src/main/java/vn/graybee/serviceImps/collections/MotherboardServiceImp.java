@@ -1,37 +1,42 @@
 package vn.graybee.serviceImps.collections;
 
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.constants.collections.ErrorGeneralConstants;
+import vn.graybee.constants.collections.ConstantCollections;
 import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.collections.MotherBoardDetail;
-import vn.graybee.models.products.Product;
+import vn.graybee.projections.collections.MotherboardDetailProjection;
 import vn.graybee.repositories.collections.MotherboardRepository;
 import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.collections.MotherboardDetailCreateRequest;
-import vn.graybee.response.DetailDtoResponse;
 import vn.graybee.services.products.ProductDetailService;
+
+import java.util.List;
 
 @Service
 public class MotherboardServiceImp implements ProductDetailService {
 
+    private final EntityManager entityManager;
 
     private final MotherboardRepository motherboardRepository;
 
-    public MotherboardServiceImp(MotherboardRepository motherboardRepository) {
+    public MotherboardServiceImp(EntityManager entityManager, MotherboardRepository motherboardRepository) {
+        this.entityManager = entityManager;
         this.motherboardRepository = motherboardRepository;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveDetail(Product product, DetailDtoRequest request) {
-        if (!product.getCategory().getName().equalsIgnoreCase("motherboard")) {
-            throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_MOTHERBOARD_TYPE);
+    public void saveDetail(long productId, String detailType, DetailDtoRequest request) {
+        if (!detailType.equalsIgnoreCase("motherboard")) {
+            throw new BusinessCustomException(ConstantCollections.PRODUCT_TYPE_ERROR, ConstantCollections.MISSING_MOTHERBOARD_TYPE);
         }
         MotherboardDetailCreateRequest motherboardDto = (MotherboardDetailCreateRequest) request;
         MotherBoardDetail motherboard = new MotherBoardDetail(
-                product,
+                productId,
                 motherboardDto.getChipset(),
                 motherboardDto.getSocket(),
                 motherboardDto.getCpuSupport(),
@@ -49,19 +54,19 @@ public class MotherboardServiceImp implements ProductDetailService {
                 motherboardDto.getBios(),
                 motherboardDto.getAccessory()
         );
-        motherboardRepository.save(motherboard);
-
+        entityManager.persist(motherboard);
     }
-
-    @Override
-    public DetailDtoResponse getDetail(Product product) {
-        return null;
-    }
-
 
     @Override
     public String getDetailType() {
         return "MotherboardDetailCreateRequest";
+    }
+
+
+    public BasicMessageResponse<List<MotherboardDetailProjection>> fetchAll() {
+        List<MotherboardDetailProjection> motherboards = motherboardRepository.fetchAll();
+
+        return new BasicMessageResponse<>(200, "Danh sách MOTHERBOARD: ", motherboards);
     }
 
 }

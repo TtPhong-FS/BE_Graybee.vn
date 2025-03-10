@@ -1,13 +1,16 @@
 package vn.graybee.response.products;
 
-import vn.graybee.models.products.Product;
-import vn.graybee.response.DetailDtoResponse;
+import vn.graybee.response.BaseResponse;
 
-public class ProductResponse {
+import java.time.LocalDateTime;
+
+public class ProductResponse extends BaseResponse {
 
     private long id;
 
-    private String model;
+    private int categoryId;
+
+    private int manufacturerId;
 
     private String name;
 
@@ -19,6 +22,10 @@ public class ProductResponse {
 
     private float price;
 
+    private int discountPercentage;
+
+    private float newPrice;
+
     private String color;
 
     private String description;
@@ -27,51 +34,64 @@ public class ProductResponse {
 
     private String conditions;
 
-    private int categoryId;
-
-    private int manufacturerId;
-
-    private DetailDtoResponse detail;
-
-    public ProductResponse() {
-    }
-
-    public ProductResponse(Product product, DetailDtoResponse detail) {
-        this.id = product.getId();
-        this.model = product.getModel();
-        this.name = product.getName();
-        this.warranty = product.getWarranty();
-        this.weight = product.getWeight();
-        this.dimension = product.getDimension();
-        this.price = product.getPrice();
-        this.color = product.getColor();
-        this.description = product.getDescription();
-        this.thumbnail = product.getThumbnail();
-        this.conditions = product.getConditions();
-        this.categoryId = product.getCategory().getId();
-        this.manufacturerId = product.getManufacturer().getId();
-        this.detail = detail;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
+    public ProductResponse(LocalDateTime createdAt, LocalDateTime updatedAt, long id, int categoryId, int manufacturerId, String name, int warranty, float weight, String dimension, float price, int discountPercentage, float newPrice, String color, String description, String thumbnail, String conditions) {
+        super(createdAt, updatedAt);
         this.id = id;
+        this.categoryId = categoryId;
+        this.manufacturerId = manufacturerId;
+        this.name = name;
+        this.warranty = warranty;
+        this.weight = weight;
+        this.dimension = dimension;
+        this.price = price;
+        this.discountPercentage = discountPercentage;
+        this.newPrice = newPrice;
+        this.color = color;
+        this.description = description;
+        this.thumbnail = thumbnail;
+        this.conditions = conditions;
+    }
+
+    public int getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(int discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
+
+    public float getNewPrice() {
+        return newPrice;
+    }
+
+    public void setNewPrice(float newPrice) {
+        this.newPrice = newPrice;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public void setId(long id) {
         this.id = id;
     }
 
-    public String getModel() {
-        return model;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setModel(String model) {
-        this.model = model;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
+
+    public int getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public void setManufacturerId(int manufacturerId) {
+        this.manufacturerId = manufacturerId;
+    }
+
 
     public String getName() {
         return name;
@@ -81,24 +101,12 @@ public class ProductResponse {
         this.name = name;
     }
 
-    public Integer getWarranty() {
+    public int getWarranty() {
         return warranty;
-    }
-
-    public void setWarranty(Integer warranty) {
-        this.warranty = warranty;
     }
 
     public void setWarranty(int warranty) {
         this.warranty = warranty;
-    }
-
-    public String getDimension() {
-        return dimension;
-    }
-
-    public void setDimension(String dimension) {
-        this.dimension = dimension;
     }
 
     public float getWeight() {
@@ -107,6 +115,14 @@ public class ProductResponse {
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    public String getDimension() {
+        return dimension;
+    }
+
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
     }
 
     public float getPrice() {
@@ -147,30 +163,6 @@ public class ProductResponse {
 
     public void setConditions(String conditions) {
         this.conditions = conditions;
-    }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public int getManufacturerId() {
-        return manufacturerId;
-    }
-
-    public void setManufacturerId(int manufacturerId) {
-        this.manufacturerId = manufacturerId;
-    }
-
-    public DetailDtoResponse getDetail() {
-        return detail;
-    }
-
-    public void setDetail(DetailDtoResponse detail) {
-        this.detail = detail;
     }
 
 }

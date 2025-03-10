@@ -1,14 +1,16 @@
 package vn.graybee.response.categories;
 
+import vn.graybee.enums.CategoryStatus;
+
 public class CategoryStatusResponse {
 
     private int id;
 
-    private boolean isDeleted;
+    private CategoryStatus status;
 
-    public CategoryStatusResponse(int id, boolean isDeleted) {
+    public CategoryStatusResponse(int id, CategoryStatus status) {
         this.id = id;
-        this.isDeleted = isDeleted;
+        this.status = status;
     }
 
     public int getId() {
@@ -19,12 +21,12 @@ public class CategoryStatusResponse {
         this.id = id;
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
+    public CategoryStatus getStatus() {
+        return status;
     }
 
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+    public void setStatus(CategoryStatus status) {
+        this.status = status;
     }
 
 }

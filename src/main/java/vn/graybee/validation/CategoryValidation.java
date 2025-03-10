@@ -1,12 +1,14 @@
 package vn.graybee.validation;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.categories.ErrorCategoryConstants;
+import vn.graybee.constants.categories.ConstantCategory;
+import vn.graybee.enums.CategoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
-import vn.graybee.models.categories.Category;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.products.ProductRepository;
+import vn.graybee.response.categories.CategoryResponse;
+import vn.graybee.response.categories.CategoryStatusResponse;
 
 @Service
 public class CategoryValidation {
@@ -20,38 +22,39 @@ public class CategoryValidation {
         this.productRepository = productRepository;
     }
 
-    public Category validateCategoryExistsByName(String categoryName) {
-        Category category = categoryRepository.findToCreateProduct(categoryName)
-                .orElseThrow(() -> new CustomNotFoundException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST));
+    public int getIdByName(String categoryName) {
+        CategoryStatusResponse category = categoryRepository.getStatusAndIdByName(categoryName)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
 
-        if (category.getStatus().equals("DELETED")) {
-            throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_TEMPORARILY_FLAGGED);
+        if (category.getStatus().equals(CategoryStatus.DELETED)) {
+            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_TEMPORARILY_FLAGGED);
         }
-        return category;
+        return category.getId();
     }
 
-    public Category validateCategoryExistsById(int categoryId) {
-        return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CustomNotFoundException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST));
+    public CategoryResponse validateCategoryExistsById(int categoryId) {
+        return categoryRepository.getById(categoryId)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
     }
 
-    public void checkExists(int id) {
-        if (categoryRepository.checkExistsById(id).isEmpty()) {
-            throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_DOES_NOT_EXIST);
-        }
-    }
-
-    public void checkUsedProduct(int id) {
-        if (productRepository.existsByCategoryId(id)) {
-            throw new BusinessCustomException(ErrorCategoryConstants.GENERAL_ERROR, ErrorCategoryConstants.CATEGORY_ID_USED_IN_PRODUCT);
+    public void countProductById(int id) {
+        int products = categoryRepository.getCountProductById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
+        if (products > 0) {
+            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_ID_USED_IN_PRODUCT);
         }
     }
 
-    public void validateNameExists(String name) {
+    public void findById(int id) {
+        if (categoryRepository.findById(id).isEmpty()) {
+            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST);
+        }
+    }
+
+    public void checkExistByName(String name) {
         if (categoryRepository.validateNameExists(name).isPresent()) {
-            throw new BusinessCustomException(ErrorCategoryConstants.NAME_ERROR, ErrorCategoryConstants.CATEGORY_NAME_EXISTS);
+            throw new BusinessCustomException(ConstantCategory.NAME, ConstantCategory.CATEGORY_NAME_EXISTS);
         }
     }
-
 
 }

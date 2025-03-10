@@ -31,7 +31,7 @@ public class MonitorDetailCreateRequest extends DetailDtoRequest {
     private String aspectRatio;
 
     @JsonProperty("is_speaker")
-    private boolean isSpeaker = false;
+    private boolean isSpeaker;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 40, message = "Must be between 1 and 40 characters")
@@ -52,7 +52,7 @@ public class MonitorDetailCreateRequest extends DetailDtoRequest {
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("refresh_rate")
-    private int refreshRate = 0;
+    private int refreshRate;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
@@ -61,31 +61,31 @@ public class MonitorDetailCreateRequest extends DetailDtoRequest {
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("power_consumption")
-    private int powerConsumption = 0;
+    private int powerConsumption;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("power_save_mode")
-    private int powerSaveMode = 0;
+    private int powerSaveMode;
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("power_off_mode")
-    private float powerOffMode = 0;
+    private float powerOffMode;
 
     @PositiveOrZero(message = "Cannot be a negative number")
-    private float voltage = 0;
+    private float voltage;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @JsonProperty("special_feature")
-    private String specialFeature = "";
+    private String specialFeature;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("hours_to_failure")
-    private int hoursToFailure = 0;
+    @JsonProperty("life_span")
+    private int lifeSpan;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String accessory = "";
+    private String accessory;
 
     public int getScreenSize() {
         return screenSize;
@@ -207,12 +207,12 @@ public class MonitorDetailCreateRequest extends DetailDtoRequest {
         this.specialFeature = specialFeature;
     }
 
-    public int getHoursToFailure() {
-        return hoursToFailure;
+    public int getLifeSpan() {
+        return lifeSpan;
     }
 
-    public void setHoursToFailure(int hoursToFailure) {
-        this.hoursToFailure = hoursToFailure;
+    public void setLifeSpan(int lifeSpan) {
+        this.lifeSpan = lifeSpan;
     }
 
     public String getAccessory() {

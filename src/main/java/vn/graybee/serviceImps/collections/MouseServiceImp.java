@@ -1,38 +1,44 @@
 package vn.graybee.serviceImps.collections;
 
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.constants.collections.ErrorGeneralConstants;
+import vn.graybee.constants.collections.ConstantCollections;
 import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.collections.MouseDetail;
-import vn.graybee.models.products.Product;
+import vn.graybee.projections.collections.MouseDetailProjection;
 import vn.graybee.repositories.collections.MouseRepository;
 import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.collections.MouseDetailCreateRequest;
-import vn.graybee.response.DetailDtoResponse;
 import vn.graybee.services.products.ProductDetailService;
+
+import java.util.List;
 
 @Service
 public class MouseServiceImp implements ProductDetailService {
 
+    private final EntityManager entityManager;
+
 
     private final MouseRepository mouseRepository;
 
-    public MouseServiceImp(MouseRepository mouseRepository) {
+    public MouseServiceImp(EntityManager entityManager, MouseRepository mouseRepository) {
+        this.entityManager = entityManager;
         this.mouseRepository = mouseRepository;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveDetail(Product product, DetailDtoRequest request) {
+    public void saveDetail(long productId, String detailType, DetailDtoRequest request) {
 
-        if (!product.getCategory().getName().equalsIgnoreCase("mouse")) {
-            throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_MOUSE_TYPE);
+        if (!detailType.equalsIgnoreCase("mouse")) {
+            throw new BusinessCustomException(ConstantCollections.PRODUCT_TYPE_ERROR, ConstantCollections.MISSING_MOUSE_TYPE);
         }
         MouseDetailCreateRequest mouseDto = (MouseDetailCreateRequest) request;
         MouseDetail mouse = new MouseDetail(
-                product,
+                productId,
                 mouseDto.getSensors(),
                 mouseDto.getNumberOfNodes(),
                 mouseDto.getSwitchType(),
@@ -44,18 +50,18 @@ public class MouseServiceImp implements ProductDetailService {
                 mouseDto.getBattery(),
                 mouseDto.getLed()
         );
-        mouseRepository.save(mouse);
+        entityManager.persist(mouse);
     }
-
-    @Override
-    public DetailDtoResponse getDetail(Product product) {
-        return null;
-    }
-
 
     @Override
     public String getDetailType() {
         return "MouseDetailCreateRequest";
+    }
+
+    public BasicMessageResponse<List<MouseDetailProjection>> fetchAll() {
+        List<MouseDetailProjection> mouses = mouseRepository.fetchAll();
+
+        return new BasicMessageResponse<>(200, "Danh sách MOUSE: ", mouses);
     }
 
 }

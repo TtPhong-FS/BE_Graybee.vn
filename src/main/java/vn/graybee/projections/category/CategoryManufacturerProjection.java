@@ -1,18 +1,18 @@
-package vn.graybee.projections;
+package vn.graybee.projections.category;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
-public interface ManufacturerProjection {
+public interface CategoryManufacturerProjection {
 
     int getId();
 
-    String getName();
+    int getCategoryId();
+
+    int getManufacturerId();
 
     String getStatus();
-
-    int getProductCount();
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime getCreatedAt();

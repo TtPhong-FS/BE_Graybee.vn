@@ -1,39 +1,43 @@
 package vn.graybee.serviceImps.collections;
 
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.constants.collections.ErrorGeneralConstants;
+import vn.graybee.constants.collections.ConstantCollections;
 import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.collections.KeyboardDetail;
-import vn.graybee.models.products.Product;
+import vn.graybee.projections.collections.KeyboardDetailProjection;
 import vn.graybee.repositories.collections.KeyboardRepository;
 import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.collections.KeyboardDetailCreateRequest;
-import vn.graybee.response.DetailDtoResponse;
 import vn.graybee.services.products.ProductDetailService;
+
+import java.util.List;
 
 @Service
 public class KeyboardServiceImp implements ProductDetailService {
 
+    private final EntityManager entityManager;
+
 
     private final KeyboardRepository keyboardRepository;
 
-    public KeyboardServiceImp(KeyboardRepository keyboardRepository) {
+    public KeyboardServiceImp(EntityManager entityManager, KeyboardRepository keyboardRepository) {
+        this.entityManager = entityManager;
         this.keyboardRepository = keyboardRepository;
     }
 
-
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveDetail(Product product, DetailDtoRequest request) {
-        if (!product.getCategory().getName().equalsIgnoreCase("keyboard")) {
-            throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_KEYBOARD_TYPE);
+    public void saveDetail(long productId, String detailType, DetailDtoRequest request) {
+        if (!detailType.equalsIgnoreCase("keyboard")) {
+            throw new BusinessCustomException(ConstantCollections.PRODUCT_TYPE_ERROR, ConstantCollections.MISSING_KEYBOARD_TYPE);
         }
         KeyboardDetailCreateRequest keyboardDto = (KeyboardDetailCreateRequest) request;
         KeyboardDetail keyboard = new KeyboardDetail(
-                product,
-                keyboardDto.getKeyMaterial(),
+                productId,
                 keyboardDto.getDesign(),
                 keyboardDto.getConnect(),
                 keyboardDto.getKeyCap(),
@@ -43,19 +47,19 @@ public class KeyboardServiceImp implements ProductDetailService {
                 keyboardDto.getSupport(),
                 keyboardDto.getLed()
         );
-        keyboardRepository.save(keyboard);
-
+        entityManager.persist(keyboard);
     }
-
-    @Override
-    public DetailDtoResponse getDetail(Product product) {
-        return null;
-    }
-
 
     @Override
     public String getDetailType() {
         return "KeyboardDetailCreateRequest";
+    }
+
+
+    public BasicMessageResponse<List<KeyboardDetailProjection>> fetchAll() {
+        List<KeyboardDetailProjection> keyboards = keyboardRepository.fetchAll();
+
+        return new BasicMessageResponse<>(200, "Danh sách Keyboard: ", keyboards);
     }
 
 }

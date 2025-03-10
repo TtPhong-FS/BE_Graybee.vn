@@ -1,36 +1,42 @@
 package vn.graybee.serviceImps.collections;
 
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.constants.collections.ErrorGeneralConstants;
+import vn.graybee.constants.collections.ConstantCollections;
 import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.collections.LaptopDetail;
-import vn.graybee.models.products.Product;
+import vn.graybee.projections.collections.LaptopDetailProjection;
 import vn.graybee.repositories.collections.LaptopRepository;
 import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.collections.LaptopDetailCreateRequest;
-import vn.graybee.response.DetailDtoResponse;
 import vn.graybee.services.products.ProductDetailService;
+
+import java.util.List;
 
 @Service
 public class LaptopServiceImp implements ProductDetailService {
 
+    private final EntityManager entityManager;
+
     private final LaptopRepository laptopRepository;
 
-    public LaptopServiceImp(LaptopRepository laptopRepository) {
+    public LaptopServiceImp(EntityManager entityManager, LaptopRepository laptopRepository) {
+        this.entityManager = entityManager;
         this.laptopRepository = laptopRepository;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveDetail(Product product, DetailDtoRequest request) {
-        if (!product.getCategory().getName().equalsIgnoreCase("laptop")) {
-            throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_LAPTOP_TYPE);
+    public void saveDetail(long productId, String detailType, DetailDtoRequest request) {
+        if (!detailType.equalsIgnoreCase("laptop")) {
+            throw new BusinessCustomException(ConstantCollections.PRODUCT_TYPE_ERROR, ConstantCollections.MISSING_LAPTOP_TYPE);
         }
         LaptopDetailCreateRequest laptopDto = (LaptopDetailCreateRequest) request;
         LaptopDetail laptop = new LaptopDetail(
-                product,
+                productId,
                 laptopDto.getCpu(),
                 laptopDto.getRam(),
                 laptopDto.getDemand(),
@@ -47,18 +53,18 @@ public class LaptopServiceImp implements ProductDetailService {
                 laptopDto.getMaterial(),
                 laptopDto.getConfidentiality()
         );
-        laptopRepository.save(laptop);
+        entityManager.persist(laptop);
     }
-
-    @Override
-    public DetailDtoResponse getDetail(Product product) {
-        return null;
-    }
-
 
     @Override
     public String getDetailType() {
         return "LaptopDetailCreateRequest";
+    }
+
+    public BasicMessageResponse<List<LaptopDetailProjection>> fetchAll() {
+        List<LaptopDetailProjection> laptops = laptopRepository.fetchAll();
+
+        return new BasicMessageResponse<>(200, "Danh sách Laptop: ", laptops);
     }
 
 }

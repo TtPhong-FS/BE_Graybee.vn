@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -14,15 +14,16 @@ import vn.graybee.models.products.Product;
 @Table(name = "laptop_details")
 public class LaptopDetail {
 
+
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
 
     @Column(length = 200, nullable = false)
     private String cpu;
@@ -69,8 +70,8 @@ public class LaptopDetail {
     @Column(length = 100)
     private String confidentiality;
 
-    public LaptopDetail(Product product, String cpu, String ram, String demand, String storage, String operatingSystem, String vga, String monitor, String ports, String keyboard, String wirelessConnectivity, String audio, String webcam, int battery, String material, String confidentiality) {
-        this.product = product;
+    public LaptopDetail(Long productId, String cpu, String ram, String demand, String storage, String operatingSystem, String vga, String monitor, String ports, String keyboard, String wirelessConnectivity, String audio, String webcam, int battery, String material, String confidentiality) {
+        this.productId = productId;
         this.cpu = cpu;
         this.ram = ram;
         this.demand = demand;
@@ -91,20 +92,20 @@ public class LaptopDetail {
     public LaptopDetail() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Product getProduct() {
         return product;
     }
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getCpu() {

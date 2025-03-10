@@ -22,9 +22,9 @@ public class HddDetailCreateRequest extends DetailDtoRequest {
 
     @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
-    @JsonProperty("hours_to_failure")
+    @JsonProperty("life_span")
     @PositiveOrZero(message = "Cannot be a negative number")
-    private int hoursToFailure;
+    private int lifeSpan;
 
     @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
@@ -48,12 +48,6 @@ public class HddDetailCreateRequest extends DetailDtoRequest {
     @PositiveOrZero(message = "Cannot be a negative number")
     private int cache;
 
-    @NotNull(message = "Cannot be null")
-    @Positive(message = "Must be a positive number")
-    @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("revolution_per_minutes")
-    private int revolutionPerMinutes;
-
     public String getCommunicationStandard() {
         return communicationStandard;
     }
@@ -70,12 +64,12 @@ public class HddDetailCreateRequest extends DetailDtoRequest {
         this.capacity = capacity;
     }
 
-    public int getHoursToFailure() {
-        return hoursToFailure;
+    public int getLifeSpan() {
+        return lifeSpan;
     }
 
-    public void setHoursToFailure(int hoursToFailure) {
-        this.hoursToFailure = hoursToFailure;
+    public void setLifeSpan(int lifeSpan) {
+        this.lifeSpan = lifeSpan;
     }
 
     public int getReadingSpeed() {
@@ -110,12 +104,5 @@ public class HddDetailCreateRequest extends DetailDtoRequest {
         this.cache = cache;
     }
 
-    public int getRevolutionPerMinutes() {
-        return revolutionPerMinutes;
-    }
-
-    public void setRevolutionPerMinutes(int revolutionPerMinutes) {
-        this.revolutionPerMinutes = revolutionPerMinutes;
-    }
 
 }

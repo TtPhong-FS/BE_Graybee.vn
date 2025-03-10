@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -14,13 +14,13 @@ import vn.graybee.models.products.Product;
 @Table(name = "mouse_details")
 public class MouseDetail {
 
+
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -54,8 +54,8 @@ public class MouseDetail {
     @Column(length = 30)
     private String led;
 
-    public MouseDetail(Product product, String sensors, int numberOfNodes, String switchType, String switchLife, int pollingRate, String software, String connect, boolean isWirelessConnect, String battery, String led) {
-        this.product = product;
+    public MouseDetail(Long productId, String sensors, int numberOfNodes, String switchType, String switchLife, int pollingRate, String software, String connect, boolean isWirelessConnect, String battery, String led) {
+        this.productId = productId;
         this.sensors = sensors;
         this.numberOfNodes = numberOfNodes;
         this.switchType = switchType;
@@ -71,20 +71,20 @@ public class MouseDetail {
     public MouseDetail() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Product getProduct() {
         return product;
     }
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getSensors() {

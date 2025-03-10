@@ -35,19 +35,17 @@ public class RamDetailCreateRequest extends DetailDtoRequest {
     private int speed;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String latency = "";
+    private String latency;
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @JsonProperty("voltage")
-    private float voltage = 0;
-
-    private boolean ecc = false;
+    private float voltage;
 
     @JsonProperty("is_heat_dissipation")
-    private boolean isHeatDissipation = false;
+    private boolean isHeatDissipation;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    private String led = "";
+    private String led;
 
     public String getSuitableFor() {
         return suitableFor;
@@ -103,14 +101,6 @@ public class RamDetailCreateRequest extends DetailDtoRequest {
 
     public void setVoltage(float voltage) {
         this.voltage = voltage;
-    }
-
-    public boolean isEcc() {
-        return ecc;
-    }
-
-    public void setEcc(boolean ecc) {
-        this.ecc = ecc;
     }
 
     public boolean isHeatDissipation() {

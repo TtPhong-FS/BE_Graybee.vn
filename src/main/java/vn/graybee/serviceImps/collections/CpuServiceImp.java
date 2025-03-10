@@ -1,35 +1,39 @@
 package vn.graybee.serviceImps.collections;
 
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.collections.ErrorGeneralConstants;
+import vn.graybee.constants.collections.ConstantCollections;
 import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.collections.CpuDetail;
-import vn.graybee.models.products.Product;
+import vn.graybee.projections.collections.CpuDetailProjection;
 import vn.graybee.repositories.collections.CpuRepository;
 import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.collections.CpuDetailCreateRequest;
-import vn.graybee.response.DetailDtoResponse;
 import vn.graybee.services.products.ProductDetailService;
+
+import java.util.List;
 
 @Service
 public class CpuServiceImp implements ProductDetailService {
 
+    private final EntityManager entityManager;
 
     private final CpuRepository cpuRepository;
 
-    public CpuServiceImp(CpuRepository cpuRepository) {
+    public CpuServiceImp(EntityManager entityManager, CpuRepository cpuRepository) {
+        this.entityManager = entityManager;
         this.cpuRepository = cpuRepository;
     }
 
-
     @Override
-    public void saveDetail(Product product, DetailDtoRequest request) {
-        if (!product.getCategory().getName().equals("CPU")) {
-            throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_CPU_TYPE);
+    public void saveDetail(long productId, String categoryName, DetailDtoRequest request) {
+        if (!categoryName.equalsIgnoreCase("cpu")) {
+            throw new BusinessCustomException(ConstantCollections.PRODUCT_TYPE_ERROR, ConstantCollections.MISSING_CPU_TYPE);
         }
         CpuDetailCreateRequest cpuDto = (CpuDetailCreateRequest) request;
         CpuDetail cpu = new CpuDetail(
-                product,
+                productId,
                 cpuDto.getSocket(),
                 cpuDto.getMultiplier(),
                 cpuDto.getNumberOfStreams(),
@@ -37,29 +41,25 @@ public class CpuServiceImp implements ProductDetailService {
                 cpuDto.getMaximumEfficiencyCore(),
                 cpuDto.getBasePerformanceCore(),
                 cpuDto.getBaseEfficiencyCore(),
-                cpuDto.getConsumption(),
+                cpuDto.getPowerConsumption(),
                 cpuDto.getCache(),
                 cpuDto.getMotherboardCompatible(),
-                cpuDto.getMaximumSupportMemory(),
                 cpuDto.getMaximumBandwidth(),
                 cpuDto.getMemoryType(),
-                cpuDto.isGraphicsCore(),
-                cpuDto.getPciEdition(),
-                cpuDto.getPciConfiguration(),
-                cpuDto.getMaximumPciPorts()
+                cpuDto.isGraphicsCore()
         );
-        cpuRepository.save(cpu);
-
-    }
-
-    @Override
-    public DetailDtoResponse getDetail(Product product) {
-        return null;
+        entityManager.persist(cpu);
     }
 
     @Override
     public String getDetailType() {
         return "CpuDetailCreateRequest";
+    }
+
+    public BasicMessageResponse<List<CpuDetailProjection>> fetchAll() {
+        List<CpuDetailProjection> cpus = cpuRepository.fetchAll();
+
+        return new BasicMessageResponse<>(200, "Danh sách Cpu: ", cpus);
     }
 
 }

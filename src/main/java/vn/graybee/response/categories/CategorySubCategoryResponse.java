@@ -1,5 +1,7 @@
 package vn.graybee.response.categories;
 
+import vn.graybee.enums.CategoryStatus;
+
 public class CategorySubCategoryResponse {
 
     private int id;
@@ -8,9 +10,9 @@ public class CategorySubCategoryResponse {
 
     private int subCategoryId;
 
-    private String status;
+    private CategoryStatus status;
 
-    public CategorySubCategoryResponse(int id, int categoryId, int subCategoryId, String status) {
+    public CategorySubCategoryResponse(int id, int categoryId, int subCategoryId, CategoryStatus status) {
         this.id = id;
         this.categoryId = categoryId;
         this.subCategoryId = subCategoryId;
@@ -41,11 +43,11 @@ public class CategorySubCategoryResponse {
         this.subCategoryId = subCategoryId;
     }
 
-    public String getStatus() {
+    public CategoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(CategoryStatus status) {
         this.status = status;
     }
 

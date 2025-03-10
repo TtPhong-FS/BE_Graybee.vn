@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -16,11 +16,10 @@ public class SsdDetail {
 
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -30,17 +29,14 @@ public class SsdDetail {
     @Column(name = "capacity", nullable = false)
     private int capacity;
 
-    @Column(name = "hours_to_failure")
-    private int hoursToFailure;
+    @Column(name = "life_span")
+    private int lifeSpan;
 
     @Column(name = "reading_speed", nullable = false)
     private int readingSpeed;
 
     @Column(name = "writing_speed", nullable = false)
     private int writingSpeed;
-
-    @Column(name = "memory_technology", nullable = false, length = 50)
-    private String memoryTechnology;
 
     @Column(name = "storage_temperature", length = 50)
     private String storageTemperature;
@@ -60,27 +56,18 @@ public class SsdDetail {
     public SsdDetail() {
     }
 
-    public SsdDetail(Product product, String communicationStandard, int capacity, int hoursToFailure, int readingSpeed, int writingSpeed, String memoryTechnology, String storageTemperature, String operatingTemperature, int randomReadingSpeed, int randomWritingSpeed, String software) {
-        this.product = product;
+    public SsdDetail(Long productId, String communicationStandard, int capacity, int lifeSpan, int readingSpeed, int writingSpeed, String storageTemperature, String operatingTemperature, int randomReadingSpeed, int randomWritingSpeed, String software) {
+        this.productId = productId;
         this.communicationStandard = communicationStandard;
         this.capacity = capacity;
-        this.hoursToFailure = hoursToFailure;
+        this.lifeSpan = lifeSpan;
         this.readingSpeed = readingSpeed;
         this.writingSpeed = writingSpeed;
-        this.memoryTechnology = memoryTechnology;
         this.storageTemperature = storageTemperature;
         this.operatingTemperature = operatingTemperature;
         this.randomReadingSpeed = randomReadingSpeed;
         this.randomWritingSpeed = randomWritingSpeed;
         this.software = software;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Product getProduct() {
@@ -89,6 +76,14 @@ public class SsdDetail {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getCommunicationStandard() {
@@ -107,12 +102,12 @@ public class SsdDetail {
         this.capacity = capacity;
     }
 
-    public int getHoursToFailure() {
-        return hoursToFailure;
+    public int getLifeSpan() {
+        return lifeSpan;
     }
 
-    public void setHoursToFailure(int hoursToFailure) {
-        this.hoursToFailure = hoursToFailure;
+    public void setLifeSpan(int lifeSpan) {
+        this.lifeSpan = lifeSpan;
     }
 
     public int getReadingSpeed() {
@@ -131,13 +126,6 @@ public class SsdDetail {
         this.writingSpeed = writingSpeed;
     }
 
-    public String getMemoryTechnology() {
-        return memoryTechnology;
-    }
-
-    public void setMemoryTechnology(String memoryTechnology) {
-        this.memoryTechnology = memoryTechnology;
-    }
 
     public String getStorageTemperature() {
         return storageTemperature;

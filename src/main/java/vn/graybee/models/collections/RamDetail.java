@@ -1,14 +1,9 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import vn.graybee.models.products.Product;
 
 @Entity
 @Table(name = "ram_details")
@@ -16,13 +11,7 @@ public class RamDetail {
 
     @Id
     @Column(name = "product_id")
-    private Long id;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @MapsId
-    @OneToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    private Long productId;
 
     @Column(nullable = false, length = 5, name = "suitable_for")
     private String suitableFor;
@@ -45,8 +34,6 @@ public class RamDetail {
     @Column(name = "voltage")
     private float voltage;
 
-    private boolean ecc;
-
     @Column(name = "is_heat_dissipation")
     private boolean isHeatDissipation;
 
@@ -56,8 +43,7 @@ public class RamDetail {
     public RamDetail() {
     }
 
-    public RamDetail(Product product, String suitableFor, String series, int capacity, String type, int speed, String latency, float voltage, boolean ecc, boolean isHeatDissipation, String led) {
-        this.product = product;
+    public RamDetail(String suitableFor, String series, int capacity, String type, int speed, String latency, float voltage, boolean isHeatDissipation, String led) {
         this.suitableFor = suitableFor;
         this.series = series;
         this.capacity = capacity;
@@ -65,25 +51,17 @@ public class RamDetail {
         this.speed = speed;
         this.latency = latency;
         this.voltage = voltage;
-        this.ecc = ecc;
         this.isHeatDissipation = isHeatDissipation;
         this.led = led;
     }
 
-    public Long getId() {
-        return id;
+
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getSuitableFor() {
@@ -142,13 +120,6 @@ public class RamDetail {
         this.voltage = voltage;
     }
 
-    public boolean isEcc() {
-        return ecc;
-    }
-
-    public void setEcc(boolean ecc) {
-        this.ecc = ecc;
-    }
 
     public boolean isHeatDissipation() {
         return isHeatDissipation;

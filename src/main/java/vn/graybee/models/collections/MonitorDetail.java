@@ -1,8 +1,8 @@
 package vn.graybee.models.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -14,13 +14,13 @@ import vn.graybee.models.products.Product;
 @Table(name = "monitor_details")
 public class MonitorDetail {
 
+
     @Id
     @Column(name = "product_id")
-    private Long id;
+    private Long productId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -68,14 +68,14 @@ public class MonitorDetail {
     @Column(name = "special_feature", length = 50)
     private String specialFeature;
 
-    @Column(name = "hours_to_failure")
-    private int hoursToFailure;
+    @Column(name = "life_span")
+    private int lifeSpan;
 
     @Column(length = 100)
     private String accessory;
 
-    public MonitorDetail(Product product, int screenSize, String screenType, String panels, String aspectRatio, boolean isSpeaker, String resolution, int colorDisplay, int percentColor, int refreshRate, String ports, int powerConsumption, int powerSaveMode, float powerOffMode, float voltage, String specialFeature, int hoursToFailure, String accessory) {
-        this.product = product;
+    public MonitorDetail(Long productId, int screenSize, String screenType, String panels, String aspectRatio, boolean isSpeaker, String resolution, int colorDisplay, int percentColor, int refreshRate, String ports, int powerConsumption, int powerSaveMode, float powerOffMode, float voltage, String specialFeature, int lifeSpan, String accessory) {
+        this.productId = productId;
         this.screenSize = screenSize;
         this.screenType = screenType;
         this.panels = panels;
@@ -91,19 +91,11 @@ public class MonitorDetail {
         this.powerOffMode = powerOffMode;
         this.voltage = voltage;
         this.specialFeature = specialFeature;
-        this.hoursToFailure = hoursToFailure;
+        this.lifeSpan = lifeSpan;
         this.accessory = accessory;
     }
 
     public MonitorDetail() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Product getProduct() {
@@ -112,6 +104,14 @@ public class MonitorDetail {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public int getScreenSize() {
@@ -234,12 +234,12 @@ public class MonitorDetail {
         this.specialFeature = specialFeature;
     }
 
-    public int getHoursToFailure() {
-        return hoursToFailure;
+    public int getLifeSpan() {
+        return lifeSpan;
     }
 
-    public void setHoursToFailure(int hoursToFailure) {
-        this.hoursToFailure = hoursToFailure;
+    public void setLifeSpan(int lifeSpan) {
+        this.lifeSpan = lifeSpan;
     }
 
     public String getAccessory() {

@@ -1,5 +1,6 @@
 package vn.graybee.response.categories;
 
+import vn.graybee.enums.CategoryStatus;
 import vn.graybee.response.BaseResponse;
 
 import java.time.LocalDateTime;
@@ -10,11 +11,11 @@ public class ManufacturerResponse extends BaseResponse {
 
     private String name;
 
-    private String status;
+    private CategoryStatus status;
 
     private int productCount;
 
-    public ManufacturerResponse(LocalDateTime createdAt, LocalDateTime updatedAt, int id, String name, String status, int productCount) {
+    public ManufacturerResponse(LocalDateTime createdAt, LocalDateTime updatedAt, int id, String name, CategoryStatus status, int productCount) {
         super(createdAt, updatedAt);
         this.id = id;
         this.name = name;
@@ -46,11 +47,11 @@ public class ManufacturerResponse extends BaseResponse {
         this.name = name;
     }
 
-    public String getStatus() {
+    public CategoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(CategoryStatus status) {
         this.status = status;
     }
 

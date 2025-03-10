@@ -2,14 +2,14 @@ package vn.graybee.models.categories;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import vn.graybee.enums.CategoryStatus;
 import vn.graybee.models.others.BaseModel;
 
 @Entity
@@ -20,23 +20,22 @@ public class CategorySubCategory extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @Column(name = "category_id", nullable = false)
+    private Integer categoryId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subcategory_id", nullable = false)
-    private SubCategory subCategory;
+    @Column(name = "subcategory_id", nullable = false)
+    private Integer subCategoryId;
 
-    @Column(name = "status", length = 30)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private CategoryStatus status;
 
     public CategorySubCategory() {
     }
 
-    public CategorySubCategory(Category category, SubCategory subCategory, String status) {
-        this.category = category;
-        this.subCategory = subCategory;
+    public CategorySubCategory(Integer categoryId, Integer subCategoryId, CategoryStatus status) {
+        this.categoryId = categoryId;
+        this.subCategoryId = subCategoryId;
         this.status = status;
     }
 
@@ -48,27 +47,27 @@ public class CategorySubCategory extends BaseModel {
         this.id = id;
     }
 
-    public Category getCategory() {
-        return category;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public SubCategory getSubCategory() {
-        return subCategory;
+    public Integer getSubCategoryId() {
+        return subCategoryId;
     }
 
-    public void setSubCategory(SubCategory subCategory) {
-        this.subCategory = subCategory;
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
     }
 
-    public String getStatus() {
+    public CategoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(CategoryStatus status) {
         this.status = status;
     }
 

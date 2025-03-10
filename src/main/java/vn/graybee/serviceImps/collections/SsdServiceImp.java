@@ -1,60 +1,67 @@
 package vn.graybee.serviceImps.collections;
 
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.constants.collections.ErrorGeneralConstants;
+import vn.graybee.constants.collections.ConstantCollections;
 import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.collections.SsdDetail;
-import vn.graybee.models.products.Product;
+import vn.graybee.projections.collections.SsdDetailProjection;
 import vn.graybee.repositories.collections.SsdRepository;
 import vn.graybee.requests.DetailDtoRequest;
 import vn.graybee.requests.collections.SsdDetailCreateRequest;
-import vn.graybee.response.DetailDtoResponse;
 import vn.graybee.services.products.ProductDetailService;
+
+import java.util.List;
 
 @Service
 public class SsdServiceImp implements ProductDetailService {
 
+    private final EntityManager entityManager;
+
     private final SsdRepository ssdRepository;
 
-    public SsdServiceImp(SsdRepository ssdRepository) {
+    public SsdServiceImp(EntityManager entityManager, SsdRepository ssdRepository) {
+        this.entityManager = entityManager;
         this.ssdRepository = ssdRepository;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveDetail(Product product, DetailDtoRequest request) {
-        if (!product.getCategory().getName().equalsIgnoreCase("ssd")) {
-            throw new BusinessCustomException(ErrorGeneralConstants.PRODUCT_TYPE_ERROR, ErrorGeneralConstants.MISSING_SSD_TYPE);
+    public void saveDetail(long productId, String categoryName, DetailDtoRequest request) {
+        if (!categoryName.equalsIgnoreCase("ssd")) {
+            throw new BusinessCustomException(ConstantCollections.PRODUCT_TYPE_ERROR, ConstantCollections.MISSING_SSD_TYPE);
         }
         SsdDetailCreateRequest ssdDto = (SsdDetailCreateRequest) request;
         SsdDetail ssd = new SsdDetail(
-                product,
+                productId,
                 ssdDto.getCommunicationStandard(),
                 ssdDto.getCapacity(),
-                ssdDto.getHoursToFailure(),
+                ssdDto.getLifeSpan(),
                 ssdDto.getReadingSpeed(),
                 ssdDto.getWritingSpeed(),
-                ssdDto.getCommunicationStandard(),
                 ssdDto.getStorageTemperature(),
                 ssdDto.getOperatingTemperature(),
                 ssdDto.getRandomReadingSpeed(),
                 ssdDto.getRandomWritingSpeed(),
                 ssdDto.getSoftware()
         );
-        ssdRepository.save(ssd);
+        entityManager.persist(ssd);
 
-    }
 
-    @Override
-    public DetailDtoResponse getDetail(Product product) {
-        return null;
     }
 
     @Override
     public String getDetailType() {
         return "SsdDetailCreateRequest";
+    }
+
+    public BasicMessageResponse<List<SsdDetailProjection>> fetchAll() {
+        List<SsdDetailProjection> ssds = ssdRepository.fetchAll();
+
+        return new BasicMessageResponse<>(200, "Danh sách SSD: ", ssds);
     }
 
 }

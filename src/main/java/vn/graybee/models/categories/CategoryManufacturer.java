@@ -2,14 +2,14 @@ package vn.graybee.models.categories;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import vn.graybee.enums.CategoryStatus;
 import vn.graybee.models.others.BaseModel;
 
 @Entity
@@ -20,33 +20,31 @@ public class CategoryManufacturer extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @Column(name = "category_id", nullable = false)
+    private Integer categoryId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manufacturer_id", nullable = false)
-    private Manufacturer manufacturer;
+    @Column(name = "manufacturer_id", nullable = false)
+    private Integer manufacturerId;
 
-    @Column(name = "status", length = 30)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private CategoryStatus status;
 
-
-    public CategoryManufacturer(Category category, Manufacturer manufacturer, String status) {
-        this.category = category;
-        this.manufacturer = manufacturer;
-        this.status = status;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
+    public CategoryManufacturer(Integer categoryId, Integer manufacturerId, CategoryStatus status) {
+        this.categoryId = categoryId;
+        this.manufacturerId = manufacturerId;
         this.status = status;
     }
 
     public CategoryManufacturer() {
+    }
+
+    public CategoryStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CategoryStatus status) {
+        this.status = status;
     }
 
     public Integer getId() {
@@ -57,20 +55,20 @@ public class CategoryManufacturer extends BaseModel {
         this.id = id;
     }
 
-    public Category getCategory() {
-        return category;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public Manufacturer getManufacturer() {
-        return manufacturer;
+    public Integer getManufacturerId() {
+        return manufacturerId;
     }
 
-    public void setManufacturer(Manufacturer manufacturer) {
-        this.manufacturer = manufacturer;
+    public void setManufacturerId(Integer manufacturerId) {
+        this.manufacturerId = manufacturerId;
     }
 
 }
