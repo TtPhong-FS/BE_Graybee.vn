@@ -8,7 +8,7 @@ public interface CategoryProjection {
 
     int getId();
 
-    String getName();
+    String getCategoryName();
 
     String getStatus();
 

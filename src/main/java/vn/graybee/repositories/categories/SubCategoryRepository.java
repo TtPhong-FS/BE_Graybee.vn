@@ -15,18 +15,16 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
     @Query("SELECT s FROM SubCategory s")
     List<SubCategoryProjection> fetchAll();
 
-    Optional<SubCategory> findByName(@Param("name") String name);
-
     @Query("Select s from SubCategory s where s.id = :id ")
     Optional<SubCategoryProjection> getById(@Param("id") int id);
 
-    @Query("Select s.name from SubCategory s where s.name = :name ")
-    Optional<String> checkExistsByName(@Param("name") String name);
+    @Query("Select s.subcategoryName from SubCategory s where s.subcategoryName = :subcategoryName ")
+    Optional<String> checkExistsByName(@Param("subcategoryName") String subcategoryName);
 
-    @Query("Select s.id from SubCategory s where s.name IN :name ")
-    List<Integer> getIdByName(@Param("name") List<String> name);
+    @Query("Select s.id from SubCategory s where s.subcategoryName IN :subcategoryNames ")
+    List<Integer> getIdByName(@Param("subcategoryNames") List<String> subcategoryNames);
 
-    @Query(value = "SELECT cs.subcategory_id as Id,  s.name as name " +
+    @Query(value = "SELECT cs.subcategory_id as Id,  s.subcategoryName as subcategoryName " +
             "FROM categories_subcategories cs join subcategories s on cs.subcategory_id = s.id WHERE cs.category_id = :categoryId", nativeQuery = true)
     List<SubCategorySummaryProject> findByCategoryId(@Param("categoryId") int categoryId);
 

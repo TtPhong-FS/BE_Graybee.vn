@@ -1,7 +1,8 @@
 package vn.graybee.serviceImps.categories;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.enums.CategoryStatus;
+import vn.graybee.constants.categories.ConstantCategory;
+import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.categories.Manufacturer;
 import vn.graybee.projections.category.ManufacturerProjection;
@@ -28,23 +29,42 @@ public class ManufacturerServiceImp implements ManufacturerService {
 
     @Override
     public BasicMessageResponse<ManufacturerResponse> create(ManufacturerCreateRequest request) {
-        manufactureValidation.checkExistByName(request.getName());
+        manufactureValidation.checkExistByName(request.getManufacturerName());
 
-        Manufacturer manufacturer = new Manufacturer(TextUtils.capitalize(request.getName())
+        Manufacturer manufacturer = new Manufacturer(TextUtils.capitalize(request.getManufacturerName())
         );
-        manufacturer.setStatus(CategoryStatus.ACTIVE);
+        manufacturer.setStatus("ACTIVE");
         Manufacturer savedManufacturer = manufacturerRepository.save(manufacturer);
 
         ManufacturerResponse manufacturerResponse = new ManufacturerResponse(
                 savedManufacturer.getCreatedAt(),
                 savedManufacturer.getCreatedAt(),
                 savedManufacturer.getId(),
-                savedManufacturer.getName(),
+                savedManufacturer.getManufacturerName(),
                 savedManufacturer.getStatus(),
                 savedManufacturer.getProductCount());
 
         return new BasicMessageResponse<>(201, "Tạo nhà sản xuất thành công!", manufacturerResponse);
 
+    }
+
+    @Override
+    public BasicMessageResponse<List<ManufacturerResponse>> createManufacturers(List<ManufacturerCreateRequest> request) {
+
+        if (request == null || request.isEmpty()) {
+            throw new BusinessCustomException(ConstantCategory.MANUFACTURER_NAMES, ConstantCategory.LIST_MANUFACTURER_NAME_CANNOT_BE_EMPTY);
+        }
+
+        List<Manufacturer> manufacturers = request.stream()
+                .map(req -> new Manufacturer(req.getManufacturerName())).toList();
+
+        List<Manufacturer> savedManufacturer = manufacturerRepository.saveAll(manufacturers);
+
+        List<ManufacturerResponse> responses = savedManufacturer
+                .stream()
+                .map(res -> new ManufacturerResponse(res.getCreatedAt(), res.getUpdatedAt(), res.getId(), res.getManufacturerName(), res.getStatus(), res.getProductCount())).toList();
+
+        return new BasicMessageResponse<>(201, "Tạo nhiều nhà sản xuất thành công!", responses);
     }
 
     @Override

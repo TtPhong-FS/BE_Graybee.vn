@@ -38,8 +38,8 @@ public class GlobalHandlerException {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CustomNotFoundException.class)
     public ProblemDetail handlerResourceNotFoundException(CustomNotFoundException ex) {
-        CustomNotFoundProblemDetail problemDetail = new CustomNotFoundProblemDetail(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getResource());
-        problemDetail.setProperty("detail", ex.getMessage());
+        CustomNotFoundProblemDetail problemDetail = new CustomNotFoundProblemDetail(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getField());
+        problemDetail.setProperty(ex.getField(), ex.getMessage());
         problemDetail.setProperty("timestamp", DatetimeFormatted.formatted_datetime());
         return problemDetail;
     }

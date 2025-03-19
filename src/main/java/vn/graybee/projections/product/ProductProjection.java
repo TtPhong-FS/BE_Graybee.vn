@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 
 public interface ProductProjection {
 
-    long getId();
+    String getProductName();
 
-    int getCategoryId();
+    String getProductCode();
 
-    int getManufacturerId();
-    
-    String getName();
+    String getCategoryName();
+
+    String getManufacturerName();
 
     int getWarranty();
 
@@ -22,9 +22,11 @@ public interface ProductProjection {
 
     float getPrice();
 
-    String getColor();
+    int getDiscountPercent();
 
-    String getDescription();
+    float getFinalPrice();
+
+    String getColor();
 
     String getThumbnail();
 

@@ -2,13 +2,11 @@ package vn.graybee.validation;
 
 import org.springframework.stereotype.Service;
 import vn.graybee.constants.categories.ConstantCategory;
-import vn.graybee.enums.CategoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.products.ProductRepository;
 import vn.graybee.response.categories.CategoryResponse;
-import vn.graybee.response.categories.CategoryStatusResponse;
 
 @Service
 public class CategoryValidation {
@@ -23,13 +21,8 @@ public class CategoryValidation {
     }
 
     public int getIdByName(String categoryName) {
-        CategoryStatusResponse category = categoryRepository.getStatusAndIdByName(categoryName)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
-
-        if (category.getStatus().equals(CategoryStatus.DELETED)) {
-            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_TEMPORARILY_FLAGGED);
-        }
-        return category.getId();
+        return categoryRepository.getIdByName(categoryName)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_TEMPORARILY_FLAGGED));
     }
 
     public CategoryResponse validateCategoryExistsById(int categoryId) {
@@ -45,15 +38,15 @@ public class CategoryValidation {
         }
     }
 
-    public void findById(int id) {
-        if (categoryRepository.findById(id).isEmpty()) {
+    public void validateNameExists(String name) {
+        if (categoryRepository.validateNameExists(name).isEmpty()) {
             throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST);
         }
     }
 
     public void checkExistByName(String name) {
         if (categoryRepository.validateNameExists(name).isPresent()) {
-            throw new BusinessCustomException(ConstantCategory.NAME, ConstantCategory.CATEGORY_NAME_EXISTS);
+            throw new BusinessCustomException(ConstantCategory.CATEGORY_NAME, ConstantCategory.CATEGORY_NAME_EXISTS);
         }
     }
 

@@ -26,13 +26,13 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/admin/categories")
-public class CategoryController {
+public class AdminCategoryController {
 
     private final CategoryService categoryService;
 
     private final SubCategoryServices subCategoryServices;
 
-    public CategoryController(CategoryService categoryService, SubCategoryServices subCategoryServices) {
+    public AdminCategoryController(CategoryService categoryService, SubCategoryServices subCategoryServices) {
         this.categoryService = categoryService;
         this.subCategoryServices = subCategoryServices;
     }

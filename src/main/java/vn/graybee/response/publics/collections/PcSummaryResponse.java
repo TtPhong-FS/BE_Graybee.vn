@@ -15,14 +15,15 @@ public class PcSummaryResponse extends ProductBasicResponse {
 
     private String ssd;
 
-    public PcSummaryResponse(long id, String name, float price, String thumbnail, PcResponse product, HardwareExtractor extractor) {
-        super(id, name, price, thumbnail);
+    public PcSummaryResponse(long id, String name, float finalPrice, float price, String thumbnail, PcResponse product, HardwareExtractor extractor) {
+        super(id, name, price, finalPrice, thumbnail);
         this.cpu = extractor.extract(product.getCpu(), "cpu");
         this.motherboard = extractor.extract(product.getMotherboard(), "motherboard");
         this.ram = extractor.extract(product.getRam(), "ram");
         this.vga = extractor.extract(product.getVga(), "vga");
         this.ssd = extractor.extract(product.getSsd(), "ssd");
     }
+
 
     public String getCpu() {
         return cpu;

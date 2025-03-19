@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -12,7 +11,6 @@ public class SsdDetailCreateRequest extends DetailDtoRequest {
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     @NotBlank(message = "Cannot be blank")
-    @JsonProperty("communication_standard")
     private String communicationStandard;
 
     @Positive(message = "Must be a positive number")
@@ -22,43 +20,35 @@ public class SsdDetailCreateRequest extends DetailDtoRequest {
 
     @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("life_span")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int lifeSpan;
 
     @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("reading_speed")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int readingSpeed;
 
     @Positive(message = "Must be a positive number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("writing_speed")
     @PositiveOrZero(message = "Cannot be a negative number")
     private int writingSpeed;
 
-    @JsonProperty("storage_temperature")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String storageTemperature;
 
-    @JsonProperty("operating_temperature")
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
     private String operatingTemperature;
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @Positive(message = "Must be a positive number")
-    @JsonProperty("random_reading_speed")
     private int randomReadingSpeed;
 
     @PositiveOrZero(message = "Cannot be a negative number")
     @Positive(message = "Must be a positive number")
-    @JsonProperty("random_writing_speed")
     private int randomWritingSpeed;
 
-    @JsonProperty("software")
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
     private String software;
 

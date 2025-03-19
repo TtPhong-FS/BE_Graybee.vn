@@ -2,13 +2,10 @@ package vn.graybee.models.categories;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.enums.CategoryStatus;
 import vn.graybee.models.others.BaseModel;
 
 @Entity
@@ -19,26 +16,17 @@ public class SubCategory extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 35, nullable = false, unique = true)
-    private String name;
+    @Column(name = "subcategory_name", length = 35, nullable = false, unique = true)
+    private String subcategoryName;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private CategoryStatus status;
+    private String status;
 
     public SubCategory() {
     }
 
-    public SubCategory(String name) {
-        this.name = name;
-    }
-
-    public CategoryStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CategoryStatus status) {
-        this.status = status;
+    public SubCategory(String subcategoryName) {
+        this.subcategoryName = subcategoryName;
     }
 
     public Integer getId() {
@@ -49,12 +37,20 @@ public class SubCategory extends BaseModel {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getSubcategoryName() {
+        return subcategoryName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSubcategoryName(String subcategoryName) {
+        this.subcategoryName = subcategoryName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

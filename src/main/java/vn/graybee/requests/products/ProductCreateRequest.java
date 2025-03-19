@@ -1,6 +1,5 @@
 package vn.graybee.requests.products;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -8,22 +7,26 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import vn.graybee.requests.DetailDtoRequest;
+
+import java.util.Collections;
+import java.util.List;
 
 @MappedSuperclass
 public class ProductCreateRequest {
 
-    @JsonProperty("category_name")
+    @Size(max = 35, message = "Độ dài tối đa 35 ký tự")
     @NotBlank(message = "Tên danh mục không thể trống")
     private String categoryName;
 
-    @JsonProperty("manufacturer_name")
+    @Size(max = 50, message = "Độ dài tối đa 50 ký tự")
     @NotBlank(message = "Tên nhà sản xuất không thể trống")
     private String manufacturerName;
 
+    private List<String> tags;
+
     @NotBlank(message = "Tên sản phẩm không thể trống")
     @Size(min = 5, max = 300, message = "Độ dài ít nhất từ 5 đến 300 ký tự")
-    private String name;
+    private String productName;
 
     @NotNull(message = "Tình trạng không thể trống")
     private String conditions;
@@ -42,37 +45,50 @@ public class ProductCreateRequest {
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     @DecimalMax(value = "100000000.0", message = "Giá tối đa là 100.000.000VND")
     @DecimalMin(value = "0.0", message = "Giá thấp nhất là 0VND")
-    private float price;
+    private double price;
 
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    private int discount_percent;
+    private int discountPercent;
 
     @Size(max = 35, message = "Độ dài tối đa 35 ký tự")
     private String color;
 
-    @Size(max = 300, message = "Độ dài tối đa 300 ký tự")
-    private String thumbnail;
+    private boolean inStock;
+
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
+    private int quantity;
+
+    @Size(max = 30, message = "Độ dài tối đa 35 ký tự")
+    private String status;
 
     private String description;
 
-    private DetailDtoRequest detail;
+    private List<String> images;
 
-    public DetailDtoRequest getDetail() {
-        return detail;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setDetail(DetailDtoRequest detail) {
-        this.detail = detail;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
-    public int getDiscount_percent() {
-        return discount_percent;
+    public List<String> getTags() {
+        return tags != null ? tags : Collections.emptyList();
     }
 
-    public void setDiscount_percent(int discount_percent) {
-        this.discount_percent = discount_percent;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
-    
+
+    public boolean isInStock() {
+        return inStock;
+    }
+
+    public void setInStock(boolean inStock) {
+        this.inStock = inStock;
+    }
+
     public String getCategoryName() {
         return categoryName;
     }
@@ -89,12 +105,12 @@ public class ProductCreateRequest {
         this.manufacturerName = manufacturerName;
     }
 
-    public String getName() {
-        return name;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public String getConditions() {
@@ -129,12 +145,20 @@ public class ProductCreateRequest {
         this.dimension = dimension;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
+    }
+
+    public int getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(int discountPercent) {
+        this.discountPercent = discountPercent;
     }
 
     public String getColor() {
@@ -145,12 +169,12 @@ public class ProductCreateRequest {
         this.color = color;
     }
 
-    public String getThumbnail() {
-        return thumbnail;
+    public String getStatus() {
+        return status;
     }
 
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getDescription() {
@@ -159,6 +183,14 @@ public class ProductCreateRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
 }

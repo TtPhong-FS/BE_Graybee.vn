@@ -11,6 +11,8 @@ public interface ManufacturerService {
 
     BasicMessageResponse<ManufacturerResponse> create(ManufacturerCreateRequest request);
 
+    BasicMessageResponse<List<ManufacturerResponse>> createManufacturers(List<ManufacturerCreateRequest> request);
+
     BasicMessageResponse<List<ManufacturerProjection>> getAllManufacturer();
 
     BasicMessageResponse<Integer> deleteById(int id);

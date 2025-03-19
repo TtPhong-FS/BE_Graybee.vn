@@ -8,7 +8,7 @@ public interface SubCategoryProjection {
 
     int getId();
 
-    String getName();
+    String getSubcategoryName();
 
     String getStatus();
 

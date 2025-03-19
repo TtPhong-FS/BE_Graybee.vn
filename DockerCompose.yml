@@ -1,0 +1,82 @@
+services:
+  # Redis + Redis Insight
+  redis:
+    image: redis:7.4.1
+    container_name: redis
+    restart: always
+    volumes:
+      - graybee_redis_volume:/data
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
+      interval: 5s
+      retries: 5
+      start_period: 5s
+    env_file:
+      - .env
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    networks:
+      - graybee
+  redis_insight:
+    image: redislabs/redisinsight:1.14.0
+    container_name: redisInsight
+    restart: always
+    ports:
+      - 5000:8001
+    volumes:
+      - graybee_redisInsight_volume:/db
+    networks:
+      - graybee
+
+  # MySQL
+  mysql:
+    image: mysql:8.0.40
+    container_name: mysql
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - graybee_mysql_volume:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - graybee
+
+  # Spring Boot App
+  graybee:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: graybee_server
+    container_name: server
+    ports:
+      - 8080:8080
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST_DOCKER}
+      - REDIS_HOST=${REDIS_HOST_DOCKER}
+    env_file:
+      - .env
+    networks:
+      - graybee
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+networks:
+  graybee:
+    driver: bridge
+    external: true
+
+volumes:
+  graybee_redis_volume:
+  graybee_redisInsight_volume:
+  graybee_mysql_volume:

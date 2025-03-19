@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -13,12 +12,10 @@ public class MonitorDetailCreateRequest extends DetailDtoRequest {
     @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("screen_size")
     private int screenSize;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
-    @JsonProperty("screen_type")
     private String screenType;
 
     @NotBlank(message = "Cannot be blank")
@@ -27,10 +24,8 @@ public class MonitorDetailCreateRequest extends DetailDtoRequest {
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 10, message = "Must be between 1 and 10 characters")
-    @JsonProperty("aspect_ratio")
     private String aspectRatio;
 
-    @JsonProperty("is_speaker")
     private boolean isSpeaker;
 
     @NotBlank(message = "Cannot be blank")
@@ -40,18 +35,15 @@ public class MonitorDetailCreateRequest extends DetailDtoRequest {
     @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("color_display")
     private int colorDisplay;
 
     @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("percent_color")
     private int percentColor;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("refresh_rate")
     private int refreshRate;
 
     @NotBlank(message = "Cannot be blank")
@@ -60,28 +52,23 @@ public class MonitorDetailCreateRequest extends DetailDtoRequest {
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("power_consumption")
     private int powerConsumption;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("power_save_mode")
     private int powerSaveMode;
 
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("power_off_mode")
     private float powerOffMode;
 
     @PositiveOrZero(message = "Cannot be a negative number")
     private float voltage;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    @JsonProperty("special_feature")
     private String specialFeature;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("life_span")
     private int lifeSpan;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")

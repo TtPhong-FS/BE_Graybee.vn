@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface RegexPatternRepository extends JpaRepository<RegexPattern, Integer> {
 
-    Optional<RegexPattern> findByType(String type);
+    Optional<RegexPattern> findByTypeName(String typeName);
 
 }

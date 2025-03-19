@@ -15,8 +15,8 @@ public class RegexPattern extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, nullable = false)
-    private String type;
+    @Column(name = "type_name", unique = true, nullable = false)
+    private String typeName;
 
     @Column(nullable = false)
     private String pattern;
@@ -24,8 +24,8 @@ public class RegexPattern extends BaseModel {
     public RegexPattern() {
     }
 
-    public RegexPattern(String type, String pattern) {
-        this.type = type;
+    public RegexPattern(String typeName, String pattern) {
+        this.typeName = typeName;
         this.pattern = pattern;
     }
 
@@ -37,12 +37,12 @@ public class RegexPattern extends BaseModel {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
+    public String getTypeName() {
+        return typeName;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
     public String getPattern() {

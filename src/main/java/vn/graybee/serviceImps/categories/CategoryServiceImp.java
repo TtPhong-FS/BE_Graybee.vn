@@ -1,5 +1,6 @@
 package vn.graybee.serviceImps.categories;
 
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.categories.ConstantCategory;
@@ -30,6 +31,8 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImp implements CategoryService {
 
+    private static final String CACHE_KEY = "manufacturers:categoryId:";
+
     private final SubCategoryRepository subCategoryRepository;
 
     private final CategorySubCategoryRepository categorySubCategoryRepository;
@@ -42,39 +45,40 @@ public class CategoryServiceImp implements CategoryService {
 
     private final CategoryValidation categoryValidation;
 
-    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, CategoryValidation categoryValidation) {
+    private final StringRedisTemplate redisTemplate;
+
+
+    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, CategoryValidation categoryValidation, StringRedisTemplate redisTemplate) {
         this.subCategoryRepository = subCategoryRepository;
         this.categorySubCategoryRepository = categorySubCategoryRepository;
         this.cmRepository = cmRepository;
         this.manufacturerRepository = manufacturerRepository;
         this.categoryRepository = categoryRepository;
         this.categoryValidation = categoryValidation;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BasicMessageResponse<CategoryResponse> createCategory(CategoryCreateRequest request) {
-        categoryValidation.checkExistByName(request.getName());
+        categoryValidation.checkExistByName(request.getCategoryName());
 
-        Category category = new Category(TextUtils.capitalize(request.getName()));
-        category.setStatus(CategoryStatus.ACTIVE);
-        category = categoryRepository.save(category);
+        Category category = new Category(TextUtils.capitalize(request.getCategoryName()));
+        category.setStatus("ACTIVE");
+        Category savedCategory = categoryRepository.save(category);
 
         if (!request.getSubCategories().isEmpty()) {
-            handleSubCategories(category.getId(), request.getSubCategories());
+            handleSubCategories(savedCategory.getId(), request.getSubCategories());
         }
 
         if (!request.getManufacturers().isEmpty()) {
-            handleManufacturers(category.getId(), request.getManufacturers());
+            handleManufacturers(savedCategory.getId(), request.getManufacturers());
         }
 
         CategoryResponse categoryResponse = new CategoryResponse(
                 category.getCreatedAt(),
                 category.getUpdatedAt(),
-                category.getId(),
-                category.getName(),
-                category.getStatus(),
-                category.getProductCount()
+                savedCategory
         );
 
         return new BasicMessageResponse<>(201, "Danh mục đã được tạo thành công! Kiểm tra dữ liệu dưới bảng", categoryResponse);
@@ -111,6 +115,11 @@ public class CategoryServiceImp implements CategoryService {
                 .map(manuId -> new CategoryManufacturer(category, manuId, CategoryStatus.PENDING))
                 .collect(Collectors.toList());
 
+//        Set<String> keys = redisTemplate.keys(CACHE_KEY + "*");
+//        if (!keys.isEmpty()) {
+//            redisTemplate.delete(keys);
+//        }
+
         cmRepository.saveAll(categoryManufacturers);
     }
 
@@ -136,27 +145,29 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     @Transactional
     public BasicMessageResponse<CategoryResponse> updateCategory(int id, CategoryUpdateRequest request) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
+//        Category category = categoryRepository.findById(id)
+//                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
+//
+//        if (category.getProductCount() > 0) {
+//            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_ID_USED_IN_PRODUCT);
+//        }
+//        category.setCategoryName(request.getName());
+//        category.setStatus(request.getStatus());
+//
+//        categoryRepository.save(category);
+//
+//        CategoryResponse categoryResponse = new CategoryResponse(
+//                category.getCreatedAt(),
+//                category.getUpdatedAt(),
+//                category.getId(),
+//                category.getName(),
+//                category.getStatus(),
+//                category.getProductCount()
+//        );
+//
+//        return new BasicMessageResponse<>(200, "Cập nhật danh mục thành công!", categoryResponse);
 
-        if (category.getProductCount() > 0) {
-            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_ID_USED_IN_PRODUCT);
-        }
-        category.setName(request.getName());
-        category.setStatus(request.getStatus());
-
-        categoryRepository.save(category);
-
-        CategoryResponse categoryResponse = new CategoryResponse(
-                category.getCreatedAt(),
-                category.getUpdatedAt(),
-                category.getId(),
-                category.getName(),
-                category.getStatus(),
-                category.getProductCount()
-        );
-
-        return new BasicMessageResponse<>(200, "Cập nhật danh mục thành công!", categoryResponse);
+        return null;
     }
 
     @Override

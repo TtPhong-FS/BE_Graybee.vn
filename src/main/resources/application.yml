@@ -1,11 +1,14 @@
 spring:
   application:
     name: Ecommerce-Graybee
+  config:
+    import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://localhost:3306/graybee?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:graybee}?useSSL=true&serverTimezone=Asia/Ho_Chi_Minh
+    username: ${MYSQL_USER:phongtt}
+    password: ${MYSQL_PASSWORD:12345}
+    hikari:
+      connection-timeout: 30000
   jpa:
     hibernate:
       ddl-auto: none
@@ -16,6 +19,17 @@ spring:
           batch_size: 20
           order_insert: true
           order_update: true
+  cache:
+    type: redis
+  data:
+    redis:
+      repositories:
+        enabled: false
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:root}
+      database: ${REDIS_DATABASE:0}
+
 server:
   address: 0.0.0.0
   port: 8080

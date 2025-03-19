@@ -6,15 +6,26 @@ public class ProductBasicResponse {
 
     private String name;
 
-    private float price;
+    private double finalPrice;
+
+    private double price;
 
     private String thumbnail;
 
-    public ProductBasicResponse(long id, String name, float price, String thumbnail) {
+    public ProductBasicResponse(long id, String name, double finalPrice, double price, String thumbnail) {
         this.id = id;
         this.name = name;
+        this.finalPrice = finalPrice;
         this.price = price;
         this.thumbnail = thumbnail;
+    }
+
+    public double getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(double finalPrice) {
+        this.finalPrice = finalPrice;
     }
 
     public long getId() {
@@ -33,11 +44,11 @@ public class ProductBasicResponse {
         this.name = name;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

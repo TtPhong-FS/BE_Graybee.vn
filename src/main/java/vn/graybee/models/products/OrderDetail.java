@@ -1,4 +1,4 @@
-package vn.graybee.models.users;
+package vn.graybee.models.products;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import vn.graybee.models.products.Product;
 
 @Entity
 @Table(name = "order_details")

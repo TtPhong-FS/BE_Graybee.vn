@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -17,18 +15,17 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @Column(name = "product_id")
+    private Long productId;
 
-    @Column(name = "image_url", length = 300)
+    @Column(name = "image_url", length = 500)
     private String imageUrl;
 
     public ProductImage() {
     }
 
-    public ProductImage(Product product, String imageUrl) {
-        this.product = product;
+    public ProductImage(Long productId, String imageUrl) {
+        this.productId = productId;
         this.imageUrl = imageUrl;
     }
 
@@ -40,12 +37,12 @@ public class ProductImage {
         this.id = id;
     }
 
-    public Product getProduct() {
-        return product;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getImageUrl() {

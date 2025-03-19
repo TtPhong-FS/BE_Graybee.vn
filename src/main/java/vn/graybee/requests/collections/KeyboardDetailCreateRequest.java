@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -19,12 +18,10 @@ public class KeyboardDetailCreateRequest extends DetailDtoRequest {
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    @JsonProperty("key_cap")
     private String keyCap;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    @JsonProperty("switch_type")
     private String switchType;
 
     @NotBlank(message = "Cannot be blank")
@@ -39,7 +36,7 @@ public class KeyboardDetailCreateRequest extends DetailDtoRequest {
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
     private String led;
-    
+
     public int getDesign() {
         return design;
     }

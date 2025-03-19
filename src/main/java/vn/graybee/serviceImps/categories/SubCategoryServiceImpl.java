@@ -46,23 +46,23 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<SubCategoryResponse> create(SubCategoryCreateRequest request) {
-        subCategoryRepository.checkExistsByName(request.getName());
+        subCategoryRepository.checkExistsByName(request.getSubcategoryName());
 
-        SubCategory subCategory = new SubCategory(TextUtils.capitalize(request.getName()));
+        SubCategory subCategory = new SubCategory(TextUtils.capitalize(request.getSubcategoryName()));
 
-        subCategory.setStatus(CategoryStatus.ACTIVE);
+        subCategory.setStatus("ACTIVE");
 
         SubCategory savedSubcategory = subCategoryRepository.save(subCategory);
 
-        if (!request.getTags().isEmpty()) {
-            handleTags(savedSubcategory.getId(), request.getTags());
+        if (!request.getTagNames().isEmpty()) {
+            handleTags(savedSubcategory.getId(), request.getTagNames());
         }
 
         SubCategoryResponse subCategoryResponse = new SubCategoryResponse(
                 subCategory.getCreatedAt(),
                 subCategory.getUpdatedAt(),
                 subCategory.getId(),
-                subCategory.getName(),
+                subCategory.getSubcategoryName(),
                 subCategory.getStatus()
         );
 
@@ -92,7 +92,7 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
             List<Tag> savedTags = tagRepository.saveAll(newTags);
 
             // Cập nhật lại map với các tag mới
-            savedTags.forEach(tag -> tagMap.put(tag.getName(), tag.getId()));
+            savedTags.forEach(tag -> tagMap.put(tag.getTagName(), tag.getId()));
         }
 
         // Tạo danh sách SubCategoryTag từ tagIdMap

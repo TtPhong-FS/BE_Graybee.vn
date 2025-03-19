@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import vn.graybee.requests.DetailDtoRequest;
@@ -32,7 +31,6 @@ public class PcDetailCreateRequest extends DetailDtoRequest {
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
 
     @NotBlank(message = "Cannot be blank")
-    @JsonProperty("operating_system")
     private String operatingSystem;
 
     @Size(min = 1, max = 150, message = "Must be between 1 and 150 characters")
@@ -40,11 +38,9 @@ public class PcDetailCreateRequest extends DetailDtoRequest {
     private String vga;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    @JsonProperty("input_port")
     private String inputPort;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    @JsonProperty("output_port")
     private String outputPort;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
@@ -54,7 +50,6 @@ public class PcDetailCreateRequest extends DetailDtoRequest {
     private String psu;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    @JsonProperty("case_name")
     private String caseName;
 
     public String getDemand() {

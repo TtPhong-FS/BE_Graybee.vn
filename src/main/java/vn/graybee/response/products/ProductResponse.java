@@ -1,18 +1,24 @@
 package vn.graybee.response.products;
 
+import vn.graybee.models.products.Product;
 import vn.graybee.response.BaseResponse;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProductResponse extends BaseResponse {
 
     private long id;
 
-    private int categoryId;
+    private String categoryName;
 
-    private int manufacturerId;
+    private String manufacturerName;
 
-    private String name;
+    private List<String> tagNames;
+
+    private String productCode;
+
+    private String productName;
 
     private int warranty;
 
@@ -20,52 +26,68 @@ public class ProductResponse extends BaseResponse {
 
     private String dimension;
 
-    private float price;
+    private double price;
 
-    private int discountPercentage;
+    private int discountPercent;
 
-    private float newPrice;
+    private double finalPrice;
 
     private String color;
-
-    private String description;
 
     private String thumbnail;
 
     private String conditions;
 
-    public ProductResponse(LocalDateTime createdAt, LocalDateTime updatedAt, long id, int categoryId, int manufacturerId, String name, int warranty, float weight, String dimension, float price, int discountPercentage, float newPrice, String color, String description, String thumbnail, String conditions) {
+    private boolean inStock;
+
+    private int quantity;
+
+    private String status;
+
+    public ProductResponse(LocalDateTime createdAt, LocalDateTime updatedAt, Product product, String categoryName, String manufacturerName, List<String> tagNames, int quantity) {
         super(createdAt, updatedAt);
-        this.id = id;
-        this.categoryId = categoryId;
-        this.manufacturerId = manufacturerId;
-        this.name = name;
-        this.warranty = warranty;
-        this.weight = weight;
-        this.dimension = dimension;
-        this.price = price;
-        this.discountPercentage = discountPercentage;
-        this.newPrice = newPrice;
-        this.color = color;
-        this.description = description;
-        this.thumbnail = thumbnail;
-        this.conditions = conditions;
+        this.id = product.getId();
+        this.productCode = product.getProductCode();
+        this.productName = product.getProductName();
+        this.categoryName = categoryName;
+        this.manufacturerName = manufacturerName;
+        this.tagNames = tagNames;
+        this.warranty = product.getWarranty();
+        this.weight = product.getWeight();
+        this.dimension = product.getDimension();
+        this.price = product.getPrice();
+        this.discountPercent = product.getDiscountPercent();
+        this.finalPrice = product.getFinalPrice();
+        this.color = product.getColor();
+        this.thumbnail = product.getThumbnail();
+        this.conditions = product.getConditions();
+        this.inStock = product.isStock();
+        this.quantity = quantity;
+        this.status = product.getStatus();
     }
 
-    public int getDiscountPercentage() {
-        return discountPercentage;
+    public boolean isInStock() {
+        return inStock;
     }
 
-    public void setDiscountPercentage(int discountPercentage) {
-        this.discountPercentage = discountPercentage;
+    public void setInStock(boolean inStock) {
+        this.inStock = inStock;
     }
 
-    public float getNewPrice() {
-        return newPrice;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setNewPrice(float newPrice) {
-        this.newPrice = newPrice;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public List<String> getTagNames() {
+        return tagNames;
+    }
+
+    public void setTagNames(List<String> tagNames) {
+        this.tagNames = tagNames;
     }
 
     public long getId() {
@@ -76,29 +98,60 @@ public class ProductResponse extends BaseResponse {
         this.id = id;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
-    public int getManufacturerId() {
-        return manufacturerId;
+    public String getManufacturerName() {
+        return manufacturerName;
     }
 
-    public void setManufacturerId(int manufacturerId) {
-        this.manufacturerId = manufacturerId;
+    public void setManufacturerName(String manufacturerName) {
+        this.manufacturerName = manufacturerName;
     }
 
-
-    public String getName() {
-        return name;
+    public int getDiscountPercent() {
+        return discountPercent;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDiscountPercent(int discountPercent) {
+        this.discountPercent = discountPercent;
+    }
+
+    public double getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(double finalPrice) {
+        this.finalPrice = finalPrice;
+    }
+
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public int getWarranty() {
@@ -125,11 +178,11 @@ public class ProductResponse extends BaseResponse {
         this.dimension = dimension;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -141,13 +194,6 @@ public class ProductResponse extends BaseResponse {
         this.color = color;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public String getThumbnail() {
         return thumbnail;

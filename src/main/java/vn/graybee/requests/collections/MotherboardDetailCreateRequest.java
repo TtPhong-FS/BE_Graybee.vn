@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import vn.graybee.requests.DetailDtoRequest;
@@ -17,54 +16,42 @@ public class MotherboardDetailCreateRequest extends DetailDtoRequest {
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
-    @JsonProperty("cpu_support")
     private String cpuSupport;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 500, message = "Must be between 1 and 500 characters")
-    @JsonProperty("memory_support")
     private String memorySupport;
 
     @Size(min = 1, max = 500, message = "Must be between 1 and 500 characters")
-    @JsonProperty("integrated_graphics")
     private String integratedGraphics;
 
     @Size(min = 1, max = 800, message = "Must be between 1 and 800 characters")
-    @JsonProperty("sound_support")
     private String soundSupport;
 
     @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
-    @JsonProperty("expansion_slots")
     private String expansionSlots;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
-    @JsonProperty("storage_support")
     private String storageSupport;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
-    @JsonProperty("usb_support")
     private String usbSupport;
 
     @Size(min = 1, max = 300, message = "Must be between 1 and 300 characters")
-    @JsonProperty("wireless_connectivity")
     private String wirelessConnectivity;
 
     @Size(min = 1, max = 150, message = "Must be between 1 and 150 characters")
-    @JsonProperty("operating_system_support")
     private String operatingSystemSupport;
 
     @Size(min = 1, max = 600, message = "Must be between 1 and 600 characters")
-    @JsonProperty("internal_input_output_connectivity")
     private String internalInputOutputConnectivity;
 
     @Size(min = 1, max = 400, message = "Must be between 1 and 400 characters")
-    @JsonProperty("rear_input_output_connectivity")
     private String rearInputOutputConnectivity;
 
     @Size(min = 1, max = 200, message = "Must be between 1 and 200 characters")
-    @JsonProperty("supporting_software")
     private String supportingSoftware;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")

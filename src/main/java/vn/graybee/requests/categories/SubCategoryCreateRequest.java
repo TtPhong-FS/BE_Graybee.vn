@@ -10,24 +10,24 @@ public class SubCategoryCreateRequest {
 
     @NotBlank(message = "Không được để trống")
     @Size(max = 35, message = "Độ dài không được vượt quá 35 ký tự")
-    private String name;
+    private String subcategoryName;
 
-    private List<String> tags;
+    private List<String> tagNames;
 
-    public List<String> getTags() {
-        return tags != null ? tags : Collections.emptyList();
+    public List<String> getTagNames() {
+        return tagNames != null ? tagNames : Collections.emptyList();
     }
 
-    public void setTags(List<String> tags) {
-        this.tags = tags;
+    public void setTagNames(List<String> tagNames) {
+        this.tagNames = tagNames;
     }
 
-    public String getName() {
-        return name;
+    public String getSubcategoryName() {
+        return subcategoryName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSubcategoryName(String subcategoryName) {
+        this.subcategoryName = subcategoryName;
     }
 
 }

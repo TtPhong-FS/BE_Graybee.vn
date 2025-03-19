@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -13,13 +12,11 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("memory_speed")
     private int memorySpeed;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("memory_bus")
     private int memoryBus;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 20 characters")
@@ -29,17 +26,14 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("cuda_kernel")
     private int cudaKernel;
 
     @Size(min = 1, max = 20, message = "Must be between 1 and 20 characters")
     @NotBlank(message = "Cannot be blank")
-    @JsonProperty("maximum_resolution")
     private String maximumResolution;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("maximum_screen")
     private int maximumScreen;
 
     @Size(min = 1, max = 200, message = "Must be between 1 and 100 characters")
@@ -53,16 +47,13 @@ public class VgaDetailCreateRequest extends DetailDtoRequest {
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("power_consumption")
     private int powerConsumption;
 
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
     @NotNull(message = "Cannot be null")
-    @JsonProperty("psu_recommend")
     private int psuRecommend;
 
-    @JsonProperty("is_application_support")
     private boolean isApplicationSupport;
 
     public int getMemorySpeed() {

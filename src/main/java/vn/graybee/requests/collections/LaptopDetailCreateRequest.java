@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -28,7 +27,6 @@ public class LaptopDetailCreateRequest extends DetailDtoRequest {
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    @JsonProperty("operating_system")
     private String operatingSystem;
 
     @NotBlank(message = "Cannot be blank")
@@ -49,7 +47,6 @@ public class LaptopDetailCreateRequest extends DetailDtoRequest {
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    @JsonProperty("wireless_connectivity")
     private String wirelessConnectivity;
 
     @NotBlank(message = "Cannot be blank")
@@ -66,10 +63,10 @@ public class LaptopDetailCreateRequest extends DetailDtoRequest {
     private int battery;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    private String material = "";
+    private String material;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String confidentiality = "";
+    private String confidentiality;
 
     public String getDemand() {
         return demand;

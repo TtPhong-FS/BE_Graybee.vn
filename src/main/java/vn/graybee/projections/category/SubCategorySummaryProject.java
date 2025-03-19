@@ -4,6 +4,6 @@ public interface SubCategorySummaryProject {
 
     Integer getId();
 
-    String getName();
+    String getSubcategoryName();
 
 }

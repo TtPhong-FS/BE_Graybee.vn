@@ -4,6 +4,6 @@ public interface TagProjection {
 
     int getId();
 
-    String getName();
+    String getTagName();
 
 }

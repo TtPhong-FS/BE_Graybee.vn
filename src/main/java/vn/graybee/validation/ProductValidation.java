@@ -60,7 +60,7 @@ public class ProductValidation {
         }
 
         try {
-            validateNameExists(request.getName());
+            validateNameExists(request.getProductName());
         } catch (BusinessCustomException e) {
             errors.put(e.getField(), e.getMessage());
         }
@@ -73,5 +73,12 @@ public class ProductValidation {
 
         return ResponseEntity.ok(new BasicMessageResponse<>(200, "Tất cả dữ liệu đều hợp lệ", null));
     }
+
+//    public void checkById(long productId) {
+//        if(productRepository.checkById(productId)  null){
+//            throw new   CustomNotFoundException(ConstantProduct.PRODUCT, ConstantProduct.PRODUCT_DOES_NOT_EXISTS));
+//        }
+//
+//    }
 
 }

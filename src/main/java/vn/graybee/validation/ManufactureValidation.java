@@ -2,11 +2,9 @@ package vn.graybee.validation;
 
 import org.springframework.stereotype.Service;
 import vn.graybee.constants.categories.ConstantCategory;
-import vn.graybee.enums.CategoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.categories.Manufacturer;
 import vn.graybee.repositories.categories.ManufacturerRepository;
-import vn.graybee.response.categories.ManufacturerStatusResponse;
 
 import java.util.Optional;
 
@@ -20,13 +18,9 @@ public class ManufactureValidation {
     }
 
     public int getIdByName(String manufacturerName) {
-        ManufacturerStatusResponse manufacturer = manufacturerRepository.getIdAndStatusByName(manufacturerName)
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.MANUFACTURER_NAME, ConstantCategory.MANUFACTURER_DOES_NOT_EXIST));
+        return manufacturerRepository.getIdByName(manufacturerName)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.MANUFACTURER_NAME, ConstantCategory.MANUFACTURER_TEMPORARILY_FLAGGED));
 
-        if (manufacturer.getStatus().equals(CategoryStatus.DELETED)) {
-            throw new BusinessCustomException(ConstantCategory.MANUFACTURER_NAME, ConstantCategory.MANUFACTURER_TEMPORARILY_FLAGGED);
-        }
-        return manufacturer.getId();
     }
 
     public Manufacturer findToUpdateStatusDelete(int manufacturerId) {

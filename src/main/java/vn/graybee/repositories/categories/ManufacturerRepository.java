@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.categories.Manufacturer;
 import vn.graybee.projections.category.ManufacturerProjection;
-import vn.graybee.response.categories.ManufacturerStatusResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,17 +24,15 @@ public interface ManufacturerRepository extends JpaRepository<Manufacturer, Inte
     @Query("Select m from Manufacturer m")
     List<ManufacturerProjection> fetchAll();
 
-    Optional<Manufacturer> findByName(@Param("name") String name);
-
-    @Query("Select m.id from Manufacturer m where m.name In :name ")
-    List<Integer> getIdByName(@Param("name") List<String> name);
+    @Query("Select m.id from Manufacturer m where m.manufacturerName In :manufacturerName ")
+    List<Integer> getIdByName(@Param("manufacturerName") List<String> manufacturerName);
 
 
-    @Query("Select new vn.graybee.response.categories.ManufacturerStatusResponse(m.id, m.status) from Manufacturer m where m.name = :name ")
-    Optional<ManufacturerStatusResponse> getIdAndStatusByName(@Param("name") String name);
+    @Query("Select m.id from Manufacturer m where m.manufacturerName = :manufacturerName and m.status = 'ACTIVE' ")
+    Optional<Integer> getIdByName(@Param("manufacturerName") String manufacturerName);
 
 
-    @Query("Select m.name from Manufacturer m where m.name = :name ")
-    Optional<String> validateNameExists(@Param("name") String name);
+    @Query("Select m.manufacturerName from Manufacturer m where m.manufacturerName = :manufacturerName ")
+    Optional<String> validateNameExists(@Param("manufacturerName") String manufacturerName);
 
 }

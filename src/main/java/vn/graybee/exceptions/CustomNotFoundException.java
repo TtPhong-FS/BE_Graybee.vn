@@ -2,15 +2,16 @@ package vn.graybee.exceptions;
 
 public class CustomNotFoundException extends RuntimeException {
 
-    private final String resource;
+    private final String field;
 
-    public CustomNotFoundException(String resource, String message) {
+
+    public CustomNotFoundException(String field, String message) {
         super(message);
-        this.resource = resource;
+        this.field = field;
     }
 
-    public String getResource() {
-        return resource;
+    public String getField() {
+        return field;
     }
 
 }

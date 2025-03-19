@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -15,39 +14,34 @@ public class MouseDetailCreateRequest extends DetailDtoRequest {
     @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("number_of_nodes")
     private int numberOfNodes;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    @JsonProperty("switch_type")
-    private String switchType = "";
+    private String switchType;
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    @JsonProperty("switch_life")
     private String switchLife;
 
     @NotNull(message = "Cannot be null")
     @Positive(message = "Must be a positive number")
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("polling_rate")
     private int pollingRate;
 
     @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters")
-    private String software = "";
+    private String software;
 
     @Size(min = 1, max = 40, message = "Must be between 1 and 40 characters")
     @NotBlank(message = "Cannot be blank")
     private String connect;
 
-    @JsonProperty("is_wireless_connect")
-    private boolean isWirelessConnect = false;
+    private boolean isWirelessConnect;
 
     @Size(min = 1, max = 50, message = "Must be between 1 and 50 characters")
-    private String battery = "";
+    private String battery;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")
-    private String led = "";
+    private String led;
 
     public String getSensors() {
         return sensors;

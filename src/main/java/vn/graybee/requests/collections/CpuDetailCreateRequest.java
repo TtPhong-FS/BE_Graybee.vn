@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -15,37 +14,30 @@ public class CpuDetailCreateRequest extends DetailDtoRequest {
 
     @NotNull(message = "Nhập số nhân")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    @JsonProperty("multiplier")
     private int multiplier;
 
     @NotNull(message = "Nhập số luồng")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    @JsonProperty("number_of_streams")
     private int numberOfStreams;
 
     @NotNull(message = "Nhập hiệu suất tối đa P-Core")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    @JsonProperty("maximum_performance_core")
     private float maximumPerformanceCore;
 
     @NotNull(message = "Nhập hiệu suất tối đa E-Core")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    @JsonProperty("maximum_efficiency_core")
     private float maximumEfficiencyCore;
 
     @NotNull(message = "Nhập hiệu suất ca bản P-Core")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    @JsonProperty("base_performance_core")
     private float basePerformanceCore;
 
     @NotNull(message = "Nhập hiệu suất ca bản E-Core")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    @JsonProperty("base_efficiency_core")
     private float baseEfficiencyCore;
 
     @NotNull(message = "Nhập nguồn điện tiêu hao")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    @JsonProperty("power_consumption")
     private float powerConsumption;
 
     @NotNull(message = "Nhập bộ nhớ đệm")
@@ -54,20 +46,16 @@ public class CpuDetailCreateRequest extends DetailDtoRequest {
 
     @NotBlank(message = "Nhập series bo mạch chủ tương thích")
     @Size(min = 5, max = 50, message = "Độ dài ít nhất từ 5 đến 50 ký tự")
-    @JsonProperty("motherboard_compatible")
     private String motherboardCompatible;
 
     @NotNull(message = "Nhập bộ nhớ tối đa")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    @JsonProperty("maximum_bandwidth")
     private int maximumBandwidth;
 
     @NotBlank(message = "Nhập loại RAM")
     @Size(min = 1, max = 50, message = "Độ dài ít nhất từ 5 đến 50 ký tự")
-    @JsonProperty("memory_type")
     private String memoryType;
 
-    @JsonProperty("is_graphics_core")
     private boolean isGraphicsCore;
 
     public String getSocket() {

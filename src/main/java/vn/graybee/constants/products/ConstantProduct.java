@@ -6,8 +6,8 @@ public class ConstantProduct {
 
     public static final String GENERAL = "general";
 
-    public static final String NAME = "name";
-    
+    public static final String NAME = "productName";
+
     public static final String PRODUCT_TEMPORARILY_FLAGGED = "Không thể thực hiện, sản phẩm tạm thời đang bị xoá!";
 
     public static final String PRODUCT_NAME_ALREADY_EXISTS = "Tên sản phẩm đã tồn tại!";

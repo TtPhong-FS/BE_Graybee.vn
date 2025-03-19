@@ -9,7 +9,6 @@ import vn.graybee.models.categories.Category;
 import vn.graybee.projections.category.CategoryProjection;
 import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.response.categories.CategoryResponse;
-import vn.graybee.response.categories.CategoryStatusResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,10 +26,10 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("delete from Category c where c.id = :id")
     void deleteByCategoryId(@Param("id") int id);
 
-    @Query("Select new vn.graybee.response.categories.CategoryStatusResponse(c.id, c.status) from Category c where c.name = :name ")
-    Optional<CategoryStatusResponse> getStatusAndIdByName(@Param("name") String name);
+    @Query("Select c.id from Category c where c.categoryName = :categoryName and c.status = 'ACTIVE' ")
+    Optional<Integer> getIdByName(@Param("categoryName") String categoryName);
 
-    @Query("Select new vn.graybee.response.categories.CategoryResponse(c.createdAt, c.updatedAt, c.id, c.name, c.status, c.productCount) from Category c where c.id = :id ")
+    @Query("Select new vn.graybee.response.categories.CategoryResponse(c.createdAt, c.updatedAt, c) from Category c where c.id = :id ")
     Optional<CategoryResponse> getById(@Param("id") int id);
 
     @Query("Select c.productCount from Category c where c.id = :id ")
@@ -39,12 +38,8 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("Select c.id from Category c where c.id = :id ")
     Optional<Integer> checkExistsById(@Param("id") int id);
 
-    @Query("Select c from Category c where c.name = :name")
-    Optional<Category> findToCreateProduct(@Param("name") String name);
-
-
-    @Query("Select c.name from Category c where c.name = :name ")
-    Optional<String> validateNameExists(@Param("name") String name);
+    @Query("Select c.categoryName from Category c where c.categoryName = :categoryName ")
+    Optional<String> validateNameExists(@Param("categoryName") String categoryName);
 
     //    public
     @Query("Select c from Category c")

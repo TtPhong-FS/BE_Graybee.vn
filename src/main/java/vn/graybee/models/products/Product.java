@@ -2,13 +2,10 @@ package vn.graybee.models.products;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.enums.GeneralStatus;
 import vn.graybee.models.others.BaseModel;
 
 @Entity
@@ -25,8 +22,11 @@ public class Product extends BaseModel {
     @Column(name = "manufacturer_id")
     private Integer manufacturerId;
 
-    @Column(unique = true, nullable = false, length = 200)
-    private String name;
+    @Column(name = "product_name", unique = true, nullable = false, length = 200)
+    private String productName;
+
+    @Column(name = "product_code", unique = true, length = 100, nullable = false)
+    private String productCode;
 
     @Column(name = "conditions", length = 5, nullable = false)
     private String conditions;
@@ -39,37 +39,47 @@ public class Product extends BaseModel {
     @Column(name = "dimension", length = 50)
     private String dimension;
 
-    private float price;
+    private double price;
 
-    private int discount_percent;
+    @Column(name = "discount_percent")
+    private int discountPercent;
 
-    private float newPrice;
+    private double finalPrice;
 
     @Column(length = 35)
     private String color;
 
-    @Column(name = "description")
-    private String description;
-
-    @Column(length = 300)
-    private String thumbnail;
-
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private GeneralStatus status;
+    private String status;
+
+    @Column(name = "in_stock")
+    private boolean isStock;
+
+    @Column(length = 150)
+    private String thumbnail;
 
     public Product() {
     }
 
-    public Product(String name, int warranty, float weight, String dimension, float price, int discount_percent, String color, String description, String thumbnail) {
-        this.name = name;
-        this.warranty = warranty;
-        this.weight = weight;
-        this.dimension = dimension;
+    public Product(String productName, double price, int discountPercent) {
+        this.productName = productName;
         this.price = price;
-        this.discount_percent = discount_percent;
-        this.color = color;
-        this.description = description;
+        this.discountPercent = discountPercent;
+    }
+
+    public boolean isStock() {
+        return isStock;
+    }
+
+    public void setStock(boolean stock) {
+        isStock = stock;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
 
@@ -81,14 +91,6 @@ public class Product extends BaseModel {
         this.id = id;
     }
 
-    public Integer getManufacturerId() {
-        return manufacturerId;
-    }
-
-    public void setManufacturerId(Integer manufacturerId) {
-        this.manufacturerId = manufacturerId;
-    }
-
     public Integer getCategoryId() {
         return categoryId;
     }
@@ -97,12 +99,28 @@ public class Product extends BaseModel {
         this.categoryId = categoryId;
     }
 
-    public String getName() {
-        return name;
+    public Integer getManufacturerId() {
+        return manufacturerId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setManufacturerId(Integer manufacturerId) {
+        this.manufacturerId = manufacturerId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
     }
 
     public String getConditions() {
@@ -137,28 +155,28 @@ public class Product extends BaseModel {
         this.dimension = dimension;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
-    public int getDiscount_percent() {
-        return discount_percent;
+    public int getDiscountPercent() {
+        return discountPercent;
     }
 
-    public void setDiscount_percent(int discount_percent) {
-        this.discount_percent = discount_percent;
+    public void setDiscountPercent(int discountPercent) {
+        this.discountPercent = discountPercent;
     }
 
-    public float getNewPrice() {
-        return newPrice;
+    public double getFinalPrice() {
+        return finalPrice;
     }
 
-    public void setNewPrice(float newPrice) {
-        this.newPrice = newPrice;
+    public void setFinalPrice(double finalPrice) {
+        this.finalPrice = finalPrice;
     }
 
     public String getColor() {
@@ -169,27 +187,12 @@ public class Product extends BaseModel {
         this.color = color;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public GeneralStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(GeneralStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

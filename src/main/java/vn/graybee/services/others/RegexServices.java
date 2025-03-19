@@ -23,7 +23,7 @@ public class RegexServices {
     public void loadRegex() {
         regexCache = regexRepository.findAll()
                 .stream()
-                .collect(Collectors.toMap(RegexPattern::getType, RegexPattern::getPattern));
+                .collect(Collectors.toMap(RegexPattern::getTypeName, RegexPattern::getPattern));
     }
 
     public String getRegex(String type) {
@@ -31,9 +31,9 @@ public class RegexServices {
     }
 
     public void updateRegex(String type, String newPattern) {
-        RegexPattern regexPattern = regexRepository.findByType(type)
+        RegexPattern regexPattern = regexRepository.findByTypeName(type)
                 .orElse(new RegexPattern(type, newPattern));
-        
+
         regexPattern.setPattern(newPattern);
         regexRepository.save(regexPattern);
 

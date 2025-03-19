@@ -1,6 +1,5 @@
 package vn.graybee.requests.collections;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -13,7 +12,6 @@ public class RamDetailCreateRequest extends DetailDtoRequest {
 
     @NotBlank(message = "Cannot be blank")
     @Size(min = 1, max = 5, message = "Must be between 1 and 5 characters")
-    @JsonProperty("suitable_for")
     private String suitableFor;
 
     @NotBlank(message = "Cannot be blank")
@@ -38,10 +36,8 @@ public class RamDetailCreateRequest extends DetailDtoRequest {
     private String latency;
 
     @PositiveOrZero(message = "Cannot be a negative number")
-    @JsonProperty("voltage")
     private float voltage;
 
-    @JsonProperty("is_heat_dissipation")
     private boolean isHeatDissipation;
 
     @Size(min = 1, max = 30, message = "Must be between 1 and 30 characters")

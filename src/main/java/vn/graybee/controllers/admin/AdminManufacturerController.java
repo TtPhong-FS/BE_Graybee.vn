@@ -22,11 +22,11 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/admin/manufacturers")
-public class ManufacturerController {
+public class AdminManufacturerController {
 
     private final ManufacturerService manufacturerService;
 
-    public ManufacturerController(ManufacturerService manufacturerService) {
+    public AdminManufacturerController(ManufacturerService manufacturerService) {
         this.manufacturerService = manufacturerService;
     }
 
@@ -41,6 +41,12 @@ public class ManufacturerController {
     public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> create(@RequestBody @Valid ManufacturerCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 manufacturerService.create(request));
+    }
+
+    @PostMapping("/add-list")
+    public ResponseEntity<BasicMessageResponse<List<ManufacturerResponse>>> createManufacturers(@RequestBody @Valid List<ManufacturerCreateRequest> request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                manufacturerService.createManufacturers(request));
     }
 
     @DeleteMapping("/{id}")

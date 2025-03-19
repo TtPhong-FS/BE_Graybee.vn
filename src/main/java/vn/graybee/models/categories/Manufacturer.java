@@ -2,13 +2,10 @@ package vn.graybee.models.categories;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.enums.CategoryStatus;
 import vn.graybee.models.others.BaseModel;
 
 @Entity
@@ -19,12 +16,11 @@ public class Manufacturer extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, length = 50, unique = true)
-    private String name;
+    @Column(name = "manufacturer_name", nullable = false, length = 50, unique = true)
+    private String manufacturerName;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private CategoryStatus status;
+    private String status;
 
     @Column(name = "product_count")
     private int productCount;
@@ -32,8 +28,8 @@ public class Manufacturer extends BaseModel {
     public Manufacturer() {
     }
 
-    public Manufacturer(String name) {
-        this.name = name;
+    public Manufacturer(String manufacturerName) {
+        this.manufacturerName = manufacturerName;
     }
 
     public void increaseProductCount() {
@@ -54,19 +50,19 @@ public class Manufacturer extends BaseModel {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getManufacturerName() {
+        return manufacturerName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setManufacturerName(String manufacturerName) {
+        this.manufacturerName = manufacturerName;
     }
 
-    public CategoryStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(CategoryStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
