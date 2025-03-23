@@ -2,28 +2,28 @@ package vn.graybee.serviceImps.categories;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.constants.categories.ConstantCategory;
-import vn.graybee.enums.CategoryStatus;
-import vn.graybee.exceptions.CustomNotFoundException;
+import vn.graybee.constants.ConstantCategory;
+import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.categories.SubCategory;
 import vn.graybee.models.categories.SubCategoryTag;
-import vn.graybee.models.categories.Tag;
-import vn.graybee.projections.category.SubCategoryProjection;
-import vn.graybee.projections.category.SubCategorySummaryProject;
+import vn.graybee.projections.admin.category.SubCategoryProjection;
+import vn.graybee.projections.admin.category.SubCategorySummaryProject;
 import vn.graybee.repositories.categories.SubCategoryRepository;
 import vn.graybee.repositories.categories.SubCategoryTagRepository;
 import vn.graybee.repositories.categories.TagRepository;
-import vn.graybee.requests.categories.SubCategoryCreateRequest;
-import vn.graybee.requests.categories.SubCategoryUpdateRequest;
-import vn.graybee.response.categories.SubCategoryResponse;
+import vn.graybee.requests.directories.SubCategoryCreateRequest;
+import vn.graybee.requests.directories.SubCategoryUpdateRequest;
+import vn.graybee.response.admin.directories.subcate.SubCategoryResponse;
+import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.services.categories.SubCategoryServices;
 import vn.graybee.utils.TextUtils;
 import vn.graybee.validation.SubCategoryValidation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 @Service
 public class SubCategoryServiceImpl implements SubCategoryServices {
@@ -54,68 +54,100 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
 
         SubCategory savedSubcategory = subCategoryRepository.save(subCategory);
 
-        if (!request.getTagNames().isEmpty()) {
-            handleTags(savedSubcategory.getId(), request.getTagNames());
+        List<TagResponse> tagResponses = new ArrayList<>();
+        if (!request.getTags().isEmpty()) {
+            tagResponses = handleTags(savedSubcategory.getId(), request.getTags());
         }
 
         SubCategoryResponse subCategoryResponse = new SubCategoryResponse(
-                subCategory.getCreatedAt(),
-                subCategory.getUpdatedAt(),
-                subCategory.getId(),
-                subCategory.getSubcategoryName(),
-                subCategory.getStatus()
+                savedSubcategory,
+                tagResponses
         );
 
         return new BasicMessageResponse<>(201, "Tạo danh mục con thành công", subCategoryResponse);
     }
 
-    private void handleTags(int subcategory, List<String> tagNames) {
-        // Lấy danh sách ID của các tag đã tồn tại bằng SELECT IN
-        Map<String, Integer> tagMap = tagRepository.getIdMapByName(tagNames);
-        System.out.println(tagMap);
-        List<Tag> newTags = new ArrayList<>();
-        List<SubCategoryTag> subCategoryTags = new ArrayList<>();
+    private List<TagResponse> handleTags(int subcategoryId, List<Integer> tagIds) {
 
-        // Duyệt qua từng tag name để xử lý
-        for (String tagName : tagNames) {
-            Integer tagId = tagMap.get(tagName);
+        List<TagResponse> tags = tagRepository.findByIds(tagIds);
 
-            if (tagId == null) {
-                // Nếu không tìm thấy tagId, tạo mới tag
-                Tag newTag = new Tag(tagName);
-                newTags.add(newTag);
-            }
+        if (tags.size() != tagIds.size()) {
+            throw new BusinessCustomException(ConstantCategory.TAGS, ConstantCategory.TAG_DOES_NOT_EXIST);
         }
 
-        // Lưu các tag mới (nếu có)
-        if (!newTags.isEmpty()) {
-            List<Tag> savedTags = tagRepository.saveAll(newTags);
+        List<SubCategoryTag> relations = tags.stream()
+                .map(tag -> new SubCategoryTag(subcategoryId, tag.getId()))
+                .toList();
 
-            // Cập nhật lại map với các tag mới
-            savedTags.forEach(tag -> tagMap.put(tag.getTagName(), tag.getId()));
-        }
+        subCategoryTagRepository.saveAll(relations);
 
-        // Tạo danh sách SubCategoryTag từ tagIdMap
-        tagMap.forEach((name, id) -> {
-            subCategoryTags.add(new SubCategoryTag(subcategory, id, CategoryStatus.ACTIVE));
-        });
-
-        // Lưu toàn bộ SubCategoryTag
-        subCategoryTagRepository.saveAll(subCategoryTags);
+        return tags;
     }
 
 
     @Override
-    @Transactional
-    public BasicMessageResponse<SubCategoryResponse> update(int subCategoryId, SubCategoryUpdateRequest request) {
-        // 1. Tìm SubCategory hiện tại
-        SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
-                .orElseThrow(() -> new RuntimeException("SubCategory not found"));
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<SubCategoryResponse> update(int id, SubCategoryUpdateRequest request) {
 
-        subCategoryRepository.save(subCategory);
+        if (request.getStatus() == null) {
+            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.STATUS_CANNOT_BE_EMPTY);
+        }
 
+        SubCategory subCategory = subCategoryRepository.findById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.SUBCATEGORY_DOES_NOT_EXIST));
 
-        return null;
+        subCategory.setSubcategoryName(request.getSubcategoryName());
+        subCategory.setStatus(request.getStatus().name());
+
+        List<TagResponse> tagResponses = new ArrayList<>();
+        if (!request.getTags().isEmpty()) {
+            List<Integer> tagIds = request.getTags();
+            List<Integer> validateTagIds = tagRepository.findAllByIds(tagIds);
+
+            if (validateTagIds.size() != tagIds.size()) {
+                throw new BusinessCustomException(ConstantCategory.TAGS, ConstantCategory.TAG_DOES_NOT_EXIST);
+            }
+
+            List<Integer> currentTagIds = subCategoryTagRepository.findTagIdsBySubcategoryId(subCategory.getId());
+
+            Set<Integer> newTags = new HashSet<>(tagIds);
+
+            subCategoryTagRepository.deleteBySubCategoryIdAndTagIdNotIn(subCategory.getId(), new ArrayList<>(newTags));
+
+            List<SubCategoryTag> newRelations = newTags
+                    .stream()
+                    .filter(tagId -> !currentTagIds.contains(tagId))
+                    .map(tagId -> new SubCategoryTag(subCategory.getId(), tagId)).toList();
+
+            subCategoryTagRepository.saveAll(newRelations);
+
+            tagResponses = tagRepository.findByIds(tagIds);
+        }
+
+        SubCategory saved = subCategoryRepository.save(subCategory);
+
+        SubCategoryResponse response = new SubCategoryResponse(saved, tagResponses);
+
+        return new BasicMessageResponse<>(200, "Cập nhật danh mục con thành công!", response);
+    }
+
+    @Override
+    public BasicMessageResponse<SubCategoryResponse> getById(int id) {
+        SubCategoryResponse response = subCategoryRepository.getById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.SUBCATEGORY_DOES_NOT_EXIST));
+
+        List<TagResponse> tags = subCategoryTagRepository.findBySubCategoryId(response.getId());
+
+        response.setTags(tags);
+
+        return new BasicMessageResponse<>(200, "Tìm danh mục con thành công!", response);
+    }
+
+    @Override
+    public BasicMessageResponse<Integer> delete(int id) {
+        int subId = subCategoryValidation.checkExistsById(id);
+        subCategoryRepository.delete(subId);
+        return new BasicMessageResponse<>(200, "Xoá danh mục con thành công!", subId);
     }
 
     @Override
@@ -123,14 +155,6 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
         List<SubCategorySummaryProject> subcategories = subCategoryRepository.findByCategoryId(categoryId);
 
         return new BasicMessageResponse<>(200, "List subcategory owned by category id = " + categoryId + ": ", subcategories);
-    }
-
-    @Override
-    public BasicMessageResponse<SubCategoryProjection> findById(int id) {
-        SubCategoryProjection subCategoryProjection = subCategoryRepository.getById(id)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.SUBCATEGORY_DOES_NOT_EXIST));
-
-        return new BasicMessageResponse<>(200, "Tìm danh mục con thành công", subCategoryProjection);
     }
 
     @Override

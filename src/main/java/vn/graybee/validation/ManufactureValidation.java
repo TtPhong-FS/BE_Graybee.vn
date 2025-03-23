@@ -1,7 +1,7 @@
 package vn.graybee.validation;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.categories.ConstantCategory;
+import vn.graybee.constants.ConstantCategory;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.categories.Manufacturer;
 import vn.graybee.repositories.categories.ManufacturerRepository;

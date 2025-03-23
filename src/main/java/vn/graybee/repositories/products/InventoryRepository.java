@@ -5,5 +5,5 @@ import vn.graybee.models.products.Inventory;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
-    
+
 }

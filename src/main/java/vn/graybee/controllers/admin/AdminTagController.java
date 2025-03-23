@@ -3,15 +3,20 @@ package vn.graybee.controllers.admin;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.category.TagProjection;
-import vn.graybee.requests.categories.TagCreateRequest;
-import vn.graybee.response.categories.TagResponse;
+import vn.graybee.projections.admin.category.TagProjection;
+import vn.graybee.requests.directories.TagCreateRequest;
+import vn.graybee.requests.directories.TagUpdateRequest;
+import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.services.categories.TagServices;
 
 import java.util.List;
@@ -32,9 +37,24 @@ public class AdminTagController {
         return ResponseEntity.ok(tagServices.fetchAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<TagResponse>> getById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(tagServices.getById(id));
+    }
+
     @PostMapping
     public ResponseEntity<BasicMessageResponse<TagResponse>> create(@RequestBody @Valid TagCreateRequest request) {
         return ResponseEntity.ok(tagServices.create(request));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<BasicMessageResponse<TagResponse>> update(@RequestParam("id") int id, @RequestBody @Valid TagUpdateRequest request) {
+        return ResponseEntity.ok(tagServices.update(id, request));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<BasicMessageResponse<Integer>> delete(@RequestParam("id") int id) {
+        return ResponseEntity.ok(tagServices.delete(id));
     }
 
 }

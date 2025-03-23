@@ -16,16 +16,16 @@ public class Inventory extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @Column(name = "product_code", length = 100, nullable = false)
+    private String productCode;
 
     private int quantity;
 
     public Inventory() {
     }
 
-    public Inventory(Long productId, int quantity) {
-        this.productId = productId;
+    public Inventory(String productCode, int quantity) {
+        this.productCode = productCode;
         this.quantity = quantity;
     }
 
@@ -37,12 +37,12 @@ public class Inventory extends BaseModel {
         this.id = id;
     }
 
-    public Long getProductId() {
-        return productId;
+    public String getProductCode() {
+        return productCode;
     }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
     }
 
     public int getQuantity() {

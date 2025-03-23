@@ -2,7 +2,6 @@ package vn.graybee.controllers.admin;
 
 import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
-import vn.graybee.response.products.ProductDto;
-import vn.graybee.response.products.ProductResponse;
-import vn.graybee.response.products.ProductStatusResponse;
+import vn.graybee.response.admin.products.ProductDto;
+import vn.graybee.response.admin.products.ProductResponse;
+import vn.graybee.response.admin.products.ProductStatusResponse;
 import vn.graybee.response.publics.ProductBasicResponse;
 import vn.graybee.services.products.ProductService;
 import vn.graybee.validation.ProductValidation;
@@ -60,10 +59,9 @@ public class AdminProductController {
         return productService.fetchByCategoryName(categoryName);
     }
 
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") int id) {
-        return ResponseEntity.status(HttpStatus.OK).body("DeleteMapping");
+    @DeleteMapping("/delete")
+    public ResponseEntity<BasicMessageResponse<Long>> delete(@RequestParam("id") long id) {
+        return ResponseEntity.ok(productService.delete(id));
     }
 
     @PutMapping("/status")

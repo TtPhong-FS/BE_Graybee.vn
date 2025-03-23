@@ -2,8 +2,8 @@ package vn.graybee.serviceImps.products;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.constants.categories.ConstantCategory;
-import vn.graybee.constants.products.ConstantProduct;
+import vn.graybee.constants.ConstantCategory;
+import vn.graybee.constants.ConstantProduct;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
@@ -16,6 +16,7 @@ import vn.graybee.models.products.ProductImage;
 import vn.graybee.models.products.ProductTag;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.categories.ManufacturerRepository;
+import vn.graybee.repositories.categories.TagRepository;
 import vn.graybee.repositories.products.InventoryRepository;
 import vn.graybee.repositories.products.ProductDescriptionRepository;
 import vn.graybee.repositories.products.ProductImageRepository;
@@ -23,12 +24,12 @@ import vn.graybee.repositories.products.ProductRepository;
 import vn.graybee.repositories.products.ProductTagRepository;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
-import vn.graybee.response.products.ProductDto;
-import vn.graybee.response.products.ProductResponse;
-import vn.graybee.response.products.ProductStatusResponse;
-import vn.graybee.response.products.ProductTagDto;
+import vn.graybee.response.admin.directories.tag.TagResponse;
+import vn.graybee.response.admin.products.ProductDto;
+import vn.graybee.response.admin.products.ProductResponse;
+import vn.graybee.response.admin.products.ProductStatusResponse;
+import vn.graybee.response.admin.products.ProductTagDto;
 import vn.graybee.response.publics.ProductBasicResponse;
-import vn.graybee.response.publics.collections.PcSummaryResponse;
 import vn.graybee.services.products.ProductService;
 import vn.graybee.utils.TextUtils;
 import vn.graybee.validation.CategoryValidation;
@@ -43,6 +44,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImp implements ProductService {
+
+    private final TagRepository tagRepository;
 
     private final InventoryRepository inventoryRepository;
 
@@ -69,7 +72,8 @@ public class ProductServiceImp implements ProductService {
 
     private final ManufacturerRepository manufacturerRepository;
 
-    public ProductServiceImp(InventoryRepository inventoryRepository, TagValidation tagValidation, ProductTagRepository ptRepository, ProductCodeGenerator codeGenerator, CategoryValidation categoryValidation, ManufactureValidation manufactureValidation, ProductValidation productValidation, ProductRepository productRepository, ProductDescriptionRepository pdRepository, ProductImageRepository piRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository) {
+    public ProductServiceImp(TagRepository tagRepository, InventoryRepository inventoryRepository, TagValidation tagValidation, ProductTagRepository ptRepository, ProductCodeGenerator codeGenerator, CategoryValidation categoryValidation, ManufactureValidation manufactureValidation, ProductValidation productValidation, ProductRepository productRepository, ProductDescriptionRepository pdRepository, ProductImageRepository piRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository) {
+        this.tagRepository = tagRepository;
         this.inventoryRepository = inventoryRepository;
         this.tagValidation = tagValidation;
         this.ptRepository = ptRepository;
@@ -125,28 +129,49 @@ public class ProductServiceImp implements ProductService {
 
         product.setProductCode(productCode);
 
+        product.setThumbnail(request.getImages().get(0));
+
         Product savedProduct = productRepository.save(product);
 
+        if (!request.getImages().isEmpty()) {
+            List<String> images = request.getImages();
+
+            List<ProductImage> productImages = images
+                    .stream().skip(1).map(i -> new ProductImage(savedProduct.getId(), i)).collect(Collectors.toList());
+
+            piRepository.saveAll(productImages);
+
+        }
         if (request.isInStock()) {
             Inventory inventory = new Inventory();
             inventory.setQuantity(request.getQuantity());
-            inventory.setProductId(savedProduct.getId());
+            inventory.setProductCode(savedProduct.getProductCode());
 
             inventoryRepository.save(inventory);
         } else {
             Inventory inventory = new Inventory();
             inventory.setQuantity(0);
-            inventory.setProductId(savedProduct.getId());
+            inventory.setProductCode(savedProduct.getProductCode());
 
             inventoryRepository.save(inventory);
         }
 
-        List<String> tagNames = request.getTags();
+        List<TagResponse> tagResponses = new ArrayList<>();
         if (!request.getTags().isEmpty() || request.getTags() != null) {
+            List<Integer> tagIds = request.getTags();
 
-            List<Integer> tagIds = tagValidation.validateByIds(tagNames);
+            tagResponses = tagRepository.findByIds(tagIds);
 
-            List<ProductTag> productTags = tagIds.stream().map(t -> new ProductTag(savedProduct.getId(), t, "ACTIVE")).collect(Collectors.toList());
+            if (tagResponses.size() != tagIds.size()) {
+                throw new BusinessCustomException(
+                        ConstantCategory.TAGS,
+                        ConstantCategory.TAG_DOES_NOT_EXIST
+                );
+            }
+
+            List<ProductTag> productTags = tagResponses
+                    .stream()
+                    .map(t -> new ProductTag(savedProduct.getId(), t.getId(), "ACTIVE")).collect(Collectors.toList());
 
             ptRepository.saveAll(productTags);
         }
@@ -161,18 +186,6 @@ public class ProductServiceImp implements ProductService {
             pdRepository.save(description);
         }
 
-        if (!request.getImages().isEmpty()) {
-            List<String> images = request.getImages();
-
-            product.setThumbnail(images.get(0));
-
-            List<ProductImage> productImages = images
-                    .stream().skip(1).map(i -> new ProductImage(savedProduct.getId(), i)).collect(Collectors.toList());
-
-            piRepository.saveAll(productImages);
-
-        }
-
         updateProductCountCategory(category, true);
 
         updateProductCountManufacturer(manufacturer, true);
@@ -183,7 +196,7 @@ public class ProductServiceImp implements ProductService {
                 savedProduct,
                 request.getCategoryName().toUpperCase(),
                 request.getManufacturerName().toUpperCase(),
-                tagNames,
+                tagResponses,
                 request.getQuantity()
         );
 
@@ -194,6 +207,13 @@ public class ProductServiceImp implements ProductService {
     public BasicMessageResponse<ProductResponse> update(long productId, ProductUpdateRequest request) {
         System.out.println("Update product");
         return null;
+    }
+
+    @Override
+    public BasicMessageResponse<Long> delete(long id) {
+        long productId = productValidation.checkQuantityFromInventory(id);
+        productRepository.delete(productId);
+        return new BasicMessageResponse<>(200, "Xoá sản phẩm thành công!", productId);
     }
 
     @Override
@@ -212,14 +232,23 @@ public class ProductServiceImp implements ProductService {
 
         List<ProductTagDto> productTags = ptRepository.findTagsByProductIds(productIds);
 
-        Map<Long, List<String>> productTagsMap = productTags.stream()
+
+        Map<Long, List<TagResponse>> productTagsMap = productTags.stream()
                 .collect(Collectors.groupingBy(
                         ProductTagDto::getProductId,
-                        Collectors.mapping(ProductTagDto::getTagName, Collectors.toList())
+                        Collectors.mapping(tag -> {
+                                    TagResponse tagResponse = new TagResponse();
+                                    tagResponse.setId(tag.getId());
+                                    tagResponse.setTagName(tag.getTagName());
+
+                                    return tagResponse;
+                                }
+                                , Collectors.toList())
                 ));
 
         for (ProductResponse product : products) {
-            product.setTagNames(productTagsMap.getOrDefault(product.getId(), new ArrayList<>()));
+            List<TagResponse> tags = productTagsMap.getOrDefault(product.getId(), new ArrayList<>());
+            product.setTags(tags);
         }
 
         return new BasicMessageResponse<>(200, "Danh sách sản phẩm", products);
@@ -231,15 +260,10 @@ public class ProductServiceImp implements ProductService {
         ProductDto response = productRepository.findById_ADMIN(productId)
                 .orElseThrow(() -> new CustomNotFoundException(ConstantProduct.PRODUCT, ConstantProduct.PRODUCT_DOES_NOT_EXISTS));
 
-        List<ProductTagDto> tagDto = ptRepository.findTagsByProductId(response.getId());
+        List<TagResponse> tagResponses = ptRepository.getTagsByProductId(response.getId());
 
-        Map<Long, List<String>> productTagsMap = tagDto.stream()
-                .collect(Collectors.groupingBy(
-                        ProductTagDto::getProductId,
-                        Collectors.mapping(ProductTagDto::getTagName, Collectors.toList())
-                ));
 
-        response.setTagNames(productTagsMap.getOrDefault(response.getId(), new ArrayList<>()));
+        response.setTags(tagResponses);
 
         return new BasicMessageResponse<>(200, "Tìm sản phẩm thành công!", response);
     }
@@ -250,12 +274,17 @@ public class ProductServiceImp implements ProductService {
 
 
     @Override
-    public PcSummaryResponse findPCByCategoryName_PUBLIC(String categoryName) {
-//        ProductBasicResponse product = productRepository.findByCategoryName_PUBLIC(categoryName)
-//                .orElseThrow(() -> new CustomNotFoundException(ConstantProduct.GENERAL, ConstantProduct.PRODUCT_DOES_NOT_EXISTS));
+    public void updateProductCountCategory(int CategoryId, boolean isIncrease) {
+        Category category = categoryRepository.findById(CategoryId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.CATEGORY_NAME, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
 
+        if (isIncrease) {
+            category.increaseProductCount();
+        } else {
+            category.decreaseProductCount();
+        }
 
-        return null;
+        categoryRepository.save(category);
     }
 
     @Override
@@ -286,30 +315,19 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public BasicMessageResponse<ProductStatusResponse> updateStatus(long id, String status) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantProduct.GENERAL, ConstantProduct.PRODUCT_DOES_NOT_EXISTS));
+//        Product product = productRepository.findById(id)
+//                .orElseThrow(() -> new CustomNotFoundException(ConstantProduct.GENERAL, ConstantProduct.PRODUCT_DOES_NOT_EXISTS));
+//
+//        product.setStatus(status);
+//
+//        productRepository.save(product);
+//
+//        ProductStatusResponse response = new ProductStatusResponse(product.getId(), product.getStatus());
+//
+//        return new BasicMessageResponse<>(200, "Cập nhật trạng thái thành công!", response);
 
-        product.setStatus(status);
-
-        productRepository.save(product);
-
-        ProductStatusResponse response = new ProductStatusResponse(product.getId(), product.getStatus());
-
-        return new BasicMessageResponse<>(200, "Cập nhật trạng thái thành công!", response);
+        return null;
     }
 
-    @Override
-    public void updateProductCountCategory(int CategoryId, boolean isIncrease) {
-        Category category = categoryRepository.findById(CategoryId)
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.CATEGORY_NAME, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
-
-        if (isIncrease) {
-            category.increaseProductCount();
-        } else {
-            category.decreaseProductCount();
-        }
-
-        categoryRepository.save(category);
-    }
 
 }

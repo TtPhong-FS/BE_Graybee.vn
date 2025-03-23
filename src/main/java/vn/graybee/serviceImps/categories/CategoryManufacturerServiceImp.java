@@ -4,10 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.constants.ConstantCategory;
+import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.repositories.categories.CategoryManufacturerRepository;
-import vn.graybee.response.categories.CategoryWithManufacturersResponse;
-import vn.graybee.response.categories.ManufacturerSummaryResponse;
+import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
+import vn.graybee.response.admin.directories.category.CategoryWithManufacturersResponse;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerSummaryResponse;
 import vn.graybee.services.categories.CategoryManufacturerService;
 
 import java.time.Duration;
@@ -52,11 +56,15 @@ public class CategoryManufacturerServiceImp implements CategoryManufacturerServi
     }
 
     @Override
-    public BasicMessageResponse<Integer> deleteManufacturerByIdAndCategoryById(int manufacturerId, int categoryId) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<CategoryManufacturerIdResponse> deleteManufacturerByIdAndCategoryById(int manufacturerId, int categoryId) {
 
-        cmRepository.deleteManufacturerByIdAndCategoryById(manufacturerId, categoryId);
-        
-        return new BasicMessageResponse<>(200, "Xoá quan hệ thành công!", manufacturerId);
+        CategoryManufacturerIdResponse response = cmRepository.findManufacturerIdWithCategoryId(categoryId, manufacturerId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.RELATIONSHIP_DOES_NOT_EXIST));
+
+        cmRepository.deleteManufacturerByIdAndCategoryById(categoryId, manufacturerId);
+
+        return new BasicMessageResponse<>(200, "Xoá quan hệ thành công!", response);
     }
 
     /**

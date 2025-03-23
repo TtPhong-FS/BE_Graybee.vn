@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.response.categories.CategoryWithManufacturersResponse;
+import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
+import vn.graybee.response.admin.directories.category.CategoryWithManufacturersResponse;
 import vn.graybee.services.categories.CategoryManufacturerService;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class AdminCategoryManufacturerController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<BasicMessageResponse<Integer>> fetchAll(@RequestParam int manufacturerId, @RequestParam("categoryId") int categoryId) {
+    public ResponseEntity<BasicMessageResponse<CategoryManufacturerIdResponse>> fetchAll(@RequestParam int manufacturerId, @RequestParam("categoryId") int categoryId) {
         return ResponseEntity.ok(categoryManufacturerService.deleteManufacturerByIdAndCategoryById(manufacturerId, categoryId));
     }
 

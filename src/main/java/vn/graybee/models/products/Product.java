@@ -49,13 +49,13 @@ public class Product extends BaseModel {
     @Column(length = 35)
     private String color;
 
-    @Column(nullable = false, length = 30)
+    @Column(length = 30)
     private String status;
 
     @Column(name = "in_stock")
     private boolean isStock;
 
-    @Column(length = 150)
+    @Column(length = 250)
     private String thumbnail;
 
     public Product() {

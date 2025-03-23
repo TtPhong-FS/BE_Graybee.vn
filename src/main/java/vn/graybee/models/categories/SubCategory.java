@@ -19,7 +19,7 @@ public class SubCategory extends BaseModel {
     @Column(name = "subcategory_name", length = 35, nullable = false, unique = true)
     private String subcategoryName;
 
-    @Column(nullable = false, length = 30)
+    @Column(length = 30)
     private String status;
 
     public SubCategory() {

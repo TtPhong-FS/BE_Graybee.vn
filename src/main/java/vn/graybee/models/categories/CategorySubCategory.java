@@ -2,19 +2,15 @@ package vn.graybee.models.categories;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import vn.graybee.enums.CategoryStatus;
-import vn.graybee.models.others.BaseModel;
 
 @Entity
 @Table(name = "categories_subcategories", uniqueConstraints = @UniqueConstraint(columnNames = {"category_id", "subcategory_id"}))
-public class CategorySubCategory extends BaseModel {
+public class CategorySubCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,18 +21,13 @@ public class CategorySubCategory extends BaseModel {
 
     @Column(name = "subcategory_id", nullable = false)
     private Integer subCategoryId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private CategoryStatus status;
-
+    
     public CategorySubCategory() {
     }
 
-    public CategorySubCategory(Integer categoryId, Integer subCategoryId, CategoryStatus status) {
+    public CategorySubCategory(Integer categoryId, Integer subCategoryId) {
         this.categoryId = categoryId;
         this.subCategoryId = subCategoryId;
-        this.status = status;
     }
 
     public Integer getId() {
@@ -61,14 +52,6 @@ public class CategorySubCategory extends BaseModel {
 
     public void setSubCategoryId(Integer subCategoryId) {
         this.subCategoryId = subCategoryId;
-    }
-
-    public CategoryStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CategoryStatus status) {
-        this.status = status;
     }
 
 }

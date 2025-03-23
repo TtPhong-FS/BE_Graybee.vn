@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.category.SubCategoryProjection;
-import vn.graybee.repositories.categories.SubCategoryRepository;
-import vn.graybee.requests.categories.SubCategoryCreateRequest;
-import vn.graybee.requests.categories.SubCategoryUpdateRequest;
-import vn.graybee.response.categories.SubCategoryResponse;
+import vn.graybee.projections.admin.category.SubCategoryProjection;
+import vn.graybee.requests.directories.SubCategoryCreateRequest;
+import vn.graybee.requests.directories.SubCategoryUpdateRequest;
+import vn.graybee.response.admin.directories.subcate.SubCategoryResponse;
 import vn.graybee.services.categories.SubCategoryServices;
 
 import java.util.List;
@@ -25,17 +25,15 @@ import java.util.List;
 @RequestMapping("/api/v1/admin/subcategories")
 public class AdminSubCategoryController {
 
-    private final SubCategoryRepository subCategoryRepository;
 
     private final SubCategoryServices subCategoryServices;
 
-    public AdminSubCategoryController(SubCategoryRepository subCategoryRepository, SubCategoryServices subCategoryServices) {
-        this.subCategoryRepository = subCategoryRepository;
+    public AdminSubCategoryController(SubCategoryServices subCategoryServices) {
         this.subCategoryServices = subCategoryServices;
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<SubCategoryResponse>> createSubCategory_V1(@RequestBody @Valid SubCategoryCreateRequest request) {
+    public ResponseEntity<BasicMessageResponse<SubCategoryResponse>> create(@RequestBody @Valid SubCategoryCreateRequest request) {
         return ResponseEntity.ok(subCategoryServices.create(request));
     }
 
@@ -44,14 +42,20 @@ public class AdminSubCategoryController {
         return ResponseEntity.ok(subCategoryServices.fetchAll());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<SubCategoryResponse>> updateSubCategory_V1(@PathVariable int id, @RequestBody @Valid SubCategoryUpdateRequest request) {
+    @GetMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<SubCategoryResponse>> getById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(subCategoryServices.getById(id));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<BasicMessageResponse<SubCategoryResponse>> update(@RequestParam int id, @RequestBody @Valid SubCategoryUpdateRequest request) {
+
         return ResponseEntity.ok(subCategoryServices.update(id, request));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<SubCategoryProjection>> findSubCategoryById_V1(@PathVariable int id) {
-        return ResponseEntity.ok(subCategoryServices.findById(id));
+    @GetMapping("/delete")
+    public ResponseEntity<BasicMessageResponse<Integer>> delete(@RequestParam("id") int id) {
+        return ResponseEntity.ok(subCategoryServices.delete(id));
     }
 
 

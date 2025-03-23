@@ -1,11 +1,10 @@
 package vn.graybee.services.categories;
 
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.category.CategoryProjection;
 import vn.graybee.projections.publics.CategoryBasicInfoProjection;
-import vn.graybee.requests.categories.CategoryCreateRequest;
-import vn.graybee.requests.categories.CategoryUpdateRequest;
-import vn.graybee.response.categories.CategoryResponse;
+import vn.graybee.requests.directories.CategoryCreateRequest;
+import vn.graybee.requests.directories.CategoryUpdateRequest;
+import vn.graybee.response.admin.directories.category.CategoryResponse;
 
 import java.util.List;
 
@@ -19,8 +18,7 @@ public interface CategoryService {
 
     BasicMessageResponse<Integer> deleteCategoryById(int id);
 
-
-    BasicMessageResponse<List<CategoryProjection>> getCategories();
+    BasicMessageResponse<List<CategoryResponse>> fetchCategories_ADMIN();
 
     //    public
     BasicMessageResponse<List<CategoryBasicInfoProjection>> getCategories_public();

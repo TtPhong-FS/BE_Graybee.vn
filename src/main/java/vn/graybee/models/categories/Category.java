@@ -19,7 +19,7 @@ public class Category extends BaseModel {
     @Column(name = "category_name", nullable = false, length = 35, unique = true)
     private String categoryName;
 
-    @Column(nullable = false, length = 30)
+    @Column(length = 30)
     private String status;
 
     @Column(name = "product_count")

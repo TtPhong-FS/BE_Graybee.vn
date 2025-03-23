@@ -1,7 +1,7 @@
 package vn.graybee.validation;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.categories.ConstantCategory;
+import vn.graybee.constants.ConstantCategory;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.repositories.categories.TagRepository;
 
@@ -33,6 +33,11 @@ public class TagValidation {
         if (tagRepository.validateNameExists(tagName).isPresent()) {
             throw new BusinessCustomException(ConstantCategory.TAG_NAME, ConstantCategory.TAG_NAME_EXISTS);
         }
+    }
+
+    public int checkExistsById(int tagId) {
+        return tagRepository.checkExistById(tagId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.TAG_DOES_NOT_EXIST));
     }
 
 }

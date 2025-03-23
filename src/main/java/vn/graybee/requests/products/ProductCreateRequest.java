@@ -22,7 +22,7 @@ public class ProductCreateRequest {
     @NotBlank(message = "Tên nhà sản xuất không thể trống")
     private String manufacturerName;
 
-    private List<String> tags;
+    private List<Integer> tags;
 
     @NotBlank(message = "Tên sản phẩm không thể trống")
     @Size(min = 5, max = 300, message = "Độ dài ít nhất từ 5 đến 300 ký tự")
@@ -73,11 +73,11 @@ public class ProductCreateRequest {
         this.quantity = quantity;
     }
 
-    public List<String> getTags() {
+    public List<Integer> getTags() {
         return tags != null ? tags : Collections.emptyList();
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(List<Integer> tags) {
         this.tags = tags;
     }
 

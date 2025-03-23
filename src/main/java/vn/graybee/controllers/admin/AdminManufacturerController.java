@@ -8,13 +8,16 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.category.ManufacturerProjection;
-import vn.graybee.requests.categories.ManufacturerCreateRequest;
-import vn.graybee.response.categories.ManufacturerResponse;
+import vn.graybee.projections.admin.category.ManufacturerProjection;
+import vn.graybee.requests.directories.ManufacturerCreateRequest;
+import vn.graybee.requests.directories.ManufacturerUpdateRequest;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
 
 import java.util.List;
@@ -36,11 +39,20 @@ public class AdminManufacturerController {
         return ResponseEntity.ok(manufacturers);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> getById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(manufacturerService.getById(id));
+    }
 
     @PostMapping
     public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> create(@RequestBody @Valid ManufacturerCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 manufacturerService.create(request));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> update(@RequestParam("id") int id, @RequestBody @Valid ManufacturerUpdateRequest request) {
+        return ResponseEntity.ok(manufacturerService.update(id, request));
     }
 
     @PostMapping("/add-list")
@@ -49,8 +61,8 @@ public class AdminManufacturerController {
                 manufacturerService.createManufacturers(request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<Integer>> deleteManufacturerById(@PathVariable("id") int id) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<BasicMessageResponse<Integer>> deleteManufacturerById(@RequestParam("id") int id) {
         return ResponseEntity.ok(manufacturerService.deleteById(id));
     }
 

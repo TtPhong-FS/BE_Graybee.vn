@@ -19,7 +19,7 @@ public class Manufacturer extends BaseModel {
     @Column(name = "manufacturer_name", nullable = false, length = 50, unique = true)
     private String manufacturerName;
 
-    @Column(nullable = false, length = 30)
+    @Column(length = 30)
     private String status;
 
     @Column(name = "product_count")

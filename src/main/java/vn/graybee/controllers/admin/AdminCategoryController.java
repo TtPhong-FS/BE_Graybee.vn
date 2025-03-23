@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.category.CategoryProjection;
-import vn.graybee.projections.category.SubCategorySummaryProject;
-import vn.graybee.requests.categories.CategoryCreateRequest;
-import vn.graybee.requests.categories.CategoryUpdateRequest;
-import vn.graybee.response.categories.CategoryResponse;
+import vn.graybee.projections.admin.category.SubCategorySummaryProject;
+import vn.graybee.requests.directories.CategoryCreateRequest;
+import vn.graybee.requests.directories.CategoryUpdateRequest;
+import vn.graybee.response.admin.directories.category.CategoryResponse;
 import vn.graybee.services.categories.CategoryService;
 import vn.graybee.services.categories.SubCategoryServices;
 
@@ -38,8 +38,8 @@ public class AdminCategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<CategoryProjection>>> getCategories() {
-        return ResponseEntity.ok(categoryService.getCategories());
+    public ResponseEntity<BasicMessageResponse<List<CategoryResponse>>> getCategories() {
+        return ResponseEntity.ok(categoryService.fetchCategories_ADMIN());
     }
 
     @GetMapping("/{id}")
@@ -61,13 +61,13 @@ public class AdminCategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<Integer>> deleteCategoryById(@PathVariable("id") int id) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<BasicMessageResponse<Integer>> deleteCategoryById(@RequestParam("id") int id) {
         return ResponseEntity.ok(categoryService.deleteCategoryById(id));
     }
 
-    @PutMapping("/{id}/update")
-    public ResponseEntity<BasicMessageResponse<CategoryResponse>> updateCategory(@PathVariable("id") int id, @RequestBody @Valid CategoryUpdateRequest request) {
+    @PutMapping("/update")
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> updateCategory(@RequestParam("id") int id, @RequestBody @Valid CategoryUpdateRequest request) {
         return ResponseEntity.ok(categoryService.updateCategory(id, request));
     }
 

@@ -1,14 +1,15 @@
 package vn.graybee.serviceImps.categories;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.categories.ConstantCategory;
+import vn.graybee.constants.ConstantCategory;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.categories.Manufacturer;
-import vn.graybee.projections.category.ManufacturerProjection;
+import vn.graybee.projections.admin.category.ManufacturerProjection;
 import vn.graybee.repositories.categories.ManufacturerRepository;
-import vn.graybee.requests.categories.ManufacturerCreateRequest;
-import vn.graybee.response.categories.ManufacturerResponse;
+import vn.graybee.requests.directories.ManufacturerCreateRequest;
+import vn.graybee.requests.directories.ManufacturerUpdateRequest;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
 import vn.graybee.utils.TextUtils;
 import vn.graybee.validation.ManufactureValidation;
@@ -37,15 +38,29 @@ public class ManufacturerServiceImp implements ManufacturerService {
         Manufacturer savedManufacturer = manufacturerRepository.save(manufacturer);
 
         ManufacturerResponse manufacturerResponse = new ManufacturerResponse(
-                savedManufacturer.getCreatedAt(),
-                savedManufacturer.getCreatedAt(),
-                savedManufacturer.getId(),
-                savedManufacturer.getManufacturerName(),
-                savedManufacturer.getStatus(),
-                savedManufacturer.getProductCount());
+                savedManufacturer);
 
         return new BasicMessageResponse<>(201, "Tạo nhà sản xuất thành công!", manufacturerResponse);
 
+    }
+
+    @Override
+    public BasicMessageResponse<ManufacturerResponse> update(int id, ManufacturerUpdateRequest request) {
+        Manufacturer manufacturer = manufacturerRepository.findById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.MANUFACTURER_DOES_NOT_EXIST));
+
+        if (manufacturer.getProductCount() > 0) {
+            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.MANUFACTURER_ID_USED_IN_PRODUCT);
+        }
+
+        manufacturer.setManufacturerName(request.getManufacturerName());
+        manufacturer.setStatus(request.getStatus().name());
+
+        Manufacturer saved = manufacturerRepository.save(manufacturer);
+
+        ManufacturerResponse response = new ManufacturerResponse(saved);
+
+        return new BasicMessageResponse<>(200, "Cập nhật danh mục thành công!", response);
     }
 
     @Override
@@ -62,9 +77,17 @@ public class ManufacturerServiceImp implements ManufacturerService {
 
         List<ManufacturerResponse> responses = savedManufacturer
                 .stream()
-                .map(res -> new ManufacturerResponse(res.getCreatedAt(), res.getUpdatedAt(), res.getId(), res.getManufacturerName(), res.getStatus(), res.getProductCount())).toList();
+                .map(ManufacturerResponse::new).toList();
 
         return new BasicMessageResponse<>(201, "Tạo nhiều nhà sản xuất thành công!", responses);
+    }
+
+    @Override
+    public BasicMessageResponse<ManufacturerResponse> getById(int id) {
+        ManufacturerResponse response = manufacturerRepository.getById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.MANUFACTURER_DOES_NOT_EXIST));
+
+        return new BasicMessageResponse<>(200, "Tìm danh mục thành công!", response);
     }
 
     @Override

@@ -1,12 +1,10 @@
 package vn.graybee.validation;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.categories.ConstantCategory;
+import vn.graybee.constants.ConstantCategory;
 import vn.graybee.exceptions.BusinessCustomException;
-import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.products.ProductRepository;
-import vn.graybee.response.categories.CategoryResponse;
 
 @Service
 public class CategoryValidation {
@@ -22,13 +20,9 @@ public class CategoryValidation {
 
     public int getIdByName(String categoryName) {
         return categoryRepository.getIdByName(categoryName)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_TEMPORARILY_FLAGGED));
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_TEMPORARILY_FLAGGED));
     }
 
-    public CategoryResponse validateCategoryExistsById(int categoryId) {
-        return categoryRepository.getById(categoryId)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
-    }
 
     public void countProductById(int id) {
         int products = categoryRepository.getCountProductById(id)
