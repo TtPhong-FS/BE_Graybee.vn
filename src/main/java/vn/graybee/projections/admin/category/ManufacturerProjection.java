@@ -8,7 +8,7 @@ public interface ManufacturerProjection {
 
     int getId();
 
-    String getManufacturerName();
+    String getName();
 
     String getStatus();
 

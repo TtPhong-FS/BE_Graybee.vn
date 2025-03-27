@@ -3,87 +3,94 @@ package vn.graybee.serviceImps.products;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantCategory;
+import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.constants.ConstantManufacturer;
 import vn.graybee.constants.ConstantProduct;
+import vn.graybee.constants.ConstantSubcategory;
+import vn.graybee.constants.ConstantTag;
+import vn.graybee.enums.GeneralStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.models.categories.Category;
-import vn.graybee.models.categories.Manufacturer;
+import vn.graybee.models.directories.Category;
+import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.models.products.Inventory;
 import vn.graybee.models.products.Product;
 import vn.graybee.models.products.ProductDescription;
 import vn.graybee.models.products.ProductImage;
+import vn.graybee.models.products.ProductSubcategory;
 import vn.graybee.models.products.ProductTag;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.categories.ManufacturerRepository;
+import vn.graybee.repositories.categories.SubCategoryRepository;
 import vn.graybee.repositories.categories.TagRepository;
 import vn.graybee.repositories.products.InventoryRepository;
 import vn.graybee.repositories.products.ProductDescriptionRepository;
 import vn.graybee.repositories.products.ProductImageRepository;
 import vn.graybee.repositories.products.ProductRepository;
+import vn.graybee.repositories.products.ProductSubcategoryRepository;
 import vn.graybee.repositories.products.ProductTagRepository;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
+import vn.graybee.response.admin.directories.subcate.SubcateDto;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.response.admin.products.ProductDto;
+import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
+import vn.graybee.response.admin.products.ProductQuantityResponse;
 import vn.graybee.response.admin.products.ProductResponse;
 import vn.graybee.response.admin.products.ProductStatusResponse;
+import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
+import vn.graybee.response.admin.products.ProductSubcategoryDto;
+import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.response.admin.products.ProductTagDto;
 import vn.graybee.response.publics.ProductBasicResponse;
 import vn.graybee.services.products.ProductService;
 import vn.graybee.utils.TextUtils;
-import vn.graybee.validation.CategoryValidation;
-import vn.graybee.validation.ManufactureValidation;
-import vn.graybee.validation.ProductValidation;
-import vn.graybee.validation.TagValidation;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImp implements ProductService {
 
+    private final ProductDescriptionRepository productDescriptionRepository;
+
     private final TagRepository tagRepository;
+
+    private final SubCategoryRepository subCategoryRepository;
+
+    private final ProductSubcategoryRepository productSubcategoryRepository;
 
     private final InventoryRepository inventoryRepository;
 
-    private final TagValidation tagValidation;
-
-    private final ProductTagRepository ptRepository;
+    private final ProductTagRepository productTagRepository;
 
     private final ProductCodeGenerator codeGenerator;
 
-    private final CategoryValidation categoryValidation;
-
-    private final ManufactureValidation manufactureValidation;
-
-    private final ProductValidation productValidation;
-
     private final ProductRepository productRepository;
 
-    private final ProductDescriptionRepository pdRepository;
-
-    private final ProductImageRepository piRepository;
-
+    private final ProductImageRepository productImageRepository;
 
     private final CategoryRepository categoryRepository;
 
     private final ManufacturerRepository manufacturerRepository;
 
-    public ProductServiceImp(TagRepository tagRepository, InventoryRepository inventoryRepository, TagValidation tagValidation, ProductTagRepository ptRepository, ProductCodeGenerator codeGenerator, CategoryValidation categoryValidation, ManufactureValidation manufactureValidation, ProductValidation productValidation, ProductRepository productRepository, ProductDescriptionRepository pdRepository, ProductImageRepository piRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository) {
+    public ProductServiceImp(ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository) {
+        this.productDescriptionRepository = productDescriptionRepository;
         this.tagRepository = tagRepository;
+        this.subCategoryRepository = subCategoryRepository;
+        this.productSubcategoryRepository = productSubcategoryRepository;
         this.inventoryRepository = inventoryRepository;
-        this.tagValidation = tagValidation;
-        this.ptRepository = ptRepository;
+        this.productTagRepository = productTagRepository;
         this.codeGenerator = codeGenerator;
-        this.categoryValidation = categoryValidation;
-        this.manufactureValidation = manufactureValidation;
-        this.productValidation = productValidation;
         this.productRepository = productRepository;
-        this.pdRepository = pdRepository;
-        this.piRepository = piRepository;
+        this.productImageRepository = productImageRepository;
         this.categoryRepository = categoryRepository;
         this.manufacturerRepository = manufacturerRepository;
     }
@@ -92,9 +99,28 @@ public class ProductServiceImp implements ProductService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<ProductResponse> create(ProductCreateRequest request) {
 
-        productValidation.validateNameExists(request.getProductName());
-        int category = categoryValidation.getIdByName(request.getCategoryName());
-        int manufacturer = manufactureValidation.getIdByName(request.getManufacturerName());
+        if (productRepository.validateName(request.getName()).isPresent()) {
+            throw new BusinessCustomException(ConstantProduct.name, ConstantProduct.name_exists);
+        }
+
+        Set<Integer> tagIds = new HashSet<>(tagRepository.findAllByIds(request.getTags()));
+        Set<Integer> subcategoryIds = new HashSet<>(subCategoryRepository.findAllByIds(request.getSubcategories()));
+
+        if (!tagIds.containsAll(request.getTags())) {
+            throw new BusinessCustomException(ConstantTag.tags, ConstantTag.does_not_exists);
+        }
+
+        if (!subcategoryIds.containsAll(request.getSubcategories())) {
+            throw new BusinessCustomException(ConstantSubcategory.subcategories, ConstantSubcategory.does_not_exists);
+        }
+
+        String categoryName = categoryRepository.getNameById(request.getCategoryId())
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.does_not_exists));
+
+        String manufacturerName = manufacturerRepository.getNameById(request.getManufacturerId())
+                .orElseThrow(() -> new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.does_not_exists));
+
+        String productCode = codeGenerator.generateProductCode(categoryName);
 
         double finalPrice = 0;
 
@@ -102,11 +128,14 @@ public class ProductServiceImp implements ProductService {
             finalPrice = calculateFinalPrice(request.getPrice(), request.getDiscountPercent());
         }
 
-        Product product = new Product(
-                TextUtils.capitalizeEachWord(request.getProductName()),
-                request.getPrice(),
-                request.getDiscountPercent()
-        );
+        Product product = new Product();
+        product.setName(TextUtils.capitalizeEachWord(request.getName()));
+        product.setPrice(request.getPrice());
+        product.setDiscountPercent(request.getDiscountPercent());
+        product.setCategoryId(request.getCategoryId());
+        product.setManufacturerId(request.getManufacturerId());
+
+        product.setCode(productCode);
 
         product.setStock(request.isInStock());
         product.setFinalPrice(finalPrice);
@@ -116,156 +145,263 @@ public class ProductServiceImp implements ProductService {
         product.setColor(request.getColor());
         product.setWarranty(request.getWarranty());
 
-        if (request.getStatus() == null || request.getStatus().isEmpty()) {
-            product.setStatus("DRAFT");
-        } else {
-            product.setStatus(request.getStatus());
-        }
+        product.setThumbnail(!request.getImages().isEmpty() ? request.getImages().get(0) : null);
 
-        product.setCategoryId(category);
-        product.setManufacturerId(manufacturer);
-
-        String productCode = codeGenerator.generateProductCode(request.getCategoryName());
-
-        product.setProductCode(productCode);
-
-        product.setThumbnail(request.getImages().get(0));
-
-        Product savedProduct = productRepository.save(product);
+        product.setStatus(!request.getStatus().isEmpty() ? request.getStatus() : "DRAFT");
+        product = productRepository.save(product);
+        long productId = product.getId();
 
         if (!request.getImages().isEmpty()) {
-            List<String> images = request.getImages();
-
-            List<ProductImage> productImages = images
-                    .stream().skip(1).map(i -> new ProductImage(savedProduct.getId(), i)).collect(Collectors.toList());
-
-            piRepository.saveAll(productImages);
-
-        }
-        if (request.isInStock()) {
-            Inventory inventory = new Inventory();
-            inventory.setQuantity(request.getQuantity());
-            inventory.setProductCode(savedProduct.getProductCode());
-
-            inventoryRepository.save(inventory);
-        } else {
-            Inventory inventory = new Inventory();
-            inventory.setQuantity(0);
-            inventory.setProductCode(savedProduct.getProductCode());
-
-            inventoryRepository.save(inventory);
+            List<ProductImage> productImages = request.getImages()
+                    .stream().skip(1).map(i -> new ProductImage(productId, i)).collect(Collectors.toList());
+            productImageRepository.saveAll(productImages);
         }
 
-        List<TagResponse> tagResponses = new ArrayList<>();
-        if (!request.getTags().isEmpty() || request.getTags() != null) {
-            List<Integer> tagIds = request.getTags();
+        Inventory inventory = new Inventory();
 
-            tagResponses = tagRepository.findByIds(tagIds);
+        inventory.setQuantity(request.isInStock() ? request.getQuantity() : 0);
+        inventory.setProductCode(product.getCode());
+        inventory.setStatus(request.isInStock() ? "ACTIVE" : "OUT_OF_STOCK");
 
-            if (tagResponses.size() != tagIds.size()) {
-                throw new BusinessCustomException(
-                        ConstantCategory.TAGS,
-                        ConstantCategory.TAG_DOES_NOT_EXIST
-                );
-            }
+        inventory = inventoryRepository.save(inventory);
 
-            List<ProductTag> productTags = tagResponses
+        if (request.getTags() != null && !request.getTags().isEmpty()) {
+            List<ProductTag> productTags = tagIds
                     .stream()
-                    .map(t -> new ProductTag(savedProduct.getId(), t.getId(), "ACTIVE")).collect(Collectors.toList());
-
-            ptRepository.saveAll(productTags);
+                    .map(tagId -> new ProductTag(productId, tagId))
+                    .toList();
+            if (!productTags.isEmpty()) {
+                productTagRepository.saveAll(productTags);
+            }
         }
 
-        if (request.getDescription() != null) {
-            ProductDescription description = new ProductDescription(request.getDescription());
-            description.setProductId(savedProduct.getId());
-            pdRepository.save(description);
-        } else {
-            ProductDescription description = new ProductDescription(null);
-            description.setProductId(savedProduct.getId());
-            pdRepository.save(description);
+        if (request.getSubcategories() != null && !request.getSubcategories().isEmpty()) {
+            List<ProductSubcategory> productSubcategories = subcategoryIds
+                    .stream()
+                    .map(subcategory -> new ProductSubcategory(productId, subcategory))
+                    .toList();
+            if (!productSubcategories.isEmpty()) {
+                productSubcategoryRepository.saveAll(productSubcategories);
+            }
         }
 
-        updateProductCountCategory(category, true);
+        ProductDescription description = new ProductDescription();
 
-        updateProductCountManufacturer(manufacturer, true);
+        description.setProductId(productId);
+        description.setDescription(!request.getDescription().isEmpty() ? request.getDescription() : null);
+
+        productDescriptionRepository.save(description);
+
+        updateProductCountCategory(request.getCategoryId(), true);
+        updateProductCountManufacturer(request.getManufacturerId(), true);
 
         ProductResponse productResponse = new ProductResponse(
-                savedProduct.getCreatedAt(),
-                savedProduct.getUpdatedAt(),
-                savedProduct,
-                request.getCategoryName().toUpperCase(),
-                request.getManufacturerName().toUpperCase(),
-                tagResponses,
-                request.getQuantity()
+                product,
+                categoryName,
+                manufacturerName,
+                inventory.getQuantity()
         );
 
-        return new BasicMessageResponse<>(201, "Tạo sản phẩm thành công", productResponse);
+        return new BasicMessageResponse<>(201, ConstantProduct.success_create, productResponse);
     }
 
     @Override
-    public BasicMessageResponse<ProductResponse> update(long productId, ProductUpdateRequest request) {
-        System.out.println("Update product");
-        return null;
-    }
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<ProductResponse> update(long id, ProductUpdateRequest request) {
 
-    @Override
-    public BasicMessageResponse<Long> delete(long id) {
-        long productId = productValidation.checkQuantityFromInventory(id);
-        productRepository.delete(productId);
-        return new BasicMessageResponse<>(200, "Xoá sản phẩm thành công!", productId);
-    }
-
-    @Override
-    @Transactional
-    public BasicMessageResponse<List<ProductResponse>> getProductsForAdmin() {
-
-        List<ProductResponse> products = productRepository.findProductsWithoutTags();
-
-        List<Long> productIds = products.stream()
-                .map(ProductResponse::getId)
-                .toList();
-
-        if (productIds.isEmpty()) {
-            return new BasicMessageResponse<>(200, "Danh sách sản phẩm", products);
+        List<Integer> tagIds = tagRepository.findAllByIds(request.getTags());
+        if (tagIds.size() != request.getTags().size()) {
+            throw new BusinessCustomException(ConstantTag.tags, ConstantTag.does_not_exists);
         }
 
-        List<ProductTagDto> productTags = ptRepository.findTagsByProductIds(productIds);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+
+        if (!product.getName().equals(request.getName()) && productRepository.existsByNameAndNotId(request.getName(), product.getId())) {
+            throw new BusinessCustomException(ConstantProduct.name, ConstantProduct.name_exists);
+        }
+
+        if (request.getManufacturerId() != 0 && request.getManufacturerId() != product.getManufacturerId()) {
+            if (product.getManufacturerId() != 0) {
+                updateProductCountManufacturer(product.getManufacturerId(), false);
+            }
+
+            product.setManufacturerId(request.getManufacturerId());
+            updateProductCountManufacturer(request.getManufacturerId(), true);
+        }
+
+        String categoryName = categoryRepository.getNameById(product.getCategoryId())
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.does_not_exists));
+
+        String manufacturerName = manufacturerRepository.getNameById(request.getManufacturerId())
+                .orElseThrow(() -> new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.does_not_exists));
+
+        double finalPrice = 0;
+
+        if (request.getPrice() != 0) {
+            finalPrice = calculateFinalPrice(request.getPrice(), request.getDiscountPercent());
+        }
+
+        product.setName(TextUtils.capitalizeEachWord(request.getName()));
+        product.setWarranty(request.getWarranty());
+        product.setWeight(request.getWeight());
+        product.setDimension(request.getDimension());
+
+        product.setThumbnail(!request.getImages().isEmpty() ? request.getImages().get(0) : null);
+
+        product.setStatus(request.getStatus());
+        product.setPrice(request.getPrice());
+        product.setDiscountPercent(request.getDiscountPercent());
+        product.setFinalPrice(finalPrice);
+        product.setColor(request.getColor());
+
+        if (request.getStatus().equals("OUT_OF_STOCK") || request.getStatus().equals("DELETED")) {
+            product.setStock(false);
+        } else {
+            product.setStock(request.isInStock());
+        }
+
+        product.setUpdatedAt(LocalDateTime.now());
+        product = productRepository.save(product);
+        long productId = product.getId();
+
+        if (!request.getImages().isEmpty()) {
+            List<String> newImageUrls = request.getImages();
+            List<String> currentImageUrls = productImageRepository.findImageUrlsByProductId(productId);
+
+            Set<String> newSet = new HashSet<>(newImageUrls);
+
+            productImageRepository.deleteByProductIdAndImageUrlNotIn(productId, new ArrayList<>(newSet));
+
+            List<ProductImage> image = newSet.stream()
+                    .filter(i -> !currentImageUrls.contains(i))
+                    .map(i -> new ProductImage(productId, i))
+                    .toList();
+
+            productImageRepository.saveAll(image);
+        }
+
+        if (!request.getTags().isEmpty() || request.getTags() != null) {
+            List<Integer> currentTagIds = productTagRepository.findTagIdsByProductId(productId);
+
+            Set<Integer> newSet = new HashSet<>(request.getTags());
+
+            productTagRepository.deleteByProductIdAndTagIdNotIn(productId, new ArrayList<>(newSet));
+
+            List<ProductTag> newRelations = newSet.stream()
+                    .filter(t -> !currentTagIds.contains(t))
+                    .map(t -> new ProductTag(productId, t))
+                    .toList();
+
+            productTagRepository.saveAll(newRelations);
+        }
+
+        ProductDescription description = productDescriptionRepository.findByProductId(productId)
+                .orElseGet(ProductDescription::new);
+
+        boolean isNewDescription = description.getId() == null;
+
+        if (isNewDescription) {
+            description.setProductId(productId);
+        }
+
+        description.setDescription(!request.getDescription().isEmpty() ? request.getDescription() : null);
+
+        productDescriptionRepository.save(description);
 
 
-        Map<Long, List<TagResponse>> productTagsMap = productTags.stream()
+        Inventory inventory = inventoryRepository.findByProductId(productId)
+                .orElseGet(Inventory::new);
+
+        boolean isNewInventory = inventory.getId() == null;
+
+        inventory.setQuantity(product.isStock() ? request.getQuantity() : 0);
+        inventory.setStatus(product.isStock() && request.getQuantity() > 0 ? GeneralStatus.ACTIVE.name() : GeneralStatus.OUT_OF_STOCK.name());
+        inventory.setUpdatedAt(LocalDateTime.now());
+
+        if (isNewInventory) {
+            inventory.setProductCode(product.getCode());
+        }
+
+        inventory = inventoryRepository.save(inventory);
+
+        ProductResponse response = new ProductResponse(product, categoryName, manufacturerName, inventory.getQuantity());
+
+        return new BasicMessageResponse<>(200, ConstantProduct.success_update, response);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<Long> delete(long id) {
+
+        ProductQuantityResponse product = inventoryRepository.findQuantityByProductId(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+
+        if (product.getQuantity() > 0) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantProduct.still_inventory);
+        }
+
+        productRepository.delete(product.getId());
+        return new BasicMessageResponse<>(200, ConstantProduct.success_delete, product.getId());
+    }
+
+    @Override
+    public BasicMessageResponse<List<ProductResponse>> fetchAll() {
+
+        List<ProductResponse> products = productRepository.fetchProducts();
+
+        if (products.isEmpty()) {
+            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, products);
+        }
+
+        return new BasicMessageResponse<>(200, ConstantProduct.success_fetch_products, products);
+    }
+
+    @Override
+    public BasicMessageResponse<List<ProductSubcategoryAndTagResponse>> fetchAllWithSubcategoriesAndTags() {
+
+        List<ProductSubcategoryAndTagResponse> products = productRepository.fetchProductsWithoutSubcategoryAndTag();
+
+        if (products.isEmpty()) {
+            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, products);
+        }
+
+        List<Long> productIds = products.stream().map(ProductSubcategoryAndTagResponse::getId).toList();
+        List<ProductTagDto> productTags = productTagRepository.findTagsByProductIds(productIds);
+        List<ProductSubcategoryDto> productSubcategories = productSubcategoryRepository.findSubcategoriesByProductIds(productIds);
+
+        Map<Long, List<SubcateDto>> productSubcategoryMap = productSubcategories
+                .stream()
+                .collect(Collectors.groupingBy(ProductSubcategoryDto::getProductId, Collectors.mapping(s -> new SubcateDto(s.getId(), s.getName()), Collectors.toList())));
+
+        Map<Long, List<TagResponse>> productTagMap = productTags.stream()
                 .collect(Collectors.groupingBy(
                         ProductTagDto::getProductId,
-                        Collectors.mapping(tag -> {
-                                    TagResponse tagResponse = new TagResponse();
-                                    tagResponse.setId(tag.getId());
-                                    tagResponse.setTagName(tag.getTagName());
-
-                                    return tagResponse;
-                                }
-                                , Collectors.toList())
+                        Collectors.mapping(tag -> new TagResponse(tag.getId(), tag.getTagName()), Collectors.toList())
                 ));
 
-        for (ProductResponse product : products) {
-            List<TagResponse> tags = productTagsMap.getOrDefault(product.getId(), new ArrayList<>());
-            product.setTags(tags);
-        }
 
-        return new BasicMessageResponse<>(200, "Danh sách sản phẩm", products);
+        products.forEach(product -> {
+            product.setTags(productTagMap.getOrDefault(product.getId(), Collections.emptyList()));
+            product.setSubcategories(productSubcategoryMap.getOrDefault(product.getId(), Collections.emptyList()));
+        });
+
+        return new BasicMessageResponse<>(200, ConstantProduct.success_fetch_relation_products, products);
     }
 
     @Override
-    public BasicMessageResponse<ProductDto> findById(long productId) {
+    public BasicMessageResponse<ProductDto> getById(long productId) {
 
-        ProductDto response = productRepository.findById_ADMIN(productId)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantProduct.PRODUCT, ConstantProduct.PRODUCT_DOES_NOT_EXISTS));
+        ProductDto response = productRepository.getById(productId)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
-        List<TagResponse> tagResponses = ptRepository.getTagsByProductId(response.getId());
+        List<TagResponse> tagResponses = productTagRepository.getTagsByProductId(response.getId());
+        List<String> images = productImageRepository.findImageUrlsByProductId(response.getId());
 
-
+        response.setImages(images);
         response.setTags(tagResponses);
 
-        return new BasicMessageResponse<>(200, "Tìm sản phẩm thành công!", response);
+        return new BasicMessageResponse<>(200, ConstantProduct.success_find_by_id, response);
     }
 
     public double calculateFinalPrice(double price, int discount) {
@@ -274,9 +410,10 @@ public class ProductServiceImp implements ProductService {
 
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void updateProductCountCategory(int CategoryId, boolean isIncrease) {
         Category category = categoryRepository.findById(CategoryId)
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.CATEGORY_NAME, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists));
 
         if (isIncrease) {
             category.increaseProductCount();
@@ -288,10 +425,11 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void updateProductCountManufacturer(int ManufacturerId, boolean isIncrease) {
         Manufacturer manufacturer = manufacturerRepository.findById(ManufacturerId)
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.MANUFACTURER_NAME
-                        , ConstantCategory.MANUFACTURER_DOES_NOT_EXIST));
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general
+                        , ConstantManufacturer.does_not_exists));
         if (isIncrease) {
             manufacturer.increaseProductCount();
         } else {
@@ -305,28 +443,39 @@ public class ProductServiceImp implements ProductService {
     @Override
     public BasicMessageResponse<List<ProductBasicResponse>> fetchByCategoryName(String categoryName) {
 
-        categoryValidation.validateNameExists(categoryName);
+        if (categoryRepository.validateName(categoryName).isEmpty()) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists);
+        }
 
         List<ProductBasicResponse> products = productRepository.fetchByCategoryName(categoryName);
-
 
         return new BasicMessageResponse<>(200, "Lấy danh sách sản phẩm theo loại " + categoryName + " Thành công", products);
     }
 
     @Override
     public BasicMessageResponse<ProductStatusResponse> updateStatus(long id, String status) {
-//        Product product = productRepository.findById(id)
-//                .orElseThrow(() -> new CustomNotFoundException(ConstantProduct.GENERAL, ConstantProduct.PRODUCT_DOES_NOT_EXISTS));
-//
-//        product.setStatus(status);
-//
-//        productRepository.save(product);
-//
-//        ProductStatusResponse response = new ProductStatusResponse(product.getId(), product.getStatus());
-//
-//        return new BasicMessageResponse<>(200, "Cập nhật trạng thái thành công!", response);
 
         return null;
+    }
+
+    @Override
+    public BasicMessageResponse<ProductIdAndTagIdResponse> deleteRelationByProductIdAndTagId(long productId, int tagId) {
+        ProductIdAndTagIdResponse relations = productTagRepository.findRelationByProductAndTagId(productId, tagId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.tag_relation_does_not_exists));
+
+        productTagRepository.deleteByProductIdAndTagId(relations.getProductId(), relations.getTagId());
+
+        return new BasicMessageResponse<>(200, ConstantProduct.success_delete_tag_relation, relations);
+    }
+
+    @Override
+    public BasicMessageResponse<ProductSubcategoryIDResponse> deleteRelationByProductIdAndSubcategoryId(long productId, int subcategoryId) {
+        ProductSubcategoryIDResponse relations = productSubcategoryRepository.findRelationByProductAndSubcategoryId(productId, subcategoryId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.subcategory_relation_does_not_exists));
+
+        productSubcategoryRepository.deleteByProductIdAndSubcategoryId(relations.getProductId(), relations.getSubcategoryId());
+
+        return new BasicMessageResponse<>(200, ConstantProduct.success_delete_subcategory_relation, relations);
     }
 
 

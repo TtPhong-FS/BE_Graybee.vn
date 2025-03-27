@@ -4,14 +4,14 @@ public class SubcateDto {
 
     private int id;
 
-    private String subcategoryName;
+    private String name;
 
     public SubcateDto() {
     }
 
-    public SubcateDto(int id, String subcategoryName) {
+    public SubcateDto(int id, String name) {
         this.id = id;
-        this.subcategoryName = subcategoryName;
+        this.name = name;
     }
 
     public int getId() {
@@ -22,12 +22,12 @@ public class SubcateDto {
         this.id = id;
     }
 
-    public String getSubcategoryName() {
-        return subcategoryName;
+    public String getName() {
+        return name;
     }
 
-    public void setSubcategoryName(String subcategoryName) {
-        this.subcategoryName = subcategoryName;
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

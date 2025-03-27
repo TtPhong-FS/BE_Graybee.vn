@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.projections.admin.category.TagProjection;
-import vn.graybee.requests.directories.TagCreateRequest;
-import vn.graybee.requests.directories.TagUpdateRequest;
+import vn.graybee.requests.directories.TagRequest;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.services.categories.TagServices;
 
@@ -43,12 +42,12 @@ public class AdminTagController {
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<TagResponse>> create(@RequestBody @Valid TagCreateRequest request) {
+    public ResponseEntity<BasicMessageResponse<TagResponse>> create(@RequestBody @Valid TagRequest request) {
         return ResponseEntity.ok(tagServices.create(request));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<TagResponse>> update(@RequestParam("id") int id, @RequestBody @Valid TagUpdateRequest request) {
+    public ResponseEntity<BasicMessageResponse<TagResponse>> update(@RequestParam("id") int id, @RequestBody @Valid TagRequest request) {
         return ResponseEntity.ok(tagServices.update(id, request));
     }
 

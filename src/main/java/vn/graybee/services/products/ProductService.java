@@ -4,8 +4,11 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
 import vn.graybee.response.admin.products.ProductDto;
+import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
 import vn.graybee.response.admin.products.ProductResponse;
 import vn.graybee.response.admin.products.ProductStatusResponse;
+import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
+import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.response.publics.ProductBasicResponse;
 
 import java.util.List;
@@ -14,13 +17,15 @@ public interface ProductService {
 
     BasicMessageResponse<ProductResponse> create(ProductCreateRequest request);
 
-    BasicMessageResponse<ProductResponse> update(long productId, ProductUpdateRequest request);
+    BasicMessageResponse<ProductResponse> update(long id, ProductUpdateRequest request);
 
     BasicMessageResponse<Long> delete(long id);
 
-    BasicMessageResponse<List<ProductResponse>> getProductsForAdmin();
+    BasicMessageResponse<List<ProductResponse>> fetchAll();
 
-    BasicMessageResponse<ProductDto> findById(long id);
+    BasicMessageResponse<List<ProductSubcategoryAndTagResponse>> fetchAllWithSubcategoriesAndTags();
+
+    BasicMessageResponse<ProductDto> getById(long id);
 
     void updateProductCountCategory(int CategoryId, boolean isIncrease);
 
@@ -29,5 +34,9 @@ public interface ProductService {
     BasicMessageResponse<List<ProductBasicResponse>> fetchByCategoryName(String categoryName);
 
     BasicMessageResponse<ProductStatusResponse> updateStatus(long id, String status);
+
+    BasicMessageResponse<ProductIdAndTagIdResponse> deleteRelationByProductIdAndTagId(long productId, int tagId);
+
+    BasicMessageResponse<ProductSubcategoryIDResponse> deleteRelationByProductIdAndSubcategoryId(long productId, int subcategoryId);
 
 }

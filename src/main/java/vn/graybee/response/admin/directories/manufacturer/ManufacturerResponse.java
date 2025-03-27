@@ -1,13 +1,13 @@
 package vn.graybee.response.admin.directories.manufacturer;
 
-import vn.graybee.models.categories.Manufacturer;
+import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.response.BaseResponse;
 
 public class ManufacturerResponse extends BaseResponse {
 
     private int id;
 
-    private String manufacturerName;
+    private String name;
 
     private String status;
 
@@ -16,7 +16,7 @@ public class ManufacturerResponse extends BaseResponse {
     public ManufacturerResponse(Manufacturer manufacturer) {
         super(manufacturer.getCreatedAt(), manufacturer.getUpdatedAt());
         this.id = manufacturer.getId();
-        this.manufacturerName = manufacturer.getManufacturerName();
+        this.name = manufacturer.getName();
         this.status = manufacturer.getStatus();
         this.productCount = manufacturer.getProductCount();
     }
@@ -37,12 +37,12 @@ public class ManufacturerResponse extends BaseResponse {
         this.id = id;
     }
 
-    public String getManufacturerName() {
-        return manufacturerName;
+    public String getName() {
+        return name;
     }
 
-    public void setManufacturerName(String manufacturerName) {
-        this.manufacturerName = manufacturerName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getStatus() {

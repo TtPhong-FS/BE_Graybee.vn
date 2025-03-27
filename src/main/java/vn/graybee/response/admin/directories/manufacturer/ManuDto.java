@@ -4,14 +4,14 @@ public class ManuDto {
 
     private int id;
 
-    private String manufacturerName;
+    private String name;
 
     public ManuDto() {
     }
 
-    public ManuDto(int id, String manufacturerName) {
+    public ManuDto(int id, String name) {
         this.id = id;
-        this.manufacturerName = manufacturerName;
+        this.name = name;
     }
 
     public int getId() {
@@ -22,12 +22,12 @@ public class ManuDto {
         this.id = id;
     }
 
-    public String getManufacturerName() {
-        return manufacturerName;
+    public String getName() {
+        return name;
     }
 
-    public void setManufacturerName(String manufacturerName) {
-        this.manufacturerName = manufacturerName;
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

@@ -1,6 +1,6 @@
 package vn.graybee.response.admin.directories.subcate;
 
-import vn.graybee.models.categories.SubCategory;
+import vn.graybee.models.directories.SubCategory;
 import vn.graybee.response.BaseResponse;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
@@ -10,7 +10,7 @@ public class SubCategoryResponse extends BaseResponse {
 
     private int id;
 
-    private String subcategoryName;
+    private String name;
 
     private String status;
 
@@ -19,7 +19,7 @@ public class SubCategoryResponse extends BaseResponse {
     public SubCategoryResponse(SubCategory subCategory, List<TagResponse> tags) {
         super(subCategory.getCreatedAt(), subCategory.getUpdatedAt());
         this.id = subCategory.getId();
-        this.subcategoryName = subCategory.getSubcategoryName();
+        this.name = subCategory.getName();
         this.status = subCategory.getStatus();
         this.tags = tags;
     }
@@ -40,12 +40,12 @@ public class SubCategoryResponse extends BaseResponse {
         this.id = id;
     }
 
-    public String getSubcategoryName() {
-        return subcategoryName;
+    public String getName() {
+        return name;
     }
 
-    public void setSubcategoryName(String subcategoryName) {
-        this.subcategoryName = subcategoryName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getStatus() {

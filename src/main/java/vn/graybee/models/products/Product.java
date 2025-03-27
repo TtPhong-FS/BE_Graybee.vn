@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.models.others.BaseModel;
+import vn.graybee.models.BaseModel;
 
 @Entity
 @Table(name = "products")
@@ -22,11 +22,11 @@ public class Product extends BaseModel {
     @Column(name = "manufacturer_id")
     private Integer manufacturerId;
 
-    @Column(name = "product_name", unique = true, nullable = false, length = 200)
-    private String productName;
+    @Column(unique = true, nullable = false, length = 200)
+    private String name;
 
-    @Column(name = "product_code", unique = true, length = 100, nullable = false)
-    private String productCode;
+    @Column(unique = true, length = 100, nullable = false)
+    private String code;
 
     @Column(name = "conditions", length = 5, nullable = false)
     private String conditions;
@@ -59,12 +59,6 @@ public class Product extends BaseModel {
     private String thumbnail;
 
     public Product() {
-    }
-
-    public Product(String productName, double price, int discountPercent) {
-        this.productName = productName;
-        this.price = price;
-        this.discountPercent = discountPercent;
     }
 
     public boolean isStock() {
@@ -107,20 +101,21 @@ public class Product extends BaseModel {
         this.manufacturerId = manufacturerId;
     }
 
-    public String getProductName() {
-        return productName;
+
+    public String getName() {
+        return name;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getProductCode() {
-        return productCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getConditions() {

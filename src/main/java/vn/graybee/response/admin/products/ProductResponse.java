@@ -2,10 +2,8 @@ package vn.graybee.response.admin.products;
 
 import vn.graybee.models.products.Product;
 import vn.graybee.response.BaseResponse;
-import vn.graybee.response.admin.directories.tag.TagResponse;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class ProductResponse extends BaseResponse {
 
@@ -15,11 +13,9 @@ public class ProductResponse extends BaseResponse {
 
     private String manufacturerName;
 
-    private List<TagResponse> tags;
+    private String code;
 
-    private String productCode;
-
-    private String productName;
+    private String name;
 
     private int warranty;
 
@@ -45,14 +41,17 @@ public class ProductResponse extends BaseResponse {
 
     private String status;
 
-    public ProductResponse(LocalDateTime createdAt, LocalDateTime updatedAt, Product product, String categoryName, String manufacturerName, List<TagResponse> tags, int quantity) {
+    public ProductResponse(LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
+    }
+
+    public ProductResponse(Product product, String categoryName, String manufacturerName, int quantity) {
+        super(product.getCreatedAt(), product.getUpdatedAt());
         this.id = product.getId();
-        this.productCode = product.getProductCode();
-        this.productName = product.getProductName();
+        this.code = product.getCode();
+        this.name = product.getName();
         this.categoryName = categoryName;
         this.manufacturerName = manufacturerName;
-        this.tags = tags;
         this.warranty = product.getWarranty();
         this.weight = product.getWeight();
         this.dimension = product.getDimension();
@@ -81,14 +80,6 @@ public class ProductResponse extends BaseResponse {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public List<TagResponse> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<TagResponse> tags) {
-        this.tags = tags;
     }
 
     public long getId() {
@@ -131,20 +122,20 @@ public class ProductResponse extends BaseResponse {
         this.finalPrice = finalPrice;
     }
 
-    public String getProductCode() {
-        return productCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getName() {
+        return name;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getStatus() {

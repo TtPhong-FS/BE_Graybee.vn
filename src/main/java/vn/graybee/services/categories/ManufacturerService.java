@@ -14,14 +14,10 @@ public interface ManufacturerService {
 
     BasicMessageResponse<ManufacturerResponse> update(int id, ManufacturerUpdateRequest request);
 
-    BasicMessageResponse<List<ManufacturerResponse>> createManufacturers(List<ManufacturerCreateRequest> request);
+    BasicMessageResponse<Integer> delete(int id);
 
     BasicMessageResponse<ManufacturerResponse> getById(int id);
 
     BasicMessageResponse<List<ManufacturerProjection>> getAllManufacturer();
-
-    BasicMessageResponse<Integer> deleteById(int id);
-
-    void updateStatusDeleteRecord(int id);
 
 }

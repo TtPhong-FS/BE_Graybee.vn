@@ -4,12 +4,11 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:graybee}?useSSL=true&serverTimezone=Asia/Ho_Chi_Minh
-    username: ${MYSQL_USER:phongtt}
-    password: ${MYSQL_PASSWORD:12345}
-    hikari:
-      connection-timeout: 30000
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=true&serverTimezone=Asia/Ho_Chi_Minh
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: none
     show-sql: true
@@ -25,10 +24,10 @@ spring:
     redis:
       repositories:
         enabled: false
-      host: ${REDIS_HOST:redis}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:root}
-      database: ${REDIS_DATABASE:0}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE}
 
 server:
   address: 0.0.0.0
@@ -46,7 +45,6 @@ logging:
   level:
     com:
       zaxxer: ERROR
-
 
 api:
   version: v1

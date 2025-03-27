@@ -2,51 +2,35 @@ package vn.graybee.constants;
 
 public class ConstantCategory {
 
-    public static final String GENERAL_ERROR = "general";
+    public static final String name = "name";
 
-    public static final String NAME = "name";
+    public static final String categoryId = "categoryId";
 
-    public static final String CATEGORY_NAME = "categoryName";
+    public static final String manufacturer_relation_does_not_exists = "Nhà sản xuất chưa được liên kết với danh mục";
 
-    public static final String SUBCATEGORY_NAME = "subcategoryName";
+    public static final String subcategory_relation_does_not_exists = "Danh mục con chưa được liên kết với danh mục";
 
-    public static final String TAG_NAME = "tagName";
+    public static final String temporarily_flagged = "Không thể thực hiện, danh mục đang tạm thời bị xoá";
 
-    public static final String TAGS = "tags";
+    public static final String does_not_exists = "Danh mục không tồn tại";
 
-    public static final String RELATIONSHIP_DOES_NOT_EXIST = "Quan hệ không tồn tại!";
+    public static final String name_exists = "Tên danh mục đã tồn tại";
 
-    public static final String MANUFACTURER_NAME = "manufacturerName";
+    public static final String products_in_use = "Không thể thực hiện, danh mục đang được sử dụng bởi một sản phẩm";
 
-    public static final String MANUFACTURER_NAMES = "manufacturerNames";
+    //    Response
+    public static final String success_create = "Tạo danh mục thành công";
 
-    public static final String LIST_MANUFACTURER_NAME_CANNOT_BE_EMPTY = "Danh sách tên nhà sản xuất không được để trống";
+    public static final String success_update = "Cập nhật danh mục thành công";
 
-    public static final String SUBCATEGORY_DOES_NOT_EXIST = "Danh mục con không tồn tại!";
+    public static final String success_delete = "Xoá danh mục thành công";
 
-    public static final String TAG_DOES_NOT_EXIST = "Thẻ phân loại không tồn tại!";
+    public static final String success_find_by_id = "Tìm danh mục thành công";
+    
+    public static final String success_fetch_categories = "Danh sách danh mục đã được lấy thành công";
 
-    public static final String CATEGORY_TEMPORARILY_FLAGGED = "Không thể thực hiện, danh mục đang tạm thời bị xoá!";
+    public static final String success_delete_manufacturer_relation = "Nhà sản xuất đã được loại bỏ khỏi danh mục";
 
-    public static final String CATEGORY_DOES_NOT_EXIST = "Danh mục không tồn tại!";
-
-    public static final String CATEGORY_NAME_EXISTS = "Tên danh mục đã tồn tại!";
-
-    public static final String TAG_NAME_EXISTS = "Tên thẻ phân loại đã tồn tại!";
-
-    public static final String STATUS_CANNOT_BE_EMPTY = "Trạng thái không thể trống!";
-
-    public static final String SUBCATEGORY_NAME_EXISTS = "Tên danh mục con đã tồn tại!";
-
-
-    public static final String CATEGORY_ID_USED_IN_PRODUCT = "Không thể thực hiện, danh mục đang được sử dụng bởi một sản phẩm!";
-
-    public static final String MANUFACTURER_TEMPORARILY_FLAGGED = "Không thể thực hiện, thương hiệu đang tạm thời bị xoá";
-
-    public static final String MANUFACTURER_DOES_NOT_EXIST = "Thương hiệu không tồn tại";
-
-    public static final String MANUFACTURER_NAME_EXISTS = "Tên thương hiệu đã tồn tại";
-
-    public static final String MANUFACTURER_ID_USED_IN_PRODUCT = "Không thể thực hiện, thương hiệu đang được sử dụng bởi một sản phẩm";
+    public static final String success_delete_subcategory_relation = "Danh mục con đã được loại bỏ khỏi danh mục";
 
 }

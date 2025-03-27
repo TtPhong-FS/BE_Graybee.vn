@@ -7,14 +7,14 @@ public class ManufacturerCreateRequest {
 
     @NotBlank(message = "Không được để trống")
     @Size(max = 35, message = "Độ dài không được vượt quá 35 ký tự")
-    private String manufacturerName;
+    private String name;
 
-    public String getManufacturerName() {
-        return manufacturerName;
+    public String getName() {
+        return name;
     }
 
-    public void setManufacturerName(String manufacturerName) {
-        this.manufacturerName = manufacturerName;
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

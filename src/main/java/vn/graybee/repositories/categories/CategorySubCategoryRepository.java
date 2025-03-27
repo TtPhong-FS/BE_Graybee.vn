@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.models.categories.CategorySubCategory;
+import vn.graybee.models.directories.CategorySubCategory;
 import vn.graybee.response.admin.directories.category.CategorySubDto;
 import vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategorySubCategoryRepository extends JpaRepository<CategorySubCategory, Integer> {
-    
-    @Query("SELECT new vn.graybee.response.admin.directories.category.CategorySubDto(cs.categoryId, s.id,  s.subcategoryName) " +
+
+    @Query("SELECT new vn.graybee.response.admin.directories.category.CategorySubDto(cs.categoryId, s.id,  s.name) " +
             "FROM CategorySubCategory cs " +
             "INNER JOIN SubCategory s ON cs.subCategoryId = s.id " +
             "WHERE cs.categoryId IN :categoryIds")
@@ -33,7 +33,7 @@ public interface CategorySubCategoryRepository extends JpaRepository<CategorySub
     @Query("SELECT cs.subCategoryId FROM CategorySubCategory cs WHERE cs.categoryId = :categoryId")
     List<Integer> findSubcategoryIdsByCategoryId(@Param("categoryId") int categoryId);
 
-    @Query("Select new vn.graybee.response.admin.directories.subcate.SubcateDto(s.id, s.subcategoryName) from CategorySubCategory cs join SubCategory s on cs.subCategoryId = s.id where cs.categoryId = :categoryId ORDER BY s.id ASC")
+    @Query("Select new vn.graybee.response.admin.directories.subcate.SubcateDto(s.id, s.name) from CategorySubCategory cs join SubCategory s on cs.subCategoryId = s.id where cs.categoryId = :categoryId ORDER BY s.id ASC")
     List<SubcateDto> findByCategoryId(@Param("categoryId") int categoryId);
 
     @Query("Select new vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse(cs.categoryId, cs.subCategoryId) from CategorySubCategory cs where cs.categoryId =:categoryId and cs.subCategoryId = :subCategoryId ")

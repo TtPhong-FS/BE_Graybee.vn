@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.models.others.BaseModel;
+import vn.graybee.models.BaseModel;
 
 @Entity
 @Table(name = "inventories")
@@ -21,12 +21,24 @@ public class Inventory extends BaseModel {
 
     private int quantity;
 
+    @Column(length = 30)
+    private String status;
+
     public Inventory() {
     }
 
-    public Inventory(String productCode, int quantity) {
+    public Inventory(String productCode, int quantity, String status) {
         this.productCode = productCode;
         this.quantity = quantity;
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Integer getId() {

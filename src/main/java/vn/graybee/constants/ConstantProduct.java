@@ -2,18 +2,38 @@ package vn.graybee.constants;
 
 public class ConstantProduct {
 
-    public static final String PRODUCT = "product";
+    public static final String name = "productName";
 
-    public static final String GENERAL = "general";
+    public static final String tag_relation_does_not_exists = "Thẻ phân loại hiện chưa được liên kết với sản phẩm";
 
-    public static final String NAME = "productName";
+    public static final String subcategory_relation_does_not_exists = "Danh mục con hiện chưa được liên kết với sản phẩm";
 
-    public static final String PRODUCT_TEMPORARILY_FLAGGED = "Không thể thực hiện, sản phẩm tạm thời đang bị xoá!";
+    public static final String temporarily_flagged = "Không thể thực hiện, sản phẩm tạm thời đang bị xoá";
 
-    public static final String PRODUCT_NAME_ALREADY_EXISTS = "Tên sản phẩm đã tồn tại!";
+    public static final String name_exists = "Tên sản phẩm đã tồn tại trong hệ thống";
 
-    public static final String PRODUCT_DOES_NOT_EXISTS = "Sản phẩm không tồn tại!";
+    public static final String does_not_exists = "Sản phẩm không tồn tại trong hệ thống";
 
-    public static final String PRODUCT_STILL_INVENTORY = "Không thể thực hiện! Sản phẩm hiện vẫn còn trong kho";
+    public static final String still_inventory = "Không thể thực hiện vì sản phẩm hiện vẫn còn trong kho";
+
+    public static final String does_not_exists_in_inventory = "Không thể thực hiện vì sản phẩm chưa được thêm vào kho";
+
+    //    Response
+    public static final String success_create = "Tạo sản phẩm thành công";
+
+    public static final String success_update = "Cập nhật sản phẩm thành công";
+
+    public static final String success_delete = "Xoá sản phẩm thành công";
+
+    public static final String success_find_by_id = "Tìm sản phẩm thành công";
+
+    public static final String success_fetch_relation_products = "Danh sách quan hệ sản phẩm đã được lấy thành công";
+
+    public static final String success_fetch_products = "Danh sách sản phẩm đã được lấy thành công";
+
+    public static final String success_delete_tag_relation = "Thẻ phân loại đã được loại bỏ khỏi sản phẩm";
+
+    public static final String success_delete_subcategory_relation = "Danh mục con đã được loại bỏ khỏi sản phẩm";
+
 
 }

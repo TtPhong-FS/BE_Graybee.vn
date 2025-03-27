@@ -1,7 +1,6 @@
 package vn.graybee.controllers.admin;
 
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,12 +14,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
+import vn.graybee.requests.products.ProductUpdateRequest;
 import vn.graybee.response.admin.products.ProductDto;
+import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
 import vn.graybee.response.admin.products.ProductResponse;
-import vn.graybee.response.admin.products.ProductStatusResponse;
-import vn.graybee.response.publics.ProductBasicResponse;
+import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
+import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.services.products.ProductService;
-import vn.graybee.validation.ProductValidation;
 
 import java.util.List;
 
@@ -31,11 +31,8 @@ public class AdminProductController {
 
     private final ProductService productService;
 
-    private final ProductValidation productValidation;
-
-    public AdminProductController(ProductService productService, ProductValidation productValidation) {
+    public AdminProductController(ProductService productService) {
         this.productService = productService;
-        this.productValidation = productValidation;
     }
 
     @PostMapping
@@ -43,20 +40,9 @@ public class AdminProductController {
         return ResponseEntity.ok(productService.create(request));
     }
 
-    @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<ProductResponse>>> fetchAll() {
-        return ResponseEntity.ok(productService.getProductsForAdmin());
-    }
-
-    @GetMapping("/")
-    public ResponseEntity<BasicMessageResponse<ProductDto>> findById(@PathParam("id") long id) {
-        return ResponseEntity.ok(productService.findById(id));
-    }
-
-
-    @GetMapping("/category/{categoryName}")
-    public BasicMessageResponse<List<ProductBasicResponse>> fetchByCategoryId(@PathVariable("categoryName") String categoryName) {
-        return productService.fetchByCategoryName(categoryName);
+    @PutMapping("/update")
+    public ResponseEntity<BasicMessageResponse<ProductResponse>> update(@RequestParam("id") long id, @RequestBody @Valid ProductUpdateRequest request) {
+        return ResponseEntity.ok(productService.update(id, request));
     }
 
     @DeleteMapping("/delete")
@@ -64,9 +50,29 @@ public class AdminProductController {
         return ResponseEntity.ok(productService.delete(id));
     }
 
-    @PutMapping("/status")
-    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> fetchByCategoryId(@RequestParam("id") long id, @RequestBody String status) {
-        return ResponseEntity.ok(productService.updateStatus(id, status));
+    @DeleteMapping("/subcategories/delete")
+    public ResponseEntity<BasicMessageResponse<ProductSubcategoryIDResponse>> deleteRelationByProductIdAndSubcategoryId(@RequestParam("productId") long productId, @RequestParam("subcategoryId") int subcategoryId) {
+        return ResponseEntity.ok(productService.deleteRelationByProductIdAndSubcategoryId(productId, subcategoryId));
     }
 
+    @DeleteMapping("/tags/delete")
+    public ResponseEntity<BasicMessageResponse<ProductIdAndTagIdResponse>> deleteRelationByProductIdAndTagId(@RequestParam("productId") long productId, @RequestParam("tagId") int tagId) {
+        return ResponseEntity.ok(productService.deleteRelationByProductIdAndTagId(productId, tagId));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<ProductDto>> getById(@PathVariable("id") long id) {
+        return ResponseEntity.ok(productService.getById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<BasicMessageResponse<List<ProductResponse>>> fetchAll() {
+        return ResponseEntity.ok(productService.fetchAll());
+    }
+
+    @GetMapping("/subcategories&tags")
+    public ResponseEntity<BasicMessageResponse<List<ProductSubcategoryAndTagResponse>>> fetchProductsWithSubcategoriesAndTags() {
+        return ResponseEntity.ok(productService.fetchAllWithSubcategoriesAndTags());
+    }
+    
 }

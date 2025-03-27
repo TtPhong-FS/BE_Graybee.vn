@@ -6,10 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.models.others.BaseModel;
+import vn.graybee.models.BaseModel;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -19,10 +18,13 @@ public class User extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "role_id", nullable = false)
+    private Integer roleId;
+
     @Column(name = "fullname", length = 100)
     private String fullName;
 
-    @Column(name = "phone_number", length = 12, nullable = false)
+    @Column(name = "phone_number", length = 12, nullable = false, unique = true)
     private String phoneNumber;
 
     @Column(name = "password", length = 200, nullable = false)
@@ -34,28 +36,19 @@ public class User extends BaseModel {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    @Column(name = "google_account_id")
-    private int googleAccountId;
-
-    @Column(name = "facebook_account_id")
-    private int facebookAccountId;
+    @Column(length = 30)
+    private String status;
 
     public User() {
     }
 
-    public User(LocalDateTime createdAt, LocalDateTime updatedAt, String fullName, String phoneNumber, String password, String address, Date dateOfBirth, boolean isActive, int googleAccountId, int facebookAccountId) {
-        super(createdAt, updatedAt);
-        this.fullName = fullName;
+    public User(Integer roleId, String phoneNumber, String password) {
+        this.roleId = roleId;
         this.phoneNumber = phoneNumber;
         this.password = password;
-        this.address = address;
-        this.dateOfBirth = dateOfBirth;
-        this.isActive = isActive;
-        this.googleAccountId = googleAccountId;
-        this.facebookAccountId = facebookAccountId;
     }
 
     public Long getId() {
@@ -66,6 +59,13 @@ public class User extends BaseModel {
         this.id = id;
     }
 
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
+    }
 
     public String getFullName() {
         return fullName;
@@ -115,20 +115,12 @@ public class User extends BaseModel {
         isActive = active;
     }
 
-    public int getGoogleAccountId() {
-        return googleAccountId;
+    public String getStatus() {
+        return status;
     }
 
-    public void setGoogleAccountId(int googleAccountId) {
-        this.googleAccountId = googleAccountId;
-    }
-
-    public int getFacebookAccountId() {
-        return facebookAccountId;
-    }
-
-    public void setFacebookAccountId(int facebookAccountId) {
-        this.facebookAccountId = facebookAccountId;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

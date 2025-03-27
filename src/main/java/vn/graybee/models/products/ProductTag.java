@@ -7,11 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import vn.graybee.models.others.BaseModel;
 
 @Entity
 @Table(name = "products_tags", uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "tag_id"}))
-public class ProductTag extends BaseModel {
+public class ProductTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,16 +22,13 @@ public class ProductTag extends BaseModel {
     @Column(name = "tag_id", nullable = false)
     private Integer tagId;
 
-    @Column(length = 30, nullable = false)
-    private String status;
 
     public ProductTag() {
     }
 
-    public ProductTag(Long productId, Integer tagId, String status) {
+    public ProductTag(Long productId, Integer tagId) {
         this.productId = productId;
         this.tagId = tagId;
-        this.status = status;
     }
 
     public Integer getId() {
@@ -57,14 +53,6 @@ public class ProductTag extends BaseModel {
 
     public void setTagId(Integer tagId) {
         this.tagId = tagId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
 }

@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.models.others.BaseModel;
+import vn.graybee.models.BaseModel;
 
 @Entity
 @Table(name = "roles")
@@ -19,7 +19,10 @@ public class Role extends BaseModel {
     @Column(unique = true, nullable = false, length = 20)
     private String name;
 
-    @Column(length = 30, nullable = false)
+    @Column(name = "user_count")
+    private int userCount;
+
+    @Column(length = 30)
     private String status;
 
     public Role() {
@@ -28,6 +31,14 @@ public class Role extends BaseModel {
     public Role(String name, String status) {
         this.name = name;
         this.status = status;
+    }
+
+    public int getUserCount() {
+        return userCount;
+    }
+
+    public void setUserCount(int userCount) {
+        this.userCount = userCount;
     }
 
     public Integer getId() {

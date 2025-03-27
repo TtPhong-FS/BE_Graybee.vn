@@ -4,12 +4,15 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantCategory;
+import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.constants.ConstantManufacturer;
+import vn.graybee.constants.ConstantSubcategory;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.models.categories.Category;
-import vn.graybee.models.categories.CategoryManufacturer;
-import vn.graybee.models.categories.CategorySubCategory;
+import vn.graybee.models.directories.Category;
+import vn.graybee.models.directories.CategoryManufacturer;
+import vn.graybee.models.directories.CategorySubCategory;
 import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.repositories.categories.CategoryManufacturerRepository;
 import vn.graybee.repositories.categories.CategoryRepository;
@@ -19,17 +22,19 @@ import vn.graybee.repositories.categories.SubCategoryRepository;
 import vn.graybee.requests.directories.CategoryCreateRequest;
 import vn.graybee.requests.directories.CategoryUpdateRequest;
 import vn.graybee.response.admin.directories.category.CategoryManuDto;
+import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
+import vn.graybee.response.admin.directories.category.CategoryProductCountResponse;
 import vn.graybee.response.admin.directories.category.CategoryResponse;
 import vn.graybee.response.admin.directories.category.CategorySubDto;
+import vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManuDto;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
 import vn.graybee.services.categories.CategoryService;
 import vn.graybee.utils.TextUtils;
-import vn.graybee.validation.CategoryValidation;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -51,93 +56,96 @@ public class CategoryServiceImp implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    private final CategoryValidation categoryValidation;
-
     private final StringRedisTemplate redisTemplate;
 
-
-    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, CategoryValidation categoryValidation, StringRedisTemplate redisTemplate) {
+    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, StringRedisTemplate redisTemplate) {
         this.subCategoryRepository = subCategoryRepository;
         this.categorySubCategoryRepository = categorySubCategoryRepository;
         this.cmRepository = cmRepository;
         this.manufacturerRepository = manufacturerRepository;
         this.categoryRepository = categoryRepository;
-        this.categoryValidation = categoryValidation;
         this.redisTemplate = redisTemplate;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BasicMessageResponse<CategoryResponse> createCategory(CategoryCreateRequest request) {
-        categoryValidation.checkExistByName(request.getCategoryName());
+    public BasicMessageResponse<CategoryResponse> create(CategoryCreateRequest request) {
 
-        Category category = new Category(TextUtils.capitalize(request.getCategoryName()));
-        category.setStatus("ACTIVE");
-        Category savedCategory = categoryRepository.save(category);
-
-        List<SubcateDto> subDto = new ArrayList<>();
-        if (!request.getSubcategories().isEmpty()) {
-            subDto = handleSubCategories(savedCategory.getId(), request.getSubcategories());
+        if (categoryRepository.validateName(request.getName()).isPresent()) {
+            throw new BusinessCustomException(ConstantCategory.name, ConstantCategory.name_exists);
         }
 
-        List<ManuDto> manuDtos = new ArrayList<>();
-        if (!request.getManufacturers().isEmpty()) {
-            manuDtos = handleManufacturers(savedCategory.getId(), request.getManufacturers());
+
+        List<SubcateDto> subcategories = subCategoryRepository.findByIds(request.getSubcategories());
+        Set<Integer> foundSubcategoryIds = subcategories.stream()
+                .map(SubcateDto::getId)
+                .collect(Collectors.toSet());
+
+        if (!foundSubcategoryIds.containsAll(request.getSubcategories())) {
+            throw new BusinessCustomException(ConstantSubcategory.subcategories, ConstantSubcategory.does_not_exists);
+        }
+
+        List<ManuDto> manufacturers = manufacturerRepository.findByIds(request.getManufacturers());
+        Set<Integer> foundManufacturerIds = manufacturers.stream()
+                .map(ManuDto::getId)
+                .collect(Collectors.toSet());
+
+        if (!foundManufacturerIds.containsAll(request.getManufacturers())) {
+            throw new BusinessCustomException(ConstantManufacturer.manufacturers, ConstantManufacturer.does_not_exists);
+        }
+
+
+        Category category = new Category();
+        category.setName(TextUtils.capitalize(request.getName()));
+        category.setStatus("ACTIVE");
+        category = categoryRepository.save(category);
+
+        if (request.getSubcategories() != null && !request.getSubcategories().isEmpty()) {
+            handleSubCategories(category.getId(), foundSubcategoryIds);
+        }
+
+        if (request.getManufacturers() != null && !request.getManufacturers().isEmpty()) {
+            handleManufacturers(category.getId(), foundManufacturerIds);
         }
 
         CategoryResponse categoryResponse = new CategoryResponse(
-                savedCategory,
-                subDto,
-                manuDtos
+                category,
+                subcategories,
+                manufacturers
         );
 
-        return new BasicMessageResponse<>(201, "Danh mục đã được tạo thành công!", categoryResponse);
+        return new BasicMessageResponse<>(201, ConstantCategory.success_create, categoryResponse);
     }
 
-    private List<SubcateDto> handleSubCategories(int category, List<Integer> subCateIds) {
-        List<SubcateDto> subCateDtos = subCategoryRepository.findByIds(subCateIds);
+    private void handleSubCategories(int category, Set<Integer> subCateIds) {
 
-        if (subCateDtos.size() != subCateIds.size()) {
-            throw new BusinessCustomException(
-                    ConstantCategory.SUBCATEGORY_NAME,
-                    ConstantCategory.SUBCATEGORY_DOES_NOT_EXIST
-            );
-        }
-
-        List<CategorySubCategory> categorySubCategories = subCateDtos.stream()
-                .map(sub -> new CategorySubCategory(category, sub.getId()))
+        List<CategorySubCategory> categorySubCategories = subCateIds.stream()
+                .map(sub -> new CategorySubCategory(category, sub))
                 .collect(Collectors.toList());
 
-        categorySubCategoryRepository.saveAll(categorySubCategories);
+        if (!categorySubCategories.isEmpty()) {
+            categorySubCategoryRepository.saveAll(categorySubCategories);
+        }
 
-        return subCateDtos;
     }
 
-    private List<ManuDto> handleManufacturers(int category, List<Integer> manuIds) {
-        List<ManuDto> manufacturers = manufacturerRepository.findByIds(manuIds);
+    private void handleManufacturers(int category, Set<Integer> manuIds) {
 
-        if (manufacturers.size() != manuIds.size()) {
-            throw new BusinessCustomException(ConstantCategory.MANUFACTURER_NAME, ConstantCategory.MANUFACTURER_DOES_NOT_EXIST);
-        }
-
-        List<CategoryManufacturer> categoryManufacturers = manufacturers.stream()
-                .map(manu -> new CategoryManufacturer(category, manu.getId()))
+        List<CategoryManufacturer> categoryManufacturers = manuIds.stream()
+                .map(manu -> new CategoryManufacturer(category, manu))
                 .collect(Collectors.toList());
 
-//        Set<String> keys = redisTemplate.keys(CACHE_KEY + "*");
-//        if (!keys.isEmpty()) {
-//            redisTemplate.delete(keys);
-//        }
+        if (!categoryManufacturers.isEmpty()) {
+            cmRepository.saveAll(categoryManufacturers);
 
-        cmRepository.saveAll(categoryManufacturers);
+        }
 
-        return manufacturers;
     }
 
     @Override
     public BasicMessageResponse<CategoryResponse> findById(int id) {
         CategoryResponse category = categoryRepository.getById(id)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
+                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantCategory.does_not_exists));
 
         List<SubcateDto> subcateDtos = categorySubCategoryRepository.findByCategoryId(category.getId());
         List<ManuDto> manuDtos = cmRepository.findByCategoryId(category.getId());
@@ -145,100 +153,110 @@ public class CategoryServiceImp implements CategoryService {
         category.setManufacturers(manuDtos);
         category.setSubcategories(subcateDtos);
 
-        return new BasicMessageResponse<>(200, "Tìm danh mục thành công", category);
-    }
-
-    @Override
-    @Transactional
-    public BasicMessageResponse<Integer> deleteCategoryById(int id) {
-
-        categoryValidation.countProductById(id);
-
-        categoryRepository.deleteByCategoryId(id);
-
-        return new BasicMessageResponse<>(200, "Danh mục đã được xoá thành công!", id);
+        return new BasicMessageResponse<>(200, ConstantCategory.success_find_by_id, category);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<CategoryResponse> updateCategory(int id, CategoryUpdateRequest request) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_DOES_NOT_EXIST));
+    public BasicMessageResponse<Integer> delete(int id) {
+
+        CategoryProductCountResponse category = categoryRepository.checkExistsAndGetProductCountById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists));
 
         if (category.getProductCount() > 0) {
-            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.CATEGORY_ID_USED_IN_PRODUCT);
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantCategory.products_in_use);
         }
 
-        category.setCategoryName(request.getCategoryName());
+        categoryRepository.deleteById(id);
+
+        return new BasicMessageResponse<>(200, ConstantCategory.success_delete, category.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<CategoryResponse> update(int id, CategoryUpdateRequest request) {
+
+        List<SubcateDto> subcategories = subCategoryRepository.findByIds(request.getSubcategories());
+        Set<Integer> foundSubcategoryIds = subcategories.stream()
+                .map(SubcateDto::getId)
+                .collect(Collectors.toSet());
+
+        if (!foundSubcategoryIds.containsAll(request.getSubcategories())) {
+            throw new BusinessCustomException(ConstantSubcategory.subcategories, ConstantSubcategory.does_not_exists);
+        }
+
+        List<ManuDto> manufacturers = manufacturerRepository.findByIds(request.getManufacturers());
+        Set<Integer> foundManufacturerIds = manufacturers.stream()
+                .map(ManuDto::getId)
+                .collect(Collectors.toSet());
+
+        if (!foundManufacturerIds.containsAll(request.getManufacturers())) {
+            throw new BusinessCustomException(ConstantManufacturer.manufacturers, ConstantManufacturer.does_not_exists);
+        }
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantCategory.does_not_exists));
+
+        if (!category.getName().equals(request.getName()) && categoryRepository.existsByNameAndNotId(request.getName(), category.getId())) {
+            throw new BusinessCustomException(ConstantCategory.name, ConstantCategory.name_exists);
+        }
+
+        if (category.getProductCount() == 0) {
+            category.setName(request.getName());
+        }
+
         if (request.getStatus() != null) {
             category.setStatus(request.getStatus().name());
         } else {
             category.setStatus("PENDING");
         }
 
-        List<SubcateDto> subCategoryResponse = new ArrayList<>();
-        List<ManuDto> manufacturerResponse = new ArrayList<>();
+        category.setUpdatedAt(LocalDateTime.now());
 
-        if (!request.getSubcategories().isEmpty()) {
-            List<Integer> newSubcategoryIds = request.getSubcategories();
-            List<Integer> validateSubIds = subCategoryRepository.findAllByIds(newSubcategoryIds);
+        category = categoryRepository.save(category);
+        int categoryId = category.getId();
 
-            if (validateSubIds.size() != newSubcategoryIds.size()) {
-                throw new BusinessCustomException(ConstantCategory.SUBCATEGORY_NAME, ConstantCategory.SUBCATEGORY_DOES_NOT_EXIST);
-            }
+        if (request.getSubcategories() != null && !request.getSubcategories().isEmpty()) {
+            List<Integer> currentSubcategoryIds = categorySubCategoryRepository.findSubcategoryIdsByCategoryId(categoryId);
 
-            List<Integer> currentSubcategoryIds = categorySubCategoryRepository.findSubcategoryIdsByCategoryId(category.getId());
+            Set<Integer> newSet = new HashSet<>(request.getSubcategories());
 
-            Set<Integer> newSet = new HashSet<>(newSubcategoryIds);
-
-            categorySubCategoryRepository.deleteByCategoryIdAndSubCategoryIdNotIn(category.getId(), new ArrayList<>(newSet));
+            categorySubCategoryRepository.deleteByCategoryIdAndSubCategoryIdNotIn(categoryId, new ArrayList<>(newSet));
 
             List<CategorySubCategory> newRelations = newSet.stream()
                     .filter(subId -> !currentSubcategoryIds.contains(subId))
-                    .map(sub -> new CategorySubCategory(category.getId(), sub))
+                    .map(sub -> new CategorySubCategory(categoryId, sub))
                     .toList();
 
-            categorySubCategoryRepository.saveAll(newRelations);
-
-            subCategoryResponse = subCategoryRepository.findByIds(newSubcategoryIds);
+            if (!newRelations.isEmpty()) {
+                categorySubCategoryRepository.saveAll(newRelations);
+            }
         }
 
+        if (request.getManufacturers() != null && !request.getManufacturers().isEmpty()) {
 
-        if (!request.getManufacturers().isEmpty()) {
+            List<Integer> currentManufacturerIds = cmRepository.findManufacturerIdsByCategoryId(categoryId);
 
-            List<Integer> newManufacturerIds = request.getManufacturers();
-            List<Integer> validateManuIds = subCategoryRepository.findAllByIds(newManufacturerIds);
+            Set<Integer> newSet = new HashSet<>(request.getManufacturers());
 
-            if (validateManuIds.size() != newManufacturerIds.size()) {
-                throw new BusinessCustomException(ConstantCategory.MANUFACTURER_NAME, ConstantCategory.MANUFACTURER_DOES_NOT_EXIST);
-            }
-
-            List<Integer> currentManufacturerIds = cmRepository.findManufacturerIdsByCategoryId(category.getId());
-
-            Set<Integer> newSet = new HashSet<>(newManufacturerIds);
-
-            cmRepository.deleteByCategoryIdAndManufacturerIdNotIn(category.getId(), new ArrayList<>(newSet));
+            cmRepository.deleteByCategoryIdAndManufacturerIdNotIn(categoryId, new ArrayList<>(newSet));
 
             List<CategoryManufacturer> newRelations = newSet.stream()
                     .filter(manuid -> !currentManufacturerIds.contains(manuid))
-                    .map(manu -> new CategoryManufacturer(category.getId(), manu)).toList();
+                    .map(manu -> new CategoryManufacturer(categoryId, manu)).toList();
 
-            cmRepository.saveAll(newRelations);
-
-            manufacturerResponse = manufacturerRepository.findByIds(newManufacturerIds);
-
+            if (!newRelations.isEmpty()) {
+                cmRepository.saveAll(newRelations);
+            }
         }
 
-        Category savedCategory = categoryRepository.save(category);
-
-
         CategoryResponse categoryResponse = new CategoryResponse(
-                savedCategory,
-                subCategoryResponse,
-                manufacturerResponse
+                category,
+                subcategories,
+                manufacturers
         );
 
-        return new BasicMessageResponse<>(200, "Cập nhật danh mục thành công!", categoryResponse);
+        return new BasicMessageResponse<>(200, ConstantCategory.success_update, categoryResponse);
 
     }
 
@@ -248,49 +266,48 @@ public class CategoryServiceImp implements CategoryService {
 
         List<CategoryResponse> categories = categoryRepository.fetchAll_ADMIN();
 
+        if (categories.isEmpty()) {
+            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, categories);
+        }
+
         List<Integer> categoryIds = categories.stream().map(CategoryResponse::getId).toList();
-
         List<CategoryManuDto> manuDtos = cmRepository.findManufacturersByCategoryId_ADMIN(categoryIds);
-
         List<CategorySubDto> subDtos = categorySubCategoryRepository.findSubcategoriesByCategoryId_ADMIN(categoryIds);
 
+        Map<Integer, List<ManuDto>> CateManuMap = manuDtos.stream()
+                .collect(Collectors.groupingBy(CategoryManuDto::getCategoryId, Collectors.mapping(manufacturer -> new ManuDto(manufacturer.getManufacturerId(), manufacturer.getManufacturerName()), Collectors.toList())));
 
-        Map<Integer, List<ManuDto>> CateManuMap = new HashMap<>();
-        Map<Integer, List<SubcateDto>> CateSubMap = new HashMap<>();
+        Map<Integer, List<SubcateDto>> CateSubMap = subDtos.stream()
+                .collect(Collectors.groupingBy(CategorySubDto::getCategoryId, Collectors.mapping(subcategory -> new SubcateDto(subcategory.getSubCategoryId(), subcategory.getSubcategoryName()), Collectors.toList())));
 
-        if (!manuDtos.isEmpty()) {
-            CateManuMap = manuDtos
-                    .stream()
-                    .collect(Collectors.groupingBy(CategoryManuDto::getCategoryId,
-                            Collectors.mapping(
-                                    manu -> new ManuDto(manu.getManufacturerId(), manu.getManufacturerName()), Collectors.toList())));
-        }
+        categories.forEach(category -> {
+            category.setManufacturers(CateManuMap.getOrDefault(category.getId(), Collections.emptyList()));
+            category.setSubcategories(CateSubMap.getOrDefault(category.getId(), Collections.emptyList()));
+        });
 
-        if (!subDtos.isEmpty()) {
-            CateSubMap = subDtos
-                    .stream()
-                    .collect(Collectors.groupingBy(CategorySubDto::getCategoryId,
-                            Collectors.mapping(
-                                    cate -> new SubcateDto(cate.getSubCategoryId(), cate.getSubcategoryName()), Collectors.toList())));
-        }
+        return new BasicMessageResponse<>(200, ConstantCategory.success_fetch_categories, categories);
+    }
 
+    @Override
+    public BasicMessageResponse<CategoryManufacturerIdResponse> deleteRelationByCategoryIdAndManufacturerId(int categoryId, int manufacturerId) {
 
-        for (CategoryResponse category : categories) {
-            if (!CateSubMap.isEmpty()) {
-                List<SubcateDto> subs = CateSubMap.getOrDefault(category.getId(), new ArrayList<>());
-                category.setSubcategories(subs);
-            } else {
-                category.setSubcategories(Collections.emptyList());
-            }
-            if (!CateManuMap.isEmpty()) {
-                List<ManuDto> manus = CateManuMap.getOrDefault(category.getId(), new ArrayList<>());
-                category.setManufacturers(manus);
-            } else {
-                category.setManufacturers(Collections.emptyList());
-            }
-        }
+        CategoryManufacturerIdResponse response = cmRepository.findManufacturerIdWithCategoryId(categoryId, manufacturerId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.manufacturer_relation_does_not_exists));
 
-        return new BasicMessageResponse<>(200, "Lấy danh sách danh mục thành công!", categories);
+        cmRepository.deleteManufacturerByIdAndCategoryById(categoryId, manufacturerId);
+
+        return new BasicMessageResponse<>(200, ConstantCategory.success_delete_manufacturer_relation, response);
+    }
+
+    @Override
+    public BasicMessageResponse<CategorySubcategoryIdResponse> deleteRelationBySubcategoryByCategoryId(int categoryId, int subcategoryId) {
+
+        CategorySubcategoryIdResponse response = categorySubCategoryRepository.findSubcategoryIdWithCategoryId(categoryId, subcategoryId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.subcategory_relation_does_not_exists));
+
+        categorySubCategoryRepository.deleteSubcategoryByCategoryById(categoryId, subcategoryId);
+
+        return new BasicMessageResponse<>(200, ConstantCategory.success_delete_subcategory_relation, response);
     }
 
     @Override

@@ -14,19 +14,21 @@ import java.util.List;
 @MappedSuperclass
 public class ProductCreateRequest {
 
-    @Size(max = 35, message = "Độ dài tối đa 35 ký tự")
-    @NotBlank(message = "Tên danh mục không thể trống")
-    private String categoryName;
+    @NotNull(message = "Vui lòng chọn danh mục")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
+    private int categoryId;
 
-    @Size(max = 50, message = "Độ dài tối đa 50 ký tự")
-    @NotBlank(message = "Tên nhà sản xuất không thể trống")
-    private String manufacturerName;
+    @NotNull(message = "Vui lòng chọn nhà sản xuất")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
+    private int manufacturerId;
 
     private List<Integer> tags;
 
+    private List<Integer> subcategories;
+
     @NotBlank(message = "Tên sản phẩm không thể trống")
     @Size(min = 5, max = 300, message = "Độ dài ít nhất từ 5 đến 300 ký tự")
-    private String productName;
+    private String name;
 
     @NotNull(message = "Tình trạng không thể trống")
     private String conditions;
@@ -42,11 +44,13 @@ public class ProductCreateRequest {
     @Size(max = 50, message = "Độ dài không vượt quá 50 ký tự")
     private String dimension;
 
+    @NotNull(message = "Giá không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     @DecimalMax(value = "100000000.0", message = "Giá tối đa là 100.000.000VND")
     @DecimalMin(value = "0.0", message = "Giá thấp nhất là 0VND")
     private double price;
 
+    @NotNull(message = "Giảm giá không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     private int discountPercent;
 
@@ -55,6 +59,7 @@ public class ProductCreateRequest {
 
     private boolean inStock;
 
+    @NotNull(message = "Số lượng không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     private int quantity;
 
@@ -64,6 +69,14 @@ public class ProductCreateRequest {
     private String description;
 
     private List<String> images;
+
+    public List<Integer> getSubcategories() {
+        return subcategories != null ? subcategories : Collections.emptyList();
+    }
+
+    public void setSubcategories(List<Integer> subcategories) {
+        this.subcategories = subcategories;
+    }
 
     public int getQuantity() {
         return quantity;
@@ -89,28 +102,28 @@ public class ProductCreateRequest {
         this.inStock = inStock;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public String getManufacturerName() {
-        return manufacturerName;
+    public int getManufacturerId() {
+        return manufacturerId;
     }
 
-    public void setManufacturerName(String manufacturerName) {
-        this.manufacturerName = manufacturerName;
+    public void setManufacturerId(int manufacturerId) {
+        this.manufacturerId = manufacturerId;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getName() {
+        return name;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getConditions() {

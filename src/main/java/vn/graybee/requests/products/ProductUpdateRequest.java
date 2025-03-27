@@ -12,19 +12,15 @@ import java.util.List;
 
 public class ProductUpdateRequest {
 
-    @Size(max = 35, message = "Độ dài tối đa 35 ký tự")
-    @NotBlank(message = "Tên danh mục không thể trống")
-    private String categoryName;
-
-    @Size(max = 50, message = "Độ dài tối đa 50 ký tự")
-    @NotBlank(message = "Tên nhà sản xuất không thể trống")
-    private String manufacturerName;
-
-    private List<String> tags;
+    private List<Integer> tags;
 
     @NotBlank(message = "Tên sản phẩm không thể trống")
     @Size(min = 5, max = 300, message = "Độ dài ít nhất từ 5 đến 300 ký tự")
-    private String productName;
+    private String name;
+
+    @NotNull(message = "Chọn nhà sản xuất")
+    @PositiveOrZero(message = "Vui lòng nhập số dương")
+    private int manufacturerId;
 
     @NotNull(message = "Tình trạng không thể trống")
     private String conditions;
@@ -40,11 +36,13 @@ public class ProductUpdateRequest {
     @Size(max = 50, message = "Độ dài không vượt quá 50 ký tự")
     private String dimension;
 
+    @NotNull(message = "Giá không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     @DecimalMax(value = "100000000.0", message = "Giá tối đa là 100.000.000VND")
     @DecimalMin(value = "0.0", message = "Giá thấp nhất là 0VND")
     private double price;
 
+    @NotNull(message = "Giảm giá không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     private int discountPercent;
 
@@ -53,46 +51,40 @@ public class ProductUpdateRequest {
 
     private boolean inStock;
 
+    @NotNull(message = "Số lượng không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     private int quantity;
 
-    @Size(max = 30, message = "Độ dài tối đa 35 ký tự")
+    @NotBlank(message = "Vui lòng chọn trạng thái sản phẩm")
+    @Size(max = 30, message = "Độ dài tối đa 30 ký tự")
     private String status;
 
     private String description;
 
     private List<String> images;
 
-    public String getCategoryName() {
-        return categoryName;
+    public int getManufacturerId() {
+        return manufacturerId;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setManufacturerId(int manufacturerId) {
+        this.manufacturerId = manufacturerId;
     }
 
-    public String getManufacturerName() {
-        return manufacturerName;
-    }
-
-    public void setManufacturerName(String manufacturerName) {
-        this.manufacturerName = manufacturerName;
-    }
-
-    public List<String> getTags() {
+    public List<Integer> getTags() {
         return tags != null ? tags : Collections.emptyList();
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(List<Integer> tags) {
         this.tags = tags;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getName() {
+        return name;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getConditions() {

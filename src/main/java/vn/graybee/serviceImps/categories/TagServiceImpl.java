@@ -1,18 +1,18 @@
 package vn.graybee.serviceImps.categories;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.ConstantCategory;
+import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.constants.ConstantTag;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.models.categories.Tag;
+import vn.graybee.models.directories.Tag;
 import vn.graybee.projections.admin.category.TagProjection;
 import vn.graybee.repositories.categories.TagRepository;
-import vn.graybee.requests.directories.TagCreateRequest;
-import vn.graybee.requests.directories.TagUpdateRequest;
+import vn.graybee.requests.directories.TagRequest;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.services.categories.TagServices;
 import vn.graybee.utils.TextUtils;
-import vn.graybee.validation.TagValidation;
 
 import java.util.List;
 
@@ -21,60 +21,73 @@ public class TagServiceImpl implements TagServices {
 
     private final TagRepository tagRepository;
 
-    private final TagValidation tagValidation;
-
-    public TagServiceImpl(TagRepository tagRepository, TagValidation tagValidation) {
+    public TagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
-        this.tagValidation = tagValidation;
     }
 
     @Override
     public BasicMessageResponse<List<TagProjection>> fetchAll() {
         List<TagProjection> tags = tagRepository.fetchAll();
 
-        return new BasicMessageResponse<>(200, "Lấy danh sách thẻ phân loại thành công!", tags);
+        if (tags.isEmpty()) {
+            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, tags);
+        }
+        return new BasicMessageResponse<>(200, ConstantTag.success_fetch_tags, tags);
     }
 
     @Override
-    public BasicMessageResponse<TagResponse> create(TagCreateRequest request) {
-        tagValidation.validateNameExists(request.getTagName());
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<TagResponse> create(TagRequest request) {
 
-        Tag tag = new Tag(TextUtils.capitalize(request.getTagName()));
+        if (tagRepository.validateName(request.getName()).isPresent()) {
+            throw new BusinessCustomException(ConstantTag.name, ConstantTag.name_exists);
+        }
 
+        Tag tag = new Tag();
+        tag.setName(TextUtils.capitalize(request.getName()));
         Tag savedTag = tagRepository.save(tag);
 
-        TagResponse response = new TagResponse(savedTag);
+        TagResponse response = new TagResponse(savedTag.getId(), savedTag.getName());
 
-        return new BasicMessageResponse<>(201, "Tạo thẻ phân loại thành công!", response);
+        return new BasicMessageResponse<>(201, ConstantTag.success_create, response);
     }
 
     @Override
-    public BasicMessageResponse<TagResponse> update(int id, TagUpdateRequest request) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<TagResponse> update(int id, TagRequest request) {
+
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.TAG_DOES_NOT_EXIST));
-        tag.setTagName(request.getTagName());
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantTag.does_not_exists));
 
-        Tag saved = tagRepository.save(tag);
+        if (!tag.getName().equals(request.getName()) && tagRepository.existsByNameAndNotId(request.getName(), tag.getId())) {
+            throw new BusinessCustomException(ConstantTag.name, ConstantTag.name_exists);
+        }
 
-        TagResponse response = new TagResponse(saved);
+        tag.setName(request.getName());
 
-        return new BasicMessageResponse<>(200, "Cập nhật thẻ phân loại thành công!", response);
+        tag = tagRepository.save(tag);
+
+        TagResponse response = new TagResponse(tag.getId(), tag.getName());
+
+        return new BasicMessageResponse<>(200, ConstantTag.success_update, response);
     }
 
     @Override
     public BasicMessageResponse<TagResponse> getById(int id) {
         TagResponse response = tagRepository.getById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.TAG_DOES_NOT_EXIST));
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantTag.does_not_exists));
 
-        return new BasicMessageResponse<>(200, "Tìm thẻ phân loại thành công!", response);
+        return new BasicMessageResponse<>(200, ConstantTag.success_find_by_id, response);
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> delete(int id) {
-        int tagId = tagValidation.checkExistsById(id);
+        int tagId = tagRepository.checkExistById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantTag.does_not_exists));
 
         tagRepository.delete(tagId);
-        return new BasicMessageResponse<>(200, "Xoá thẻ phân loại thành công!", tagId);
+        return new BasicMessageResponse<>(200, ConstantTag.success_delete, tagId);
     }
 
 }

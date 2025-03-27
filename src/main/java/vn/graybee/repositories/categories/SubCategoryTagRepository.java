@@ -5,8 +5,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.models.categories.SubCategoryTag;
+import vn.graybee.models.directories.SubCategoryTag;
 import vn.graybee.response.admin.directories.subcate.SubcategoryTagIdResponse;
+import vn.graybee.response.admin.directories.subcate.SubcategoryTagResponse;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
 import java.util.List;
@@ -27,10 +28,16 @@ public interface SubCategoryTagRepository extends JpaRepository<SubCategoryTag, 
     @Query("SELECT st.tagId FROM SubCategoryTag st WHERE st.subcategoryId = :subcategoryId")
     List<Integer> findTagIdsBySubcategoryId(@Param("subcategoryId") int subcategoryId);
 
-    @Query("Select new vn.graybee.response.admin.directories.tag.TagResponse(t) from SubCategoryTag st join Tag t on st.tagId = t.id where st.subcategoryId = :subcategoryId ORDER BY t.id ASC")
-    List<TagResponse> findBySubCategoryId(@Param("subcategoryId") int subcategoryId);
+    @Query("Select new vn.graybee.response.admin.directories.tag.TagResponse(t.id, t.name) from SubCategoryTag st join Tag t on st.tagId = t.id where st.subcategoryId = :subcategoryId ORDER BY t.id ASC")
+    List<TagResponse> findTagsBySubCategoryId(@Param("subcategoryId") int subcategoryId);
 
     @Query("Select new vn.graybee.response.admin.directories.subcate.SubcategoryTagIdResponse(st.subcategoryId, st.tagId) from SubCategoryTag st where st.subcategoryId = :subcategoryId and st.tagId = :tagId ")
     Optional<SubcategoryTagIdResponse> findRelationsBySubcategoryIdAndTagId(@Param("subcategoryId") int subcategoryId, @Param("tagId") int tagId);
+
+    @Query("SELECT new vn.graybee.response.admin.directories.subcate.SubcategoryTagResponse(st.subcategoryId, t.id, t.name) " +
+            "FROM SubCategoryTag st " +
+            "INNER JOIN Tag t ON st.tagId = t.id " +
+            "WHERE st.subcategoryId IN :subcategoryIds")
+    List<SubcategoryTagResponse> findTagsBySubcategoryIds(@Param("subcategoryIds") List<Integer> subcategoryIds);
 
 }

@@ -2,7 +2,7 @@ package vn.graybee.services.others;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
-import vn.graybee.models.others.RegexPattern;
+import vn.graybee.models.RegexPattern;
 import vn.graybee.repositories.others.RegexPatternRepository;
 
 import java.util.Map;
@@ -23,21 +23,21 @@ public class RegexServices {
     public void loadRegex() {
         regexCache = regexRepository.findAll()
                 .stream()
-                .collect(Collectors.toMap(RegexPattern::getTypeName, RegexPattern::getPattern));
+                .collect(Collectors.toMap(RegexPattern::getName, RegexPattern::getPattern));
     }
 
-    public String getRegex(String type) {
-        return regexCache.get(type);
+    public String getRegex(String name) {
+        return regexCache.get(name);
     }
 
-    public void updateRegex(String type, String newPattern) {
-        RegexPattern regexPattern = regexRepository.findByTypeName(type)
-                .orElse(new RegexPattern(type, newPattern));
+    public void updateRegex(String name, String newPattern) {
+        RegexPattern regexPattern = regexRepository.findByName(name)
+                .orElse(new RegexPattern(name, newPattern));
 
         regexPattern.setPattern(newPattern);
         regexRepository.save(regexPattern);
 
-        regexCache.put(type, newPattern);
+        regexCache.put(name, newPattern);
     }
 
 }

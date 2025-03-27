@@ -4,22 +4,21 @@ import vn.graybee.models.products.Product;
 import vn.graybee.response.BaseResponse;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class ProductDto extends BaseResponse {
 
     private long id;
 
-    private String categoryName;
+    private int categoryId;
 
-    private String manufacturerName;
+    private int manufacturerId;
 
     private List<TagResponse> tags;
 
-    private String productCode;
+    private String code;
 
-    private String productName;
+    private String name;
 
     private int warranty;
 
@@ -37,6 +36,8 @@ public class ProductDto extends BaseResponse {
 
     private String thumbnail;
 
+    private List<String> images;
+
     private String conditions;
 
     private String description;
@@ -47,13 +48,13 @@ public class ProductDto extends BaseResponse {
 
     private String status;
 
-    public ProductDto(LocalDateTime createdAt, LocalDateTime updatedAt, Product product, String categoryName, String manufacturerName, List<TagResponse> tags, int quantity, String description) {
-        super(createdAt, updatedAt);
+    public ProductDto(Product product, int categoryId, int manufacturerId, List<TagResponse> tags, List<String> images, int quantity, String description) {
+        super(product.getCreatedAt(), product.getUpdatedAt());
         this.id = product.getId();
-        this.productCode = product.getProductCode();
-        this.productName = product.getProductName();
-        this.categoryName = categoryName;
-        this.manufacturerName = manufacturerName;
+        this.code = product.getCode();
+        this.name = product.getName();
+        this.categoryId = categoryId;
+        this.manufacturerId = manufacturerId;
         this.tags = tags;
         this.warranty = product.getWarranty();
         this.weight = product.getWeight();
@@ -62,12 +63,21 @@ public class ProductDto extends BaseResponse {
         this.discountPercent = product.getDiscountPercent();
         this.finalPrice = product.getFinalPrice();
         this.color = product.getColor();
+        this.images = images;
         this.thumbnail = product.getThumbnail();
         this.conditions = product.getConditions();
         this.inStock = product.isStock();
         this.quantity = quantity;
         this.description = description;
         this.status = product.getStatus();
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public long getId() {
@@ -78,20 +88,20 @@ public class ProductDto extends BaseResponse {
         this.id = id;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public int getManufacturerId() {
+        return manufacturerId;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setManufacturerId(int manufacturerId) {
+        this.manufacturerId = manufacturerId;
     }
 
-    public String getManufacturerName() {
-        return manufacturerName;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setManufacturerName(String manufacturerName) {
-        this.manufacturerName = manufacturerName;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public List<TagResponse> getTags() {
@@ -102,20 +112,20 @@ public class ProductDto extends BaseResponse {
         this.tags = tags;
     }
 
-    public String getProductCode() {
-        return productCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getName() {
+        return name;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getWarranty() {

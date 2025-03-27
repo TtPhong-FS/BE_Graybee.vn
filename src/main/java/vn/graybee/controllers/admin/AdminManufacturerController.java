@@ -33,17 +33,6 @@ public class AdminManufacturerController {
         this.manufacturerService = manufacturerService;
     }
 
-    @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<ManufacturerProjection>>> getAllManufacturers() {
-        BasicMessageResponse<List<ManufacturerProjection>> manufacturers = manufacturerService.getAllManufacturer();
-        return ResponseEntity.ok(manufacturers);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> getById(@PathVariable("id") int id) {
-        return ResponseEntity.ok(manufacturerService.getById(id));
-    }
-
     @PostMapping
     public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> create(@RequestBody @Valid ManufacturerCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -55,21 +44,26 @@ public class AdminManufacturerController {
         return ResponseEntity.ok(manufacturerService.update(id, request));
     }
 
-    @PostMapping("/add-list")
-    public ResponseEntity<BasicMessageResponse<List<ManufacturerResponse>>> createManufacturers(@RequestBody @Valid List<ManufacturerCreateRequest> request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                manufacturerService.createManufacturers(request));
-    }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<BasicMessageResponse<Integer>> deleteManufacturerById(@RequestParam("id") int id) {
-        return ResponseEntity.ok(manufacturerService.deleteById(id));
+    public ResponseEntity<BasicMessageResponse<Integer>> delete(@RequestParam("id") int id) {
+        return ResponseEntity.ok(manufacturerService.delete(id));
     }
 
-//    @PutMapping("/update-manufacturer")
-//    public ResponseEntity<MessageResponse> updateStatusDeleteRecord(@RequestParam("id") long id) {
-//        manufacturerService.updateStatusDeleteRecord(id);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("200", "Update status delete for Manufacturer with id = " + id + " successful", null));
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> getById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(manufacturerService.getById(id));
+    }
 
+    @GetMapping
+    public ResponseEntity<BasicMessageResponse<List<ManufacturerProjection>>> getAllManufacturers() {
+        BasicMessageResponse<List<ManufacturerProjection>> manufacturers = manufacturerService.getAllManufacturer();
+        return ResponseEntity.ok(manufacturers);
+    }
+
+//    @PostMapping("/add-list")
+//    public ResponseEntity<BasicMessageResponse<List<ManufacturerResponse>>> createManufacturers(@RequestBody @Valid List<ManufacturerCreateRequest> request) {
+//        return ResponseEntity.status(HttpStatus.CREATED).body(
+//                manufacturerService.createManufacturers(request));
+//    }
 }

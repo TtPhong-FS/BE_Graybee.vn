@@ -1,6 +1,6 @@
 package vn.graybee.response.admin.directories.category;
 
-import vn.graybee.models.categories.Category;
+import vn.graybee.models.directories.Category;
 import vn.graybee.response.BaseResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManuDto;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
@@ -12,7 +12,7 @@ public class CategoryResponse extends BaseResponse {
 
     private int id;
 
-    private String categoryName;
+    private String name;
 
     private List<SubcateDto> subcategories;
 
@@ -29,7 +29,7 @@ public class CategoryResponse extends BaseResponse {
     public CategoryResponse(Category category, List<SubcateDto> subcategories, List<ManuDto> manufacturers) {
         super(category.getCreatedAt(), category.getUpdatedAt());
         this.id = category.getId();
-        this.categoryName = category.getCategoryName();
+        this.name = category.getName();
         this.status = category.getStatus();
         this.productCount = category.getProductCount();
         this.subcategories = subcategories;
@@ -60,12 +60,12 @@ public class CategoryResponse extends BaseResponse {
         this.id = id;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getName() {
+        return name;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getStatus() {

@@ -1,19 +1,17 @@
 package vn.graybee.response.admin.directories.tag;
 
-import vn.graybee.models.categories.Tag;
-
 public class TagResponse {
 
     private int id;
 
-    private String tagName;
+    private String name;
 
     public TagResponse() {
     }
 
-    public TagResponse(Tag tag) {
-        this.id = tag.getId();
-        this.tagName = tag.getTagName();
+    public TagResponse(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public int getId() {
@@ -24,12 +22,12 @@ public class TagResponse {
         this.id = id;
     }
 
-    public String getTagName() {
-        return tagName;
+    public String getName() {
+        return name;
     }
 
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

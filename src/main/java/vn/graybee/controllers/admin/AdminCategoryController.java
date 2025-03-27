@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.admin.category.SubCategorySummaryProject;
 import vn.graybee.requests.directories.CategoryCreateRequest;
 import vn.graybee.requests.directories.CategoryUpdateRequest;
+import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
 import vn.graybee.response.admin.directories.category.CategoryResponse;
+import vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse;
 import vn.graybee.services.categories.CategoryService;
-import vn.graybee.services.categories.SubCategoryServices;
 
 import java.util.List;
 
@@ -30,11 +30,8 @@ public class AdminCategoryController {
 
     private final CategoryService categoryService;
 
-    private final SubCategoryServices subCategoryServices;
-
-    public AdminCategoryController(CategoryService categoryService, SubCategoryServices subCategoryServices) {
+    public AdminCategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
-        this.subCategoryServices = subCategoryServices;
     }
 
     @GetMapping
@@ -43,37 +40,33 @@ public class AdminCategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<CategoryResponse>> getCategoryById(@PathVariable("id") int id) {
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> getById(@PathVariable("id") int id) {
         return ResponseEntity.ok(categoryService.findById(id));
     }
 
-    //
-//    @GetMapping("/category")
-//    public ResponseEntity<MessageResponse> findProductsByName(@RequestParam("name") String name) {
-//        List<ProductResponseByCategoryName> products = productService.findProductsByCategoryName(name);
-//        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(
-//                "200", "Products by category name: ", products
-//        ));
-//    }
-//
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<CategoryResponse>> createCategory(@RequestBody @Valid CategoryCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(request));
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> create(@RequestBody @Valid CategoryCreateRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<BasicMessageResponse<Integer>> deleteCategoryById(@RequestParam("id") int id) {
-        return ResponseEntity.ok(categoryService.deleteCategoryById(id));
+    public ResponseEntity<BasicMessageResponse<Integer>> delete(@RequestParam("id") int id) {
+        return ResponseEntity.ok(categoryService.delete(id));
+    }
+
+    @DeleteMapping("/manufacturers/delete")
+    public ResponseEntity<BasicMessageResponse<CategoryManufacturerIdResponse>> deleteRelationManufacturer(@RequestParam("categoryId") int categoryId, @RequestParam("manufacturerId") int manufacturerId) {
+        return ResponseEntity.ok(categoryService.deleteRelationByCategoryIdAndManufacturerId(categoryId, manufacturerId));
+    }
+
+    @DeleteMapping("/subcategories/delete")
+    public ResponseEntity<BasicMessageResponse<CategorySubcategoryIdResponse>> deleteRelationSubcategory(@RequestParam("categoryId") int categoryId, @RequestParam("subcategoryId") int subcategoryId) {
+        return ResponseEntity.ok(categoryService.deleteRelationBySubcategoryByCategoryId(categoryId, subcategoryId));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<CategoryResponse>> updateCategory(@RequestParam("id") int id, @RequestBody @Valid CategoryUpdateRequest request) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, request));
-    }
-
-    @GetMapping("/{id}/subcategories")
-    public ResponseEntity<BasicMessageResponse<List<SubCategorySummaryProject>>> fetchSubCategoryByCategoryId(@PathVariable int id) {
-        return ResponseEntity.status(HttpStatus.OK).body(subCategoryServices.findByCategoryId(id));
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> update(@RequestParam("id") int id, @RequestBody @Valid CategoryUpdateRequest request) {
+        return ResponseEntity.ok(categoryService.update(id, request));
     }
 
 }

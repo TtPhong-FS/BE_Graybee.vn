@@ -1,19 +1,22 @@
 package vn.graybee.serviceImps.categories;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.constants.ConstantCategory;
+import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.constants.ConstantManufacturer;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.models.categories.Manufacturer;
+import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.projections.admin.category.ManufacturerProjection;
 import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.requests.directories.ManufacturerCreateRequest;
 import vn.graybee.requests.directories.ManufacturerUpdateRequest;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerProductCountResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
 import vn.graybee.utils.TextUtils;
-import vn.graybee.validation.ManufactureValidation;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,96 +24,90 @@ public class ManufacturerServiceImp implements ManufacturerService {
 
     private final ManufacturerRepository manufacturerRepository;
 
-    private final ManufactureValidation manufactureValidation;
-
-    public ManufacturerServiceImp(ManufacturerRepository manufacturerRepository, ManufactureValidation manufactureValidation) {
+    public ManufacturerServiceImp(ManufacturerRepository manufacturerRepository) {
         this.manufacturerRepository = manufacturerRepository;
-        this.manufactureValidation = manufactureValidation;
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<ManufacturerResponse> create(ManufacturerCreateRequest request) {
-        manufactureValidation.checkExistByName(request.getManufacturerName());
 
-        Manufacturer manufacturer = new Manufacturer(TextUtils.capitalize(request.getManufacturerName())
-        );
+        if (manufacturerRepository.validateName(request.getName()).isPresent()) {
+            throw new BusinessCustomException(ConstantManufacturer.name, ConstantManufacturer.name_exists);
+        }
+
+        Manufacturer manufacturer = new Manufacturer();
+        manufacturer.setName(TextUtils.capitalize(request.getName()));
         manufacturer.setStatus("ACTIVE");
-        Manufacturer savedManufacturer = manufacturerRepository.save(manufacturer);
+
+        manufacturer = manufacturerRepository.save(manufacturer);
 
         ManufacturerResponse manufacturerResponse = new ManufacturerResponse(
-                savedManufacturer);
+                manufacturer);
 
-        return new BasicMessageResponse<>(201, "Tạo nhà sản xuất thành công!", manufacturerResponse);
+        return new BasicMessageResponse<>(201, ConstantManufacturer.success_create, manufacturerResponse);
 
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<ManufacturerResponse> update(int id, ManufacturerUpdateRequest request) {
+
         Manufacturer manufacturer = manufacturerRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.MANUFACTURER_DOES_NOT_EXIST));
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
 
-        if (manufacturer.getProductCount() > 0) {
-            throw new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.MANUFACTURER_ID_USED_IN_PRODUCT);
+        if (!manufacturer.getName().equals(request.getName()) && manufacturerRepository.existsByNameAndNotId(request.getName(), manufacturer.getId())) {
+            throw new BusinessCustomException(ConstantManufacturer.name, ConstantManufacturer.name_exists);
         }
 
-        manufacturer.setManufacturerName(request.getManufacturerName());
+        if (manufacturer.getProductCount() == 0) {
+            manufacturer.setName(request.getName());
+        }
+
         manufacturer.setStatus(request.getStatus().name());
+        manufacturer.setUpdatedAt(LocalDateTime.now());
 
-        Manufacturer saved = manufacturerRepository.save(manufacturer);
+        manufacturer = manufacturerRepository.save(manufacturer);
 
-        ManufacturerResponse response = new ManufacturerResponse(saved);
+        ManufacturerResponse response = new ManufacturerResponse(manufacturer);
 
-        return new BasicMessageResponse<>(200, "Cập nhật danh mục thành công!", response);
-    }
-
-    @Override
-    public BasicMessageResponse<List<ManufacturerResponse>> createManufacturers(List<ManufacturerCreateRequest> request) {
-
-        if (request == null || request.isEmpty()) {
-            throw new BusinessCustomException(ConstantCategory.MANUFACTURER_NAMES, ConstantCategory.LIST_MANUFACTURER_NAME_CANNOT_BE_EMPTY);
-        }
-
-        List<Manufacturer> manufacturers = request.stream()
-                .map(req -> new Manufacturer(req.getManufacturerName())).toList();
-
-        List<Manufacturer> savedManufacturer = manufacturerRepository.saveAll(manufacturers);
-
-        List<ManufacturerResponse> responses = savedManufacturer
-                .stream()
-                .map(ManufacturerResponse::new).toList();
-
-        return new BasicMessageResponse<>(201, "Tạo nhiều nhà sản xuất thành công!", responses);
+        return new BasicMessageResponse<>(200, ConstantManufacturer.success_update, response);
     }
 
     @Override
     public BasicMessageResponse<ManufacturerResponse> getById(int id) {
         ManufacturerResponse response = manufacturerRepository.getById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.GENERAL_ERROR, ConstantCategory.MANUFACTURER_DOES_NOT_EXIST));
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
 
-        return new BasicMessageResponse<>(200, "Tìm danh mục thành công!", response);
+        return new BasicMessageResponse<>(200, ConstantManufacturer.success_find_by_id, response);
     }
 
     @Override
     public BasicMessageResponse<List<ManufacturerProjection>> getAllManufacturer() {
-        List<ManufacturerProjection> manufacturerProjectionList = manufacturerRepository.fetchAll();
+        List<ManufacturerProjection> manufacturers = manufacturerRepository.fetchAll();
 
-        return new BasicMessageResponse<>(200, "List manufacturer: ", manufacturerProjectionList);
+        if (manufacturers.isEmpty()) {
+            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, manufacturers);
+        }
+
+        return new BasicMessageResponse<>(200, ConstantManufacturer.success_fetch_manufacturers, manufacturers);
 
     }
 
     @Override
-    public BasicMessageResponse<Integer> deleteById(int id) {
-        manufactureValidation.countProductById(id);
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<Integer> delete(int id) {
+
+        ManufacturerProductCountResponse manufacturer = manufacturerRepository.checkExistsByIdAndGetProductCount(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
+
+        if (manufacturer.getProductCount() > 0) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.products_in_use);
+        }
 
         manufacturerRepository.deleteById(id);
-        return new BasicMessageResponse<>(200, "Nhà sản xuất đã được xoá thành công!", id);
-    }
 
-    @Override
-    public void updateStatusDeleteRecord(int id) {
-        Manufacturer manufacturer = manufactureValidation.findToUpdateStatusDelete(id);
-
-        manufacturerRepository.save(manufacturer);
+        return new BasicMessageResponse<>(200, ConstantManufacturer.success_delete, manufacturer.getId());
     }
 
 }

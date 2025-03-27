@@ -11,7 +11,7 @@ public class CategoryUpdateRequest {
 
     @NotBlank(message = "Không được để trống")
     @Size(max = 35, message = "Độ dài không được vượt quá 35 ký tự")
-    private String categoryName;
+    private String name;
 
     private CategoryStatus status;
 
@@ -35,12 +35,12 @@ public class CategoryUpdateRequest {
         this.manufacturers = manufacturers;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getName() {
+        return name;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public CategoryStatus getStatus() {

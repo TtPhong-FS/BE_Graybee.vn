@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.models.categories.CategoryManufacturer;
+import vn.graybee.models.directories.CategoryManufacturer;
 import vn.graybee.response.admin.directories.category.CategoryManuDto;
 import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManuDto;
@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategoryManufacturerRepository extends JpaRepository<CategoryManufacturer, Integer> {
-    
-    @Query("SELECT new vn.graybee.response.admin.directories.category.CategoryManuDto(cm.categoryId, m.id,  m.manufacturerName) " +
+
+    @Query("SELECT new vn.graybee.response.admin.directories.category.CategoryManuDto(cm.categoryId, m.id,  m.name) " +
             "FROM CategoryManufacturer cm " +
             "INNER JOIN Manufacturer m ON cm.manufacturerId = m.id " +
             "WHERE cm.categoryId IN :categoryIds")
     List<CategoryManuDto> findManufacturersByCategoryId_ADMIN(@Param("categoryIds") List<Integer> categoryIds);
 
-    @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManuDto(m.id, m.manufacturerName) from CategoryManufacturer cm join Manufacturer m on cm.manufacturerId = m.id where cm.categoryId = :categoryId order by m.id asc")
+    @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManuDto(m.id, m.name) from CategoryManufacturer cm join Manufacturer m on cm.manufacturerId = m.id where cm.categoryId = :categoryId order by m.id asc")
     List<ManuDto> findByCategoryId(@Param("categoryId") int categoryId);
 
     @Transactional
@@ -41,14 +41,5 @@ public interface CategoryManufacturerRepository extends JpaRepository<CategoryMa
 
     @Query("SELECT cm.manufacturerId FROM CategoryManufacturer cm WHERE cm.categoryId = :categoryId AND cm.manufacturerId IN :manufacturerIds")
     List<Integer> findExistingManufacturerIds(@Param("categoryId") Integer categoryId, @Param("manufacturerIds") List<Integer> manufacturerIds);
-
-    @Query("""
-                SELECT c.id, c.categoryName, m.id, m.manufacturerName
-                FROM CategoryManufacturer cm
-                JOIN Category c ON cm.categoryId = c.id
-                JOIN Manufacturer m ON cm.manufacturerId = m.id
-            """)
-    List<Object[]> fetchCategoryWithManufacturersRaw();
-
 
 }
