@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import vn.graybee.models.BaseModel;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "products")
 public class Product extends BaseModel {
@@ -39,12 +41,12 @@ public class Product extends BaseModel {
     @Column(name = "dimension", length = 50)
     private String dimension;
 
-    private double price;
+    private BigDecimal price;
 
     @Column(name = "discount_percent")
     private int discountPercent;
 
-    private double finalPrice;
+    private BigDecimal finalPrice;
 
     @Column(length = 35)
     private String color;
@@ -150,11 +152,11 @@ public class Product extends BaseModel {
         this.dimension = dimension;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -166,11 +168,11 @@ public class Product extends BaseModel {
         this.discountPercent = discountPercent;
     }
 
-    public double getFinalPrice() {
+    public BigDecimal getFinalPrice() {
         return finalPrice;
     }
 
-    public void setFinalPrice(double finalPrice) {
+    public void setFinalPrice(BigDecimal finalPrice) {
         this.finalPrice = finalPrice;
     }
 

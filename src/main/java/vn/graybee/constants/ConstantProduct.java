@@ -19,7 +19,16 @@ public class ConstantProduct {
     public static final String does_not_exists_in_inventory = "Không thể thực hiện vì sản phẩm chưa được thêm vào kho";
 
     //    Response
+
+    public static final String view_detail_of_name = "Bạn đang xem chi tiết sản phẩm ";
+
+    public static final String no_comment = "Sản phẩm hiện tại chưa có nhận xét nào";
+
+    public static final String success_get_comment = "Lấy thành công nhận xét của sản phẩm";
+
     public static final String success_create = "Tạo sản phẩm thành công";
+
+    public static final String success_update_relation = "Cập nhật quan hệ sản phẩm thành công";
 
     public static final String success_update = "Cập nhật sản phẩm thành công";
 

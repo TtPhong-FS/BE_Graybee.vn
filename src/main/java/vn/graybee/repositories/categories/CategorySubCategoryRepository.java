@@ -18,7 +18,7 @@ public interface CategorySubCategoryRepository extends JpaRepository<CategorySub
     @Query("SELECT new vn.graybee.response.admin.directories.category.CategorySubDto(cs.categoryId, s.id,  s.name) " +
             "FROM CategorySubCategory cs " +
             "INNER JOIN SubCategory s ON cs.subCategoryId = s.id " +
-            "WHERE cs.categoryId IN :categoryIds")
+            "WHERE cs.categoryId IN :categoryIds ORDER BY cs.categoryId")
     List<CategorySubDto> findSubcategoriesByCategoryId_ADMIN(@Param("categoryIds") List<Integer> categoryIds);
 
     @Transactional

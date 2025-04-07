@@ -12,4 +12,7 @@ public interface ProductDescriptionRepository extends JpaRepository<ProductDescr
     @Query("Select pd from ProductDescription pd where pd.productId = :productId ")
     Optional<ProductDescription> findByProductId(@Param("productId") long productId);
 
+    @Query("Select pd.description from ProductDescription pd where pd.productId = :productId ")
+    String getDescriptionByProductId(@Param("productId") long productId);
+
 }

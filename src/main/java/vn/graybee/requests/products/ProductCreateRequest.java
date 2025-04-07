@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class ProductCreateRequest {
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     @DecimalMax(value = "100000000.0", message = "Giá tối đa là 100.000.000VND")
     @DecimalMin(value = "0.0", message = "Giá thấp nhất là 0VND")
-    private double price;
+    private BigDecimal price;
 
     @NotNull(message = "Giảm giá không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
@@ -58,6 +59,8 @@ public class ProductCreateRequest {
     private String color;
 
     private boolean inStock;
+
+    private boolean hasPromotion;
 
     @NotNull(message = "Số lượng không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
@@ -84,6 +87,14 @@ public class ProductCreateRequest {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public boolean isHasPromotion() {
+        return hasPromotion;
+    }
+
+    public void setHasPromotion(boolean hasPromotion) {
+        this.hasPromotion = hasPromotion;
     }
 
     public List<Integer> getTags() {
@@ -158,11 +169,11 @@ public class ProductCreateRequest {
         this.dimension = dimension;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

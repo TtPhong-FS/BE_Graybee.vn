@@ -88,6 +88,7 @@ public class RoleServiceImpl implements RoleService {
         Role role = new Role(request.getName().toUpperCase(), "ACTIVE");
         role.setUserCount(0);
 
+
         role = roleRepository.save(role);
 
         int roleId = role.getId();
@@ -121,7 +122,7 @@ public class RoleServiceImpl implements RoleService {
 
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.role_does_not_exists));
-        
+
         if (!role.getName().equals(request.getName()) && roleRepository.existsByNameNotId(request.getName(), role.getId())) {
             throw new BusinessCustomException(ConstantAuth.name, ConstantAuth.role_name_exists);
         }

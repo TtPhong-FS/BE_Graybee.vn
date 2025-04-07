@@ -9,6 +9,7 @@ import vn.graybee.models.directories.Category;
 import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.response.admin.directories.category.CategoryProductCountResponse;
 import vn.graybee.response.admin.directories.category.CategoryResponse;
+import vn.graybee.response.publics.sidebar.SidebarDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,15 +17,24 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     @Query("Select new vn.graybee.response.admin.directories.category.CategoryResponse(c, null, null) from Category c")
-    List<CategoryResponse> fetchAll_ADMIN();
+    List<CategoryResponse> fetchAll();
+
 
     @Transactional
     @Modifying
     @Query("delete from Category c where c.id = :id")
     void deleteById(@Param("id") int id);
 
+    @Transactional
+    @Modifying
+    @Query("Update Category c set c.status = :status where c.id = :id")
+    void updateStatusById(@Param("id") int id, @Param("status") String status);
+
     @Query("SELECT EXISTS (SELECT 1 FROM Category c WHERE c.name = :name AND c.id <> :id)")
     boolean existsByNameAndNotId(@Param("name") String name, @Param("id") int id);
+
+    @Query("Select c.id from Category c where c.id = :id")
+    Optional<Integer> findIdById(@Param("id") int id);
 
     @Query("Select c.name from Category c where c.id = :categoryId and c.status != 'DELETED'")
     Optional<String> getNameById(@Param("categoryId") int categoryId);
@@ -41,5 +51,8 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     //    public
     @Query("Select c from Category c")
     List<CategoryBasicInfoProjection> findAllCategories_public();
+
+    @Query("Select new vn.graybee.response.publics.sidebar.SidebarDto(c.id, c.name) from Category c")
+    List<SidebarDto> getSidebar();
 
 }

@@ -16,7 +16,7 @@ public class Manufacturer extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, length = 50, unique = true)
+    @Column(nullable = false, length = 35, unique = true)
     private String name;
 
     @Column(length = 30)

@@ -1,6 +1,7 @@
 package vn.graybee.serviceImps.products;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantInventory;
 import vn.graybee.constants.ConstantProduct;
@@ -37,6 +38,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> delete(int id) {
         InventoryQuantityResponse inventory = inventoryRepository.checkExistsById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists_in_inventory));
@@ -51,12 +53,13 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public BasicMessageResponse<InventoryResponse> updateQuantity(int id, int quantity) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<InventoryResponse> updateQuantity(int id, int quantity, String status) {
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists_in_inventory));
 
         inventory.setQuantity(quantity);
-        inventory.setStatus(quantity > 0 ? GeneralStatus.ACTIVE.name() : GeneralStatus.OUT_OF_STOCK.name());
+        inventory.setStatus(quantity > 0 ? status : GeneralStatus.OUT_OF_STOCK.name());
 
         inventory.setUpdatedAt(LocalDateTime.now());
 

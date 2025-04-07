@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import vn.graybee.models.BaseModel;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,22 +19,23 @@ public class Discount extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 200, nullable = false, unique = true)
-    private String name;
-
-    @Column(length = 200, nullable = false, unique = true)
+    @Column(length = 50, nullable = false, unique = true)
     private String code;
 
-    private LocalDateTime issue;
+    @Column(name = "discount_value")
+    private BigDecimal discountValue;
+
+    @Column(name = "discount_type", length = 10)
+    private String discountType;
+
+    @Column(length = 100)
+    private String description;
 
     private LocalDateTime expiration;
 
-    public Discount() {
-    }
+    private String status;
 
-    public Discount(String name, String code) {
-        this.name = name;
-        this.code = code;
+    public Discount() {
     }
 
     public Integer getId() {
@@ -44,14 +46,6 @@ public class Discount extends BaseModel {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getCode() {
         return code;
     }
@@ -60,12 +54,28 @@ public class Discount extends BaseModel {
         this.code = code;
     }
 
-    public LocalDateTime getIssue() {
-        return issue;
+    public BigDecimal getDiscountValue() {
+        return discountValue;
     }
 
-    public void setIssue(LocalDateTime issue) {
-        this.issue = issue;
+    public void setDiscountValue(BigDecimal discountValue) {
+        this.discountValue = discountValue;
+    }
+
+    public String getDiscountType() {
+        return discountType;
+    }
+
+    public void setDiscountType(String discountType) {
+        this.discountType = discountType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getExpiration() {
@@ -74,6 +84,14 @@ public class Discount extends BaseModel {
 
     public void setExpiration(LocalDateTime expiration) {
         this.expiration = expiration;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

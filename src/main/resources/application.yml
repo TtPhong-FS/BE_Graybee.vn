@@ -49,3 +49,7 @@ logging:
 api:
   version: v1
   endpoint: /api/${api.version}
+
+jwt:
+  secretKey: ${SECRET_KEY}
+  expiration: ${EXPIRATION}

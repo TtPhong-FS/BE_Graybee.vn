@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import vn.graybee.models.BaseModel;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
@@ -16,13 +16,22 @@ public class User extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
+
+    @Column(unique = true)
+    private Integer uid;
 
     @Column(name = "role_id", nullable = false)
     private Integer roleId;
 
+    @Column(length = 12)
+    private String username;
+
     @Column(name = "fullname", length = 100)
     private String fullName;
+
+    @Column(length = 50, unique = true)
+    private String email;
 
     @Column(name = "phone_number", length = 12, nullable = false, unique = true)
     private String phoneNumber;
@@ -30,13 +39,13 @@ public class User extends BaseModel {
     @Column(name = "password", length = 200, nullable = false)
     private String password;
 
-    @Column(name = "address", length = 200)
-    private String address;
-
     @Column(name = "date_of_birth")
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(length = 8)
+    private String gender;
+
+    @Column(name = "is_active")
     private boolean isActive;
 
     @Column(length = 30)
@@ -45,18 +54,49 @@ public class User extends BaseModel {
     public User() {
     }
 
-    public User(Integer roleId, String phoneNumber, String password) {
-        this.roleId = roleId;
+    public User(String phoneNumber, String password) {
         this.phoneNumber = phoneNumber;
         this.password = password;
     }
 
-    public Long getId() {
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
     }
 
     public Integer getRoleId() {
@@ -91,19 +131,11 @@ public class User extends BaseModel {
         this.password = password;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

@@ -14,10 +14,12 @@ import vn.graybee.repositories.categories.SubCategoryTagRepository;
 import vn.graybee.repositories.categories.TagRepository;
 import vn.graybee.requests.directories.SubCategoryCreateRequest;
 import vn.graybee.requests.directories.SubCategoryUpdateRequest;
+import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
 import vn.graybee.response.admin.directories.subcate.SubCategoryResponse;
 import vn.graybee.response.admin.directories.subcate.SubcategoryTagIdResponse;
 import vn.graybee.response.admin.directories.subcate.SubcategoryTagResponse;
 import vn.graybee.response.admin.directories.tag.TagResponse;
+import vn.graybee.response.publics.sidebar.SubcategoryDto;
 import vn.graybee.services.categories.SubCategoryServices;
 import vn.graybee.utils.TextUtils;
 
@@ -38,6 +40,7 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
     private final TagRepository tagRepository;
 
     private final SubCategoryTagRepository subCategoryTagRepository;
+
 
     public SubCategoryServiceImpl(SubCategoryRepository subCategoryRepository, TagRepository tagRepository, SubCategoryTagRepository subCategoryTagRepository) {
         this.subCategoryRepository = subCategoryRepository;
@@ -135,6 +138,19 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status) {
+        int subcategory = subCategoryRepository.checkExistsById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantSubcategory.does_not_exists));
+
+        subCategoryRepository.updateStatusById(subcategory, status);
+
+        UpdateStatusResponse response = new UpdateStatusResponse(subcategory, status, LocalDateTime.now());
+
+        return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
+    }
+
+    @Override
     public BasicMessageResponse<SubCategoryResponse> getById(int id) {
         SubCategoryResponse response = subCategoryRepository.getById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantSubcategory.general, ConstantSubcategory.does_not_exists));
@@ -176,6 +192,29 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
         });
 
         return new BasicMessageResponse<>(200, ConstantSubcategory.success_fetch_subcategories, subcategories);
+    }
+
+    @Override
+    public List<SubcategoryDto> getForSidebar() {
+
+        List<SubcategoryDto> subcategories = subCategoryRepository.getAllForSidebar();
+
+        if (subcategories.isEmpty()) {
+            return subcategories;
+        }
+
+
+        List<Integer> subIds = subcategories.stream().map(SubcategoryDto::getId).toList();
+
+        List<SubcategoryTagResponse> subcategoryTagResponses = subCategoryTagRepository.findTagsBySubcategoryIds(subIds);
+        Map<Integer, List<TagResponse>> subcategoryTagMap = subcategoryTagResponses.stream()
+                .collect(Collectors.groupingBy(SubcategoryTagResponse::getId, Collectors.mapping(tag -> new TagResponse(tag.getTagId(), tag.getTagName()), Collectors.toList())));
+
+        subcategories.forEach(subcategory -> {
+            subcategory.setTags(subcategoryTagMap.getOrDefault(subcategory.getId(), Collections.emptyList()));
+        });
+
+        return subcategories;
     }
 
     @Override

@@ -11,6 +11,7 @@ import vn.graybee.response.admin.directories.tag.TagResponse;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface TagRepository extends JpaRepository<Tag, Integer> {
 
@@ -32,7 +33,7 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
     Optional<TagResponse> getById(@Param("id") int id);
 
     @Query("Select t.id from Tag t where t.id IN :ids")
-    List<Integer> findAllByIds(@Param("ids") List<Integer> ids);
+    Set<Integer> findAllByIds(@Param("ids") List<Integer> ids);
 
     @Query("select t.id from Tag t where t.name = :name ")
     Optional<Integer> validateName(@Param("name") String name);

@@ -36,4 +36,9 @@ public interface RolePermissionRepository extends JpaRepository<RolePermission, 
     @Query("SELECT new vn.graybee.response.admin.auth.RolePermissionIdResponse(rp.roleId, rp.permissionId) FROM RolePermission rp WHERE rp.roleId = :roleId and rp.permissionId = :permissionId")
     Optional<RolePermissionIdResponse> findRelationByRoleIdAndPermissionId(@Param("roleId") int roleId, @Param("permissionId") int permissionId);
 
+    @Query("SELECT p.name FROM Permission p " +
+            "JOIN RolePermission rp ON p.id = rp.permissionId " +
+            "WHERE rp.roleId = :roleId")
+    List<String> getPermissionOfRoleByRoleId(@Param("roleId") int roleId);
+
 }

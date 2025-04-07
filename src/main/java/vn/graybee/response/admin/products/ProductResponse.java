@@ -3,6 +3,7 @@ package vn.graybee.response.admin.products;
 import vn.graybee.models.products.Product;
 import vn.graybee.response.BaseResponse;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ProductResponse extends BaseResponse {
@@ -23,11 +24,11 @@ public class ProductResponse extends BaseResponse {
 
     private String dimension;
 
-    private double price;
+    private BigDecimal price;
 
     private int discountPercent;
 
-    private double finalPrice;
+    private BigDecimal finalPrice;
 
     private String color;
 
@@ -114,14 +115,6 @@ public class ProductResponse extends BaseResponse {
         this.discountPercent = discountPercent;
     }
 
-    public double getFinalPrice() {
-        return finalPrice;
-    }
-
-    public void setFinalPrice(double finalPrice) {
-        this.finalPrice = finalPrice;
-    }
-
     public String getCode() {
         return code;
     }
@@ -170,14 +163,6 @@ public class ProductResponse extends BaseResponse {
         this.dimension = dimension;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
     public String getColor() {
         return color;
     }
@@ -201,6 +186,22 @@ public class ProductResponse extends BaseResponse {
 
     public void setConditions(String conditions) {
         this.conditions = conditions;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(BigDecimal finalPrice) {
+        this.finalPrice = finalPrice;
     }
 
 }

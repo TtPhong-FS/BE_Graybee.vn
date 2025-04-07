@@ -25,8 +25,16 @@ public interface ProductSubcategoryRepository extends JpaRepository<ProductSubca
     @Query("delete from ProductSubcategory ps where ps.productId = :productId and ps.subcategoryId = :subcategoryId")
     void deleteByProductIdAndSubcategoryId(@Param("productId") long productId, @Param("subcategoryId") int subcategoryId);
 
+    @Transactional
+    @Modifying
+    @Query("Delete from ProductSubcategory ps where ps.productId = :productId and ps.subcategoryId NOT IN :subcategoryIds")
+    void deleteByProductIdAndSubcategoryIdNotIn(@Param("productId") long productId, @Param("subcategoryIds") List<Integer> subcategoryIds);
+
     @Query("Select new vn.graybee.response.admin.products.ProductSubcategoryIDResponse(ps.productId, ps.subcategoryId) " +
             "from ProductSubcategory ps where ps.productId = :productId and ps.subcategoryId = :subcategoryId")
     Optional<ProductSubcategoryIDResponse> findRelationByProductAndSubcategoryId(@Param("productId") long productId, @Param("subcategoryId") int subcategoryId);
+
+    @Query("SELECT ps.subcategoryId FROM ProductSubcategory ps WHERE ps.productId = :productId")
+    List<Integer> findSubcategoryIdsByProductId(@Param("productId") long productId);
 
 }

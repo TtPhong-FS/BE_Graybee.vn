@@ -18,7 +18,7 @@ public interface CategoryManufacturerRepository extends JpaRepository<CategoryMa
     @Query("SELECT new vn.graybee.response.admin.directories.category.CategoryManuDto(cm.categoryId, m.id,  m.name) " +
             "FROM CategoryManufacturer cm " +
             "INNER JOIN Manufacturer m ON cm.manufacturerId = m.id " +
-            "WHERE cm.categoryId IN :categoryIds")
+            "WHERE cm.categoryId IN :categoryIds ORDER BY cm.categoryId")
     List<CategoryManuDto> findManufacturersByCategoryId_ADMIN(@Param("categoryIds") List<Integer> categoryIds);
 
     @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManuDto(m.id, m.name) from CategoryManufacturer cm join Manufacturer m on cm.manufacturerId = m.id where cm.categoryId = :categoryId order by m.id asc")

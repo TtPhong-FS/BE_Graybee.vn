@@ -11,6 +11,6 @@ public interface InventoryService {
 
     BasicMessageResponse<Integer> delete(int id);
 
-    BasicMessageResponse<InventoryResponse> updateQuantity(int id, int quantity);
+    BasicMessageResponse<InventoryResponse> updateQuantity(int id, int quantity, String status);
 
 }

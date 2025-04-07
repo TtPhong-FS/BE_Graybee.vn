@@ -18,7 +18,7 @@ public interface ProductTagRepository extends JpaRepository<ProductTag, Integer>
     @Query("SELECT new vn.graybee.response.admin.products.ProductTagDto(pt.productId, t.id,  t.name) " +
             "FROM ProductTag pt " +
             "INNER JOIN Tag t ON pt.tagId = t.id " +
-            "WHERE pt.productId IN :productIds ")
+            "WHERE pt.productId IN :productIds ORDER BY pt.productId")
     List<ProductTagDto> findTagsByProductIds(@Param("productIds") List<Long> productIds);
 
     @Query("SELECT new vn.graybee.response.admin.directories.tag.TagResponse(t.id, t.name) " +
@@ -36,7 +36,7 @@ public interface ProductTagRepository extends JpaRepository<ProductTag, Integer>
     @Modifying
     @Query("delete from ProductTag pt where pt.productId = :productId and pt.tagId = :tagId")
     void deleteByProductIdAndTagId(@Param("productId") long productId, @Param("tagId") int tagId);
-    
+
     @Query("SELECT pt.tagId FROM ProductTag pt WHERE pt.productId = :productId")
     List<Integer> findTagIdsByProductId(@Param("productId") long productId);
 

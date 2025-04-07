@@ -11,6 +11,7 @@ import vn.graybee.projections.admin.category.ManufacturerProjection;
 import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.requests.directories.ManufacturerCreateRequest;
 import vn.graybee.requests.directories.ManufacturerUpdateRequest;
+import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerProductCountResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
@@ -72,6 +73,18 @@ public class ManufacturerServiceImp implements ManufacturerService {
         ManufacturerResponse response = new ManufacturerResponse(manufacturer);
 
         return new BasicMessageResponse<>(200, ConstantManufacturer.success_update, response);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status) {
+        int manufacturer = manufacturerRepository.checkExistsById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
+
+        manufacturerRepository.updateStatusById(manufacturer, status);
+        UpdateStatusResponse response = new UpdateStatusResponse(manufacturer, status, LocalDateTime.now());
+
+        return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
     }
 
     @Override

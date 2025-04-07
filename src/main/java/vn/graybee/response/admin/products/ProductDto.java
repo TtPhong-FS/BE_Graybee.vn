@@ -4,6 +4,7 @@ import vn.graybee.models.products.Product;
 import vn.graybee.response.BaseResponse;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class ProductDto extends BaseResponse {
@@ -26,11 +27,11 @@ public class ProductDto extends BaseResponse {
 
     private String dimension;
 
-    private double price;
+    private BigDecimal price;
 
     private int discountPercent;
 
-    private double finalPrice;
+    private BigDecimal finalPrice;
 
     private String color;
 
@@ -152,12 +153,20 @@ public class ProductDto extends BaseResponse {
         this.dimension = dimension;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(BigDecimal finalPrice) {
+        this.finalPrice = finalPrice;
     }
 
     public int getDiscountPercent() {
@@ -166,14 +175,6 @@ public class ProductDto extends BaseResponse {
 
     public void setDiscountPercent(int discountPercent) {
         this.discountPercent = discountPercent;
-    }
-
-    public double getFinalPrice() {
-        return finalPrice;
-    }
-
-    public void setFinalPrice(double finalPrice) {
-        this.finalPrice = finalPrice;
     }
 
     public String getColor() {

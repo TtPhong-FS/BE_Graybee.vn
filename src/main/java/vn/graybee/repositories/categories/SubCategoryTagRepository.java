@@ -37,7 +37,7 @@ public interface SubCategoryTagRepository extends JpaRepository<SubCategoryTag, 
     @Query("SELECT new vn.graybee.response.admin.directories.subcate.SubcategoryTagResponse(st.subcategoryId, t.id, t.name) " +
             "FROM SubCategoryTag st " +
             "INNER JOIN Tag t ON st.tagId = t.id " +
-            "WHERE st.subcategoryId IN :subcategoryIds")
+            "WHERE st.subcategoryId IN :subcategoryIds ORDER BY st.subcategoryId")
     List<SubcategoryTagResponse> findTagsBySubcategoryIds(@Param("subcategoryIds") List<Integer> subcategoryIds);
 
 }

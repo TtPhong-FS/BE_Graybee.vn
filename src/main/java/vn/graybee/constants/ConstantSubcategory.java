@@ -23,7 +23,7 @@ public class ConstantSubcategory {
     public static final String success_find_by_id = "Tìm danh mục con thành công";
 
     public static final String success_fetch_subcategories = "Danh sách danh mục con đã được lấy thành công";
-    
+
     public static final String success_delete_by_id = "Xoá danh mục con thành công";
 
     public static final String success_delete_tag_relation = "Thẻ phân loại đã được loại bỏ khỏi danh mục con";

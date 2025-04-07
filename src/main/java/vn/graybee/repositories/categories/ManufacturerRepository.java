@@ -21,6 +21,14 @@ public interface ManufacturerRepository extends JpaRepository<Manufacturer, Inte
     @Query("delete from Manufacturer m where m.id = :id")
     void deleteById(@Param("id") int id);
 
+    @Transactional
+    @Modifying
+    @Query("Update Manufacturer m set m.status = :status where m.id = :id")
+    void updateStatusById(@Param("id") int id, @Param("status") String status);
+
+    @Query("Select m.id from Manufacturer m where m.id = :id")
+    Optional<Integer> checkExistsById(@Param("id") int id);
+
     @Query("SELECT EXISTS (SELECT 1 FROM Manufacturer m WHERE m.name = :name AND m.id <> :id)")
     boolean existsByNameAndNotId(@Param("name") String name, @Param("id") int id);
 

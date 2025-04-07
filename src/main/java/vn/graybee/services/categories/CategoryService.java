@@ -1,12 +1,13 @@
 package vn.graybee.services.categories;
 
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.requests.directories.CategoryCreateRequest;
 import vn.graybee.requests.directories.CategoryUpdateRequest;
 import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
 import vn.graybee.response.admin.directories.category.CategoryResponse;
 import vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse;
+import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
+import vn.graybee.response.publics.sidebar.SidebarDto;
 
 import java.util.List;
 
@@ -26,8 +27,8 @@ public interface CategoryService {
 
     BasicMessageResponse<CategorySubcategoryIdResponse> deleteRelationBySubcategoryByCategoryId(int categoryId, int subcategoryId);
 
+    BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status);
 
-    //    public
-    BasicMessageResponse<List<CategoryBasicInfoProjection>> getCategories_public();
+    BasicMessageResponse<List<SidebarDto>> getSidebar();
 
 }

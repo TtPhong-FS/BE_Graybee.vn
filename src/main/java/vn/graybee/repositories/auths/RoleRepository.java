@@ -17,6 +17,12 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
     @Query("Select new vn.graybee.response.admin.auth.RoleResponse(r, null) from Role r ")
     List<RoleResponse> fetchAll();
 
+    @Query("Select r.id from Role r where r.name = 'CUSTOMER' ")
+    Optional<Integer> getIdByRoleCustomer();
+
+    @Query("Select r.name from Role r where r.id = :id ")
+    String getNameById(@Param("id") int id);
+
     @Transactional
     @Modifying
     @Query("Delete from Role r where r.id = :id ")

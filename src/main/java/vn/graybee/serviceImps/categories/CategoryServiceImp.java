@@ -13,7 +13,6 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.directories.Category;
 import vn.graybee.models.directories.CategoryManufacturer;
 import vn.graybee.models.directories.CategorySubCategory;
-import vn.graybee.projections.publics.CategoryBasicInfoProjection;
 import vn.graybee.repositories.categories.CategoryManufacturerRepository;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.categories.CategorySubCategoryRepository;
@@ -27,9 +26,13 @@ import vn.graybee.response.admin.directories.category.CategoryProductCountRespon
 import vn.graybee.response.admin.directories.category.CategoryResponse;
 import vn.graybee.response.admin.directories.category.CategorySubDto;
 import vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse;
+import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManuDto;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
+import vn.graybee.response.publics.sidebar.SidebarDto;
+import vn.graybee.response.publics.sidebar.SubcategoryDto;
 import vn.graybee.services.categories.CategoryService;
+import vn.graybee.services.categories.SubCategoryServices;
 import vn.graybee.utils.TextUtils;
 
 import java.time.LocalDateTime;
@@ -39,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,14 +60,18 @@ public class CategoryServiceImp implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+
+    private final SubCategoryServices subCategoryServices;
+
     private final StringRedisTemplate redisTemplate;
 
-    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, StringRedisTemplate redisTemplate) {
+    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, SubCategoryServices subCategoryServices, StringRedisTemplate redisTemplate) {
         this.subCategoryRepository = subCategoryRepository;
         this.categorySubCategoryRepository = categorySubCategoryRepository;
         this.cmRepository = cmRepository;
         this.manufacturerRepository = manufacturerRepository;
         this.categoryRepository = categoryRepository;
+        this.subCategoryServices = subCategoryServices;
         this.redisTemplate = redisTemplate;
     }
 
@@ -75,8 +83,8 @@ public class CategoryServiceImp implements CategoryService {
             throw new BusinessCustomException(ConstantCategory.name, ConstantCategory.name_exists);
         }
 
-
         List<SubcateDto> subcategories = subCategoryRepository.findByIds(request.getSubcategories());
+
         Set<Integer> foundSubcategoryIds = subcategories.stream()
                 .map(SubcateDto::getId)
                 .collect(Collectors.toSet());
@@ -261,10 +269,9 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
-    @Transactional
     public BasicMessageResponse<List<CategoryResponse>> fetchCategories_ADMIN() {
 
-        List<CategoryResponse> categories = categoryRepository.fetchAll_ADMIN();
+        List<CategoryResponse> categories = categoryRepository.fetchAll();
 
         if (categories.isEmpty()) {
             return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, categories);
@@ -289,6 +296,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<CategoryManufacturerIdResponse> deleteRelationByCategoryIdAndManufacturerId(int categoryId, int manufacturerId) {
 
         CategoryManufacturerIdResponse response = cmRepository.findManufacturerIdWithCategoryId(categoryId, manufacturerId)
@@ -300,6 +308,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<CategorySubcategoryIdResponse> deleteRelationBySubcategoryByCategoryId(int categoryId, int subcategoryId) {
 
         CategorySubcategoryIdResponse response = categorySubCategoryRepository.findSubcategoryIdWithCategoryId(categoryId, subcategoryId)
@@ -311,10 +320,57 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
-    public BasicMessageResponse<List<CategoryBasicInfoProjection>> getCategories_public() {
-        List<CategoryBasicInfoProjection> categories = categoryRepository.findAllCategories_public();
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status) {
+        int category = categoryRepository.findIdById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists));
 
-        return new BasicMessageResponse<>(200, "", categories);
+        categoryRepository.updateStatusById(category, status);
+
+        UpdateStatusResponse response = new UpdateStatusResponse(category, status, LocalDateTime.now());
+
+        return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
     }
+
+    @Override
+    public BasicMessageResponse<List<SidebarDto>> getSidebar() {
+
+        List<SidebarDto> sidebar = categoryRepository.getSidebar();
+
+        if (sidebar.isEmpty()) {
+            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, sidebar);
+        }
+
+        List<Integer> categoryIds = sidebar.stream().map(SidebarDto::getId).toList();
+
+        List<CategoryManuDto> manuDtos = cmRepository.findManufacturersByCategoryId_ADMIN(categoryIds);
+        List<CategorySubDto> subDtos = categorySubCategoryRepository.findSubcategoriesByCategoryId_ADMIN(categoryIds);
+
+        List<SubcategoryDto> subcategories = subCategoryServices.getForSidebar();
+
+        Map<Integer, List<ManuDto>> CateManuMap = manuDtos.stream()
+                .collect(Collectors.groupingBy(CategoryManuDto::getCategoryId, Collectors.mapping(manufacturer -> new ManuDto(manufacturer.getManufacturerId(), manufacturer.getManufacturerName()), Collectors.toList())));
+
+
+        Map<Integer, SubcategoryDto> subIdToDtoMap = subcategories.stream()
+                .collect(Collectors.toMap(SubcategoryDto::getId, Function.identity()));
+
+
+        Map<Integer, List<SubcategoryDto>> categoryToSubDtos = subDtos.stream()
+                .collect(Collectors.groupingBy(
+                        CategorySubDto::getCategoryId,
+                        Collectors.mapping(sub -> subIdToDtoMap.get(sub.getSubCategoryId()), Collectors.toList())
+                ));
+
+
+        sidebar.forEach(category -> {
+            category.setManufacturers(CateManuMap.getOrDefault(category.getId(), Collections.emptyList()));
+            category.setSubcategories(categoryToSubDtos.getOrDefault(category.getId(), Collections.emptyList()));
+
+        });
+
+        return new BasicMessageResponse<>(200, null, sidebar);
+    }
+
 
 }

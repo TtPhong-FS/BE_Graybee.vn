@@ -21,8 +21,7 @@ public class ProductTag {
 
     @Column(name = "tag_id", nullable = false)
     private Integer tagId;
-
-
+    
     public ProductTag() {
     }
 

@@ -8,9 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.directories.SubCategory;
 import vn.graybee.response.admin.directories.subcate.SubCategoryResponse;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
+import vn.graybee.response.publics.sidebar.SubcategoryDto;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface SubCategoryRepository extends JpaRepository<SubCategory, Integer> {
 
@@ -21,6 +23,11 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
     @Modifying
     @Query("delete from SubCategory s where s.id = :id ")
     void delete(@Param("id") int id);
+
+    @Transactional
+    @Modifying
+    @Query("Update SubCategory s set s.status = :status where s.id = :id")
+    void updateStatusById(@Param("id") int id, @Param("status") String status);
 
     @Query("SELECT EXISTS (SELECT 1 FROM SubCategory s WHERE s.name = :name AND s.id <> :id)")
     boolean existsByNameAndNotId(@Param("name") String name, @Param("id") int id);
@@ -35,9 +42,13 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
     Optional<String> validateName(@Param("name") String name);
 
     @Query("Select s.id from SubCategory s where s.id IN :ids and s.status != 'DELETED' ")
-    List<Integer> findAllByIds(@Param("ids") List<Integer> ids);
+    Set<Integer> findAllByIds(@Param("ids") List<Integer> ids);
 
     @Query("Select new vn.graybee.response.admin.directories.subcate.SubcateDto(s.id, s.name) from SubCategory s where s.id IN :ids and s.status != 'DELETED' ")
     List<SubcateDto> findByIds(@Param("ids") List<Integer> ids);
+
+    //    Public
+    @Query("SELECT new vn.graybee.response.publics.sidebar.SubcategoryDto(s.id, s.name) from SubCategory s")
+    List<SubcategoryDto> getAllForSidebar();
 
 }
