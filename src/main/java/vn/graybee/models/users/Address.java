@@ -18,28 +18,40 @@ public class Address {
     @Column(name = "user_uid")
     private Integer userUid;
 
-    @Column(length = 50)
-    private String fullname;
+    @Column(name = "session_id", length = 50)
+    private String sessionId;
 
-    @Column(length = 12, name = "phone_number")
+
+    @Column(length = 50, nullable = false, name = "fullname")
+    private String fullName;
+
+    @Column(length = 12, name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String city;
 
-    @Column(length = 100)
+    @Column(length = 100, nullable = false)
     private String district;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String commune;
 
-    @Column(name = "street_address", length = 150)
+    @Column(name = "street_address", length = 150, nullable = false)
     private String streetAddress;
 
     @Column(name = "is_default")
     private boolean isDefault;
 
     public Address() {
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public boolean isDefault() {
@@ -90,12 +102,12 @@ public class Address {
         this.commune = commune;
     }
 
-    public String getFullname() {
-        return fullname;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPhoneNumber() {

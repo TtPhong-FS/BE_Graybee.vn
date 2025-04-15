@@ -10,6 +10,9 @@ public class PaginationInfo {
 
     private int pageSize;
 
+    public PaginationInfo() {
+    }
+
     public PaginationInfo(int currentPage, int totalPages, long totalItems, int pageSize) {
         this.currentPage = currentPage;
         this.totalPages = totalPages;

@@ -4,6 +4,8 @@ public class ConstantUser {
 
     public static final String email = "email";
 
+    public static final String addressId = "addressId";
+
     public static final String phoneNumber = "phoneNumber";
 
     public static final String email_exists = "Địa chỉ Email đã có người khác sử dụng. Vui lòng sử dụng địa chỉ Email khác!";

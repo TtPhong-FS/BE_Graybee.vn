@@ -1,6 +1,7 @@
 package vn.graybee.response.admin.directories.general;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import vn.graybee.enums.DirectoryStatus;
 
 import java.time.LocalDateTime;
 
@@ -8,7 +9,7 @@ public class UpdateStatusResponse {
 
     private int id;
 
-    private String status;
+    private DirectoryStatus status;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
@@ -16,7 +17,7 @@ public class UpdateStatusResponse {
     public UpdateStatusResponse() {
     }
 
-    public UpdateStatusResponse(int id, String status, LocalDateTime updatedAt) {
+    public UpdateStatusResponse(int id, DirectoryStatus status, LocalDateTime updatedAt) {
         this.id = id;
         this.status = status;
         this.updatedAt = updatedAt;
@@ -30,11 +31,11 @@ public class UpdateStatusResponse {
         this.id = id;
     }
 
-    public String getStatus() {
+    public DirectoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(DirectoryStatus status) {
         this.status = status;
     }
 

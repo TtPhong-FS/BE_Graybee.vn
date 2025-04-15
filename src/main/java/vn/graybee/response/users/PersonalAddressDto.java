@@ -6,7 +6,7 @@ public class PersonalAddressDto {
 
     private String phoneNumber;
 
-    private String fullname;
+    private String fullName;
 
     private String city;
 
@@ -21,10 +21,10 @@ public class PersonalAddressDto {
     public PersonalAddressDto() {
     }
 
-    public PersonalAddressDto(int id, String phoneNumber, String fullname, String city, String district, String commune, String streetAddress, boolean isDefault) {
+    public PersonalAddressDto(int id, String phoneNumber, String fullName, String city, String district, String commune, String streetAddress, boolean isDefault) {
         this.id = id;
         this.phoneNumber = phoneNumber;
-        this.fullname = fullname;
+        this.fullName = fullName;
         this.city = city;
         this.district = district;
         this.commune = commune;
@@ -80,14 +80,13 @@ public class PersonalAddressDto {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getFullname() {
-        return fullname;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
-    
 
     public boolean isDefault() {
         return isDefault;

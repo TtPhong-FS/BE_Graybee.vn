@@ -14,7 +14,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     @Query("Select p.finalPrice from Product p where p.id = :productId ")
     double findProductFinalPriceByProductId(@Param("productId") long productId);
 
-    @Query("SELECT new vn.graybee.response.orders.OrderMapOrderDetailWithProductBasicDto(od.orderId, od.id, p.name, p.thumbnail, od.quantity, od.subtotal, od.priceAtTime) " +
+    @Query("SELECT new vn.graybee.response.orders.OrderMapOrderDetailWithProductBasicDto(od.orderId, od.id,p.id, p.name, p.thumbnail, od.quantity, od.subtotal, od.priceAtTime) " +
             "FROM OrderDetail od JOIN Product p ON od.productId = p.id " +
             "WHERE od.orderId IN :orderIds " +
             "ORDER BY od.orderId, od.id ")

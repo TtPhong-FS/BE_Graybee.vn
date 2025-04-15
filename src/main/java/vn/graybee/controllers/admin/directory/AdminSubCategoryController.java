@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.directories.SubCategoryCreateRequest;
 import vn.graybee.requests.directories.SubCategoryUpdateRequest;
@@ -23,7 +24,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/v1/admin/subcategories")
+@RequestMapping("${api.subcategories}")
 public class AdminSubCategoryController {
 
     private final SubCategoryServices subCategoryServices;
@@ -54,7 +55,7 @@ public class AdminSubCategoryController {
     }
 
     @PutMapping("/update/status")
-    public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatus(@RequestParam int id, @RequestParam("status") String status) {
+    public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatus(@RequestParam int id, @RequestParam("status") DirectoryStatus status) {
         return ResponseEntity.ok(subCategoryServices.updateStatusById(id, status));
     }
 

@@ -2,10 +2,13 @@ package vn.graybee.models.users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import vn.graybee.enums.AccountStatus;
 import vn.graybee.models.BaseModel;
 
 import java.time.LocalDate;
@@ -48,8 +51,9 @@ public class User extends BaseModel {
     @Column(name = "is_active")
     private boolean isActive;
 
-    @Column(length = 30)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AccountStatus status;
 
     public User() {
     }
@@ -147,11 +151,11 @@ public class User extends BaseModel {
         isActive = active;
     }
 
-    public String getStatus() {
+    public AccountStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(AccountStatus status) {
         this.status = status;
     }
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vn.graybee.utils.DatetimeFormatted;
 
+import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,5 +44,18 @@ public class GlobalHandlerException {
         problemDetail.setProperty("timestamp", DatetimeFormatted.formatted_datetime());
         return problemDetail;
     }
+
+    @ResponseStatus(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS)
+    @ExceptionHandler(ConnectException.class)
+    public ProblemDetail handleConnectFailed(ConnectException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+                ex.getMessage()
+        );
+        problemDetail.setDetail("Server is not ready. Please try again.");
+        problemDetail.setTitle("Unconnected to server");
+        return problemDetail;
+    }
+
 
 }

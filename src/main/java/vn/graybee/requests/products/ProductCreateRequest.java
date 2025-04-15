@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.enums.ProductStatus;
+import vn.graybee.exceptions.BusinessCustomException;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -64,14 +67,22 @@ public class ProductCreateRequest {
 
     @NotNull(message = "Số lượng không thể trống")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
-    private int quantity;
+    private Integer quantity;
 
-    @Size(max = 30, message = "Độ dài tối đa 35 ký tự")
+    @NotBlank(message = "Trạng thái không được để trống")
     private String status;
 
     private String description;
 
     private List<String> images;
+
+    public ProductStatus getStatusEnum() {
+        try {
+            return ProductStatus.valueOf(status.toUpperCase());
+        } catch (RuntimeException e) {
+            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid + status);
+        }
+    }
 
     public List<Integer> getSubcategories() {
         return subcategories != null ? subcategories : Collections.emptyList();
@@ -81,11 +92,11 @@ public class ProductCreateRequest {
         this.subcategories = subcategories;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

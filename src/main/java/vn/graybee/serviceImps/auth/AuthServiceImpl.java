@@ -1,11 +1,14 @@
 package vn.graybee.serviceImps.auth;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantAuth;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantUser;
+import vn.graybee.enums.AccountStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.orders.Cart;
@@ -13,18 +16,30 @@ import vn.graybee.models.users.User;
 import vn.graybee.models.users.UserPrincipalDto;
 import vn.graybee.repositories.auths.RoleRepository;
 import vn.graybee.repositories.orders.CartRepository;
+import vn.graybee.repositories.orders.OrderRepository;
 import vn.graybee.repositories.users.UserRepository;
 import vn.graybee.requests.auth.LoginRequest;
 import vn.graybee.requests.auth.SignUpRequest;
 import vn.graybee.response.publics.auth.AuthResponse;
+import vn.graybee.response.users.UserAuthenDto;
+import vn.graybee.serviceImps.others.RedisServices;
 import vn.graybee.services.auth.AuthService;
+import vn.graybee.utils.CodeGenerator;
 import vn.graybee.utils.TextUtils;
-import vn.graybee.utils.UidGenerator;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    private final OrderRepository orderRepository;
+
+    private final AuthenticationManager authenticationManager;
+
     private final JwtServices jwtServices;
+
+    private final RedisServices redisServices;
 
     private final UserRepository userRepository;
 
@@ -34,9 +49,11 @@ public class AuthServiceImpl implements AuthService {
 
     private final CartRepository cartRepository;
 
-
-    public AuthServiceImpl(JwtServices jwtServices, UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, RoleRepository roleRepository, CartRepository cartRepository) {
+    public AuthServiceImpl(OrderRepository orderRepository, AuthenticationManager authenticationManager, JwtServices jwtServices, RedisServices redisServices, UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, RoleRepository roleRepository, CartRepository cartRepository) {
+        this.orderRepository = orderRepository;
+        this.authenticationManager = authenticationManager;
         this.jwtServices = jwtServices;
+        this.redisServices = redisServices;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -58,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
         int roleId = roleRepository.getIdByRoleCustomer()
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.role_does_not_exists));
 
-        int uid = UidGenerator.generateUid();
+        int uid = CodeGenerator.generateUid();
 
         User user = new User();
 
@@ -72,22 +89,29 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setDateOfBirth(request.getDateOfBirth());
         user.setGender(request.getGender());
-        user.setStatus("PENDING");
+        user.setStatus(AccountStatus.ACTIVE);
 
         user = userRepository.save(user);
 
         Cart cart = cartRepository.findBySessionId(sessionId).orElseGet(Cart::new);
 
+        cart.setTotalAmount(BigDecimal.ZERO);
         cart.setSessionId(null);
         cart.setUserUid(user.getUid());
-
         cartRepository.save(cart);
+
+        if (sessionId != null && !sessionId.isEmpty()) {
+            List<Long> orderIds = orderRepository.findIdsBySessionId(sessionId);
+
+            orderRepository.transformOrdersToUserUidByIds(orderIds, user.getUid());
+        }
 
         UserPrincipalDto userPrincipalDto = new UserPrincipalDto();
         userPrincipalDto.setUsername(user.getUsername());
         userPrincipalDto.setROLE_NAME("CUSTOMER");
 
-        String token = jwtServices.generateToken(userPrincipalDto);
+        String token = jwtServices.generateToken(user.getUsername(), userPrincipalDto.getROLE_NAME());
+        redisServices.saveToken(user.getUid(), token, 1800);
 
         AuthResponse response = new AuthResponse();
         response.setToken(token);
@@ -98,23 +122,33 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public BasicMessageResponse<AuthResponse> Login(LoginRequest request) {
 
-        String password = userRepository.getPasswordByUsername(request.getUsername());
-
-        if (userRepository.checkExistsByUsername(request.getUsername()).isEmpty()) {
+        if (!userRepository.checkExistsByUsername(request.getUsername())) {
             throw new BusinessCustomException(ConstantAuth.username, ConstantAuth.wrong_username);
         }
 
-        if (!passwordEncoder.matches(request.getPassword(), password)) {
+        UserAuthenDto user = userRepository.getAuthenBasicByUsername(request.getUsername());
+
+        if (!user.isActive()) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantAuth.account_locked);
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessCustomException(ConstantAuth.password, ConstantAuth.wrong_password);
         }
 
-        UserPrincipalDto user = userRepository.findByUserName(request.getUsername())
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantUser.does_not_exists));
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(), request.getPassword()
+                )
+        );
 
-        String token = jwtServices.generateToken(user);
+        String token = jwtServices.generateToken(request.getUsername(), user.getRole());
 
         AuthResponse response = new AuthResponse();
         response.setToken(token);
+
+        userRepository.updateStatus(AccountStatus.ONLINE, user.getUid());
+        redisServices.saveToken(user.getUid(), token, 1800);
 
         return new BasicMessageResponse<>(200, ConstantAuth.success_login, response);
     }

@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantSubcategory;
 import vn.graybee.constants.ConstantTag;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.directories.SubCategory;
@@ -65,7 +66,7 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
 
         SubCategory subCategory = new SubCategory();
         subCategory.setName(TextUtils.capitalize(request.getName()));
-        subCategory.setStatus("ACTIVE");
+        subCategory.setStatus(DirectoryStatus.ACTIVE);
 
         SubCategory savedSubcategory = subCategoryRepository.save(subCategory);
 
@@ -95,6 +96,8 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<SubCategoryResponse> update(int id, SubCategoryUpdateRequest request) {
 
+        DirectoryStatus status = request.getStatusEnum();
+
         List<TagResponse> tags = tagRepository.findByIds(request.getTags());
         Set<Integer> foundTagIds = tags.stream().map(TagResponse::getId).collect(Collectors.toSet());
 
@@ -111,7 +114,7 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
         }
 
         subCategory.setName(request.getName());
-        subCategory.setStatus(request.getStatus().name());
+        subCategory.setStatus(status);
         subCategory.setUpdatedAt(LocalDateTime.now());
 
         subCategory = subCategoryRepository.save(subCategory);
@@ -139,7 +142,7 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status) {
+    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status) {
         int subcategory = subCategoryRepository.checkExistsById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantSubcategory.does_not_exists));
 

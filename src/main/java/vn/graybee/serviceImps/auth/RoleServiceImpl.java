@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantAuth;
 import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.enums.RolePermissionStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.users.Role;
@@ -48,9 +49,7 @@ public class RoleServiceImpl implements RoleService {
     public BasicMessageResponse<List<RoleResponse>> fetchAll() {
         List<RoleResponse> roles = roleRepository.fetchAll();
 
-        if (roles.isEmpty()) {
-            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, roles);
-        }
+        String message = roles.isEmpty() ? ConstantGeneral.empty_list : ConstantAuth.success_fetch_roles;
 
         List<Integer> roleIds = roles.stream().map(RoleResponse::getId).toList();
 
@@ -66,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
             role.setPermissions(rolePermissionMap.getOrDefault(role.getId(), Collections.emptyList()));
         });
 
-        return new BasicMessageResponse<>(200, ConstantAuth.success_fetch_roles, roles);
+        return new BasicMessageResponse<>(200, message, roles);
     }
 
     @Override
@@ -85,7 +84,10 @@ public class RoleServiceImpl implements RoleService {
         }
 
 
-        Role role = new Role(request.getName().toUpperCase(), "ACTIVE");
+        Role role = new Role();
+        role.setName(request.getName().toUpperCase());
+        role.setStatus(RolePermissionStatus.ACTIVE);
+
         role.setUserCount(0);
 
 
@@ -113,6 +115,8 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<RoleResponse> update(int id, RoleUpdateRequest request) {
 
+        RolePermissionStatus status = request.getStatusEnum();
+
         List<PermissionBasicResponse> permissions = permissionRepository.findByIds(request.getPermissions());
         Set<Integer> foundPermissionIds = permissions.stream().map(PermissionBasicResponse::getId).collect(Collectors.toSet());
 
@@ -127,10 +131,12 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessCustomException(ConstantAuth.name, ConstantAuth.role_name_exists);
         }
 
+        role.setStatus(status);
         role.setName(request.getName().toUpperCase());
         role.setUpdatedAt(LocalDateTime.now());
 
         role = roleRepository.save(role);
+
         int roleId = role.getId();
 
         if (request.getPermissions() != null && !request.getPermissions().isEmpty()) {
@@ -181,6 +187,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<RolePermissionIdResponse> deleteRelationByRoleIdAndPermissionId(int roleId, int permissionId) {
 
         RolePermissionIdResponse response = rolePermissionRepository.findRelationByRoleIdAndPermissionId(roleId, permissionId)

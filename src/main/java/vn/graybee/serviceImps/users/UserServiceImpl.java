@@ -27,9 +27,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Integer getUidByToken(String token) {
-        String username = jwtServices.extractUsername(token);
-
+    public Integer getUidByUsername(String username) {
         return userRepository.getUidByUsername(username).orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantUser.does_not_exists));
 
     }
@@ -55,7 +53,7 @@ public class UserServiceImpl implements UserService {
         user.setDateOfBirth(request.getDateOfBirth());
 
         user = userRepository.save(user);
-        
+
         UserProfileResponse response = new UserProfileResponse(
                 user.getUid(),
                 user.getFullName(),

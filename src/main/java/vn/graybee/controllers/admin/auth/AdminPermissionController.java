@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.admin.auth.PermissionProjection;
+import vn.graybee.models.users.Permission;
 import vn.graybee.requests.auth.PermissionCreateRequest;
 import vn.graybee.requests.auth.PermissionUpdateRequest;
-import vn.graybee.response.admin.auth.PermissionResponse;
 import vn.graybee.services.auth.PermissionService;
 
 import java.util.List;
@@ -31,22 +30,22 @@ public class AdminPermissionController {
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<PermissionProjection>>> fetchAll() {
-        return ResponseEntity.ok(permissionService.fetchAll());
+    public ResponseEntity<BasicMessageResponse<List<Permission>>> fetchAll() {
+        return ResponseEntity.ok(permissionService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<PermissionProjection>> getById(@PathVariable("id") int id) {
-        return ResponseEntity.ok(permissionService.getById(id));
+    public ResponseEntity<BasicMessageResponse<Permission>> getById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(permissionService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<PermissionResponse>> create(@RequestBody @Valid PermissionCreateRequest request) {
+    public ResponseEntity<BasicMessageResponse<Permission>> create(@RequestBody @Valid PermissionCreateRequest request) {
         return ResponseEntity.ok(permissionService.create(request));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<PermissionResponse>> update(@RequestParam("id") int id, @RequestBody @Valid PermissionUpdateRequest request) {
+    public ResponseEntity<BasicMessageResponse<Permission>> update(@RequestParam("id") int id, @RequestBody @Valid PermissionUpdateRequest request) {
         return ResponseEntity.ok(permissionService.update(id, request));
     }
 

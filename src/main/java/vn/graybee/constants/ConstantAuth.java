@@ -2,6 +2,8 @@ package vn.graybee.constants;
 
 public class ConstantAuth {
 
+    public static final String token = "token";
+
     public static final String name = "name";
 
     public static final String password = "password";
@@ -55,5 +57,7 @@ public class ConstantAuth {
     public static final String success_fetch_roles = "Danh sách vai trò đã được lấy thành công";
 
     public static final String success_fetch_permissions = "Danh sách quyền đã được lấy thành công";
+
+    public static final String account_locked = "Tài khoản hiện đang bị khoá!. Vui lòng liên hệ với quản trị viên/quản lý để biết thêm thông tin";
 
 }

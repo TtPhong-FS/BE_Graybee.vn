@@ -2,17 +2,20 @@ package vn.graybee.controllers.publics;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.requests.orders.AddCartItemRequest;
 import vn.graybee.requests.orders.RemoveCartItemRequest;
 import vn.graybee.response.publics.carts.AddItemToCartResponse;
@@ -36,51 +39,53 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<AddItemToCartResponse>>> findCartByUserUid(@RequestHeader(value = "Authorization", required = false) String token, @CookieValue(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<BasicMessageResponse<List<AddItemToCartResponse>>> findCartByUserUid(
+            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
         Integer uid = null;
-        if (token != null && !token.isEmpty()) {
-            String subToken = token.substring(7);
-            uid = userService.getUidByToken(subToken);
+        if (userPrincipal != null && userPrincipal.getUser().getUserUid() != null) {
+            uid = userPrincipal.getUser().getUserUid();
         }
         return ResponseEntity.ok(cartService.findCartByUserUidOrSessionId(uid, sessionId));
     }
 
     @PostMapping("/add")
-    public ResponseEntity<BasicMessageResponse<AddItemToCartResponse>> addItemToCart(@RequestBody @Valid AddCartItemRequest request, @RequestHeader(value = "Authorization", required = false) String token, @CookieValue(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<BasicMessageResponse<AddItemToCartResponse>> addItemToCart(@RequestBody @Valid AddCartItemRequest request, @CookieValue(value = "sessionId", required = false) String sessionId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Integer uid = null;
-        if (token != null && !token.isEmpty()) {
-            String subToken = token.substring(7);
-            uid = userService.getUidByToken(subToken);
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            uid = userService.getUidByUsername(auth.getName());
         }
         return ResponseEntity.ok(cartService.addItemToCart(request, uid, sessionId));
     }
 
     @PutMapping("/item/decrease")
-    public ResponseEntity<BasicMessageResponse<DecreaseQuantityResponse>> decreaseQuantityToCartItem(@RequestBody @Valid RemoveCartItemRequest request, @RequestHeader(value = "Authorization", required = false) String token, @CookieValue(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<BasicMessageResponse<DecreaseQuantityResponse>> decreaseQuantityToCartItem(@RequestBody @Valid RemoveCartItemRequest request, @CookieValue(value = "sessionId", required = false) String sessionId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Integer uid = null;
-        if (token != null && !token.isEmpty()) {
-            String subToken = token.substring(7);
-            uid = userService.getUidByToken(subToken);
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            uid = userService.getUidByUsername(auth.getName());
         }
         return ResponseEntity.ok(cartService.decreaseQuantityToCartItem(request, uid, sessionId));
     }
 
     @DeleteMapping("/item/delete")
-    public ResponseEntity<BasicMessageResponse<Integer>> deleteItemToCart(@RequestParam("cartItemId") int cartItemId, @RequestHeader(value = "Authorization", required = false) String token, @CookieValue(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<BasicMessageResponse<Integer>> deleteItemToCart(@RequestParam("cartItemId") int cartItemId, @CookieValue(value = "sessionId", required = false) String sessionId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Integer uid = null;
-        if (token != null && !token.isEmpty()) {
-            String subToken = token.substring(7);
-            uid = userService.getUidByToken(subToken);
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            uid = userService.getUidByUsername(auth.getName());
         }
         return ResponseEntity.ok(cartService.deleteCartItemToCart(cartItemId, uid, sessionId));
     }
 
     @DeleteMapping
-    public ResponseEntity<BasicMessageResponse<?>> clearItemsToCart(@RequestHeader(value = "Authorization", required = false) String token, @CookieValue(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<BasicMessageResponse<?>> clearItemsToCart(@CookieValue(value = "sessionId", required = false) String sessionId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Integer uid = null;
-        if (token != null && !token.isEmpty()) {
-            String subToken = token.substring(7);
-            uid = userService.getUidByToken(subToken);
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            uid = userService.getUidByUsername(auth.getName());
         }
         return ResponseEntity.ok(cartService.clearItemsToCart(uid, sessionId));
     }

@@ -2,6 +2,7 @@ package vn.graybee.services.users;
 
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.users.AddressCreateRequest;
+import vn.graybee.response.users.AddressExistingDto;
 import vn.graybee.response.users.DefaultAddressDto;
 import vn.graybee.response.users.PersonalAddressDto;
 
@@ -20,5 +21,7 @@ public interface AddressService {
     BasicMessageResponse<DefaultAddressDto> updateDefaultAddress(int id, int userUid);
 
     void checkExistsById(Integer id);
+
+    BasicMessageResponse<List<AddressExistingDto>> getAddressExistingByUserUidOrSessionId(Integer userUid, String sessionId);
 
 }

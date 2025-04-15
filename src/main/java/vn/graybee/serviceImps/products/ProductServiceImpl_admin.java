@@ -4,11 +4,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantCategory;
 import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.constants.ConstantInventory;
 import vn.graybee.constants.ConstantManufacturer;
 import vn.graybee.constants.ConstantProduct;
 import vn.graybee.constants.ConstantSubcategory;
 import vn.graybee.constants.ConstantTag;
-import vn.graybee.enums.GeneralStatus;
+import vn.graybee.enums.InventoryStatus;
+import vn.graybee.enums.ProductStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
@@ -63,6 +65,8 @@ import java.util.stream.Collectors;
 @Service
 public class ProductServiceImpl_admin implements ProductService_admin {
 
+    private final ProductDocumentService productDocumentService;
+
     private final ProductDescriptionRepository productDescriptionRepository;
 
     private final TagRepository tagRepository;
@@ -87,7 +91,8 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
     private final ManufacturerRepository manufacturerRepository;
 
-    public ProductServiceImpl_admin(ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductStatisticRepository productStatisticRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository) {
+    public ProductServiceImpl_admin(ProductDocumentService productDocumentService, ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductStatisticRepository productStatisticRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository) {
+        this.productDocumentService = productDocumentService;
         this.productDescriptionRepository = productDescriptionRepository;
         this.tagRepository = tagRepository;
         this.subCategoryRepository = subCategoryRepository;
@@ -102,9 +107,26 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         this.manufacturerRepository = manufacturerRepository;
     }
 
+    public ProductResponse getProductResponse(Product product, String categoryName, String manufacturerName, int quantity) {
+        return new ProductResponse(
+                product,
+                categoryName,
+                manufacturerName,
+                quantity
+        );
+    }
+
+    @Override
+    public Long checkExistById(long id) {
+        return productRepository.checkExistsById(id).orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+    }
+
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<ProductResponse> create(ProductCreateRequest request) {
+
+
+        ProductStatus status = request.getStatusEnum();
 
         if (productRepository.validateName(request.getName()).isPresent()) {
             throw new BusinessCustomException(ConstantProduct.name, ConstantProduct.name_exists);
@@ -140,16 +162,18 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         }
 
         Product product = new Product();
+        product.setStatus(status);
+
         product.setName(TextUtils.capitalizeEachWord(request.getName()));
+        product.setCode(productCode);
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
+        product.setFinalPrice(finalPrice);
         product.setCategoryId(request.getCategoryId());
         product.setManufacturerId(request.getManufacturerId());
 
-        product.setCode(productCode);
 
         product.setStock(request.isInStock());
-        product.setFinalPrice(finalPrice);
         product.setConditions(request.getConditions().toUpperCase());
         product.setDimension(request.getDimension());
         product.setWeight(request.getWeight());
@@ -158,9 +182,10 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         product.setThumbnail(request.getImages() != null && !request.getImages().isEmpty() ? request.getImages().get(0) : null);
 
-        product.setStatus(request.getStatus() != null && !request.getStatus().isEmpty() ? request.getStatus() : "DRAFT");
 
         product = productRepository.save(product);
+
+        productDocumentService.insertProduct(product);
 
         long productId = product.getId();
 
@@ -181,8 +206,8 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         Inventory inventory = new Inventory();
 
         inventory.setQuantity(request.isInStock() ? request.getQuantity() : 0);
-        inventory.setProductCode(product.getCode());
-        inventory.setStatus(request.isInStock() ? "ACTIVE" : "OUT_OF_STOCK");
+        inventory.setProductId(product.getId());
+        inventory.setStatus(request.isInStock() ? InventoryStatus.ACTIVE : InventoryStatus.OUT_OF_STOCK);
 
         inventory = inventoryRepository.save(inventory);
 
@@ -216,19 +241,16 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         updateProductCountCategory(request.getCategoryId(), true);
         updateProductCountManufacturer(request.getManufacturerId(), true);
 
-        ProductResponse productResponse = new ProductResponse(
-                product,
-                categoryName,
-                manufacturerName,
-                inventory.getQuantity()
-        );
+        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity());
 
-        return new BasicMessageResponse<>(201, ConstantProduct.success_create, productResponse);
+        return new BasicMessageResponse<>(201, ConstantProduct.success_create, response);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<ProductResponse> update(long id, ProductUpdateRequest request) {
+
+        ProductStatus status = request.getStatusEnum();
 
         Set<Integer> tagIds = new HashSet<>();
         if (request.getTags() != null && !request.getTags().isEmpty()) {
@@ -286,13 +308,13 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         product.setThumbnail(request.getImages() != null && !request.getImages().isEmpty() ? request.getImages().get(0) : null);
 
-        product.setStatus(request.getStatus());
+        product.setStatus(status);
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
         product.setFinalPrice(finalPrice);
         product.setColor(request.getColor());
 
-        if (request.getStatus().equals("OUT_OF_STOCK") || request.getStatus().equals("DELETED")) {
+        if (status.equals(ProductStatus.OUT_OF_STOCK) || status.equals(ProductStatus.DELETED)) {
             product.setStock(false);
         } else {
             product.setStock(request.isInStock());
@@ -369,16 +391,16 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         boolean isNewInventory = inventory.getId() == null;
 
         inventory.setQuantity(product.isStock() ? request.getQuantity() : 0);
-        inventory.setStatus(product.isStock() && request.getQuantity() > 0 ? GeneralStatus.ACTIVE.name() : GeneralStatus.OUT_OF_STOCK.name());
+        inventory.setStatus(product.isStock() && request.getQuantity() > 0 ? InventoryStatus.ACTIVE : InventoryStatus.OUT_OF_STOCK);
         inventory.setUpdatedAt(LocalDateTime.now());
 
         if (isNewInventory) {
-            inventory.setProductCode(product.getCode());
+            inventory.setProductId(product.getId());
         }
 
         inventory = inventoryRepository.save(inventory);
 
-        ProductResponse response = new ProductResponse(product, categoryName, manufacturerName, inventory.getQuantity());
+        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity());
 
         return new BasicMessageResponse<>(200, ConstantProduct.success_update, response);
     }
@@ -435,7 +457,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
             }
         }
 
-        String productCode = productRepository.getProductCodeById(id);
+        String productCode = productRepository.getProductCodeById(id).orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
         ProductSubcategoryAndTagResponse response = new ProductSubcategoryAndTagResponse();
         response.setId(id);
@@ -451,13 +473,15 @@ public class ProductServiceImpl_admin implements ProductService_admin {
     public BasicMessageResponse<Long> delete(long id) {
 
         ProductQuantityResponse product = inventoryRepository.findQuantityByProductId(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantInventory.product_does_not_exists));
 
         if (product.getQuantity() > 0) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantProduct.still_inventory);
         }
 
-        productRepository.delete(product.getId());
+        productRepository.deleteById(product.getId());
+
+        productDocumentService.deleteProduct(product.getId());
         return new BasicMessageResponse<>(200, ConstantProduct.success_delete, product.getId());
     }
 
@@ -511,8 +535,10 @@ public class ProductServiceImpl_admin implements ProductService_admin {
                 .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
         List<TagResponse> tagResponses = productTagRepository.getTagsByProductId(response.getId());
+        List<SubcateDto> subcategories = productSubcategoryRepository.findSubcategoriesByProductId(response.getId());
         List<String> images = productImageRepository.findImageUrlsByProductId(response.getId());
 
+        response.setSubcategories(subcategories);
         response.setImages(images);
         response.setTags(tagResponses);
 
@@ -559,7 +585,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ProductStatusResponse> updateStatus(long id, String status) {
+    public BasicMessageResponse<ProductStatusResponse> updateStatus(long id, ProductStatus status) {
 
         long product = productRepository.checkExistsById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));

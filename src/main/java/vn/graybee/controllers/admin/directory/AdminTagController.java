@@ -12,16 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.admin.category.TagProjection;
+import vn.graybee.models.directories.Tag;
 import vn.graybee.requests.directories.TagRequest;
-import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.services.categories.TagServices;
 
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/v1/admin/tags")
+@RequestMapping("${api.tags}")
 public class AdminTagController {
 
     private final TagServices tagServices;
@@ -31,22 +30,22 @@ public class AdminTagController {
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<TagProjection>>> fetchAll() {
-        return ResponseEntity.ok(tagServices.fetchAll());
+    public ResponseEntity<BasicMessageResponse<List<Tag>>> findAll() {
+        return ResponseEntity.ok(tagServices.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<TagResponse>> getById(@PathVariable("id") int id) {
-        return ResponseEntity.ok(tagServices.getById(id));
+    public ResponseEntity<BasicMessageResponse<Tag>> findById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(tagServices.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<TagResponse>> create(@RequestBody @Valid TagRequest request) {
+    public ResponseEntity<BasicMessageResponse<Tag>> create(@RequestBody @Valid TagRequest request) {
         return ResponseEntity.ok(tagServices.create(request));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<TagResponse>> update(@RequestParam("id") int id, @RequestBody @Valid TagRequest request) {
+    public ResponseEntity<BasicMessageResponse<Tag>> update(@RequestParam("id") int id, @RequestBody @Valid TagRequest request) {
         return ResponseEntity.ok(tagServices.update(id, request));
     }
 

@@ -27,4 +27,8 @@ public interface CartService {
 
     BasicMessageResponse<DecreaseQuantityResponse> decreaseQuantityToCartItem(RemoveCartItemRequest request, Integer userUid, String sessionId);
 
+    void updateTotalAmount(int cartId);
+
+    Integer findByUserIdOrSessionId(Integer userUid, String sessionId);
+
 }

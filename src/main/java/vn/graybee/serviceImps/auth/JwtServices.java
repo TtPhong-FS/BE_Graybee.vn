@@ -4,10 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import vn.graybee.models.users.UserPrincipalDto;
+import vn.graybee.config.JwtConfig;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -18,16 +17,14 @@ public class JwtServices {
 
     private final SecretKey secretKey;
 
-    private final int expiration;
+    private final JwtConfig jwtConfig;
 
     public JwtServices(
-            @Value("${jwt.secretKey}") String random,
-            @Value("${jwt.expiration}") int expiration
-
+            JwtConfig jwtconfig
     ) {
-        byte[] keyBytes = Decoders.BASE64.decode(random);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtconfig.getSecretKey());
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
-        this.expiration = expiration;
+        this.jwtConfig = jwtconfig;
 
     }
 
@@ -35,15 +32,15 @@ public class JwtServices {
         return secretKey;
     }
 
-    public String generateToken(UserPrincipalDto user) {
+    public String generateToken(String username, String role) {
         long now = System.currentTimeMillis();
         return Jwts
                 .builder()
                 .header().add("typ", "JWT").and()
-                .claim("role", user.getROLE_NAME())
-                .subject(user.getUsername())
+                .claim("role", role)
+                .subject(username)
                 .issuedAt(new Date(now))
-                .expiration(new Date(now + expiration))
+                .expiration(new Date(now + jwtConfig.getExpiration()))
                 .signWith(getKey())
                 .compact();
 

@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.enums.ProductStatus;
+import vn.graybee.exceptions.BusinessCustomException;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -60,13 +63,20 @@ public class ProductUpdateRequest {
     @PositiveOrZero(message = "Vui lòng nhập số dương")
     private int quantity;
 
-    @NotBlank(message = "Vui lòng chọn trạng thái sản phẩm")
-    @Size(max = 30, message = "Độ dài tối đa 30 ký tự")
+    @NotNull(message = "Trạng thái không được để trống")
     private String status;
 
     private String description;
 
     private List<String> images;
+
+    public ProductStatus getStatusEnum() {
+        try {
+            return ProductStatus.valueOf(status.toUpperCase());
+        } catch (RuntimeException e) {
+            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid + status);
+        }
+    }
 
     public List<Integer> getSubcategories() {
         return subcategories != null ? subcategories : Collections.emptyList();

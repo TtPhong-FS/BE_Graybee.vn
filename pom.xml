@@ -109,6 +109,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!--ElasticSearch-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+
 
     </dependencies>
 
@@ -119,7 +125,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
-        <finalName>graybee</finalName>
+        <finalName>ecommerce-graybee-server</finalName>
     </build>
 
 </project>

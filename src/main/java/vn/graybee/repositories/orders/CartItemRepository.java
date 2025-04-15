@@ -18,6 +18,9 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Query("Select c from CartItem c where c.id in :ids")
     List<CartItem> findByIds(List<Integer> ids);
 
+    @Query("Select c from CartItem c where c.id in :ids and c.cartId = :cartId")
+    List<CartItem> findByIdsAndCartId(@Param("ids") List<Integer> ids, @Param("cartId") Integer cartId);
+
     @Query("Select ci from CartItem ci where ci.cartId = :cartId and ci.productId = :productId ")
     Optional<CartItem> findByCartIdAndProductId(@Param("cartId") int cartId, @Param("productId") long productId);
 
@@ -36,5 +39,10 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Modifying
     @Query("DELETE FROM CartItem c WHERE c.id = :id")
     void deleteById(@Param("id") int id);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM CartItem c WHERE c.id in :ids")
+    void deleteByIds(@Param("ids") List<Integer> ids);
 
 }

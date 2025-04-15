@@ -37,7 +37,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserPrincipalDto user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantUser.does_not_exists));
-
+        
         List<String> rolePermissions = rolePermissionRepository.getPermissionOfRoleByRoleId(user.getRoleId());
         List<String> userPermissions = userPermissionRepository.getPermissionOfUserByUserId(user.getId());
 
@@ -54,7 +54,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
             user.setPermissions(permissions);
         }
 
-        return new UserPrincipal(user, user.getUserUid());
+        return new UserPrincipal(user);
     }
 
 }

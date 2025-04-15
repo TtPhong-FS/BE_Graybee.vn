@@ -1,10 +1,8 @@
 package vn.graybee.repositories.auths;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.users.Permission;
 import vn.graybee.projections.admin.auth.PermissionProjection;
 import vn.graybee.response.admin.auth.PermissionBasicResponse;
@@ -17,11 +15,6 @@ public interface PermissionRepository extends JpaRepository<Permission, Integer>
 
     @Query("Select p from Permission p")
     List<PermissionProjection> fetchAll();
-
-    @Transactional
-    @Modifying
-    @Query("Delete from Permission p where p.id = :id ")
-    void deleteById(@Param("id") int id);
 
     @Query("Select new vn.graybee.response.admin.auth.PermissionUserCountResponse(p.id, p.userCount) from Permission p where p.id = :id")
     Optional<PermissionUserCountResponse> getUserCountBeforeDelete(@Param("id") int id);

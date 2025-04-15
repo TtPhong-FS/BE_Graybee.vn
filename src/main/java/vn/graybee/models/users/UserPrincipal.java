@@ -1,7 +1,5 @@
 package vn.graybee.models.users;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,23 +10,14 @@ import java.util.List;
 
 public class UserPrincipal implements UserDetails {
 
-    private final Logger logger = LoggerFactory.getLogger(UserPrincipal.class);
-
     private final UserPrincipalDto user;
 
-    private final Integer userUid;
-
-    public UserPrincipal(UserPrincipalDto user, Integer userUid) {
+    public UserPrincipal(UserPrincipalDto user) {
         this.user = user;
-        this.userUid = userUid;
     }
 
     public UserPrincipalDto getUser() {
         return user;
-    }
-
-    public Integer getUserUid() {
-        return userUid;
     }
 
     @Override
@@ -43,7 +32,6 @@ public class UserPrincipal implements UserDetails {
             user.getPermissions().forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission.toUpperCase())));
         }
 
-        logger.info("Permission: {}", authorities);
         return authorities;
     }
 

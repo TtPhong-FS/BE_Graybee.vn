@@ -1,6 +1,6 @@
 package vn.graybee.enums;
 
-public enum GeneralStatus {
+public enum ProductStatus {
     DRAFT,
     ACTIVE,
     INACTIVE,

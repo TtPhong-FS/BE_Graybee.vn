@@ -2,10 +2,13 @@ package vn.graybee.models.products;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import vn.graybee.enums.ProductStatus;
 import vn.graybee.models.BaseModel;
 
 import java.math.BigDecimal;
@@ -46,13 +49,15 @@ public class Product extends BaseModel {
     @Column(name = "discount_percent")
     private int discountPercent;
 
+    @Column(name = "final_price")
     private BigDecimal finalPrice;
 
     @Column(length = 35)
     private String color;
 
-    @Column(length = 30)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProductStatus status;
 
     @Column(name = "in_stock")
     private boolean isStock;
@@ -184,12 +189,11 @@ public class Product extends BaseModel {
         this.color = color;
     }
 
-
-    public String getStatus() {
+    public ProductStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ProductStatus status) {
         this.status = status;
     }
 

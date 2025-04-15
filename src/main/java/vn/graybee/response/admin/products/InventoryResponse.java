@@ -1,5 +1,6 @@
 package vn.graybee.response.admin.products;
 
+import vn.graybee.enums.InventoryStatus;
 import vn.graybee.models.products.Inventory;
 import vn.graybee.response.BaseResponse;
 
@@ -11,21 +12,21 @@ public class InventoryResponse extends BaseResponse {
 
     private int quantity;
 
-    private String status;
+    private InventoryStatus status;
 
-    public InventoryResponse(Inventory inventory) {
+    public InventoryResponse(Inventory inventory, String productCode) {
         super(inventory.getCreatedAt(), inventory.getUpdatedAt());
         this.id = inventory.getId();
-        this.productCode = inventory.getProductCode();
+        this.productCode = productCode;
         this.quantity = inventory.getQuantity();
         this.status = inventory.getStatus();
     }
 
-    public String getStatus() {
+    public InventoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(InventoryStatus status) {
         this.status = status;
     }
 

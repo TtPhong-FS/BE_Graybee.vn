@@ -18,6 +18,9 @@ spring:
           batch_size: 20
           order_insert: true
           order_update: true
+  output:
+    ansi:
+      enabled: always
   cache:
     type: redis
   data:
@@ -28,6 +31,12 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
       database: ${REDIS_DATABASE}
+    elasticsearch:
+      repositories:
+        enabled: false
+      uris: http://localhost:9200
+#      username: elastic
+#      password: admin123
 
 server:
   address: 0.0.0.0
@@ -38,18 +47,24 @@ servlet:
     enabled: true
     max-file-size: 10MB
     max-request-size: 10MB
-output:
-  ansi:
-    enabled: always
+
 logging:
   level:
     com:
       zaxxer: ERROR
 
 api:
-  version: v1
-  endpoint: /api/${api.version}
+  admin: /api/v1/admin
+  categories: ${api.admin}/categories
+  manufacturers: ${api.admin}/manufacturers
+  products: ${api.admin}/products
+  orders: ${api.admin}/orders
+  tags: ${api.admin}/tags
+  subcategories: ${api.admin}/subcategories
+
 
 jwt:
   secretKey: ${SECRET_KEY}
   expiration: ${EXPIRATION}
+  header: ${HEADER}
+  prefix: ${PREFIX}

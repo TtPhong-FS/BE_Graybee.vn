@@ -12,19 +12,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.admin.category.ManufacturerProjection;
+import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.requests.directories.ManufacturerCreateRequest;
 import vn.graybee.requests.directories.ManufacturerUpdateRequest;
 import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
-import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
 
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/v1/admin/manufacturers")
+@RequestMapping("${api.manufacturers}")
 public class AdminManufacturerController {
 
     private final ManufacturerService manufacturerService;
@@ -34,18 +34,18 @@ public class AdminManufacturerController {
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> create(@RequestBody @Valid ManufacturerCreateRequest request) {
+    public ResponseEntity<BasicMessageResponse<Manufacturer>> create(@RequestBody @Valid ManufacturerCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 manufacturerService.create(request));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> update(@RequestParam("id") int id, @RequestBody @Valid ManufacturerUpdateRequest request) {
+    public ResponseEntity<BasicMessageResponse<Manufacturer>> update(@RequestParam("id") int id, @RequestBody @Valid ManufacturerUpdateRequest request) {
         return ResponseEntity.ok(manufacturerService.update(id, request));
     }
 
     @PutMapping("/update/status")
-    public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatusById(@RequestParam("id") int id, @RequestParam("status") String status) {
+    public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatusById(@RequestParam("id") int id, @RequestParam("status") DirectoryStatus status) {
         return ResponseEntity.ok(manufacturerService.updateStatusById(id, status));
     }
 
@@ -55,19 +55,13 @@ public class AdminManufacturerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> getById(@PathVariable("id") int id) {
-        return ResponseEntity.ok(manufacturerService.getById(id));
+    public ResponseEntity<BasicMessageResponse<Manufacturer>> findById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(manufacturerService.findById(id));
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<ManufacturerProjection>>> getAllManufacturers() {
-        BasicMessageResponse<List<ManufacturerProjection>> manufacturers = manufacturerService.getAllManufacturer();
-        return ResponseEntity.ok(manufacturers);
+    public ResponseEntity<BasicMessageResponse<List<Manufacturer>>> findAll() {
+        return ResponseEntity.ok(manufacturerService.findAll());
     }
 
-//    @PostMapping("/add-list")
-//    public ResponseEntity<BasicMessageResponse<List<ManufacturerResponse>>> createManufacturers(@RequestBody @Valid List<ManufacturerCreateRequest> request) {
-//        return ResponseEntity.status(HttpStatus.CREATED).body(
-//                manufacturerService.createManufacturers(request));
-//    }
 }

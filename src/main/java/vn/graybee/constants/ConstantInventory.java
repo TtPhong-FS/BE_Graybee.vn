@@ -10,4 +10,10 @@ public class ConstantInventory {
 
     public static final String success_fetch_inventories = "Danh sách kho hàng đã được lấy thành công";
 
+    public static final String product_does_not_exists = "Sản phẩm chưa được cập nhật vào kho";
+
+    public static final String product_out_of_stock = "Sản phẩm hiện không đủ hàng";
+
+    public static final String success_create = "Tạo kho cho sản phẩm thành công";
+
 }

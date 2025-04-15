@@ -6,7 +6,9 @@ public class OrderMapOrderDetailWithProductBasicDto {
 
     private long orderId;
 
-    private long id;
+    private long orderDetailId;
+
+    private long productId;
 
     private String name;
 
@@ -21,14 +23,31 @@ public class OrderMapOrderDetailWithProductBasicDto {
     public OrderMapOrderDetailWithProductBasicDto() {
     }
 
-    public OrderMapOrderDetailWithProductBasicDto(long orderId, long id, String name, String thumbnail, int quantity, BigDecimal subtotal, BigDecimal priceAtTime) {
+    public OrderMapOrderDetailWithProductBasicDto(long orderId, long orderDetailId, long productId, String name, String thumbnail, int quantity, BigDecimal subtotal, BigDecimal priceAtTime) {
         this.orderId = orderId;
-        this.id = id;
+        this.orderDetailId = orderDetailId;
+        this.productId = productId;
         this.name = name;
         this.thumbnail = thumbnail;
         this.quantity = quantity;
         this.subtotal = subtotal;
         this.priceAtTime = priceAtTime;
+    }
+
+    public long getOrderDetailId() {
+        return orderDetailId;
+    }
+
+    public void setOrderDetailId(long orderDetailId) {
+        this.orderDetailId = orderDetailId;
+    }
+
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     public BigDecimal getSubtotal() {
@@ -56,13 +75,6 @@ public class OrderMapOrderDetailWithProductBasicDto {
         this.orderId = orderId;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

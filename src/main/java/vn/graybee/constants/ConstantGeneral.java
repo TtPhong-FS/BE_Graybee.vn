@@ -4,7 +4,11 @@ public class ConstantGeneral {
 
     public static final String general = "general";
 
+    public static final String status = "status";
+
     //    Response
+
+    public static final String success_load_product_into_elastic = "Tải dữ liệu sản phẩm vào ElasticSearch thành công";
 
     public static final String success_delete_by_id = "Bản ghi đã được xoá thành công!";
 
@@ -19,5 +23,13 @@ public class ConstantGeneral {
     public static final String invalid_request = "Yêu cầu không xác định!";
 
     public static final String conflict_UserUid_and_sessionId = "Xung đột giữa người dùng và phiên. Vui lòng chỉ xử dụng một trong hai!";
+
+    public static final String method_invalid = "Phương thức không hợp lệ: ";
+
+    public static final String type_invalid = "Loại không hợp lệ: ";
+
+    public static final String status_invalid = "Trạng thái không hợp lệ: ";
+
+    public static final String discount_not_exists = "Mã giảm giá không tồn tại";
 
 }

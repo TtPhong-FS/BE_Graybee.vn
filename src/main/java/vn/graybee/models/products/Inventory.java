@@ -2,10 +2,13 @@ package vn.graybee.models.products;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import vn.graybee.enums.InventoryStatus;
 import vn.graybee.models.BaseModel;
 
 @Entity
@@ -16,28 +19,23 @@ public class Inventory extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "product_code", length = 100, nullable = false)
-    private String productCode;
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 
-    private int quantity;
+    private Integer quantity;
 
-    @Column(length = 30)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private InventoryStatus status;
 
     public Inventory() {
     }
 
-    public Inventory(String productCode, int quantity, String status) {
-        this.productCode = productCode;
-        this.quantity = quantity;
-        this.status = status;
-    }
-
-    public String getStatus() {
+    public InventoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(InventoryStatus status) {
         this.status = status;
     }
 
@@ -49,19 +47,19 @@ public class Inventory extends BaseModel {
         this.id = id;
     }
 
-    public String getProductCode() {
-        return productCode;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

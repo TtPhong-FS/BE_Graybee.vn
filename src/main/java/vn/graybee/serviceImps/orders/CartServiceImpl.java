@@ -69,8 +69,8 @@ public class CartServiceImpl implements CartService {
             cart.setSessionId(userUid == null ? sessionId : null);
             cart.setTotalAmount(BigDecimal.ZERO);
         }
-
         cart = cartRepository.save(cart);
+
 
         ProductBasicResponse product = productServicePublic.findBasicToAddToCartById(request.getProductId());
 
@@ -82,7 +82,7 @@ public class CartServiceImpl implements CartService {
 
                 CartItemResponse item = updateCartItemQuantity(cartItem.getId(), newQuantity, product.getFinalPrice());
 
-                updateTotalAmountToCart(cart.getId());
+                updateTotalAmount(cart.getId());
 
                 AddItemToCartResponse response = new AddItemToCartResponse(cartItem.getId(), product, item.getQuantity(), item.getTotal());
 
@@ -98,7 +98,7 @@ public class CartServiceImpl implements CartService {
 
         newCartItem = cartItemRepository.save(newCartItem);
 
-        updateTotalAmountToCart(cart.getId());
+        updateTotalAmount(cart.getId());
 
         AddItemToCartResponse response = new AddItemToCartResponse(newCartItem.getId(), product, newCartItem.getQuantity(), newCartItem.getTotal());
 
@@ -165,7 +165,7 @@ public class CartServiceImpl implements CartService {
         if (userUid != null && sessionId != null) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.conflict_UserUid_and_sessionId);
         }
-        
+
         Integer cartId;
 
         if (userUid != null) {
@@ -211,7 +211,7 @@ public class CartServiceImpl implements CartService {
 
         cartItemRepository.deleteById(id);
 
-        updateTotalAmountToCart(cartId);
+        updateTotalAmount(cartId);
 
         return new BasicMessageResponse<>(200, ConstantCart.success_delete_item_to_cart, id);
     }
@@ -227,7 +227,6 @@ public class CartServiceImpl implements CartService {
         Integer cartId;
 
         if (userUid != null) {
-
             cartId = cartRepository.findIdByUserUid(userUid)
                     .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCart.cart_does_not_exists));
         } else if (sessionId != null) {
@@ -247,7 +246,7 @@ public class CartServiceImpl implements CartService {
         DecreaseQuantityResponse response = new DecreaseQuantityResponse();
         if (cartItem.getQuantity() <= request.getQuantity()) {
             cartItemRepository.deleteById(cartItem.getId());
-            updateTotalAmountToCart(cartItem.getCartId());
+            updateTotalAmount(cartItem.getCartId());
 
             response.setId(cartItem.getId());
             response.setTotal(BigDecimal.ZERO);
@@ -264,7 +263,7 @@ public class CartServiceImpl implements CartService {
 
         cartItem = cartItemRepository.save(cartItem);
 
-        updateTotalAmountToCart(cartItem.getCartId());
+        updateTotalAmount(cartItem.getCartId());
 
         response.setTotal(cartItem.getTotal());
         response.setId(cartItem.getId());
@@ -273,10 +272,30 @@ public class CartServiceImpl implements CartService {
         return new BasicMessageResponse<>(200, ConstantCart.success_remove_item_to_cart, response);
     }
 
-    public void updateTotalAmountToCart(Integer cartId) {
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void updateTotalAmount(int cartId) {
         BigDecimal totalAmount = cartItemRepository.sumTotalByCartId(cartId);
         cartRepository.updateTotalAmount(cartId, totalAmount);
-
     }
+
+    @Override
+    public Integer findByUserIdOrSessionId(Integer userUid, String sessionId) {
+        if (userUid != null && sessionId != null) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.conflict_UserUid_and_sessionId);
+        }
+
+        Integer cartId = null;
+        if (userUid != null) {
+            cartId = cartRepository.findIdByUserUid(userUid)
+                    .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCart.cart_does_not_exists));
+        } else if (sessionId != null) {
+            cartId = cartRepository.findIdBySessionId(sessionId)
+                    .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCart.cart_does_not_exists));
+        }
+
+        return cartId;
+    }
+
 
 }

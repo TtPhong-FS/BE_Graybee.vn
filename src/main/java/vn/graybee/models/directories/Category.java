@@ -2,10 +2,13 @@ package vn.graybee.models.directories;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.models.BaseModel;
 
 @Entity
@@ -19,8 +22,9 @@ public class Category extends BaseModel {
     @Column(nullable = false, length = 35, unique = true)
     private String name;
 
-    @Column(length = 30)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DirectoryStatus status;
 
     @Column(name = "product_count")
     private int productCount;
@@ -54,11 +58,11 @@ public class Category extends BaseModel {
         this.id = id;
     }
 
-    public String getStatus() {
+    public DirectoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(DirectoryStatus status) {
         this.status = status;
     }
 

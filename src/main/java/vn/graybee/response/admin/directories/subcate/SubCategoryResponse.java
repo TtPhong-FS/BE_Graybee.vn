@@ -1,5 +1,6 @@
 package vn.graybee.response.admin.directories.subcate;
 
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.models.directories.SubCategory;
 import vn.graybee.response.BaseResponse;
 import vn.graybee.response.admin.directories.tag.TagResponse;
@@ -12,7 +13,7 @@ public class SubCategoryResponse extends BaseResponse {
 
     private String name;
 
-    private String status;
+    private DirectoryStatus status;
 
     private List<TagResponse> tags;
 
@@ -48,11 +49,11 @@ public class SubCategoryResponse extends BaseResponse {
         this.name = name;
     }
 
-    public String getStatus() {
+    public DirectoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(DirectoryStatus status) {
         this.status = status;
     }
 

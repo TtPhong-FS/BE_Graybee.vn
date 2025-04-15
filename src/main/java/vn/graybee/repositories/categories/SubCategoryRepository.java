@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.models.directories.SubCategory;
 import vn.graybee.response.admin.directories.subcate.SubCategoryResponse;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
@@ -27,7 +28,7 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
     @Transactional
     @Modifying
     @Query("Update SubCategory s set s.status = :status where s.id = :id")
-    void updateStatusById(@Param("id") int id, @Param("status") String status);
+    void updateStatusById(@Param("id") int id, @Param("status") DirectoryStatus status);
 
     @Query("SELECT EXISTS (SELECT 1 FROM SubCategory s WHERE s.name = :name AND s.id <> :id)")
     boolean existsByNameAndNotId(@Param("name") String name, @Param("id") int id);

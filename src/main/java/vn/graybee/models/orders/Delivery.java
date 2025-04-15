@@ -1,18 +1,25 @@
 package vn.graybee.models.orders;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.models.BaseModel;
+import vn.graybee.enums.DeliveryStatus;
+import vn.graybee.enums.DeliveryType;
+import vn.graybee.enums.ShippingMethod;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 @Table(name = "deliveries")
-public class Delivery extends BaseModel {
+public class Delivery {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,25 +28,60 @@ public class Delivery extends BaseModel {
     @Column(name = "order_id")
     private Long orderId;
 
-    @Column(name = "tracking_number")
+    @Column(name = "tracking_number", length = 50)
     private String trackingNumber;
 
     @Column(name = "shipping_method")
-    private String shippingMethod;
+    private ShippingMethod shippingMethod;
 
-    @Column(name = "delivery_type")
-    private String deliveryType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DeliveryType deliveryType;
 
-    @Column(name = "delivery_status")
-    private String deliveryStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DeliveryStatus deliveryStatus;
 
     @Column(name = "shipping_address")
     private String shippingAddress;
 
+    @Column(name = "order_date")
+    private LocalDate orderDate;
+
     @Column(name = "estimated_delivery_date")
-    private Date estimatedDeliveryDate;
+    private LocalDate estimatedDeliveryDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public Delivery() {
+    }
+
+    public Delivery(LocalDate orderDate) {
+        this.orderDate = orderDate;
+        setEstimatedDeliveryDate();
+    }
+
+    public LocalDate getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDate orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setEstimatedDeliveryDate() {
+        int daysToAdd = ThreadLocalRandom.current().nextInt(2, 4);
+        this.estimatedDeliveryDate = this.orderDate.plusDays(daysToAdd);
     }
 
     public Integer getId() {
@@ -66,27 +108,27 @@ public class Delivery extends BaseModel {
         this.trackingNumber = trackingNumber;
     }
 
-    public String getShippingMethod() {
+    public ShippingMethod getShippingMethod() {
         return shippingMethod;
     }
 
-    public void setShippingMethod(String shippingMethod) {
+    public void setShippingMethod(ShippingMethod shippingMethod) {
         this.shippingMethod = shippingMethod;
     }
 
-    public String getDeliveryType() {
+    public DeliveryType getDeliveryType() {
         return deliveryType;
     }
 
-    public void setDeliveryType(String deliveryType) {
+    public void setDeliveryType(DeliveryType deliveryType) {
         this.deliveryType = deliveryType;
     }
 
-    public String getDeliveryStatus() {
+    public DeliveryStatus getDeliveryStatus() {
         return deliveryStatus;
     }
 
-    public void setDeliveryStatus(String deliveryStatus) {
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;
     }
 
@@ -98,11 +140,11 @@ public class Delivery extends BaseModel {
         this.shippingAddress = shippingAddress;
     }
 
-    public Date getEstimatedDeliveryDate() {
+    public LocalDate getEstimatedDeliveryDate() {
         return estimatedDeliveryDate;
     }
 
-    public void setEstimatedDeliveryDate(Date estimatedDeliveryDate) {
+    public void setEstimatedDeliveryDate(LocalDate estimatedDeliveryDate) {
         this.estimatedDeliveryDate = estimatedDeliveryDate;
     }
 

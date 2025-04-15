@@ -6,6 +6,8 @@ public class OrderDetailProductDto {
 
     private long orderDetailId;
 
+    private long productId;
+
     private String productName;
 
     private String thumbnail;
@@ -19,13 +21,22 @@ public class OrderDetailProductDto {
     public OrderDetailProductDto() {
     }
 
-    public OrderDetailProductDto(long orderDetailId, String productName, String thumbnail, int quantity, BigDecimal subTotal, BigDecimal priceAtTime) {
+    public OrderDetailProductDto(long orderDetailId, long productId, String productName, String thumbnail, int quantity, BigDecimal subTotal, BigDecimal priceAtTime) {
         this.orderDetailId = orderDetailId;
+        this.productId = productId;
         this.productName = productName;
         this.thumbnail = thumbnail;
         this.quantity = quantity;
         this.subTotal = subTotal;
         this.priceAtTime = priceAtTime;
+    }
+
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     public long getOrderDetailId() {

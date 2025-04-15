@@ -1,5 +1,6 @@
 package vn.graybee.response.admin.directories.manufacturer;
 
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.response.BaseResponse;
 
@@ -9,7 +10,7 @@ public class ManufacturerResponse extends BaseResponse {
 
     private String name;
 
-    private String status;
+    private DirectoryStatus status;
 
     private int productCount;
 
@@ -45,11 +46,11 @@ public class ManufacturerResponse extends BaseResponse {
         this.name = name;
     }
 
-    public String getStatus() {
+    public DirectoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(DirectoryStatus status) {
         this.status = status;
     }
 

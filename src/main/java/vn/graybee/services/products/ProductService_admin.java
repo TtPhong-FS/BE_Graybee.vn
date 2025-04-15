@@ -1,5 +1,6 @@
 package vn.graybee.services.products;
 
+import vn.graybee.enums.ProductStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductRelationUpdateRequest;
@@ -14,6 +15,8 @@ import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import java.util.List;
 
 public interface ProductService_admin {
+
+    Long checkExistById(long id);
 
     BasicMessageResponse<ProductResponse> create(ProductCreateRequest request);
 
@@ -33,7 +36,7 @@ public interface ProductService_admin {
 
     void updateProductCountManufacturer(int ManufacturerId, boolean isIncrease);
 
-    BasicMessageResponse<ProductStatusResponse> updateStatus(long id, String status);
+    BasicMessageResponse<ProductStatusResponse> updateStatus(long id, ProductStatus status);
 
     BasicMessageResponse<ProductIdAndTagIdResponse> deleteRelationByProductIdAndTagId(long productId, int tagId);
 

@@ -7,6 +7,7 @@ import vn.graybee.constants.ConstantCategory;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantManufacturer;
 import vn.graybee.constants.ConstantSubcategory;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
@@ -102,10 +103,9 @@ public class CategoryServiceImp implements CategoryService {
             throw new BusinessCustomException(ConstantManufacturer.manufacturers, ConstantManufacturer.does_not_exists);
         }
 
-
         Category category = new Category();
         category.setName(TextUtils.capitalize(request.getName()));
-        category.setStatus("ACTIVE");
+        category.setStatus(DirectoryStatus.ACTIVE);
         category = categoryRepository.save(category);
 
         if (request.getSubcategories() != null && !request.getSubcategories().isEmpty()) {
@@ -117,10 +117,10 @@ public class CategoryServiceImp implements CategoryService {
         }
 
         CategoryResponse categoryResponse = new CategoryResponse(
-                category,
-                subcategories,
-                manufacturers
+                category
         );
+        categoryResponse.setSubcategories(subcategories);
+        categoryResponse.setManufacturers(manufacturers);
 
         return new BasicMessageResponse<>(201, ConstantCategory.success_create, categoryResponse);
     }
@@ -184,6 +184,8 @@ public class CategoryServiceImp implements CategoryService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<CategoryResponse> update(int id, CategoryUpdateRequest request) {
 
+        DirectoryStatus status = request.getEnumStatus();
+
         List<SubcateDto> subcategories = subCategoryRepository.findByIds(request.getSubcategories());
         Set<Integer> foundSubcategoryIds = subcategories.stream()
                 .map(SubcateDto::getId)
@@ -212,16 +214,12 @@ public class CategoryServiceImp implements CategoryService {
         if (category.getProductCount() == 0) {
             category.setName(request.getName());
         }
-
-        if (request.getStatus() != null) {
-            category.setStatus(request.getStatus().name());
-        } else {
-            category.setStatus("PENDING");
-        }
-
+        
+        category.setStatus(status);
         category.setUpdatedAt(LocalDateTime.now());
 
         category = categoryRepository.save(category);
+
         int categoryId = category.getId();
 
         if (request.getSubcategories() != null && !request.getSubcategories().isEmpty()) {
@@ -259,10 +257,10 @@ public class CategoryServiceImp implements CategoryService {
         }
 
         CategoryResponse categoryResponse = new CategoryResponse(
-                category,
-                subcategories,
-                manufacturers
+                category
         );
+        categoryResponse.setSubcategories(subcategories);
+        categoryResponse.setManufacturers(manufacturers);
 
         return new BasicMessageResponse<>(200, ConstantCategory.success_update, categoryResponse);
 
@@ -321,7 +319,7 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status) {
+    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status) {
         int category = categoryRepository.findIdById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists));
 

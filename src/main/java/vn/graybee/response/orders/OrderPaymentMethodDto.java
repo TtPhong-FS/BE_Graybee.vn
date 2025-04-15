@@ -1,12 +1,14 @@
 package vn.graybee.response.orders;
 
+import vn.graybee.enums.PaymentMethod;
+
 public class OrderPaymentMethodDto {
 
     private long orderId;
 
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
-    public OrderPaymentMethodDto(long orderId, String paymentMethod) {
+    public OrderPaymentMethodDto(long orderId, PaymentMethod paymentMethod) {
         this.orderId = orderId;
         this.paymentMethod = paymentMethod;
     }
@@ -22,11 +24,11 @@ public class OrderPaymentMethodDto {
         this.orderId = orderId;
     }
 
-    public String getPaymentMethod() {
+    public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 

@@ -4,16 +4,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantManufacturer;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.directories.Manufacturer;
-import vn.graybee.projections.admin.category.ManufacturerProjection;
 import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.requests.directories.ManufacturerCreateRequest;
 import vn.graybee.requests.directories.ManufacturerUpdateRequest;
 import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerProductCountResponse;
-import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
 import vn.graybee.utils.TextUtils;
 
@@ -31,28 +30,27 @@ public class ManufacturerServiceImp implements ManufacturerService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ManufacturerResponse> create(ManufacturerCreateRequest request) {
+    public BasicMessageResponse<Manufacturer> create(ManufacturerCreateRequest request) {
 
-        if (manufacturerRepository.validateName(request.getName()).isPresent()) {
+        if (manufacturerRepository.checkExistsByName(request.getName())) {
             throw new BusinessCustomException(ConstantManufacturer.name, ConstantManufacturer.name_exists);
         }
 
         Manufacturer manufacturer = new Manufacturer();
         manufacturer.setName(TextUtils.capitalize(request.getName()));
-        manufacturer.setStatus("ACTIVE");
+        manufacturer.setStatus(DirectoryStatus.ACTIVE);
 
         manufacturer = manufacturerRepository.save(manufacturer);
 
-        ManufacturerResponse manufacturerResponse = new ManufacturerResponse(
-                manufacturer);
-
-        return new BasicMessageResponse<>(201, ConstantManufacturer.success_create, manufacturerResponse);
+        return new BasicMessageResponse<>(201, ConstantManufacturer.success_create, manufacturer);
 
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ManufacturerResponse> update(int id, ManufacturerUpdateRequest request) {
+    public BasicMessageResponse<Manufacturer> update(int id, ManufacturerUpdateRequest request) {
+
+        DirectoryStatus status = request.getStatusEnum();
 
         Manufacturer manufacturer = manufacturerRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
@@ -65,45 +63,43 @@ public class ManufacturerServiceImp implements ManufacturerService {
             manufacturer.setName(request.getName());
         }
 
-        manufacturer.setStatus(request.getStatus().name());
+        manufacturer.setStatus(status);
         manufacturer.setUpdatedAt(LocalDateTime.now());
 
         manufacturer = manufacturerRepository.save(manufacturer);
 
-        ManufacturerResponse response = new ManufacturerResponse(manufacturer);
-
-        return new BasicMessageResponse<>(200, ConstantManufacturer.success_update, response);
+        return new BasicMessageResponse<>(200, ConstantManufacturer.success_update, manufacturer);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status) {
-        int manufacturer = manufacturerRepository.checkExistsById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
+    public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status) {
+        if (!manufacturerRepository.checkExistsById(id)) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists);
+        }
 
-        manufacturerRepository.updateStatusById(manufacturer, status);
-        UpdateStatusResponse response = new UpdateStatusResponse(manufacturer, status, LocalDateTime.now());
+        manufacturerRepository.updateStatusById(id, status);
+
+        UpdateStatusResponse response = new UpdateStatusResponse(id, status, LocalDateTime.now());
 
         return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
     }
 
     @Override
-    public BasicMessageResponse<ManufacturerResponse> getById(int id) {
-        ManufacturerResponse response = manufacturerRepository.getById(id)
+    public BasicMessageResponse<Manufacturer> findById(int id) {
+        Manufacturer response = manufacturerRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
 
         return new BasicMessageResponse<>(200, ConstantManufacturer.success_find_by_id, response);
     }
 
     @Override
-    public BasicMessageResponse<List<ManufacturerProjection>> getAllManufacturer() {
-        List<ManufacturerProjection> manufacturers = manufacturerRepository.fetchAll();
+    public BasicMessageResponse<List<Manufacturer>> findAll() {
+        List<Manufacturer> manufacturers = manufacturerRepository.findAll();
 
-        if (manufacturers.isEmpty()) {
-            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, manufacturers);
-        }
+        String message = manufacturers.isEmpty() ? ConstantGeneral.empty_list : ConstantManufacturer.success_fetch_manufacturers;
 
-        return new BasicMessageResponse<>(200, ConstantManufacturer.success_fetch_manufacturers, manufacturers);
+        return new BasicMessageResponse<>(200, message, manufacturers);
 
     }
 

@@ -6,7 +6,7 @@ import vn.graybee.response.users.UserProfileResponse;
 
 public interface UserService {
 
-    Integer getUidByToken(String token);
+    Integer getUidByUsername(String username);
 
     BasicMessageResponse<UserProfileResponse> getProfileByUid(Integer uid);
 

@@ -1,15 +1,17 @@
 package vn.graybee.response.orders;
 
+import vn.graybee.enums.DeliveryType;
+
 public class OrderDeliveryTypeDto {
 
     private long orderId;
 
-    private String deliveryType;
+    private DeliveryType deliveryType;
 
     public OrderDeliveryTypeDto() {
     }
 
-    public OrderDeliveryTypeDto(long orderId, String deliveryType) {
+    public OrderDeliveryTypeDto(long orderId, DeliveryType deliveryType) {
         this.orderId = orderId;
         this.deliveryType = deliveryType;
     }
@@ -22,11 +24,11 @@ public class OrderDeliveryTypeDto {
         this.orderId = orderId;
     }
 
-    public String getDeliveryType() {
+    public DeliveryType getDeliveryType() {
         return deliveryType;
     }
 
-    public void setDeliveryType(String deliveryType) {
+    public void setDeliveryType(DeliveryType deliveryType) {
         this.deliveryType = deliveryType;
     }
 

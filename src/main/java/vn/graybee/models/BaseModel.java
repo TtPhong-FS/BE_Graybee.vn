@@ -1,5 +1,6 @@
 package vn.graybee.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
@@ -11,9 +12,11 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public class BaseModel {
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

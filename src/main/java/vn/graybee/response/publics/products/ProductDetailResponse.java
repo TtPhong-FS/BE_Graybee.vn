@@ -10,6 +10,8 @@ public class ProductDetailResponse {
 
     private String name;
 
+    private String manufacturerName;
+
     private int warranty;
 
     private String conditions;
@@ -35,9 +37,10 @@ public class ProductDetailResponse {
     public ProductDetailResponse() {
     }
 
-    public ProductDetailResponse(long id, String name, int warranty, String conditions, float weight, String color, String thumbnail, BigDecimal price, BigDecimal finalPrice, int discountPercent) {
+    public ProductDetailResponse(long id, String name, String manufacturerName, int warranty, String conditions, float weight, String color, String thumbnail, BigDecimal price, BigDecimal finalPrice, int discountPercent) {
         this.id = id;
         this.name = name;
+        this.manufacturerName = manufacturerName;
         this.warranty = warranty;
         this.conditions = conditions;
         this.weight = weight;
@@ -46,6 +49,14 @@ public class ProductDetailResponse {
         this.price = price;
         this.finalPrice = finalPrice;
         this.discountPercent = discountPercent;
+    }
+
+    public String getManufacturerName() {
+        return manufacturerName;
+    }
+
+    public void setManufacturerName(String manufacturerName) {
+        this.manufacturerName = manufacturerName;
     }
 
     public long getId() {

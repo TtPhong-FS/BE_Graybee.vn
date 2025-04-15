@@ -1,6 +1,7 @@
 package vn.graybee.services.products;
 
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.messages.MessageResponse;
 import vn.graybee.response.favourites.ProductFavourite;
 import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductDetailResponse;
@@ -10,13 +11,11 @@ import java.util.List;
 
 public interface ProductService_public {
 
-    BasicMessageResponse<List<ProductBasicResponse>> fetchProductsFromClient();
+    MessageResponse<List<ProductBasicResponse>> findByCategoryName(String categoryName, int page, int size, String sortBy, String order);
 
-    BasicMessageResponse<List<ProductBasicResponse>> findByCategoryName(String categoryName);
+    MessageResponse<List<ProductBasicResponse>> findByCategoryAndManufacturer(String categoryName, String manufacturerName, int page, int size, String sortBy, String order);
 
-    BasicMessageResponse<List<ProductBasicResponse>> findByCategoryAndManufacturer(String categoryName, String manufacturerName);
-
-    BasicMessageResponse<List<ProductBasicResponse>> findByCategoryAndSubcategoryAndTag(String categoryName, String subcategoryName, String tagName);
+    MessageResponse<List<ProductBasicResponse>> findByCategoryAndSubcategoryAndTag(String categoryName, String subcategoryName, String tagName, int page, int size, String sortBy, String order);
 
     ProductPriceResponse getPriceById(long id);
 

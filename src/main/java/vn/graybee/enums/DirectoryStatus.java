@@ -1,6 +1,6 @@
 package vn.graybee.enums;
 
-public enum CategoryStatus {
+public enum DirectoryStatus {
     ACTIVE,
     INACTIVE,
     DELETED,

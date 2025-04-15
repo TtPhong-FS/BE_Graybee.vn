@@ -9,7 +9,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class EcommerceGraybeeApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(EcommerceGraybeeApplication.class, args);
+
     }
+
 
 }

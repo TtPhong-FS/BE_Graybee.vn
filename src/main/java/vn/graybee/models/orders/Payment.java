@@ -2,11 +2,17 @@ package vn.graybee.models.orders;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import vn.graybee.enums.PaymentMethod;
+import vn.graybee.enums.PaymentStatus;
 import vn.graybee.models.BaseModel;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "payments")
@@ -20,18 +26,31 @@ public class Payment extends BaseModel {
     private Long orderId;
 
     @Column(name = "total_amount")
-    private double totalAmount;
+    private BigDecimal totalAmount;
 
-    @Column(name = "payment_method")
-    private String paymentMethod;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentMethod paymentMethod;
 
-    @Column(name = "payment_status")
-    private String paymentStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus;
 
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
 
+    @Column(name = "currency_code", length = 3)
+    private String currentCode;
+
     public Payment() {
+    }
+
+    public String getCurrentCode() {
+        return currentCode;
+    }
+
+    public void setCurrentCode(String currentCode) {
+        this.currentCode = currentCode;
     }
 
     public Integer getId() {
@@ -50,28 +69,28 @@ public class Payment extends BaseModel {
         this.orderId = orderId;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getPaymentStatus() {
+    public PaymentStatus getPaymentStatus() {
         return paymentStatus;
     }
 
-    public void setPaymentStatus(String paymentStatus) {
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public String getTransactionId() {

@@ -1,5 +1,6 @@
 package vn.graybee.response.admin.products;
 
+import vn.graybee.enums.ProductStatus;
 import vn.graybee.models.products.Product;
 import vn.graybee.response.BaseResponse;
 
@@ -40,7 +41,7 @@ public class ProductResponse extends BaseResponse {
 
     private int quantity;
 
-    private String status;
+    private ProductStatus status;
 
     public ProductResponse(LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
@@ -131,11 +132,11 @@ public class ProductResponse extends BaseResponse {
         this.name = name;
     }
 
-    public String getStatus() {
+    public ProductStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ProductStatus status) {
         this.status = status;
     }
 

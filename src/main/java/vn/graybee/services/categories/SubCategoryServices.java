@@ -1,5 +1,6 @@
 package vn.graybee.services.categories;
 
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.directories.SubCategoryCreateRequest;
 import vn.graybee.requests.directories.SubCategoryUpdateRequest;
@@ -16,7 +17,7 @@ public interface SubCategoryServices {
 
     BasicMessageResponse<SubCategoryResponse> update(int id, SubCategoryUpdateRequest request);
 
-    BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status);
+    BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status);
 
     BasicMessageResponse<SubCategoryResponse> getById(int id);
 

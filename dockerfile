@@ -3,7 +3,7 @@ FROM openjdk:17-slim
 # Đặt thư mục làm việc
 WORKDIR /app
 
-COPY target/graybee.jar ecommerce-graybee-server.jar
+COPY target/ecommerce-graybee-server.jar ecommerce-graybee-server.jar
 
 EXPOSE 8080
 

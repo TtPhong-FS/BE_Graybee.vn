@@ -1,6 +1,9 @@
 package vn.graybee.response.orders;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import vn.graybee.enums.DeliveryType;
+import vn.graybee.enums.OrderStatus;
+import vn.graybee.enums.PaymentMethod;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,7 +14,7 @@ public class OrderHistoryResponse {
 
     private long orderId;
 
-    private String status;
+    private OrderStatus status;
 
     private BigDecimal totalAmount;
 
@@ -22,14 +25,14 @@ public class OrderHistoryResponse {
 
     private List<OrderDetailProductDto> orderDetails;
 
-    private String deliveryType;
+    private DeliveryType deliveryType;
 
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
     public OrderHistoryResponse() {
     }
 
-    public OrderHistoryResponse(long orderId, String status, BigDecimal totalAmount, int totalQuantity, LocalDateTime orderDate, List<OrderDetailProductDto> orderDetails, String deliveryType, String paymentMethod) {
+    public OrderHistoryResponse(long orderId, OrderStatus status, BigDecimal totalAmount, int totalQuantity, LocalDateTime orderDate, List<OrderDetailProductDto> orderDetails, DeliveryType deliveryType, PaymentMethod paymentMethod) {
         this.orderId = orderId;
         this.status = status;
         this.totalAmount = totalAmount;
@@ -37,14 +40,6 @@ public class OrderHistoryResponse {
         this.orderDate = orderDate;
         this.orderDetails = orderDetails;
         this.deliveryType = deliveryType;
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 
@@ -56,11 +51,11 @@ public class OrderHistoryResponse {
         this.orderId = orderId;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 
@@ -97,12 +92,20 @@ public class OrderHistoryResponse {
         this.orderDetails = orderDetails;
     }
 
-    public String getDeliveryType() {
+    public DeliveryType getDeliveryType() {
         return deliveryType;
     }
 
-    public void setDeliveryType(String deliveryType) {
+    public void setDeliveryType(DeliveryType deliveryType) {
         this.deliveryType = deliveryType;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
 }

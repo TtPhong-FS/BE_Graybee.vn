@@ -1,6 +1,7 @@
 package vn.graybee.response.orders;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import vn.graybee.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ public class OrderBasicDto {
 
     private long id;
 
-    private String status;
+    private OrderStatus status;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDate;
@@ -19,7 +20,7 @@ public class OrderBasicDto {
     public OrderBasicDto() {
     }
 
-    public OrderBasicDto(long id, String status, LocalDateTime orderDate, BigDecimal totalAmount) {
+    public OrderBasicDto(long id, OrderStatus status, LocalDateTime orderDate, BigDecimal totalAmount) {
         this.id = id;
         this.status = status;
         this.orderDate = orderDate;
@@ -34,11 +35,11 @@ public class OrderBasicDto {
         this.id = id;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 

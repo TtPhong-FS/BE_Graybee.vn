@@ -6,11 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "order_details")
+@Table(name = "order_details", uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "order_id"}))
 public class OrderDetail {
 
     @Id

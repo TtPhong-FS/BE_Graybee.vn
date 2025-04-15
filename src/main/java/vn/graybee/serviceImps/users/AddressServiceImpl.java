@@ -9,6 +9,7 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.users.Address;
 import vn.graybee.repositories.users.AddressRepository;
 import vn.graybee.requests.users.AddressCreateRequest;
+import vn.graybee.response.users.AddressExistingDto;
 import vn.graybee.response.users.DefaultAddressDto;
 import vn.graybee.response.users.PersonalAddressDto;
 import vn.graybee.services.users.AddressService;
@@ -48,7 +49,7 @@ public class AddressServiceImpl implements AddressService {
 
         Address address = new Address();
         address.setUserUid(userUid);
-        address.setFullname(TextUtils.capitalizeEachWord(request.getFullname()));
+        address.setFullName(TextUtils.capitalizeEachWord(request.getFullName()));
         address.setPhoneNumber(request.getPhoneNumber());
         address.setCity(TextUtils.capitalizeEachWord(request.getCity()));
         address.setDistrict(TextUtils.capitalizeEachWord(request.getDistrict()));
@@ -65,7 +66,7 @@ public class AddressServiceImpl implements AddressService {
         PersonalAddressDto response = new PersonalAddressDto(
                 address.getId(),
                 address.getPhoneNumber(),
-                address.getFullname(),
+                address.getFullName(),
                 address.getCity(),
                 address.getDistrict(),
                 address.getCommune(),
@@ -82,13 +83,13 @@ public class AddressServiceImpl implements AddressService {
         Address updateAddress = addressRepository.findByIdAndUserUid(id, userUid)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantUser.address_not_exists));
 
-        updateAddress.setFullname(request.getFullname());
+        updateAddress.setFullName(request.getFullName());
         updateAddress.setPhoneNumber(request.getPhoneNumber());
         updateAddress.setCity(request.getCity());
         updateAddress.setDistrict(request.getDistrict());
         updateAddress.setCommune(request.getCommune());
         updateAddress.setStreetAddress(request.getStreetAddress());
-        
+
         if (request.isDefault()) {
             addressRepository.updateAllDefaultToFalseByUserUid(userUid);
         }
@@ -99,7 +100,7 @@ public class AddressServiceImpl implements AddressService {
         PersonalAddressDto response = new PersonalAddressDto(
                 updateAddress.getId(),
                 updateAddress.getPhoneNumber(),
-                updateAddress.getFullname(),
+                updateAddress.getFullName(),
                 updateAddress.getCity(),
                 updateAddress.getDistrict(),
                 updateAddress.getCommune(),
@@ -127,6 +128,15 @@ public class AddressServiceImpl implements AddressService {
         if (!addressRepository.checkExistsById(id)) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantUser.address_not_exists);
         }
+    }
+
+    @Override
+    public BasicMessageResponse<List<AddressExistingDto>> getAddressExistingByUserUidOrSessionId(Integer userUid, String sessionId) {
+        if (userUid != null && sessionId != null) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.invalid_request);
+        }
+        List<AddressExistingDto> response = addressRepository.getAddressExistingByUserUidOrSessionId(userUid, sessionId);
+        return new BasicMessageResponse<>(200, null, response);
     }
 
 }

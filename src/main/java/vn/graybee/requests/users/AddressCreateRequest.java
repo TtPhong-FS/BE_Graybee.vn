@@ -8,7 +8,7 @@ public class AddressCreateRequest {
 
     @NotBlank(message = "Nhập họ và tên người nhận")
     @Size(max = 50, message = "Họ và tên quá dài")
-    private String fullname;
+    private String fullName;
 
     @NotBlank(message = "Nhập số điện thoại người nhận")
     @Size(min = 10, max = 12, message = "Số điện thoại phải từ 10 - 12 số")
@@ -44,12 +44,12 @@ public class AddressCreateRequest {
         isDefault = aDefault;
     }
 
-    public String getFullname() {
-        return fullname;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPhoneNumber() {

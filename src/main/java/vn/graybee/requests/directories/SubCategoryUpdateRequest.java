@@ -2,7 +2,9 @@ package vn.graybee.requests.directories;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import vn.graybee.enums.CategoryStatus;
+import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.enums.DirectoryStatus;
+import vn.graybee.exceptions.BusinessCustomException;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,9 +15,19 @@ public class SubCategoryUpdateRequest {
     @Size(max = 35, message = "Độ dài không được vượt quá 35 ký tự")
     private String name;
 
-    private CategoryStatus status;
+    @NotBlank(message = "Trạng thái không được để trống")
+    private String status;
 
     private List<Integer> tags;
+
+    public DirectoryStatus getStatusEnum() {
+        try {
+            return DirectoryStatus.valueOf(status.toUpperCase());
+
+        } catch (RuntimeException e) {
+            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid);
+        }
+    }
 
     public String getName() {
         return name;
@@ -25,11 +37,11 @@ public class SubCategoryUpdateRequest {
         this.name = name;
     }
 
-    public CategoryStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(CategoryStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

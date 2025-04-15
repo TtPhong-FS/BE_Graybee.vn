@@ -1,5 +1,9 @@
 package vn.graybee.serviceImps.products;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantGeneral;
@@ -7,6 +11,9 @@ import vn.graybee.constants.ConstantProduct;
 import vn.graybee.constants.ConstantUser;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.messages.MessageResponse;
+import vn.graybee.messages.other.PaginationInfo;
+import vn.graybee.messages.other.SortInfo;
 import vn.graybee.models.users.Favourite;
 import vn.graybee.repositories.products.ProductDescriptionRepository;
 import vn.graybee.repositories.products.ProductImageRepository;
@@ -47,30 +54,80 @@ public class ProductServiceImpl_public implements ProductService_public {
         this.reviewCommentRepository = reviewCommentRepository;
     }
 
-    @Override
-    public BasicMessageResponse<List<ProductBasicResponse>> fetchProductsFromClient() {
-
-        return null;
+    public PaginationInfo getPagination(Page<ProductBasicResponse> page) {
+        return new PaginationInfo(
+                page.getNumber(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.getSize()
+        );
     }
 
     @Override
-    public BasicMessageResponse<List<ProductBasicResponse>> findByCategoryAndManufacturer(String categoryName, String manufacturerName) {
-        List<ProductBasicResponse> products = productRepository.findByCategoryAndManufacturer(categoryName, manufacturerName);
-        if (products.isEmpty()) {
-            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, products);
-        }
+    public MessageResponse<List<ProductBasicResponse>> findByCategoryName(String categoryName, int page, int size, String sortBy, String order) {
 
-        return new BasicMessageResponse<>(200, ConstantProduct.success_fetch_products, products);
+        Sort sort = order.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ProductBasicResponse> productPage = productRepository.findProductsByCategoryName(categoryName, pageable);
+
+        PaginationInfo paginationInfo = new PaginationInfo(
+                productPage.getNumber(), productPage.getTotalPages(), productPage.getTotalElements(), productPage.getSize()
+        );
+
+        SortInfo sortInfo = new SortInfo(
+                sortBy, order
+        );
+
+        String message = productPage.isEmpty()
+                ? ConstantGeneral.empty_list
+                : ConstantProduct.success_fetch_products;
+
+        return new MessageResponse<>(200, message, productPage.getContent(), paginationInfo, sortInfo);
+    }
+
+
+    @Override
+    public MessageResponse<List<ProductBasicResponse>> findByCategoryAndManufacturer(String categoryName, String manufacturerName, int page, int size, String sortBy, String order) {
+
+        Sort sort = order.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ProductBasicResponse> productPage = productRepository.findByCategoryAndManufacturer(categoryName, manufacturerName, pageable);
+
+        PaginationInfo paginationInfo = getPagination(productPage);
+
+        SortInfo sortInfo = new SortInfo(sortBy, order);
+
+
+        String message = productPage.isEmpty()
+                ? ConstantGeneral.empty_list
+                : ConstantProduct.success_fetch_products;
+
+        return new MessageResponse<>(200, message, productPage.getContent(), paginationInfo, sortInfo);
     }
 
     @Override
-    public BasicMessageResponse<List<ProductBasicResponse>> findByCategoryAndSubcategoryAndTag(String categoryName, String subcategoryName, String tagName) {
-        List<ProductBasicResponse> products = productRepository.findByCategoryAndSubcategoryAndTag(categoryName, subcategoryName, tagName);
-        if (products.isEmpty()) {
-            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, products);
-        }
+    public MessageResponse<List<ProductBasicResponse>> findByCategoryAndSubcategoryAndTag(String categoryName, String subcategoryName, String tagName, int page, int size, String sortBy, String order) {
 
-        return new BasicMessageResponse<>(200, ConstantProduct.success_fetch_products, products);
+        Sort sort = order.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ProductBasicResponse> productPage = productRepository.findByCategoryAndSubcategoryAndTag(categoryName, subcategoryName, tagName, pageable);
+
+        PaginationInfo paginationInfo = getPagination(productPage);
+
+        SortInfo sortInfo = new SortInfo(sortBy, order);
+
+
+        String message = productPage.isEmpty()
+                ? ConstantGeneral.empty_list
+                : ConstantProduct.success_fetch_products;
+
+        return new MessageResponse<>(200, message, productPage.getContent(), paginationInfo, sortInfo);
     }
 
     @Override
@@ -83,7 +140,6 @@ public class ProductServiceImpl_public implements ProductService_public {
     public ProductBasicResponse findBasicToAddToCartById(long id) {
         return productRepository.findBasicToAddToCart(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
-
     }
 
     @Override
@@ -94,7 +150,6 @@ public class ProductServiceImpl_public implements ProductService_public {
         List<String> images = productImageRepository.findImageUrlsByProductId(response.getId());
         List<ReviewCommentDto> reviews = reviewCommentRepository.getReviewsByProductId(response.getId());
         String description = productDescriptionRepository.getDescriptionByProductId(response.getId());
-
 
         response.setImages(images);
         response.setDescription(description);
@@ -144,17 +199,6 @@ public class ProductServiceImpl_public implements ProductService_public {
         }
 
         return new BasicMessageResponse<>(200, ConstantUser.success_add_favourite, product);
-    }
-
-    @Override
-    public BasicMessageResponse<List<ProductBasicResponse>> findByCategoryName(String categoryName) {
-        List<ProductBasicResponse> products = productRepository.findProductsByCategoryName(categoryName);
-
-        if (products.isEmpty()) {
-            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, products);
-        }
-
-        return new BasicMessageResponse<>(200, ConstantProduct.success_fetch_products, products);
     }
 
 }

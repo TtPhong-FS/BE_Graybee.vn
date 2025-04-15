@@ -5,11 +5,13 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantInventory;
 import vn.graybee.constants.ConstantProduct;
-import vn.graybee.enums.GeneralStatus;
+import vn.graybee.enums.InventoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.products.Inventory;
 import vn.graybee.repositories.products.InventoryRepository;
+import vn.graybee.repositories.products.ProductRepository;
+import vn.graybee.requests.products.InventoryRequest;
 import vn.graybee.response.admin.products.InventoryQuantityResponse;
 import vn.graybee.response.admin.products.InventoryResponse;
 import vn.graybee.services.products.InventoryService;
@@ -22,19 +24,40 @@ public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
 
-    public InventoryServiceImpl(InventoryRepository inventoryRepository) {
+    private final ProductRepository productRepository;
+
+    public InventoryServiceImpl(InventoryRepository inventoryRepository, ProductRepository productRepository) {
         this.inventoryRepository = inventoryRepository;
+        this.productRepository = productRepository;
+    }
+
+    @Override
+    public BasicMessageResponse<InventoryResponse> create(InventoryRequest request) {
+
+        String productCode = productRepository.getProductCodeById(request.getProductId())
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+        
+        InventoryStatus status = request.getStatusEnum();
+
+        Inventory inventory = new Inventory();
+        inventory.setProductId(request.getProductId());
+        inventory.setQuantity(request.getQuantity());
+        inventory.setStatus(status);
+
+        inventory = inventoryRepository.save(inventory);
+
+        InventoryResponse response = new InventoryResponse(inventoryRepository.save(inventory), productCode);
+
+        return new BasicMessageResponse<>(200, ConstantInventory.success_create, response);
     }
 
     @Override
     public BasicMessageResponse<List<InventoryResponse>> fetchAll() {
         List<InventoryResponse> response = inventoryRepository.fetchAll();
 
-        if (response.isEmpty()) {
-            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, response);
-        }
+        final String message = response.isEmpty() ? ConstantGeneral.empty_list : ConstantInventory.success_fetch_inventories;
 
-        return new BasicMessageResponse<>(200, ConstantInventory.success_fetch_inventories, response);
+        return new BasicMessageResponse<>(200, message, response);
     }
 
     @Override
@@ -54,18 +77,22 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<InventoryResponse> updateQuantity(int id, int quantity, String status) {
+    public BasicMessageResponse<InventoryResponse> updateQuantity(int id, int quantity, InventoryStatus status) {
+
+        String productCode = inventoryRepository.getProductCodeById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists_in_inventory));
 
         inventory.setQuantity(quantity);
-        inventory.setStatus(quantity > 0 ? status : GeneralStatus.OUT_OF_STOCK.name());
+        inventory.setStatus(quantity > 0 ? status : InventoryStatus.OUT_OF_STOCK);
 
         inventory.setUpdatedAt(LocalDateTime.now());
 
         inventory = inventoryRepository.save(inventory);
 
-        InventoryResponse response = new InventoryResponse(inventory);
+        InventoryResponse response = new InventoryResponse(inventory, productCode);
 
         return new BasicMessageResponse<>(200, ConstantInventory.success_update, response);
     }

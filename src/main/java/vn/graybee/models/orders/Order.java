@@ -2,10 +2,13 @@ package vn.graybee.models.orders;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import vn.graybee.enums.OrderStatus;
 import vn.graybee.models.BaseModel;
 
 import java.math.BigDecimal;
@@ -21,10 +24,13 @@ public class Order extends BaseModel {
     @Column(name = "user_uid")
     private Integer userUid;
 
+    @Column(name = "session_id", length = 50)
+    private String sessionId;
+
     @Column(name = "address_id")
     private Integer addressId;
 
-    @Column(name = "disscount_id")
+    @Column(name = "discount_id")
     private Integer discountId;
 
     @Column(name = "is_guest")
@@ -39,9 +45,41 @@ public class Order extends BaseModel {
     @Column(name = "issue_invoices")
     private boolean issueInvoices;
 
-    private String status;
+    @Column(name = "is_confirmed")
+    private boolean isConfirmed;
+
+    @Column(name = "is_cancelled")
+    private boolean isCancelled;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
 
     public Order() {
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public boolean isCancelled() {
+        return isCancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        isCancelled = cancelled;
+    }
+
+    public boolean isConfirmed() {
+        return isConfirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        isConfirmed = confirmed;
     }
 
     public Long getId() {
@@ -108,11 +146,11 @@ public class Order extends BaseModel {
         this.issueInvoices = issueInvoices;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 

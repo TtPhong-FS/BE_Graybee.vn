@@ -12,7 +12,7 @@ public class SignUpRequest {
     private String fullName;
 
     @NotBlank(message = "Vui lòng nhập Số điện thoại")
-    @Size(max = 12, message = "Độ dài tối đa không vượt quá 12 ký tự")
+    @Size(max = 12, message = "Số điện thoại chỉ được từ 10 - 12 số")
     private String phoneNumber;
 
     @Size(max = 50, message = "Độ dài tối đa không vượt quá 50 ký tự")

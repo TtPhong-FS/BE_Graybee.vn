@@ -1,5 +1,6 @@
 package vn.graybee.response.admin.directories.category;
 
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.models.directories.Category;
 import vn.graybee.response.BaseResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManuDto;
@@ -18,7 +19,7 @@ public class CategoryResponse extends BaseResponse {
 
     private List<ManuDto> manufacturers;
 
-    private String status;
+    private DirectoryStatus status;
 
     private int productCount;
 
@@ -26,14 +27,12 @@ public class CategoryResponse extends BaseResponse {
         super(createdAt, updatedAt);
     }
 
-    public CategoryResponse(Category category, List<SubcateDto> subcategories, List<ManuDto> manufacturers) {
+    public CategoryResponse(Category category) {
         super(category.getCreatedAt(), category.getUpdatedAt());
         this.id = category.getId();
         this.name = category.getName();
         this.status = category.getStatus();
         this.productCount = category.getProductCount();
-        this.subcategories = subcategories;
-        this.manufacturers = manufacturers;
     }
 
     public List<SubcateDto> getSubcategories() {
@@ -68,11 +67,11 @@ public class CategoryResponse extends BaseResponse {
         this.name = name;
     }
 
-    public String getStatus() {
+    public DirectoryStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(DirectoryStatus status) {
         this.status = status;
     }
 

@@ -1,7 +1,9 @@
 package vn.graybee.response.admin.products;
 
+import vn.graybee.enums.ProductStatus;
 import vn.graybee.models.products.Product;
 import vn.graybee.response.BaseResponse;
+import vn.graybee.response.admin.directories.subcate.SubcateDto;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
 import java.math.BigDecimal;
@@ -16,6 +18,8 @@ public class ProductDto extends BaseResponse {
     private int manufacturerId;
 
     private List<TagResponse> tags;
+
+    private List<SubcateDto> subcategories;
 
     private String code;
 
@@ -47,7 +51,7 @@ public class ProductDto extends BaseResponse {
 
     private int quantity;
 
-    private String status;
+    private ProductStatus status;
 
     public ProductDto(Product product, int categoryId, int manufacturerId, List<TagResponse> tags, List<String> images, int quantity, String description) {
         super(product.getCreatedAt(), product.getUpdatedAt());
@@ -71,6 +75,14 @@ public class ProductDto extends BaseResponse {
         this.quantity = quantity;
         this.description = description;
         this.status = product.getStatus();
+    }
+
+    public List<SubcateDto> getSubcategories() {
+        return subcategories;
+    }
+
+    public void setSubcategories(List<SubcateDto> subcategories) {
+        this.subcategories = subcategories;
     }
 
     public List<String> getImages() {
@@ -225,11 +237,11 @@ public class ProductDto extends BaseResponse {
         this.quantity = quantity;
     }
 
-    public String getStatus() {
+    public ProductStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ProductStatus status) {
         this.status = status;
     }
 

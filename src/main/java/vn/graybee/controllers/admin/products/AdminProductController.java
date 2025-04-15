@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.enums.ProductStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductRelationUpdateRequest;
@@ -21,18 +23,24 @@ import vn.graybee.response.admin.products.ProductResponse;
 import vn.graybee.response.admin.products.ProductStatusResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
+import vn.graybee.serviceImps.products.ProductDocumentService;
 import vn.graybee.services.products.ProductService_admin;
 
+import java.io.IOException;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/v1/admin/products")
+@RequestMapping("${api.products}")
 public class AdminProductController {
+
+
+    private final ProductDocumentService productDocumentService;
 
     private final ProductService_admin productServiceADMIN;
 
-    public AdminProductController(ProductService_admin productServiceADMIN) {
+    public AdminProductController(ProductDocumentService productDocumentService, ProductService_admin productServiceADMIN) {
+        this.productDocumentService = productDocumentService;
         this.productServiceADMIN = productServiceADMIN;
     }
 
@@ -82,9 +90,14 @@ public class AdminProductController {
     }
 
     @PutMapping("/update/status")
-    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@RequestParam("id") long id, @RequestParam("status") String status) {
+    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@RequestParam("id") long id, @RequestParam("status") ProductStatus status) {
         return ResponseEntity.ok(productServiceADMIN.updateStatus(id, status));
     }
 
+    @GetMapping("/load-elastic")
+    public ResponseEntity<BasicMessageResponse<?>> loadProductsIndexIntoElastic() throws IOException {
+        productDocumentService.loadProductsIndexIntoElastic();
+        return ResponseEntity.ok(new BasicMessageResponse<>(200, ConstantGeneral.success_load_product_into_elastic, null));
+    }
 
 }
