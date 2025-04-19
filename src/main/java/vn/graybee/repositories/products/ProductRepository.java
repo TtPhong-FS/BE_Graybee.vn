@@ -27,9 +27,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "FROM Product p " +
             "INNER JOIN Category c ON p.categoryId = c.id " +
             "INNER JOIN Manufacturer m ON p.manufacturerId = m.id " +
-            "LEFT JOIN Inventory i on p.id = i.productId "
+            "LEFT JOIN Inventory i on p.id = i.productId " +
+            "Where (:status IS NULL or p.status = :status) and (:categoryName IS NULL or c.name = :categoryName) and (:manufacturerName IS NULL or m.name = :manufacturerName)"
     )
-    List<ProductResponse> fetchProducts();
+    Page<ProductResponse> fetchProducts(
+            @Param("status") ProductStatus status,
+            @Param("categoryName") String categoryName,
+            @Param("manufacturerName") String manufacturerName,
+            Pageable pageable);
 
     @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p where p.id = :id")
     Optional<ProductBasicResponse> findBasicById(@Param("id") long id);
@@ -71,10 +76,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT EXISTS (SELECT 1 FROM Product p WHERE p.name = :name AND p.id <> :id)")
     boolean existsByNameAndNotId(@Param("name") String name, @Param("id") long id);
 
-    //    Public
-
     @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p where p.status = 'PUBLISHED' ")
-    List<ProductBasicResponse> getProductToLoadIntoElastic();
+    List<ProductBasicResponse> getProductPublishedToLoadIntoElastic();
+    //    Public
 
     @Query("Select new vn.graybee.response.favourites.ProductFavourite(p.id, p.finalPrice,p.name, p.thumbnail) from Product p where p.id = :id and p.status = 'PUBLISHED' ")
     Optional<ProductFavourite> findToAddToFavourite(@Param("id") long id);

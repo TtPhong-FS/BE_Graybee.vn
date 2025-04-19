@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.messages.MessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductRelationUpdateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
@@ -59,25 +59,35 @@ public class AdminProductController {
         return ResponseEntity.ok(productServiceADMIN.delete(id));
     }
 
-    @DeleteMapping("/subcategories/delete")
-    public ResponseEntity<BasicMessageResponse<ProductSubcategoryIDResponse>> deleteRelationByProductIdAndSubcategoryId(@RequestParam("productId") long productId, @RequestParam("subcategoryId") int subcategoryId) {
-        return ResponseEntity.ok(productServiceADMIN.deleteRelationByProductIdAndSubcategoryId(productId, subcategoryId));
-    }
-
-    @DeleteMapping("/tags/delete")
-    public ResponseEntity<BasicMessageResponse<ProductIdAndTagIdResponse>> deleteRelationByProductIdAndTagId(@RequestParam("productId") long productId, @RequestParam("tagId") int tagId) {
-        return ResponseEntity.ok(productServiceADMIN.deleteRelationByProductIdAndTagId(productId, tagId));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<BasicMessageResponse<ProductDto>> getById(@PathVariable("id") long id) {
         return ResponseEntity.ok(productServiceADMIN.getById(id));
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<ProductResponse>>> fetchAll() {
-        return ResponseEntity.ok(productServiceADMIN.fetchAll());
+    public ResponseEntity<MessageResponse<List<ProductResponse>>> fetchAll(
+            @RequestParam(value = "status", defaultValue = "all") String status,
+            @RequestParam(value = "category", defaultValue = "all") String category,
+            @RequestParam(value = "manufacturer", defaultValue = "all") String manufacturer,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "15") int size,
+            @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
+            @RequestParam(value = "order", defaultValue = "desc") String order
+    ) {
+        return ResponseEntity.ok(productServiceADMIN.fetchAll(status, category, manufacturer, page, size, sortBy, order));
     }
+
+    @PutMapping("/update/status")
+    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@RequestParam("id") long id, @RequestParam("status") ProductStatus status) {
+        return ResponseEntity.ok(productServiceADMIN.updateStatus(id, status));
+    }
+
+    @GetMapping("/load-elastic")
+    public ResponseEntity<BasicMessageResponse<String>> loadProductsPublishedIndexIntoElastic() throws IOException {
+        return ResponseEntity.ok(productDocumentService.loadProductsPublishedIndexIntoElastic());
+    }
+
+//    subcategory - tag - product
 
     @GetMapping("/subcategories&tags")
     public ResponseEntity<BasicMessageResponse<List<ProductSubcategoryAndTagResponse>>> fetchProductsWithSubcategoriesAndTags() {
@@ -89,15 +99,17 @@ public class AdminProductController {
         return ResponseEntity.ok(productServiceADMIN.updateSubcategoriesAndTagIds(id, request));
     }
 
-    @PutMapping("/update/status")
-    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@RequestParam("id") long id, @RequestParam("status") ProductStatus status) {
-        return ResponseEntity.ok(productServiceADMIN.updateStatus(id, status));
+
+    //    Subcategory - Product
+    @DeleteMapping("/subcategories/delete")
+    public ResponseEntity<BasicMessageResponse<ProductSubcategoryIDResponse>> deleteRelationByProductIdAndSubcategoryId(@RequestParam("productId") long productId, @RequestParam("subcategoryId") int subcategoryId) {
+        return ResponseEntity.ok(productServiceADMIN.deleteRelationByProductIdAndSubcategoryId(productId, subcategoryId));
     }
 
-    @GetMapping("/load-elastic")
-    public ResponseEntity<BasicMessageResponse<?>> loadProductsIndexIntoElastic() throws IOException {
-        productDocumentService.loadProductsIndexIntoElastic();
-        return ResponseEntity.ok(new BasicMessageResponse<>(200, ConstantGeneral.success_load_product_into_elastic, null));
+    //    Tag - Product
+    @DeleteMapping("/tags/delete")
+    public ResponseEntity<BasicMessageResponse<ProductIdAndTagIdResponse>> deleteRelationByProductIdAndTagId(@RequestParam("productId") long productId, @RequestParam("tagId") int tagId) {
+        return ResponseEntity.ok(productServiceADMIN.deleteRelationByProductIdAndTagId(productId, tagId));
     }
 
 }

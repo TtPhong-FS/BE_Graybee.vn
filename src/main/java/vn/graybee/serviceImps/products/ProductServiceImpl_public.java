@@ -27,11 +27,17 @@ import vn.graybee.response.publics.products.ProductPriceResponse;
 import vn.graybee.response.publics.products.ReviewCommentDto;
 import vn.graybee.services.products.ProductService_public;
 import vn.graybee.services.products.ProductStatisticService;
+import vn.graybee.services.products.RedisProductService;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProductServiceImpl_public implements ProductService_public {
+
+    private static final String PRODUCT_DETAIL_KEY = "product:detail:";
+
+    private static final String PRODUCT_LIST_KEY = "product:list:";
 
     private final ProductRepository productRepository;
 
@@ -45,13 +51,16 @@ public class ProductServiceImpl_public implements ProductService_public {
 
     private final ReviewCommentRepository reviewCommentRepository;
 
-    public ProductServiceImpl_public(ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository) {
+    private final RedisProductService redisProductService;
+
+    public ProductServiceImpl_public(ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
         this.productRepository = productRepository;
         this.favouriteRepository = favouriteRepository;
         this.productStatisticService = productStatisticService;
         this.productImageRepository = productImageRepository;
         this.productDescriptionRepository = productDescriptionRepository;
         this.reviewCommentRepository = reviewCommentRepository;
+        this.redisProductService = redisProductService;
     }
 
     public PaginationInfo getPagination(Page<ProductBasicResponse> page) {
@@ -65,6 +74,25 @@ public class ProductServiceImpl_public implements ProductService_public {
 
     @Override
     public MessageResponse<List<ProductBasicResponse>> findByCategoryName(String categoryName, int page, int size, String sortBy, String order) {
+
+        List<ProductBasicResponse> cachedProducts = redisProductService.getCachedListProductBasicBySortedSet(categoryName, sortBy, page, size, true);
+
+        if (cachedProducts != null && !cachedProducts.isEmpty()) {
+
+            long totalElements = cachedProducts.size();
+
+            int totalPages = (int) Math.ceil((double) totalElements / size);
+
+            PaginationInfo paginationInfo = new PaginationInfo(
+                    page, totalPages, totalElements, size
+            );
+
+            SortInfo sortInfo = new SortInfo(
+                    sortBy, order
+            );
+
+            return new MessageResponse<>(200, ConstantProduct.success_fetch_products, cachedProducts, paginationInfo, sortInfo);
+        }
 
         Sort sort = order.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
@@ -83,6 +111,8 @@ public class ProductServiceImpl_public implements ProductService_public {
         String message = productPage.isEmpty()
                 ? ConstantGeneral.empty_list
                 : ConstantProduct.success_fetch_products;
+
+        redisProductService.cacheListProductBasicBySortedSet(productPage.getContent(), categoryName, sortBy, 12, TimeUnit.HOURS);
 
         return new MessageResponse<>(200, message, productPage.getContent(), paginationInfo, sortInfo);
     }
@@ -144,6 +174,13 @@ public class ProductServiceImpl_public implements ProductService_public {
 
     @Override
     public BasicMessageResponse<ProductDetailResponse> getDetailById(long id) {
+        String key = PRODUCT_DETAIL_KEY + id;
+
+        ProductDetailResponse cache = redisProductService.getProduct(key, ProductDetailResponse.class);
+        if (cache != null) {
+            return new BasicMessageResponse<>(200, null, cache);
+        }
+
         ProductDetailResponse response = productRepository.getDetailByProductId(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
@@ -156,6 +193,8 @@ public class ProductServiceImpl_public implements ProductService_public {
         response.setReviews(reviews);
 
         productStatisticService.updateViewCount(response.getId());
+
+        redisProductService.setProduct(key, response, 6, TimeUnit.HOURS);
 
         return new BasicMessageResponse<>(200, null, response);
     }

@@ -2,6 +2,7 @@ package vn.graybee.services.products;
 
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.messages.MessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductRelationUpdateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
@@ -26,7 +27,7 @@ public interface ProductService_admin {
 
     BasicMessageResponse<Long> delete(long id);
 
-    BasicMessageResponse<List<ProductResponse>> fetchAll();
+    MessageResponse<List<ProductResponse>> fetchAll(String status, String categoryName, String manufacturerName, int page, int size, String sortBy, String order);
 
     BasicMessageResponse<List<ProductSubcategoryAndTagResponse>> fetchAllWithSubcategoriesAndTags();
 

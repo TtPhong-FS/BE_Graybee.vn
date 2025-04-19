@@ -22,13 +22,13 @@ import vn.graybee.requests.auth.LoginRequest;
 import vn.graybee.requests.auth.SignUpRequest;
 import vn.graybee.response.publics.auth.AuthResponse;
 import vn.graybee.response.users.UserAuthenDto;
-import vn.graybee.serviceImps.others.RedisServices;
 import vn.graybee.services.auth.AuthService;
 import vn.graybee.utils.CodeGenerator;
 import vn.graybee.utils.TextUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtServices jwtServices;
 
-    private final RedisServices redisServices;
+    private final RedisAuthServices redisAuthServices;
 
     private final UserRepository userRepository;
 
@@ -49,11 +49,11 @@ public class AuthServiceImpl implements AuthService {
 
     private final CartRepository cartRepository;
 
-    public AuthServiceImpl(OrderRepository orderRepository, AuthenticationManager authenticationManager, JwtServices jwtServices, RedisServices redisServices, UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, RoleRepository roleRepository, CartRepository cartRepository) {
+    public AuthServiceImpl(OrderRepository orderRepository, AuthenticationManager authenticationManager, JwtServices jwtServices, RedisAuthServices redisAuthServices, UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, RoleRepository roleRepository, CartRepository cartRepository) {
         this.orderRepository = orderRepository;
         this.authenticationManager = authenticationManager;
         this.jwtServices = jwtServices;
-        this.redisServices = redisServices;
+        this.redisAuthServices = redisAuthServices;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
         userPrincipalDto.setROLE_NAME("CUSTOMER");
 
         String token = jwtServices.generateToken(user.getUsername(), userPrincipalDto.getROLE_NAME());
-        redisServices.saveToken(user.getUid(), token, 1800);
+        redisAuthServices.saveToken(user.getUid(), token, 30, TimeUnit.MINUTES);
 
         AuthResponse response = new AuthResponse();
         response.setToken(token);
@@ -148,7 +148,8 @@ public class AuthServiceImpl implements AuthService {
         response.setToken(token);
 
         userRepository.updateStatus(AccountStatus.ONLINE, user.getUid());
-        redisServices.saveToken(user.getUid(), token, 1800);
+
+        redisAuthServices.saveToken(user.getUid(), token, 30, TimeUnit.MINUTES);
 
         return new BasicMessageResponse<>(200, ConstantAuth.success_login, response);
     }

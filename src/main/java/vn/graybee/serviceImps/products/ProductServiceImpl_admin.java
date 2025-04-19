@@ -1,5 +1,8 @@
 package vn.graybee.serviceImps.products;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantCategory;
@@ -14,6 +17,9 @@ import vn.graybee.enums.ProductStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.messages.MessageResponse;
+import vn.graybee.messages.other.PaginationInfo;
+import vn.graybee.messages.other.SortInfo;
 import vn.graybee.models.directories.Category;
 import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.models.products.Inventory;
@@ -49,6 +55,7 @@ import vn.graybee.response.admin.products.ProductSubcategoryDto;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.response.admin.products.ProductTagDto;
 import vn.graybee.services.products.ProductService_admin;
+import vn.graybee.services.products.RedisProductService;
 import vn.graybee.utils.TextUtils;
 
 import java.math.BigDecimal;
@@ -64,6 +71,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl_admin implements ProductService_admin {
+
+    private static final String PRODUCT_DETAIL_KEY = "product:detail:";
 
     private final ProductDocumentService productDocumentService;
 
@@ -91,7 +100,9 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
     private final ManufacturerRepository manufacturerRepository;
 
-    public ProductServiceImpl_admin(ProductDocumentService productDocumentService, ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductStatisticRepository productStatisticRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository) {
+    private final RedisProductService redisProductService;
+
+    public ProductServiceImpl_admin(ProductDocumentService productDocumentService, ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductStatisticRepository productStatisticRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository, RedisProductService redisProductService) {
         this.productDocumentService = productDocumentService;
         this.productDescriptionRepository = productDescriptionRepository;
         this.tagRepository = tagRepository;
@@ -105,6 +116,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         this.productImageRepository = productImageRepository;
         this.categoryRepository = categoryRepository;
         this.manufacturerRepository = manufacturerRepository;
+        this.redisProductService = redisProductService;
     }
 
     public ProductResponse getProductResponse(Product product, String categoryName, String manufacturerName, int quantity) {
@@ -124,7 +136,6 @@ public class ProductServiceImpl_admin implements ProductService_admin {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<ProductResponse> create(ProductCreateRequest request) {
-
 
         ProductStatus status = request.getStatusEnum();
 
@@ -321,6 +332,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         }
 
         product.setUpdatedAt(LocalDateTime.now());
+
         product = productRepository.save(product);
         long productId = product.getId();
 
@@ -401,6 +413,10 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         inventory = inventoryRepository.save(inventory);
 
         ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity());
+
+        String key = PRODUCT_DETAIL_KEY + productId;
+
+        redisProductService.deleteProduct(key);
 
         return new BasicMessageResponse<>(200, ConstantProduct.success_update, response);
     }
@@ -486,15 +502,46 @@ public class ProductServiceImpl_admin implements ProductService_admin {
     }
 
     @Override
-    public BasicMessageResponse<List<ProductResponse>> fetchAll() {
+    public MessageResponse<List<ProductResponse>> fetchAll(String status, String category, String manufacturer, int page, int size, String sortBy, String order) {
 
-        List<ProductResponse> products = productRepository.fetchProducts();
+        ProductStatus statusEnum = null;
 
-        if (products.isEmpty()) {
-            return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, products);
+        try {
+            if (status != null && !status.isEmpty() && !"all".equals(status)) {
+                statusEnum = ProductStatus.valueOf(status.toUpperCase());
+
+            }
+        } catch (RuntimeException e) {
+            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid);
         }
 
-        return new BasicMessageResponse<>(200, ConstantProduct.success_fetch_products, products);
+        String categoryName = category.equals("all") ? null : category;
+        String manufacturerName = manufacturer.equals("all") ? null : manufacturer;
+
+        Sort sort = order.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        Page<ProductResponse> productPage = productRepository.fetchProducts(
+                statusEnum,
+                categoryName,
+                manufacturerName,
+                pageRequest);
+
+        PaginationInfo paginationInfo = new PaginationInfo(
+                productPage.getNumber(),
+                productPage.getTotalPages(),
+                productPage.getTotalElements(),
+                productPage.getSize()
+        );
+
+        SortInfo sortInfo = new SortInfo(sortBy, order);
+
+
+        String message = productPage.getContent().isEmpty() ? ConstantGeneral.empty_list : ConstantProduct.success_fetch_products;
+
+
+        return new MessageResponse<>(200, message, productPage.getContent(), paginationInfo, sortInfo);
     }
 
     @Override

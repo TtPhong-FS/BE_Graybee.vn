@@ -59,8 +59,8 @@ public class ProductDocumentService {
         return new BasicMessageResponse<>(200, null, responses);
     }
 
-    public void loadProductsIndexIntoElastic() throws IOException {
-        List<ProductBasicResponse> products = productRepository.getProductToLoadIntoElastic();
+    public BasicMessageResponse<String> loadProductsPublishedIndexIntoElastic() {
+        List<ProductBasicResponse> products = productRepository.getProductPublishedToLoadIntoElastic();
 
         for (ProductBasicResponse product : products) {
             ProductDocument productDocument = new ProductDocument();
@@ -70,12 +70,19 @@ public class ProductDocumentService {
             productDocument.setFinalPrice(product.getFinalPrice());
             productDocument.setThumbnail(product.getThumbnail());
 
-            elasticsearchClient.index(
-                    i -> i.index("products").id(String.valueOf(productDocument.getId())).document(productDocument)
-            );
+            try {
+                elasticsearchClient.index(
+                        i -> i.index("products").id(String.valueOf(productDocument.getId())).document(productDocument)
+                );
+            } catch (IOException e) {
+                throw new BusinessCustomException(ConstantGeneral.general, e.getMessage());
+            }
+
         }
 
         System.out.println("✅ Đã index " + products.size() + " sản phẩm vào Elasticsearch.");
+
+        return new BasicMessageResponse<>(200, "Elasticsearch: Thành công tạo index cho " + products.size() + " sản phẩm!", null);
 
     }
 

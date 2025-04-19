@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import vn.graybee.config.JwtConfig;
 import vn.graybee.serviceImps.auth.JwtServices;
-import vn.graybee.serviceImps.others.RedisServices;
+import vn.graybee.serviceImps.auth.RedisAuthServices;
 import vn.graybee.serviceImps.users.UserDetailServiceImpl;
 import vn.graybee.services.users.UserService;
 
@@ -26,16 +26,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtServices jwtServices;
 
-    private final RedisServices redisServices;
+    private final RedisAuthServices redisAuthServices;
 
     private final JwtConfig jwtConfig;
 
     private final UserDetailServiceImpl userDetailService;
 
-    public JwtFilter(UserService userService, JwtServices jwtServices, RedisServices redisServices, JwtConfig jwtConfig, UserDetailServiceImpl userDetailService) {
+    public JwtFilter(UserService userService, JwtServices jwtServices, RedisAuthServices redisAuthServices, JwtConfig jwtConfig, UserDetailServiceImpl userDetailService) {
         this.userService = userService;
         this.jwtServices = jwtServices;
-        this.redisServices = redisServices;
+        this.redisAuthServices = redisAuthServices;
         this.jwtConfig = jwtConfig;
         this.userDetailService = userDetailService;
     }
@@ -57,7 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
             Integer uid = userService.getUidByUsername(username);
 
             if (username != null && !username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
-                if (redisServices.isValidToken(uid, token)) {
+                if (redisAuthServices.isValidToken(uid, token)) {
                     UserDetails userDetails = userDetailService.loadUserByUsername(username);
 
                     if (jwtServices.isValid(token, userDetails)) {

@@ -34,7 +34,7 @@ spring:
     elasticsearch:
       repositories:
         enabled: false
-      uris: http://localhost:9200
+      uris: http://${ELS_HOST}:9200
 #      username: elastic
 #      password: admin123
 

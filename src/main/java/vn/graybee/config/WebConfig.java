@@ -65,7 +65,6 @@ public class WebConfig {
                                 .requestMatchers(apiConfig.getAdmin() + "/**").hasRole("ADMIN")
                                 .requestMatchers("/api/v1/account/**").authenticated()
                                 .requestMatchers("/api/v1/public/**").permitAll()
-                                .requestMatchers("/api/v1/general/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
 
                                 .anyRequest().authenticated()
@@ -78,7 +77,8 @@ public class WebConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(List.of(
-                "http://localhost:3100"
+                "http://localhost:3100",
+                "http://localhost:3000"
         ));
         cors.setAllowCredentials(true);
         cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));

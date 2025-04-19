@@ -1,8 +1,9 @@
 package vn.graybee.response.publics.products;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProductBasicResponse {
+public class ProductBasicResponse implements Serializable {
 
     private long id;
 
@@ -13,6 +14,9 @@ public class ProductBasicResponse {
     private BigDecimal finalPrice;
 
     private String thumbnail;
+
+    public ProductBasicResponse() {
+    }
 
     public ProductBasicResponse(long id, String name, BigDecimal price, BigDecimal finalPrice, String thumbnail) {
         this.id = id;
