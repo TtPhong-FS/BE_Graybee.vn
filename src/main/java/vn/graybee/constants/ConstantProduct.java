@@ -2,7 +2,7 @@ package vn.graybee.constants;
 
 public class ConstantProduct {
 
-    public static final String name = "productName";
+    public static final String name = "name";
 
     public static final String tag_relation_does_not_exists = "Thẻ phân loại hiện chưa được liên kết với sản phẩm";
 

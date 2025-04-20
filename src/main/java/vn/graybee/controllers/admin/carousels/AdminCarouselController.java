@@ -19,7 +19,6 @@ import vn.graybee.response.admin.carousels.CarouselItemResponse;
 import vn.graybee.response.admin.carousels.CarouselPosition;
 import vn.graybee.services.carousels.CarouselGroupService;
 import vn.graybee.services.carousels.CarouselItemService;
-import vn.graybee.services.users.UserService;
 
 import java.util.List;
 
@@ -31,12 +30,9 @@ public class AdminCarouselController {
 
     private final CarouselGroupService carouselGroupService;
 
-    private final UserService userService;
-
-    public AdminCarouselController(CarouselItemService carouselItemService, CarouselGroupService carouselGroupService, UserService userService) {
+    public AdminCarouselController(CarouselItemService carouselItemService, CarouselGroupService carouselGroupService) {
         this.carouselItemService = carouselItemService;
         this.carouselGroupService = carouselGroupService;
-        this.userService = userService;
     }
 
 //    Carousel Group
@@ -55,6 +51,14 @@ public class AdminCarouselController {
             @RequestParam("id") Integer id
     ) {
         return ResponseEntity.ok(carouselGroupService.update(request, id));
+    }
+
+    @PutMapping("/group/active")
+    public ResponseEntity<BasicMessageResponse<CarouselActiveResponse>> updateActiveById(
+            @RequestParam("id") Integer id,
+            @RequestParam("active") Boolean active
+    ) {
+        return ResponseEntity.ok(carouselGroupService.updateActiveById(id, active));
     }
 
     @GetMapping("/groups")

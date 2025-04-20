@@ -13,6 +13,8 @@ public interface RedisProductService {
 
     void deleteProduct(String key);
 
+    void deleteProductListPattern(String category);
+
     void cacheListProductBasicBySortedSet(List<ProductBasicResponse> products, String categoryName, String sortBy, long timeout, TimeUnit unit);
 
     List<ProductBasicResponse> getCachedListProductBasicBySortedSet(String categoryName, String sortBy, int page, int size, boolean asc);

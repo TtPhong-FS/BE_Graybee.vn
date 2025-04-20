@@ -31,10 +31,10 @@ public class ProductController {
         this.productServicePublic = productServicePublic;
     }
 
-    @GetMapping("/by-category-and-manufacturer")
+    @GetMapping("/{category}/{manufacturer}")
     public ResponseEntity<MessageResponse<List<ProductBasicResponse>>> findByCategoryAndManufacturer(
-            @RequestParam("category") String category,
-            @RequestParam("manufacturer") String manufacturer,
+            @PathVariable("category") String category,
+            @PathVariable("manufacturer") String manufacturer,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -42,11 +42,11 @@ public class ProductController {
         return ResponseEntity.ok(productServicePublic.findByCategoryAndManufacturer(category, manufacturer, page, size, sortBy, order));
     }
 
-    @GetMapping("/by-category-and-subcategory-and-tag")
+    @GetMapping("/{category}/{subcategory}/{tag}")
     public ResponseEntity<MessageResponse<List<ProductBasicResponse>>> findByCategoryAndSubcategoryAndTag(
-            @RequestParam("category") String category,
-            @RequestParam("subcategory") String subcategory,
-            @RequestParam("tag") String tag,
+            @PathVariable("category") String category,
+            @PathVariable("subcategory") String subcategory,
+            @PathVariable("tag") String tag,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,

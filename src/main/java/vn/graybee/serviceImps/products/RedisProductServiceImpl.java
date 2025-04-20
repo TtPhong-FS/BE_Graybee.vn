@@ -40,6 +40,15 @@ public class RedisProductServiceImpl implements RedisProductService {
     }
 
     @Override
+    public void deleteProductListPattern(String category) {
+        String pattern = "product:list:category:" + category.toLowerCase() + "*";
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
+    }
+
+    @Override
     public void cacheListProductBasicBySortedSet(List<ProductBasicResponse> products, String categoryName, String sortBy, long timeout, TimeUnit unit) {
         String key = generateKeyCategory(categoryName, sortBy);
         for (ProductBasicResponse product : products) {
@@ -47,7 +56,7 @@ public class RedisProductServiceImpl implements RedisProductService {
             redisTemplate.opsForZSet().add(key, product, score);
         }
         redisTemplate.expire(key, timeout, unit);
-      
+
     }
 
     @Override

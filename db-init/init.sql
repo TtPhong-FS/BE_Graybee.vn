@@ -47,37 +47,6 @@ CREATE TABLE categories_manufacturers (
 	UNIQUE (category_id, manufacturer_id)
 );
 
-DELIMITER $$
-CREATE TRIGGER update_category_count
-AFTER DELETE ON products
-FOR EACH ROW
-BEGIN
-    UPDATE categories c
-    SET product_count = (
-        SELECT COUNT(*)
-        FROM products p
-        WHERE p.category_id = OLD.category_id
-    )
-    WHERE id = OLD.category_id;
-END $$
-DELIMITER ;
-
-
-DELIMITER $$
-CREATE TRIGGER update_manufacturer_count
-AFTER DELETE ON products
-FOR EACH ROW
-BEGIN
-    UPDATE manufacturers m
-    SET product_count = (
-        SELECT COUNT(*)
-        FROM products p
-        WHERE p.manufacturer_id = OLD.manufacturer_id
-    )
-    WHERE id = OLD.manufacturer_id;
-END $$
-DELIMITER ;
-
 CREATE TABLE subcategories(
     id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(35) NOT NULL UNIQUE,
@@ -138,6 +107,37 @@ CREATE TABLE products (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     status ENUM('ACTIVE', 'INACTIVE', 'PUBLISHED', 'OUT_OF_STOCK', 'DELETED', 'PENDING', 'DRAFT', 'COMING_SOON') default 'DRAFT'
 );
+
+DELIMITER $$
+CREATE TRIGGER update_category_count
+AFTER DELETE ON products
+FOR EACH ROW
+BEGIN
+    UPDATE categories c
+    SET product_count = (
+        SELECT COUNT(*)
+        FROM products p
+        WHERE p.category_id = OLD.category_id
+    )
+    WHERE id = OLD.category_id;
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER update_manufacturer_count
+AFTER DELETE ON products
+FOR EACH ROW
+BEGIN
+    UPDATE manufacturers m
+    SET product_count = (
+        SELECT COUNT(*)
+        FROM products p
+        WHERE p.manufacturer_id = OLD.manufacturer_id
+    )
+    WHERE id = OLD.manufacturer_id;
+END $$
+DELIMITER ;
 
 create table product_statistics(
 	id int unsigned primary key auto_increment,
@@ -244,6 +244,7 @@ CREATE TABLE users (
     uid int unsigned not null unique,
     role_id tinyint unsigned NOT NULL,
     FOREIGN KEY (role_id) REFERENCES roles(id),
+    username  VARCHAR(12) UNIQUE NOT NULL,
     fullname VARCHAR(100) DEFAULT null,
     phone_number VARCHAR(12) UNIQUE NOT NULL,
 	email VARCHAR(50) UNIQUE default NULL,
@@ -255,6 +256,17 @@ CREATE TABLE users (
 	is_active BOOLEAN DEFAULT FALSE,
 	status enum('ACTIVE', 'INACTIVE', 'DELETED', 'OFFLINE', 'ONLINE', 'BANNED', 'PENDING') default 'PENDING'
 );
+
+INSERT INTO roles (name)
+values ('ADMIN'),
+('CUSTOMER')
+
+INSERT INTO permissions(name)
+values ('FULL_CONTROL')
+
+INSERT INTO users(role_id, uid, phone_number, password, is_active)
+values (1, 111111, '0393150468', '$2a$10$oZnkhO.Uauo.D6GSjevI6.1.imQvexIB1irNNGhcjRQ9rzDVpERXC', true)
+
 
 create table favourites(
 	id INT unsigned PRIMARY KEY AUTO_INCREMENT,

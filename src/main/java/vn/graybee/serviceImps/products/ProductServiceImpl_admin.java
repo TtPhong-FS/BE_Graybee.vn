@@ -218,7 +218,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         inventory.setQuantity(request.isInStock() ? request.getQuantity() : 0);
         inventory.setProductId(product.getId());
-        inventory.setStatus(request.isInStock() ? InventoryStatus.ACTIVE : InventoryStatus.OUT_OF_STOCK);
+        inventory.setStatus(request.isInStock() && request.getQuantity() > 0 ? InventoryStatus.ACTIVE : InventoryStatus.OUT_OF_STOCK);
 
         inventory = inventoryRepository.save(inventory);
 
@@ -252,7 +252,10 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         updateProductCountCategory(request.getCategoryId(), true);
         updateProductCountManufacturer(request.getManufacturerId(), true);
 
+        redisProductService.deleteProductListPattern(categoryName);
+
         ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity());
+
 
         return new BasicMessageResponse<>(201, ConstantProduct.success_create, response);
     }
@@ -317,7 +320,9 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         product.setWeight(request.getWeight());
         product.setDimension(request.getDimension());
 
-        product.setThumbnail(request.getImages() != null && !request.getImages().isEmpty() ? request.getImages().get(0) : null);
+        if (request.getImages() != null && !request.getImages().isEmpty() && product.getThumbnail().isEmpty()) {
+            product.setThumbnail(request.getImages().get(0));
+        }
 
         product.setStatus(status);
         product.setPrice(request.getPrice());
@@ -417,6 +422,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         String key = PRODUCT_DETAIL_KEY + productId;
 
         redisProductService.deleteProduct(key);
+        redisProductService.deleteProductListPattern(categoryName);
 
         return new BasicMessageResponse<>(200, ConstantProduct.success_update, response);
     }
@@ -480,6 +486,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         response.setCode(productCode);
         response.setTags(tags);
         response.setSubcategories(subcategories);
+
 
         return new BasicMessageResponse<>(200, ConstantProduct.success_update_relation, response);
     }

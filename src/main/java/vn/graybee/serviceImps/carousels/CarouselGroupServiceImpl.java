@@ -11,6 +11,7 @@ import vn.graybee.models.carousels.CarouselGroup;
 import vn.graybee.repositories.carousels.CarouselGroupRepository;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.requests.carousels.CarouselGroupRequest;
+import vn.graybee.response.admin.carousels.CarouselActiveResponse;
 import vn.graybee.services.carousels.CarouselGroupService;
 
 import java.util.List;
@@ -72,7 +73,7 @@ public class CarouselGroupServiceImpl implements CarouselGroupService {
 
         CarouselGroup carouselGroup = carouselGroupRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCarousel.does_not_exists));
-        
+
         return new BasicMessageResponse<>(200, null, carouselGroup);
     }
 
@@ -108,6 +109,18 @@ public class CarouselGroupServiceImpl implements CarouselGroupService {
         String message = !responses.isEmpty() ? ConstantCarousel.success_fetch_all : ConstantGeneral.empty_list;
 
         return new BasicMessageResponse<>(201, message, responses);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<CarouselActiveResponse> updateActiveById(int id, boolean active) {
+        checkExistsById(id);
+
+        carouselGroupRepository.updateActiveById(id, active);
+
+        CarouselActiveResponse res = new CarouselActiveResponse(id, active);
+
+        return new BasicMessageResponse<>(200, null, res);
     }
 
 }
