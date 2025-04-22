@@ -1,9 +1,8 @@
 package vn.graybee.enums;
 
 public enum PaymentStatus {
-
+    UNPAID,
     PENDING,
-    COMPLETED,
     FAILED,
     REFUNDED,
     PAID

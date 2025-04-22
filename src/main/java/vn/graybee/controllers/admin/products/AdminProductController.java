@@ -17,12 +17,12 @@ import vn.graybee.messages.MessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductRelationUpdateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
-import vn.graybee.response.admin.products.ProductDto;
 import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
 import vn.graybee.response.admin.products.ProductResponse;
 import vn.graybee.response.admin.products.ProductStatusResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
+import vn.graybee.response.admin.products.ProductUpdateResponse;
 import vn.graybee.serviceImps.products.ProductDocumentService;
 import vn.graybee.services.products.ProductService_admin;
 
@@ -60,7 +60,7 @@ public class AdminProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<ProductDto>> getById(@PathVariable("id") long id) {
+    public ResponseEntity<BasicMessageResponse<ProductUpdateResponse>> getById(@PathVariable("id") long id) {
         return ResponseEntity.ok(productServiceADMIN.getById(id));
     }
 

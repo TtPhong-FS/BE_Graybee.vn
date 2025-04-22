@@ -31,15 +31,16 @@ public class Delivery {
     @Column(name = "tracking_number", length = 50)
     private String trackingNumber;
 
-    @Column(name = "shipping_method")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "shipping_method")
     private ShippingMethod shippingMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "delivery_type")
     private DeliveryType deliveryType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "delivery_status")
     private DeliveryStatus deliveryStatus;
 
     @Column(name = "shipping_address")

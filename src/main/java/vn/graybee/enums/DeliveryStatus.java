@@ -4,11 +4,8 @@ public enum DeliveryStatus {
 
 
     PENDING,
-    SHIPPED,
-    IN_TRANSIT,
+    SHIPPING,
     DELIVERED,
-    CANCELLED,
-    COMPLETED
-
-
+    FAILED,
+    RETURNED
 }

@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
         userPrincipalDto.setROLE_NAME("CUSTOMER");
 
         String token = jwtServices.generateToken(user.getUsername(), userPrincipalDto.getROLE_NAME());
-        redisAuthServices.saveToken(user.getUid(), token, 30, TimeUnit.MINUTES);
+        redisAuthServices.saveToken(user.getUid(), token, 1440, TimeUnit.MINUTES);
 
         AuthResponse response = new AuthResponse();
         response.setToken(token);
@@ -149,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.updateStatus(AccountStatus.ONLINE, user.getUid());
 
-        redisAuthServices.saveToken(user.getUid(), token, 30, TimeUnit.MINUTES);
+        redisAuthServices.saveToken(user.getUid(), token, 1440, TimeUnit.MINUTES);
 
         return new BasicMessageResponse<>(200, ConstantAuth.success_login, response);
     }

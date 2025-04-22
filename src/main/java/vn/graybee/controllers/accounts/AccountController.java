@@ -3,7 +3,6 @@ package vn.graybee.controllers.accounts;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +19,6 @@ import vn.graybee.requests.users.UpdateProfileRequest;
 import vn.graybee.response.admin.orders.CancelOrderResponse;
 import vn.graybee.response.favourites.ProductFavourite;
 import vn.graybee.response.orders.OrderHistoryResponse;
-import vn.graybee.response.users.AddressExistingDto;
 import vn.graybee.response.users.DefaultAddressDto;
 import vn.graybee.response.users.PersonalAddressDto;
 import vn.graybee.response.users.UserProfileResponse;
@@ -86,15 +84,6 @@ public class AccountController {
 
 //    Address
 
-    @GetMapping("/address-existing")
-    public ResponseEntity<BasicMessageResponse<List<AddressExistingDto>>> getAddressExistingByUserUidOrSessionId(
-            @CookieValue(value = "sessionId", required = false) String sessionId,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        Integer userUid = userPrincipal.getUser().getUserUid();
-        return ResponseEntity.ok(addressService.getAddressExistingByUserUidOrSessionId(userUid, sessionId));
-    }
-
     @PostMapping("/address/add")
     public ResponseEntity<BasicMessageResponse<PersonalAddressDto>> createAddress(
             @RequestBody @Valid AddressCreateRequest request,
@@ -138,11 +127,10 @@ public class AccountController {
 //    Order
 
     @PutMapping("/order/cancel/{id}")
-    public ResponseEntity<BasicMessageResponse<CancelOrderResponse>> cancelOrderByIdAndUserUid(
-            @PathVariable("id") long id,
-            @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        Integer userUid = userPrincipal.getUser().getUserUid();
-        return ResponseEntity.ok(orderService.cancelOrder(id, userUid));
+    public ResponseEntity<BasicMessageResponse<CancelOrderResponse>> cancelOrderById(
+            @PathVariable("id") long id) {
+
+        return ResponseEntity.ok(orderService.cancelOrder(id));
     }
 
     @GetMapping("/orders-history/{status}")

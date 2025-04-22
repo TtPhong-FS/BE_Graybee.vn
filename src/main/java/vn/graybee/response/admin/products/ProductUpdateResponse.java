@@ -2,14 +2,13 @@ package vn.graybee.response.admin.products;
 
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.models.products.Product;
-import vn.graybee.response.BaseResponse;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public class ProductDto extends BaseResponse {
+public class ProductUpdateResponse {
 
     private long id;
 
@@ -20,8 +19,6 @@ public class ProductDto extends BaseResponse {
     private List<TagResponse> tags;
 
     private List<SubcateDto> subcategories;
-
-    private String code;
 
     private String name;
 
@@ -45,22 +42,22 @@ public class ProductDto extends BaseResponse {
 
     private String conditions;
 
-    private String description;
-
-    private boolean inStock;
+    private boolean isStock;
 
     private int quantity;
 
+    private String description;
+
     private ProductStatus status;
 
-    public ProductDto(Product product, int categoryId, int manufacturerId, List<TagResponse> tags, List<String> images, int quantity, String description) {
-        super(product.getCreatedAt(), product.getUpdatedAt());
+    public ProductUpdateResponse() {
+    }
+
+    public ProductUpdateResponse(Product product, String description, int quantity) {
         this.id = product.getId();
-        this.code = product.getCode();
+        this.categoryId = product.getCategoryId();
+        this.manufacturerId = product.getManufacturerId();
         this.name = product.getName();
-        this.categoryId = categoryId;
-        this.manufacturerId = manufacturerId;
-        this.tags = tags;
         this.warranty = product.getWarranty();
         this.weight = product.getWeight();
         this.dimension = product.getDimension();
@@ -68,29 +65,28 @@ public class ProductDto extends BaseResponse {
         this.discountPercent = product.getDiscountPercent();
         this.finalPrice = product.getFinalPrice();
         this.color = product.getColor();
-        this.images = images;
         this.thumbnail = product.getThumbnail();
         this.conditions = product.getConditions();
-        this.inStock = product.isStock();
-        this.quantity = quantity;
-        this.description = description;
+        this.isStock = product.isStock();
         this.status = product.getStatus();
+        this.description = description;
+        this.quantity = quantity;
     }
 
-    public List<SubcateDto> getSubcategories() {
-        return subcategories;
+    public boolean isStock() {
+        return isStock;
     }
 
-    public void setSubcategories(List<SubcateDto> subcategories) {
-        this.subcategories = subcategories;
+    public void setStock(boolean stock) {
+        isStock = stock;
     }
 
-    public List<String> getImages() {
-        return images;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setImages(List<String> images) {
-        this.images = images;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public long getId() {
@@ -101,20 +97,20 @@ public class ProductDto extends BaseResponse {
         this.id = id;
     }
 
-    public int getManufacturerId() {
-        return manufacturerId;
-    }
-
-    public void setManufacturerId(int manufacturerId) {
-        this.manufacturerId = manufacturerId;
-    }
-
     public int getCategoryId() {
         return categoryId;
     }
 
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public int getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public void setManufacturerId(int manufacturerId) {
+        this.manufacturerId = manufacturerId;
     }
 
     public List<TagResponse> getTags() {
@@ -125,12 +121,12 @@ public class ProductDto extends BaseResponse {
         this.tags = tags;
     }
 
-    public String getCode() {
-        return code;
+    public List<SubcateDto> getSubcategories() {
+        return subcategories;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setSubcategories(List<SubcateDto> subcategories) {
+        this.subcategories = subcategories;
     }
 
     public String getName() {
@@ -173,20 +169,20 @@ public class ProductDto extends BaseResponse {
         this.price = price;
     }
 
-    public BigDecimal getFinalPrice() {
-        return finalPrice;
-    }
-
-    public void setFinalPrice(BigDecimal finalPrice) {
-        this.finalPrice = finalPrice;
-    }
-
     public int getDiscountPercent() {
         return discountPercent;
     }
 
     public void setDiscountPercent(int discountPercent) {
         this.discountPercent = discountPercent;
+    }
+
+    public BigDecimal getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(BigDecimal finalPrice) {
+        this.finalPrice = finalPrice;
     }
 
     public String getColor() {
@@ -205,6 +201,14 @@ public class ProductDto extends BaseResponse {
         this.thumbnail = thumbnail;
     }
 
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
     public String getConditions() {
         return conditions;
     }
@@ -219,22 +223,6 @@ public class ProductDto extends BaseResponse {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public boolean isInStock() {
-        return inStock;
-    }
-
-    public void setInStock(boolean inStock) {
-        this.inStock = inStock;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public ProductStatus getStatus() {

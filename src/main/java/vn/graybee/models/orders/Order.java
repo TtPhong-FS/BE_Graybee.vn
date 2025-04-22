@@ -27,7 +27,7 @@ public class Order extends BaseModel {
     @Column(name = "session_id", length = 50)
     private String sessionId;
 
-    @Column(name = "address_id")
+    @Column(name = "address_id", nullable = false)
     private Integer addressId;
 
     @Column(name = "discount_id")

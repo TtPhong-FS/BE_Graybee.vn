@@ -6,12 +6,12 @@ import vn.graybee.messages.MessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductRelationUpdateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
-import vn.graybee.response.admin.products.ProductDto;
 import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
 import vn.graybee.response.admin.products.ProductResponse;
 import vn.graybee.response.admin.products.ProductStatusResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
+import vn.graybee.response.admin.products.ProductUpdateResponse;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public interface ProductService_admin {
 
     BasicMessageResponse<List<ProductSubcategoryAndTagResponse>> fetchAllWithSubcategoriesAndTags();
 
-    BasicMessageResponse<ProductDto> getById(long id);
+    BasicMessageResponse<ProductUpdateResponse> getById(long id);
 
     void updateProductCountCategory(int CategoryId, boolean isIncrease);
 

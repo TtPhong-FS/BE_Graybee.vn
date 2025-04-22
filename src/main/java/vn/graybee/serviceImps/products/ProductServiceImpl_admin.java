@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantCategory;
 import vn.graybee.constants.ConstantGeneral;
-import vn.graybee.constants.ConstantInventory;
 import vn.graybee.constants.ConstantManufacturer;
 import vn.graybee.constants.ConstantProduct;
 import vn.graybee.constants.ConstantSubcategory;
@@ -45,7 +44,6 @@ import vn.graybee.requests.products.ProductRelationUpdateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
 import vn.graybee.response.admin.directories.tag.TagResponse;
-import vn.graybee.response.admin.products.ProductDto;
 import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
 import vn.graybee.response.admin.products.ProductQuantityResponse;
 import vn.graybee.response.admin.products.ProductResponse;
@@ -54,6 +52,7 @@ import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryDto;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.response.admin.products.ProductTagDto;
+import vn.graybee.response.admin.products.ProductUpdateResponse;
 import vn.graybee.services.products.ProductService_admin;
 import vn.graybee.services.products.RedisProductService;
 import vn.graybee.utils.TextUtils;
@@ -333,7 +332,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         if (status.equals(ProductStatus.OUT_OF_STOCK) || status.equals(ProductStatus.DELETED)) {
             product.setStock(false);
         } else {
-            product.setStock(request.isInStock());
+            product.setStock(request.isStock());
         }
 
         product.setUpdatedAt(LocalDateTime.now());
@@ -495,8 +494,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Long> delete(long id) {
 
-        ProductQuantityResponse product = inventoryRepository.findQuantityByProductId(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantInventory.product_does_not_exists));
+        ProductQuantityResponse product = inventoryRepository.findQuantityByProductId(id);
 
         if (product.getQuantity() > 0) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantProduct.still_inventory);
@@ -583,9 +581,9 @@ public class ProductServiceImpl_admin implements ProductService_admin {
     }
 
     @Override
-    public BasicMessageResponse<ProductDto> getById(long productId) {
+    public BasicMessageResponse<ProductUpdateResponse> getById(long productId) {
 
-        ProductDto response = productRepository.findToUpdate(productId)
+        ProductUpdateResponse response = productRepository.findToUpdate(productId)
                 .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
         List<TagResponse> tagResponses = productTagRepository.getTagsByProductId(response.getId());

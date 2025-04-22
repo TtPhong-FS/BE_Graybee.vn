@@ -39,7 +39,7 @@ public interface AddressRepository extends JpaRepository<Address, Integer> {
     @Query("Select new vn.graybee.response.users.PersonalAddressDto(a.id, a.phoneNumber, a.fullName, a.city, a.district, a.commune, a.streetAddress, a.isDefault) from Address a where a.userUid = :userUid")
     List<PersonalAddressDto> getAddressesByUserUid(@Param("userUid") int userUid);
 
-    @Query("Select new vn.graybee.response.users.AddressExistingDto(a.id, a.phoneNumber, a.fullName, a.city, a.district, a.commune, a.streetAddress) from Address a where a.userUid = :userUid or a.sessionId = :sessionId")
+    @Query("Select new vn.graybee.response.users.AddressExistingDto(a.id, a.phoneNumber, a.fullName, a.city, a.district, a.commune, a.streetAddress) from Address a where (:userUid IS NULL OR a.userUid = :userUid) and (:sessionId IS NULL OR a.sessionId = :sessionId)")
     List<AddressExistingDto> getAddressExistingByUserUidOrSessionId(@Param("userUid") Integer userUid, @Param("sessionId") String sessionId);
 
     @Query("Select exists (Select 1 from Address a where a.id = :id)")

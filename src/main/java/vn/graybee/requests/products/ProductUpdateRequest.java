@@ -55,7 +55,7 @@ public class ProductUpdateRequest {
     @Size(max = 35, message = "Độ dài tối đa 35 ký tự")
     private String color;
 
-    private boolean inStock;
+    private boolean isStock;
 
     private boolean hasPromotion;
 
@@ -174,12 +174,12 @@ public class ProductUpdateRequest {
         this.color = color;
     }
 
-    public boolean isInStock() {
-        return inStock;
+    public boolean isStock() {
+        return isStock;
     }
 
-    public void setInStock(boolean inStock) {
-        this.inStock = inStock;
+    public void setStock(boolean stock) {
+        isStock = stock;
     }
 
     public int getQuantity() {

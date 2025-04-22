@@ -19,7 +19,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
     Optional<Inventory> findByProductId(@Param("productId") long productId);
 
     @Query("Select new vn.graybee.response.admin.products.ProductQuantityResponse(p.id, COALESCE(i.quantity, 0)) from Product p left join Inventory i on i.productId = p.id where p.id = :productId ")
-    Optional<ProductQuantityResponse> findQuantityByProductId(@Param("productId") long productId);
+    ProductQuantityResponse findQuantityByProductId(@Param("productId") long productId);
 
     @Query("Select p.code from Product p join Inventory i on p.id = i.productId where i.id = :id ")
     Optional<String> getProductCodeById(@Param("id") int id);

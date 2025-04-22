@@ -19,4 +19,6 @@ public class ConstantOrder {
 
     public static final String success_cancel = "Huỷ đơn hàng thành công. Hãy tiếp tục mua hàng.";
 
+    public static final String order_empty = "Chưa có đơn hàng nào.";
+
 }

@@ -14,7 +14,7 @@ public class ConstantProduct {
 
     public static final String does_not_exists = "Sản phẩm không tồn tại trong hệ thống";
 
-    public static final String still_inventory = "Không thể thực hiện vì sản phẩm hiện vẫn còn trong kho";
+    public static final String still_inventory = "Không thể thực hiện, sản phẩm hiện vẫn còn tồn kho.";
 
     public static final String does_not_exists_in_inventory = "Không thể thực hiện vì sản phẩm chưa được thêm vào kho";
 

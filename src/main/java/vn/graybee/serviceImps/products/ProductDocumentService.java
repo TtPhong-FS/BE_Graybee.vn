@@ -3,6 +3,8 @@ package vn.graybee.serviceImps.products;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch.core.DeleteResponse;
+import co.elastic.clients.elasticsearch.core.GetRequest;
+import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import org.springframework.stereotype.Service;
@@ -105,10 +107,21 @@ public class ProductDocumentService {
 
     public void deleteProduct(long id) {
         try {
-            DeleteResponse response = elasticsearchClient.delete(d -> d.index("products").id(String.valueOf(id)));
-            if (response.result() == Result.NotFound) {
-                throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.record_not_exists);
+            GetRequest getRequest = new GetRequest.Builder()
+                    .index("products")
+                    .id(String.valueOf(id))
+                    .build();
+
+            GetResponse<ProductDocument> getResponse = elasticsearchClient.get(getRequest, ProductDocument.class);
+
+            if (getResponse.found()) {
+                DeleteResponse response = elasticsearchClient.delete(d -> d.index("products").id(String.valueOf(id)));
+                
+                if (response.result() == Result.NotFound) {
+                    throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.record_not_exists);
+                }
             }
+
         } catch (IOException e) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.record_not_exists);
         }

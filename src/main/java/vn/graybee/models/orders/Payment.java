@@ -29,11 +29,11 @@ public class Payment extends BaseModel {
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "payment_method")
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "payment_status")
     private PaymentStatus paymentStatus;
 
     @Column(name = "transaction_id", length = 100)

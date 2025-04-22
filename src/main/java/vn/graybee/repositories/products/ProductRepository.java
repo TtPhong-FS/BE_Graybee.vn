@@ -9,9 +9,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.models.products.Product;
-import vn.graybee.response.admin.products.ProductDto;
 import vn.graybee.response.admin.products.ProductResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
+import vn.graybee.response.admin.products.ProductUpdateResponse;
 import vn.graybee.response.favourites.ProductFavourite;
 import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductDetailResponse;
@@ -45,14 +45,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT new vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse(p.id, p.code,null,null) FROM Product p")
     List<ProductSubcategoryAndTagResponse> fetchProductsWithoutSubcategoryAndTag();
 
-    @Query("SELECT new vn.graybee.response.admin.products.ProductDto(p ,c.id, m.id,null,null, COALESCE(i.quantity, 0), pd.description) " +
+    @Query("SELECT new vn.graybee.response.admin.products.ProductUpdateResponse(p, pd.description, COALESCE(i.quantity, 0)) " +
             "FROM Product p " +
-            "INNER JOIN Category c ON p.categoryId = c.id " +
-            "INNER JOIN Manufacturer m ON p.manufacturerId = m.id " +
             "LEFT JOIN Inventory i on p.id = i.productId " +
             "LEFT JOIN ProductDescription pd on p.id = pd.productId where p.id = :id"
     )
-    Optional<ProductDto> findToUpdate(@Param("id") long id);
+    Optional<ProductUpdateResponse> findToUpdate(@Param("id") long id);
 
     @Query("Select p.id from Product p where p.id = :id")
     Optional<Long> checkExistsById(@Param("id") long id);

@@ -1,5 +1,9 @@
 package vn.graybee.serviceImps.orders;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantCart;
@@ -15,6 +19,9 @@ import vn.graybee.enums.PaymentStatus;
 import vn.graybee.enums.ShippingMethod;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.messages.MessageResponse;
+import vn.graybee.messages.other.PaginationInfo;
+import vn.graybee.messages.other.SortInfo;
 import vn.graybee.models.orders.CartItem;
 import vn.graybee.models.orders.Delivery;
 import vn.graybee.models.orders.Order;
@@ -31,6 +38,7 @@ import vn.graybee.repositories.products.InventoryRepository;
 import vn.graybee.repositories.products.ProductRepository;
 import vn.graybee.repositories.users.AddressRepository;
 import vn.graybee.requests.orders.OrderCreateRequest;
+import vn.graybee.response.admin.orders.AdminOrderResponse;
 import vn.graybee.response.admin.orders.CancelOrderResponse;
 import vn.graybee.response.admin.orders.ConfirmOrderResponse;
 import vn.graybee.response.orders.OrderBasicDto;
@@ -97,10 +105,10 @@ public class OrderServiceImpl implements OrderService {
         Payment payment = new Payment();
         payment.setOrderId(orderId);
         payment.setPaymentMethod(paymentMethod);
-        payment.setPaymentStatus(PaymentStatus.PENDING);
+        payment.setPaymentStatus(PaymentStatus.UNPAID);
 
         payment.setTotalAmount(totalAmount);
-        payment.setTransactionId(paymentMethod.equals(PaymentMethod.COD) ? null : "00002");
+        payment.setTransactionId(null);
         payment.setCurrentCode("VND");
         return payment;
     }
@@ -116,7 +124,7 @@ public class OrderServiceImpl implements OrderService {
         delivery.setDeliveryType(deliveryType);
         if (deliveryType.equals(DeliveryType.STORE_PICKUP)) {
             delivery.setTrackingNumber(null);
-            delivery.setDeliveryStatus(DeliveryStatus.COMPLETED);
+            delivery.setDeliveryStatus(DeliveryStatus.DELIVERED);
         } else {
             delivery.setDeliveryStatus(DeliveryStatus.PENDING);
             delivery.setTrackingNumber(CodeGenerator.trackingGenerate());
@@ -192,6 +200,38 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public MessageResponse<List<AdminOrderResponse>> findAll(int page, int size, String sortBy, String order) {
+
+        Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<AdminOrderResponse> orderPage = orderRepository.fetchAll(pageable);
+
+        PaginationInfo paginationInfo = new PaginationInfo(
+                orderPage.getNumber(),
+                orderPage.getTotalPages(),
+                orderPage.getTotalElements(),
+                orderPage.getSize()
+        );
+
+        SortInfo sortInfo = new SortInfo(sortBy, order);
+
+        for (AdminOrderResponse re : orderPage.getContent()) {
+            if (re.getPaymentStatus() == null) {
+                re.setPaymentStatus(PaymentStatus.UNPAID);
+            }
+            if (re.getDeliveryType() == null) {
+                re.setDeliveryType(DeliveryType.HOME_DELIVERY);
+            }
+        }
+
+        String message = orderPage.getContent().isEmpty() ? ConstantOrder.order_empty : null;
+
+        return new MessageResponse<>(200, message, orderPage.getContent(), paginationInfo, sortInfo);
+    }
+
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<?> createOrder(OrderCreateRequest request, Integer userUid, String sessionId) {
 
@@ -220,7 +260,7 @@ public class OrderServiceImpl implements OrderService {
             Integer stockQuantity = inventoryRepository.findStockByProductId(item.getProductId());
 
             if (stockQuantity == null) {
-                throw new BusinessCustomException(ConstantGeneral.general, ConstantInventory.product_does_not_exists);
+                throw new BusinessCustomException(ConstantGeneral.general, ConstantInventory.product_out_of_stock);
             }
 
             if (stockQuantity < item.getQuantity()) {
@@ -328,7 +368,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<CancelOrderResponse> cancelOrder(long orderId, Integer userUid) {
+    public BasicMessageResponse<CancelOrderResponse> cancelOrder(long orderId) {
 
         if (!orderRepository.checkExistsById(orderId)) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantOrder.does_not_exists);
@@ -337,14 +377,12 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus status = orderRepository.findStatusById(orderId);
 
         if (status.equals(OrderStatus.PENDING) || status.equals(OrderStatus.CONFIRMED) || status.equals(OrderStatus.PROCESSING)) {
-            orderRepository.cancelOrderByIdAndUserId(orderId, userUid);
-        } else if (status.equals(OrderStatus.SHIPPED)) {
-            throw new BusinessCustomException(ConstantGeneral.general, ConstantOrder.cannot_cancel_order_already);
+            orderRepository.cancelOrderById(orderId);
         } else {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantOrder.cannot_cancel_order_already_delivery);
         }
 
-        CancelOrderResponse response = new CancelOrderResponse(orderId, true, OrderStatus.CANCELED);
+        CancelOrderResponse response = new CancelOrderResponse(orderId, true, OrderStatus.CANCELLED);
 
         return new BasicMessageResponse<>(200, ConstantOrder.success_cancel, response);
     }
