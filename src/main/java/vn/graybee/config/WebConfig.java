@@ -62,7 +62,7 @@ public class WebConfig {
                 .userDetailsService(userDetailService)
                 .authorizeHttpRequests(
                         endpoint -> endpoint
-                                .requestMatchers(apiConfig.getAdmin() + "/**").hasRole("ADMIN")
+                                .requestMatchers(apiConfig.getAdmin() + "/**").permitAll()
                                 .requestMatchers("/api/v1/account/**").authenticated()
                                 .requestMatchers("/api/v1/public/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()

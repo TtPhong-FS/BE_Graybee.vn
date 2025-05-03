@@ -21,11 +21,13 @@ public class ConstantManufacturer {
     public static final String success_create = "Tạo nhà sản xuất thành công";
 
     public static final String success_update = "Cập nhật nhà sản xuất thành công";
-    
+
     public static final String success_delete = "Xoá nhà sản xuất thành công";
 
     public static final String success_find_by_id = "Tìm nhà sản xuất thành công";
 
     public static final String success_fetch_manufacturers = "Danh sách nhà sản xuất đã được lấy thành công";
+
+    public static final String success_restore = "Khôi phục nhà sản xuất thành công";
 
 }

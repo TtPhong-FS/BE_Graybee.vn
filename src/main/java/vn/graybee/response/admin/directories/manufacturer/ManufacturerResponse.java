@@ -1,25 +1,50 @@
 package vn.graybee.response.admin.directories.manufacturer;
 
-import vn.graybee.enums.DirectoryStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import vn.graybee.models.directories.Manufacturer;
-import vn.graybee.response.BaseResponse;
+import vn.graybee.response.admin.products.StatusResponse;
 
-public class ManufacturerResponse extends BaseResponse {
+import java.time.LocalDateTime;
+
+public class ManufacturerResponse {
 
     private int id;
 
     private String name;
 
-    private DirectoryStatus status;
-
     private int productCount;
 
+    private StatusResponse status;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
+
     public ManufacturerResponse(Manufacturer manufacturer) {
-        super(manufacturer.getCreatedAt(), manufacturer.getUpdatedAt());
         this.id = manufacturer.getId();
         this.name = manufacturer.getName();
-        this.status = manufacturer.getStatus();
+        this.status = new StatusResponse(manufacturer.getStatus().getCode(), manufacturer.getStatus().getDisplayName());
         this.productCount = manufacturer.getProductCount();
+        this.createdAt = manufacturer.getCreatedAt();
+        this.updatedAt = manufacturer.getUpdatedAt();
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public int getProductCount() {
@@ -46,11 +71,11 @@ public class ManufacturerResponse extends BaseResponse {
         this.name = name;
     }
 
-    public DirectoryStatus getStatus() {
+    public StatusResponse getStatus() {
         return status;
     }
 
-    public void setStatus(DirectoryStatus status) {
+    public void setStatus(StatusResponse status) {
         this.status = status;
     }
 

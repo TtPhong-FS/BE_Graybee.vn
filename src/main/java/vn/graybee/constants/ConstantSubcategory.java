@@ -14,6 +14,10 @@ public class ConstantSubcategory {
 
     public static final String tag_relation_does_not_exists = "Thẻ phân loại hiện chưa được liên kết với danh mục con";
 
+    public static final String not_removed = "Danh mục con không nằm trong thùng rác. Không thể khôi phục";
+
+
+    public static final String success_restore = "Khôi phục danh mục con thành công";
 
     //    Response
     public static final String success_create = "Tạo danh mục con thành công";
@@ -27,5 +31,6 @@ public class ConstantSubcategory {
     public static final String success_delete_by_id = "Xoá danh mục con thành công";
 
     public static final String success_delete_tag_relation = "Thẻ phân loại đã được loại bỏ khỏi danh mục con";
+
 
 }

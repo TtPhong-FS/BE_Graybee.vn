@@ -6,6 +6,8 @@ public class ConstantGeneral {
 
     public static final String status = "status";
 
+    public static final String not_super_admin = "Bạn không có quyền khôi phục dữ liệu đã xóa.";
+
     //    Response
 
     public static final String success_load_product_into_elastic = "Tải dữ liệu sản phẩm vào ElasticSearch thành công";
@@ -31,5 +33,9 @@ public class ConstantGeneral {
     public static final String status_invalid = "Trạng thái không hợp lệ: ";
 
     public static final String discount_not_exists = "Mã giảm giá không tồn tại";
+
+    public static final String success_delete = "Sản phẩm đã bị xóa hoàn toàn.";
+
+    public static final String success_published = "Sản phẩm đã được xuất bản thành công.";
 
 }

@@ -51,6 +51,9 @@ public class User extends BaseModel {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @Column(name = "is_super_admin")
+    private Boolean isSuperAdmin;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AccountStatus status;
@@ -61,6 +64,14 @@ public class User extends BaseModel {
     public User(String phoneNumber, String password) {
         this.phoneNumber = phoneNumber;
         this.password = password;
+    }
+
+    public Boolean getSuperAdmin() {
+        return isSuperAdmin;
+    }
+
+    public void setSuperAdmin(Boolean superAdmin) {
+        isSuperAdmin = superAdmin;
     }
 
     public String getGender() {

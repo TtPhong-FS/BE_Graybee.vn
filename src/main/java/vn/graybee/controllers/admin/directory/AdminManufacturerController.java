@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.requests.directories.ManufacturerCreateRequest;
 import vn.graybee.requests.directories.ManufacturerUpdateRequest;
 import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
 import vn.graybee.services.categories.ManufacturerService;
 
 import java.util.List;
@@ -34,13 +34,13 @@ public class AdminManufacturerController {
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<Manufacturer>> create(@RequestBody @Valid ManufacturerCreateRequest request) {
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> create(@RequestBody @Valid ManufacturerCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 manufacturerService.create(request));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<Manufacturer>> update(@RequestParam("id") int id, @RequestBody @Valid ManufacturerUpdateRequest request) {
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> update(@RequestParam("id") int id, @RequestBody @Valid ManufacturerUpdateRequest request) {
         return ResponseEntity.ok(manufacturerService.update(id, request));
     }
 
@@ -55,12 +55,12 @@ public class AdminManufacturerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<Manufacturer>> findById(@PathVariable("id") int id) {
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> findById(@PathVariable("id") int id) {
         return ResponseEntity.ok(manufacturerService.findById(id));
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<Manufacturer>>> findAll() {
+    public ResponseEntity<BasicMessageResponse<List<ManufacturerResponse>>> findAll() {
         return ResponseEntity.ok(manufacturerService.findAll());
     }
 

@@ -9,14 +9,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.enums.OrderStatus;
 import vn.graybee.models.orders.Order;
+import vn.graybee.response.admin.orders.AdminCustomerOrderResponse;
 import vn.graybee.response.admin.orders.AdminOrderResponse;
 import vn.graybee.response.orders.OrderBasicDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("Select new vn.graybee.response.admin.orders.AdminOrderResponse(o.id, o.totalAmount, o.userUid, a.fullName, o.isGuest, p.paymentStatus, d.deliveryType, o.status, o.isCancelled, o.isConfirmed, o.createdAt) from Order o " +
+    @Query("Select new vn.graybee.response.admin.orders.AdminOrderResponse(o.id, o.userUid, o.totalAmount, a.phoneNumber, a.fullName, p.paymentStatus, d.deliveryType, o.status, o.isCancelled, o.isConfirmed, o.createdAt) from Order o " +
             "LEFT JOIN Address a on o.addressId = a.id " +
             "LEFT JOIN Payment p on p.orderId = o.id " +
             "LEFT JOIN Delivery d on d.orderId = o.id ")
@@ -48,5 +50,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT exists (Select 1 FROM Order WHERE id = :id)")
     boolean checkExistsById(long id);
+
+    @Query("Select new vn.graybee.response.admin.orders.AdminCustomerOrderResponse(SUM(o.totalAmount), COUNT(o.userUid)) from Order o where o.userUid = :userUid")
+    AdminCustomerOrderResponse findCustomerOrderByUserUId(Integer userUid);
+
+    @Query("Select o.createdAt from Order o where o.userUid = :userUid order by o.createdAt desc limit 1")
+    LocalDateTime findLastOrderDateByUid(Integer userUid);
 
 }

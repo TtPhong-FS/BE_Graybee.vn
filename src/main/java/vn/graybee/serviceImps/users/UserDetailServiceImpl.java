@@ -4,8 +4,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import vn.graybee.constants.ConstantAuth;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantUser;
+import vn.graybee.enums.RolePermissionStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.models.users.UserPrincipalDto;
@@ -37,7 +39,16 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserPrincipalDto user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantUser.does_not_exists));
-        
+
+        if (user.isSuperAdmin()) {
+            user.setROLE_NAME("SUPER_ADMIN");
+            return new UserPrincipal(user);
+        }
+
+        if (user.getStatus() == null || user.getStatus().equals(RolePermissionStatus.INACTIVE)) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantAuth.role_inactive);
+        }
+
         List<String> rolePermissions = rolePermissionRepository.getPermissionOfRoleByRoleId(user.getRoleId());
         List<String> userPermissions = userPermissionRepository.getPermissionOfUserByUserId(user.getId());
 

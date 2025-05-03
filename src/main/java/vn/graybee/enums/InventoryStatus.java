@@ -2,8 +2,7 @@ package vn.graybee.enums;
 
 public enum InventoryStatus {
 
-    ACTIVE,
-    INACTIVE,
+    STOCK,
     OUT_OF_STOCK,
     DELETED
 

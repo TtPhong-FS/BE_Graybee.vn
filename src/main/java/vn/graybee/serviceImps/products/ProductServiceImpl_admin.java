@@ -28,6 +28,7 @@ import vn.graybee.models.products.ProductImage;
 import vn.graybee.models.products.ProductStatistic;
 import vn.graybee.models.products.ProductSubcategory;
 import vn.graybee.models.products.ProductTag;
+import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.repositories.categories.SubCategoryRepository;
@@ -118,18 +119,22 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         this.redisProductService = redisProductService;
     }
 
-    public ProductResponse getProductResponse(Product product, String categoryName, String manufacturerName, int quantity) {
+    public ProductResponse getProductResponse(Product product, String categoryName, String manufacturerName, int quantity, Boolean isStock) {
         return new ProductResponse(
                 product,
                 categoryName,
                 manufacturerName,
-                quantity
+                quantity,
+                isStock
+
         );
     }
 
     @Override
-    public Long checkExistById(long id) {
-        return productRepository.checkExistsById(id).orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+    public void checkExistById(long id) {
+        if (!productRepository.checkExistsById(id)) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists);
+        }
     }
 
     @Override
@@ -182,8 +187,6 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         product.setCategoryId(request.getCategoryId());
         product.setManufacturerId(request.getManufacturerId());
 
-
-        product.setStock(request.isInStock());
         product.setConditions(request.getConditions().toUpperCase());
         product.setDimension(request.getDimension());
         product.setWeight(request.getWeight());
@@ -215,9 +218,10 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         Inventory inventory = new Inventory();
 
-        inventory.setQuantity(request.isInStock() ? request.getQuantity() : 0);
+        inventory.setStock(request.isStock());
+        inventory.setQuantity(request.isStock() ? request.getQuantity() : 0);
         inventory.setProductId(product.getId());
-        inventory.setStatus(request.isInStock() && request.getQuantity() > 0 ? InventoryStatus.ACTIVE : InventoryStatus.OUT_OF_STOCK);
+        inventory.setStatus(request.isStock() && request.getQuantity() > 0 ? InventoryStatus.STOCK : InventoryStatus.OUT_OF_STOCK);
 
         inventory = inventoryRepository.save(inventory);
 
@@ -253,7 +257,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         redisProductService.deleteProductListPattern(categoryName);
 
-        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity());
+        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity(), inventory.getStock());
 
 
         return new BasicMessageResponse<>(201, ConstantProduct.success_create, response);
@@ -329,12 +333,6 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         product.setFinalPrice(finalPrice);
         product.setColor(request.getColor());
 
-        if (status.equals(ProductStatus.OUT_OF_STOCK) || status.equals(ProductStatus.DELETED)) {
-            product.setStock(false);
-        } else {
-            product.setStock(request.isStock());
-        }
-
         product.setUpdatedAt(LocalDateTime.now());
 
         product = productRepository.save(product);
@@ -406,8 +404,9 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         boolean isNewInventory = inventory.getId() == null;
 
-        inventory.setQuantity(product.isStock() ? request.getQuantity() : 0);
-        inventory.setStatus(product.isStock() && request.getQuantity() > 0 ? InventoryStatus.ACTIVE : InventoryStatus.OUT_OF_STOCK);
+        inventory.setStock(request.isStock());
+        inventory.setQuantity(request.isStock() ? request.getQuantity() : 0);
+        inventory.setStatus(request.isStock() && request.getQuantity() > 0 ? InventoryStatus.STOCK : InventoryStatus.OUT_OF_STOCK);
         inventory.setUpdatedAt(LocalDateTime.now());
 
         if (isNewInventory) {
@@ -416,7 +415,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         inventory = inventoryRepository.save(inventory);
 
-        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity());
+        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity(), inventory.getStock());
 
         String key = PRODUCT_DETAIL_KEY + productId;
 
@@ -428,6 +427,8 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
     @Override
     public BasicMessageResponse<ProductSubcategoryAndTagResponse> updateSubcategoriesAndTagIds(long id, ProductRelationUpdateRequest request) {
+
+        checkExistById(id);
 
         List<TagResponse> tags = tagRepository.findByIds(request.getTags());
         Set<Integer> tagIds = tags.stream().map(TagResponse::getId).collect(Collectors.toSet());
@@ -478,14 +479,10 @@ public class ProductServiceImpl_admin implements ProductService_admin {
             }
         }
 
-        String productCode = productRepository.getProductCodeById(id).orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
-
         ProductSubcategoryAndTagResponse response = new ProductSubcategoryAndTagResponse();
         response.setId(id);
-        response.setCode(productCode);
         response.setTags(tags);
         response.setSubcategories(subcategories);
-
 
         return new BasicMessageResponse<>(200, ConstantProduct.success_update_relation, response);
     }
@@ -639,14 +636,74 @@ public class ProductServiceImpl_admin implements ProductService_admin {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<ProductStatusResponse> updateStatus(long id, ProductStatus status) {
 
-        long product = productRepository.checkExistsById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+        checkExistById(id);
 
-        productRepository.updateStatusById(product, status);
+        ProductStatus currentStatus = productRepository.findStatusById(id);
 
-        ProductStatusResponse response = new ProductStatusResponse(product, status, LocalDateTime.now());
+        if (currentStatus == ProductStatus.REMOVED && status == ProductStatus.DELETED) {
+
+            productRepository.updateStatusById(id, status);
+
+            ProductStatusResponse response = new ProductStatusResponse(id, status, LocalDateTime.now());
+
+            return new BasicMessageResponse<>(200, ConstantGeneral.success_delete, response);
+
+        } else if (currentStatus == ProductStatus.REMOVED) {
+            throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.removed);
+
+        } else if (currentStatus == ProductStatus.DELETED) {
+            throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.soft_delete);
+
+        } else if (currentStatus == ProductStatus.PUBLISHED && (status == ProductStatus.DRAFT || status == ProductStatus.REMOVED || status == ProductStatus.COMING_SOON || status == ProductStatus.DELETED)) {
+            throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.published + status.getDisplayName());
+        }
+
+        if ((currentStatus == ProductStatus.PENDING || currentStatus == ProductStatus.COMING_SOON) && status == ProductStatus.PUBLISHED) {
+
+            productRepository.updateStatusById(id, status);
+
+            ProductStatusResponse response = new ProductStatusResponse(id, status, LocalDateTime.now());
+
+            return new BasicMessageResponse<>(200, ConstantGeneral.success_published, response);
+        } else if (status == ProductStatus.PUBLISHED) {
+            throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.pending_to_published);
+        }
+
+        productRepository.updateStatusById(id, status);
+
+        ProductStatusResponse response = new ProductStatusResponse(id, status, LocalDateTime.now());
 
         return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<ProductResponse> restoreProduct(long id, UserPrincipal userPrincipal) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+
+        ProductStatus status = product.getStatus();
+
+        if (userPrincipal != null && !userPrincipal.getUser().isSuperAdmin() && status == ProductStatus.DELETED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.not_super_admin);
+        }
+
+        if (status != ProductStatus.DELETED && status != ProductStatus.REMOVED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantProduct.not_removed);
+        }
+
+        productRepository.updateStatusById(id, ProductStatus.INACTIVE);
+
+        String categoryName = categoryRepository.getNameById(product.getCategoryId())
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.does_not_exists));
+
+        String manufacturerName = manufacturerRepository.getNameById(product.getManufacturerId())
+                .orElseThrow(() -> new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.does_not_exists));
+
+        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, 0, false);
+
+        return new BasicMessageResponse<>(200, ConstantProduct.success_restore, response);
     }
 
     @Override

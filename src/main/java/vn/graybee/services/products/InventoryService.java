@@ -1,6 +1,5 @@
 package vn.graybee.services.products;
 
-import vn.graybee.enums.InventoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.products.InventoryRequest;
 import vn.graybee.response.admin.products.InventoryResponse;
@@ -15,6 +14,6 @@ public interface InventoryService {
 
     BasicMessageResponse<Integer> delete(int id);
 
-    BasicMessageResponse<InventoryResponse> updateQuantity(int id, int quantity, InventoryStatus status);
+    BasicMessageResponse<InventoryResponse> update(int id, InventoryRequest request);
 
 }

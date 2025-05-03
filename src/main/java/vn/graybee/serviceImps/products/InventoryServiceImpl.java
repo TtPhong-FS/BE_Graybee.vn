@@ -12,6 +12,7 @@ import vn.graybee.models.products.Inventory;
 import vn.graybee.repositories.products.InventoryRepository;
 import vn.graybee.repositories.products.ProductRepository;
 import vn.graybee.requests.products.InventoryRequest;
+import vn.graybee.response.admin.inventories.AdminInventoryProductResponse;
 import vn.graybee.response.admin.products.InventoryQuantityResponse;
 import vn.graybee.response.admin.products.InventoryResponse;
 import vn.graybee.services.products.InventoryService;
@@ -31,22 +32,37 @@ public class InventoryServiceImpl implements InventoryService {
         this.productRepository = productRepository;
     }
 
+    public InventoryResponse getResponse(Inventory inventory, AdminInventoryProductResponse product) {
+        return new InventoryResponse(
+                inventory.getId(),
+                product.getId(),
+                product.getThumbnail(),
+                product.getProductName(),
+                product.getProductCode(),
+                inventory.getQuantity(),
+                inventory.getStatus(),
+                inventory.getCreatedAt(),
+                inventory.getUpdatedAt()
+        );
+    }
+
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<InventoryResponse> create(InventoryRequest request) {
 
-        String productCode = productRepository.getProductCodeById(request.getProductId())
+        AdminInventoryProductResponse product = productRepository.findAdminInventoryProductById(request.getProductId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
-        
+
         InventoryStatus status = request.getStatusEnum();
 
         Inventory inventory = new Inventory();
-        inventory.setProductId(request.getProductId());
+        inventory.setProductId(product.getId());
         inventory.setQuantity(request.getQuantity());
-        inventory.setStatus(status);
+        inventory.setStatus(request.getQuantity() > 0 ? status : InventoryStatus.OUT_OF_STOCK);
 
         inventory = inventoryRepository.save(inventory);
 
-        InventoryResponse response = new InventoryResponse(inventoryRepository.save(inventory), productCode);
+        InventoryResponse response = getResponse(inventory, product);
 
         return new BasicMessageResponse<>(200, ConstantInventory.success_create, response);
     }
@@ -63,6 +79,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> delete(int id) {
+
         InventoryQuantityResponse inventory = inventoryRepository.checkExistsById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists_in_inventory));
 
@@ -77,22 +94,23 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<InventoryResponse> updateQuantity(int id, int quantity, InventoryStatus status) {
+    public BasicMessageResponse<InventoryResponse> update(int id, InventoryRequest request) {
 
-        String productCode = inventoryRepository.getProductCodeById(id)
+        InventoryStatus status = request.getStatusEnum();
+
+        AdminInventoryProductResponse product = productRepository.findAdminInventoryProductById(request.getProductId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists_in_inventory));
 
-        inventory.setQuantity(quantity);
-        inventory.setStatus(quantity > 0 ? status : InventoryStatus.OUT_OF_STOCK);
-
+        inventory.setQuantity(request.getQuantity());
+        inventory.setStatus(request.getQuantity() > 0 ? status : InventoryStatus.OUT_OF_STOCK);
         inventory.setUpdatedAt(LocalDateTime.now());
 
         inventory = inventoryRepository.save(inventory);
 
-        InventoryResponse response = new InventoryResponse(inventory, productCode);
+        InventoryResponse response = getResponse(inventory, product);
 
         return new BasicMessageResponse<>(200, ConstantInventory.success_update, response);
     }

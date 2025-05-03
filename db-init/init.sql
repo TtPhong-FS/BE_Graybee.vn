@@ -224,7 +224,7 @@ CREATE TABLE roles(
  	id tinyint unsigned primary key auto_increment,
 	name varchar(20) not null unique,
 	user_count int unsigned default 0,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED') default 'ACTIVE',
+	status ENUM('ACTIVE', 'INACTIVE') default 'ACTIVE',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
  );
@@ -234,7 +234,7 @@ CREATE TABLE roles(
     name VARCHAR(50) NOT NULL UNIQUE,
     description varchar(150) default null,
     user_count int unsigned default 0,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED') default 'ACTIVE',
+	status ENUM('ACTIVE', 'INACTIVE') default 'ACTIVE',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -242,7 +242,7 @@ CREATE TABLE roles(
 CREATE TABLE users (
     id INT unsigned PRIMARY KEY AUTO_INCREMENT,
     uid int unsigned not null unique,
-    role_id tinyint unsigned NOT NULL,
+    role_id tinyint unsigned,
     FOREIGN KEY (role_id) REFERENCES roles(id),
     username  VARCHAR(12) UNIQUE NOT NULL,
     fullname VARCHAR(100) DEFAULT null,
@@ -254,19 +254,20 @@ CREATE TABLE users (
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	is_active BOOLEAN DEFAULT FALSE,
+	is_super_admin BOOLEAN DEFAULT FALSE,
 	status enum('ACTIVE', 'INACTIVE', 'DELETED', 'OFFLINE', 'ONLINE', 'BANNED', 'PENDING') default 'PENDING'
 );
 
 INSERT INTO roles (name)
 values ('ADMIN'),
-('CUSTOMER')
+('CUSTOMER');
 
 INSERT INTO permissions(name)
-values ('FULL_CONTROL')
+values ('FULL_CONTROL');
 
-INSERT INTO users(role_id, uid, phone_number, password, is_active)
-values (1, 111111, '0393150468', '$2a$10$oZnkhO.Uauo.D6GSjevI6.1.imQvexIB1irNNGhcjRQ9rzDVpERXC', true)
-
+INSERT INTO users(role_id, uid,username, phone_number, password, is_active, is_super_admin, status)
+values (1, 111111,'admin', '0393150468', '$2a$10$oZnkhO.Uauo.D6GSjevI6.1.imQvexIB1irNNGhcjRQ9rzDVpERXC', true, false,  'ACTIVE'),
+values (null, 000000,'root',null, '$2a$10$cNyH4lm9NcdQDFA9PVFM0e7cIf1ti83n9rgezg.SZSF6k4GfEwxgi', true, true, 'ACTIVE');
 
 create table favourites(
 	id INT unsigned PRIMARY KEY AUTO_INCREMENT,

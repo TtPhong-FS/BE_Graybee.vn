@@ -18,11 +18,13 @@ public class ConstantCategory {
 
     public static final String products_in_use = "Không thể thực hiện, danh mục đang được sử dụng bởi một sản phẩm";
 
+    public static final String not_removed = "Danh mục không nằm trong thùng rác. Không thể khôi phục";
+
     //    Response
     public static final String success_create = "Tạo danh mục thành công";
 
     public static final String success_update = "Cập nhật danh mục thành công";
-    
+
     public static final String success_delete = "Xoá danh mục thành công";
 
     public static final String success_find_by_id = "Tìm danh mục thành công";
@@ -32,5 +34,8 @@ public class ConstantCategory {
     public static final String success_delete_manufacturer_relation = "Nhà sản xuất đã được loại bỏ khỏi danh mục";
 
     public static final String success_delete_subcategory_relation = "Danh mục con đã được loại bỏ khỏi danh mục";
+
+
+    public static final String success_restore = "Khôi phục danh mục thành công";
 
 }

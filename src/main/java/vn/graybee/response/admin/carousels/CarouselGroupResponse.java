@@ -1,10 +1,10 @@
 package vn.graybee.response.admin.carousels;
 
-import vn.graybee.response.BaseResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
-public class CarouselGroupResponse extends BaseResponse {
+public class CarouselGroupResponse {
 
     private int id;
 
@@ -16,17 +16,36 @@ public class CarouselGroupResponse extends BaseResponse {
 
     private boolean active;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
+
     public CarouselGroupResponse(LocalDateTime createdAt, LocalDateTime updatedAt, int id, String type, String name, String categoryName, boolean active) {
-        super(createdAt, updatedAt);
         this.id = id;
         this.type = type;
         this.name = name;
         this.categoryName = categoryName;
         this.active = active;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public CarouselGroupResponse(LocalDateTime createdAt, LocalDateTime updatedAt) {
-        super(createdAt, updatedAt);
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public int getId() {

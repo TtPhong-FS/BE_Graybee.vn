@@ -1,28 +1,52 @@
 package vn.graybee.response.admin.directories.subcate;
 
-import vn.graybee.enums.DirectoryStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import vn.graybee.models.directories.SubCategory;
-import vn.graybee.response.BaseResponse;
 import vn.graybee.response.admin.directories.tag.TagResponse;
+import vn.graybee.response.admin.products.StatusResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-public class SubCategoryResponse extends BaseResponse {
+public class SubCategoryResponse {
 
     private int id;
 
     private String name;
 
-    private DirectoryStatus status;
+    private StatusResponse status;
 
     private List<TagResponse> tags;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
+
     public SubCategoryResponse(SubCategory subCategory, List<TagResponse> tags) {
-        super(subCategory.getCreatedAt(), subCategory.getUpdatedAt());
         this.id = subCategory.getId();
         this.name = subCategory.getName();
-        this.status = subCategory.getStatus();
+        this.status = new StatusResponse(subCategory.getStatus().getCode(), subCategory.getStatus().getDisplayName());
         this.tags = tags;
+        this.createdAt = subCategory.getCreatedAt();
+        this.updatedAt = subCategory.getUpdatedAt();
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public List<TagResponse> getTags() {
@@ -49,11 +73,11 @@ public class SubCategoryResponse extends BaseResponse {
         this.name = name;
     }
 
-    public DirectoryStatus getStatus() {
+    public StatusResponse getStatus() {
         return status;
     }
 
-    public void setStatus(DirectoryStatus status) {
+    public void setStatus(StatusResponse status) {
         this.status = status;
     }
 

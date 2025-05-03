@@ -1,5 +1,7 @@
 package vn.graybee.models.users;
 
+import vn.graybee.enums.RolePermissionStatus;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -11,6 +13,8 @@ public class UserPrincipalDto {
 
     private boolean isActive;
 
+    private boolean isSuperAdmin;
+
     private Integer roleId;
 
     private String username;
@@ -19,19 +23,39 @@ public class UserPrincipalDto {
 
     private String ROLE_NAME;
 
+    private RolePermissionStatus status;
+
     private List<String> permissions;
 
     public UserPrincipalDto() {
     }
 
-    public UserPrincipalDto(Integer id, Integer userUid, boolean isActive, Integer roleId, String username, String password, String ROLE_NAME) {
+    public UserPrincipalDto(Integer id, Integer userUid, boolean isActive, boolean isSuperAdmin, Integer roleId, String username, String password, String ROLE_NAME, RolePermissionStatus status) {
         this.id = id;
         this.userUid = userUid;
         this.isActive = isActive;
+        this.isSuperAdmin = isSuperAdmin;
         this.roleId = roleId;
         this.username = username;
         this.password = password;
         this.ROLE_NAME = ROLE_NAME;
+        this.status = status;
+    }
+
+    public RolePermissionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RolePermissionStatus status) {
+        this.status = status;
+    }
+
+    public boolean isSuperAdmin() {
+        return isSuperAdmin;
+    }
+
+    public void setSuperAdmin(boolean superAdmin) {
+        isSuperAdmin = superAdmin;
     }
 
     public Integer getUserUid() {

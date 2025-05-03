@@ -24,11 +24,22 @@ public class Inventory extends BaseModel {
 
     private Integer quantity;
 
+    @Column(name = "is_stock")
+    private Boolean isStock;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private InventoryStatus status;
 
     public Inventory() {
+    }
+
+    public Boolean getStock() {
+        return isStock;
+    }
+
+    public void setStock(Boolean stock) {
+        isStock = stock;
     }
 
     public InventoryStatus getStatus() {

@@ -31,8 +31,8 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("SELECT EXISTS (SELECT 1 FROM Category c WHERE c.name = :name)")
     boolean checkExistsByName(@Param("name") String name);
 
-    @Query("Select c.id from Category c where c.id = :id")
-    Optional<Integer> findIdById(@Param("id") int id);
+    @Query("Select c.name from Category c where c.id = :id")
+    Optional<String> findNameById(@Param("id") int id);
 
     @Query("Select c.name from Category c where c.id = :categoryId and c.status != 'DELETED'")
     Optional<String> getNameById(@Param("categoryId") int categoryId);
@@ -40,7 +40,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("Select new vn.graybee.response.admin.directories.category.CategoryResponse(c) from Category c where c.id = :id ")
     Optional<CategoryResponse> getById(@Param("id") int id);
 
-    @Query("Select new vn.graybee.response.admin.directories.category.CategoryProductCountResponse(c.id, c.productCount) from Category c where c.id = :id ")
+    @Query("Select new vn.graybee.response.admin.directories.category.CategoryProductCountResponse(c.id, c.name, c.productCount) from Category c where c.id = :id ")
     Optional<CategoryProductCountResponse> checkExistsAndGetProductCountById(@Param("id") int id);
 
     @Query("Select c.name from Category c where c.name = :name ")
@@ -50,7 +50,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("Select c from Category c")
     List<CategoryBasicInfoProjection> findAllCategories_public();
 
-    @Query("Select new vn.graybee.response.publics.sidebar.SidebarDto(c.id, c.name) from Category c")
+    @Query("Select new vn.graybee.response.publics.sidebar.SidebarDto(c.id, c.name) from Category c where c.status = 'ACTIVE' ")
     List<SidebarDto> getSidebar();
 
 }

@@ -59,22 +59,12 @@ public class Product extends BaseModel {
     @Column(nullable = false)
     private ProductStatus status;
 
-    @Column(name = "in_stock")
-    private boolean isStock;
-
     @Column(length = 250)
     private String thumbnail;
 
     public Product() {
     }
-
-    public boolean isStock() {
-        return isStock;
-    }
-
-    public void setStock(boolean stock) {
-        isStock = stock;
-    }
+    
 
     public String getThumbnail() {
         return thumbnail;

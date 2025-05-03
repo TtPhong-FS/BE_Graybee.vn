@@ -1,13 +1,12 @@
 package vn.graybee.response.admin.products;
 
-import vn.graybee.enums.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import vn.graybee.models.products.Product;
-import vn.graybee.response.BaseResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class ProductResponse extends BaseResponse {
+public class ProductResponse {
 
     private long id;
 
@@ -37,18 +36,19 @@ public class ProductResponse extends BaseResponse {
 
     private String conditions;
 
-    private boolean inStock;
+    private Boolean isStock;
 
     private int quantity;
 
-    private ProductStatus status;
+    private StatusResponse status;
 
-    public ProductResponse(LocalDateTime createdAt, LocalDateTime updatedAt) {
-        super(createdAt, updatedAt);
-    }
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
 
-    public ProductResponse(Product product, String categoryName, String manufacturerName, int quantity) {
-        super(product.getCreatedAt(), product.getUpdatedAt());
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
+
+    public ProductResponse(Product product, String categoryName, String manufacturerName, int quantity, Boolean isStock) {
         this.id = product.getId();
         this.code = product.getCode();
         this.name = product.getName();
@@ -63,17 +63,35 @@ public class ProductResponse extends BaseResponse {
         this.color = product.getColor();
         this.thumbnail = product.getThumbnail();
         this.conditions = product.getConditions();
-        this.inStock = product.isStock();
+        this.createdAt = product.getCreatedAt();
+        this.updatedAt = product.getUpdatedAt();
+        this.isStock = isStock;
         this.quantity = quantity;
-        this.status = product.getStatus();
+        this.status = new StatusResponse(product.getStatus().getCode(), product.getStatus().getDisplayName());
     }
 
-    public boolean isInStock() {
-        return inStock;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setInStock(boolean inStock) {
-        this.inStock = inStock;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getStock() {
+        return isStock;
+    }
+
+    public void setStock(Boolean stock) {
+        isStock = stock;
     }
 
     public int getQuantity() {
@@ -132,11 +150,11 @@ public class ProductResponse extends BaseResponse {
         this.name = name;
     }
 
-    public ProductStatus getStatus() {
+    public StatusResponse getStatus() {
         return status;
     }
 
-    public void setStatus(ProductStatus status) {
+    public void setStatus(StatusResponse status) {
         this.status = status;
     }
 

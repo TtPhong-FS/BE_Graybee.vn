@@ -42,7 +42,7 @@ public class ProductUpdateResponse {
 
     private String conditions;
 
-    private boolean isStock;
+    private Boolean isStock;
 
     private int quantity;
 
@@ -53,7 +53,7 @@ public class ProductUpdateResponse {
     public ProductUpdateResponse() {
     }
 
-    public ProductUpdateResponse(Product product, String description, int quantity) {
+    public ProductUpdateResponse(Product product, String description, int quantity, Boolean isStock) {
         this.id = product.getId();
         this.categoryId = product.getCategoryId();
         this.manufacturerId = product.getManufacturerId();
@@ -67,23 +67,24 @@ public class ProductUpdateResponse {
         this.color = product.getColor();
         this.thumbnail = product.getThumbnail();
         this.conditions = product.getConditions();
-        this.isStock = product.isStock();
+        this.isStock = isStock;
         this.status = product.getStatus();
         this.description = description;
         this.quantity = quantity;
     }
 
-    public boolean isStock() {
+    public Boolean getStock() {
         return isStock;
     }
 
-    public void setStock(boolean stock) {
+    public void setStock(Boolean stock) {
         isStock = stock;
     }
 
     public int getQuantity() {
         return quantity;
     }
+
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;

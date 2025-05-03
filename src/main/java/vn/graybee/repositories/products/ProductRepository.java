@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.models.products.Product;
+import vn.graybee.response.admin.inventories.AdminInventoryProductResponse;
 import vn.graybee.response.admin.products.ProductResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
 import vn.graybee.response.admin.products.ProductUpdateResponse;
@@ -23,7 +24,7 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT new vn.graybee.response.admin.products.ProductResponse(p,c.name, m.name, COALESCE(i.quantity, 0)) " +
+    @Query("SELECT new vn.graybee.response.admin.products.ProductResponse(p,c.name, m.name, COALESCE(i.quantity, 0), i.isStock) " +
             "FROM Product p " +
             "INNER JOIN Category c ON p.categoryId = c.id " +
             "INNER JOIN Manufacturer m ON p.manufacturerId = m.id " +
@@ -42,18 +43,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("Select p.finalPrice from Product p where p.id = :id")
     BigDecimal findFinalPriceById(@Param("id") long id);
 
-    @Query("SELECT new vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse(p.id, p.code,null,null) FROM Product p")
+    @Query("SELECT new vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse(p.id, p.name,  p.code) FROM Product p")
     List<ProductSubcategoryAndTagResponse> fetchProductsWithoutSubcategoryAndTag();
 
-    @Query("SELECT new vn.graybee.response.admin.products.ProductUpdateResponse(p, pd.description, COALESCE(i.quantity, 0)) " +
+    @Query("SELECT new vn.graybee.response.admin.products.ProductUpdateResponse(p, pd.description, COALESCE(i.quantity, 0), COALESCE(i.isStock, false)) " +
             "FROM Product p " +
             "LEFT JOIN Inventory i on p.id = i.productId " +
             "LEFT JOIN ProductDescription pd on p.id = pd.productId where p.id = :id"
     )
     Optional<ProductUpdateResponse> findToUpdate(@Param("id") long id);
 
-    @Query("Select p.id from Product p where p.id = :id")
-    Optional<Long> checkExistsById(@Param("id") long id);
+    @Query("Select exists (Select 1 from Product p where p.id = :id)")
+    boolean checkExistsById(@Param("id") long id);
+
+    @Query("Select p.status from Product p where p.id = :id")
+    ProductStatus findStatusById(long id);
 
     @Query(value = "Select p.name from Product p where p.name = :name")
     Optional<String> validateName(@Param("name") String name);
@@ -76,6 +80,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p where p.status = 'PUBLISHED' ")
     List<ProductBasicResponse> getProductPublishedToLoadIntoElastic();
+
+    @Query("Select new vn.graybee.response.admin.inventories.AdminInventoryProductResponse(p.id,p.thumbnail,  p.name, p.code) from Product p where p.id = :id")
+    Optional<AdminInventoryProductResponse> findAdminInventoryProductById(@Param("id") long id);
+
     //    Public
 
     @Query("Select new vn.graybee.response.favourites.ProductFavourite(p.id, p.finalPrice,p.name, p.thumbnail) from Product p where p.id = :id and p.status = 'PUBLISHED' ")
@@ -90,13 +98,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("Select new vn.graybee.response.publics.products.ProductDetailResponse(p.id, p.name, m.name, p.warranty, p.conditions, p.weight,p.color, p.thumbnail, p.price, p.finalPrice, p.discountPercent) from Product p join Manufacturer m on p.manufacturerId = m.id where p.id = :id and p.status = 'PUBLISHED' ")
     Optional<ProductDetailResponse> getDetailByProductId(@Param("id") long id);
 
-    @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p join Category c on p.categoryId = c.id where p.status = 'PUBLISHED' and c.name = :category ")
+    @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p join Category c on p.categoryId = c.id where p.status = 'PUBLISHED' and c.name = :category and c.status = 'ACTIVE' ")
     Page<ProductBasicResponse> findProductsByCategoryName(@Param("category") String category, Pageable pageable);
 
-    @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p join Category c on p.categoryId = c.id join Manufacturer m on p.manufacturerId = m.id where p.status = 'PUBLISHED' and c.name = :category and m.name = :manufacturer ")
+    @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p join Category c on p.categoryId = c.id join Manufacturer m on p.manufacturerId = m.id where p.status = 'PUBLISHED' and c.name = :category and m.name = :manufacturer and c.status = 'ACTIVE' and m.status = 'ACTIVE' ")
     Page<ProductBasicResponse> findByCategoryAndManufacturer(@Param("category") String category, @Param("manufacturer") String manufacturer, Pageable pageable);
 
-    @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p join Category c on p.categoryId = c.id where p.status = 'PUBLISHED' and c.name = :category and exists (Select 1 from ProductSubcategory ps join SubCategory s on ps.subcategoryId = s.id where ps.productId = p.id and s.name = :subcategory) and exists (Select 1 from ProductTag pt join Tag t on pt.tagId = t.id where pt.productId = p.id and t.name = :tag)")
+    @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p join Category c on p.categoryId = c.id where p.status = 'PUBLISHED' and c.name = :category and c.status = 'ACTIVE' and exists (Select 1 from ProductSubcategory ps join SubCategory s on ps.subcategoryId = s.id where ps.productId = p.id and s.name = :subcategory) and exists (Select 1 from ProductTag pt join Tag t on pt.tagId = t.id where pt.productId = p.id and t.name = :tag)")
     Page<ProductBasicResponse> findByCategoryAndSubcategoryAndTag(@Param("category") String category, @Param("subcategory") String subcategory, @Param("tag") String tag, Pageable pageable);
 
 }

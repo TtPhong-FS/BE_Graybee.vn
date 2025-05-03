@@ -1,5 +1,6 @@
 package vn.graybee.response.admin.orders;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import vn.graybee.enums.DeliveryType;
 import vn.graybee.enums.OrderStatus;
 import vn.graybee.enums.PaymentStatus;
@@ -11,13 +12,13 @@ public class AdminOrderResponse {
 
     private long id;
 
+    private Integer uid;
+
     private BigDecimal totalAmount;
 
-    private Integer userUid;
+    private String phoneNumber;
 
     private String fullName;
-
-    private boolean isGuest;
 
     private PaymentStatus paymentStatus;
 
@@ -28,15 +29,16 @@ public class AdminOrderResponse {
     private boolean isCancelled;
 
     private boolean isConfirmed;
-
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
-    public AdminOrderResponse(long id, BigDecimal totalAmount, Integer userUid, String fullName, boolean isGuest, PaymentStatus paymentStatus, DeliveryType deliveryType, OrderStatus status, boolean isCancelled, boolean isConfirmed, LocalDateTime createdAt) {
+    public AdminOrderResponse(long id, Integer uid, BigDecimal totalAmount, String phoneNumber, String fullName, PaymentStatus paymentStatus, DeliveryType deliveryType, OrderStatus status, boolean isCancelled, boolean isConfirmed, LocalDateTime createdAt) {
         this.id = id;
+        this.uid = uid;
         this.totalAmount = totalAmount;
-        this.userUid = userUid;
+        this.phoneNumber = phoneNumber;
         this.fullName = fullName;
-        this.isGuest = isGuest;
         this.paymentStatus = paymentStatus;
         this.deliveryType = deliveryType;
         this.status = status;
@@ -46,6 +48,22 @@ public class AdminOrderResponse {
     }
 
     public AdminOrderResponse() {
+    }
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public long getId() {
@@ -64,13 +82,6 @@ public class AdminOrderResponse {
         this.totalAmount = totalAmount;
     }
 
-    public Integer getUserUid() {
-        return userUid;
-    }
-
-    public void setUserUid(Integer userUid) {
-        this.userUid = userUid;
-    }
 
     public String getFullName() {
         return fullName;
@@ -80,13 +91,6 @@ public class AdminOrderResponse {
         this.fullName = fullName;
     }
 
-    public boolean isGuest() {
-        return isGuest;
-    }
-
-    public void setGuest(boolean guest) {
-        isGuest = guest;
-    }
 
     public PaymentStatus getPaymentStatus() {
         return paymentStatus;

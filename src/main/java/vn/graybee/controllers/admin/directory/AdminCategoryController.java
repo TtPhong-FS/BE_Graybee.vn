@@ -3,6 +3,7 @@ package vn.graybee.controllers.admin.directory;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.requests.directories.CategoryCreateRequest;
 import vn.graybee.requests.directories.CategoryUpdateRequest;
 import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
@@ -73,6 +75,11 @@ public class AdminCategoryController {
     @PutMapping("/update/status")
     public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatusById(@RequestParam("id") int id, @RequestParam("status") DirectoryStatus status) {
         return ResponseEntity.ok(categoryService.updateStatusById(id, status));
+    }
+
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> updateStatusById(@PathVariable("id") int id, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(categoryService.restoreById(id, userPrincipal));
     }
 
 

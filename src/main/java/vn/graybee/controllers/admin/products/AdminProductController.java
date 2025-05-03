@@ -2,6 +2,7 @@ package vn.graybee.controllers.admin.products;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
+import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductRelationUpdateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
@@ -77,9 +79,14 @@ public class AdminProductController {
         return ResponseEntity.ok(productServiceADMIN.fetchAll(status, category, manufacturer, page, size, sortBy, order));
     }
 
-    @PutMapping("/update/status")
-    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@RequestParam("id") long id, @RequestParam("status") ProductStatus status) {
+    @PutMapping("/update/status/{id}/{status}")
+    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@PathVariable("id") long id, @PathVariable("status") ProductStatus status) {
         return ResponseEntity.ok(productServiceADMIN.updateStatus(id, status));
+    }
+
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<BasicMessageResponse<ProductResponse>> restoreProduct(@PathVariable("id") long id, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(productServiceADMIN.restoreProduct(id, userPrincipal));
     }
 
     @GetMapping("/load-elastic")

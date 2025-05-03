@@ -80,6 +80,7 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
 
         user.setActive(false);
+        user.setSuperAdmin(false);
         user.setRoleId(roleId);
         user.setFullName(TextUtils.capitalizeEachWord(request.getFullName()));
         user.setUid(uid);
@@ -141,6 +142,10 @@ public class AuthServiceImpl implements AuthService {
                         request.getUsername(), request.getPassword()
                 )
         );
+
+        if (request.getUsername().equals("root")) {
+            user.setRole("SUPER_ADMIN");
+        }
 
         String token = jwtServices.generateToken(request.getUsername(), user.getRole());
 

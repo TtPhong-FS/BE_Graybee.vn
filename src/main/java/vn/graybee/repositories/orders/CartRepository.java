@@ -18,7 +18,7 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
     @Query("Select c from Cart c where c.sessionId = :sessionId ")
     Optional<Cart> findBySessionId(@Param("sessionId") String sessionId);
 
-    @Query("Select c.id from Cart c where c.userUid = :userUid ")
+    @Query("Select c.id from Cart c where c.userUid = :userUid")
     Optional<Integer> findIdByUserUid(@Param("userUid") int userUid);
 
     @Query("Select c.id from Cart c where c.sessionId = :sessionId ")

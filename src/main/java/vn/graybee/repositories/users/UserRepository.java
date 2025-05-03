@@ -8,9 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.enums.AccountStatus;
 import vn.graybee.models.users.User;
 import vn.graybee.models.users.UserPrincipalDto;
+import vn.graybee.response.admin.users.AdminCustomerResponse;
 import vn.graybee.response.users.UserAuthenDto;
 import vn.graybee.response.users.UserProfileResponse;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
@@ -20,10 +22,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("Update User u set u.status = :status where u.uid = :uid")
     void updateStatus(@Param("status") AccountStatus status, @Param("uid") Integer uid);
 
-    @Query("Select new vn.graybee.response.users.UserAuthenDto(u.password, r.name, u.uid, u.isActive) from User u join Role r on u.roleId = r.id where u.username = :username")
+    @Query("Select new vn.graybee.response.users.UserAuthenDto(u.password, r.name, u.uid, u.isActive) from User u left join Role r on u.roleId = r.id where u.username = :username")
     UserAuthenDto getAuthenBasicByUsername(@Param("username") String username);
 
-    @Query("Select new vn.graybee.models.users.UserPrincipalDto(u.id,u.uid, u.isActive, u.roleId, u.username, u.password, r.name) from User u join Role r on u.roleId = r.id where u.username = :username")
+    @Query("Select new vn.graybee.models.users.UserPrincipalDto(u.id,u.uid, u.isActive, u.isSuperAdmin, u.roleId, u.username, u.password, r.name, r.status) from User u left join Role r on u.roleId = r.id where u.username = :username")
     Optional<UserPrincipalDto> findByUserName(@Param("username") String username);
 
     @Query("Select u.phoneNumber from User u where u.phoneNumber = :phoneNumber")
@@ -46,5 +48,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("Select u from User u where u.uid = :uid")
     User findByUid(@Param("uid") int uid);
+
+    @Query("Select new vn.graybee.response.admin.users.AdminCustomerResponse(u.id, u.uid, u.fullName, u.phoneNumber, u.email) from User u where u.isSuperAdmin = false")
+    List<AdminCustomerResponse> getAllCustomers();
 
 }

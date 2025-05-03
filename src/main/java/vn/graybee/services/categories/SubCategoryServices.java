@@ -2,6 +2,7 @@ package vn.graybee.services.categories;
 
 import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.requests.directories.SubCategoryCreateRequest;
 import vn.graybee.requests.directories.SubCategoryUpdateRequest;
 import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
@@ -19,10 +20,11 @@ public interface SubCategoryServices {
 
     BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status);
 
+    BasicMessageResponse<SubCategoryResponse> restoreById(int id, UserPrincipal userPrincipal);
+
     BasicMessageResponse<SubCategoryResponse> getById(int id);
 
     BasicMessageResponse<Integer> delete(int id);
-
 
     BasicMessageResponse<SubcategoryTagIdResponse> deleteRelationsBySubCategoryIdAndTagId(int subcategoryId, int tagId);
 

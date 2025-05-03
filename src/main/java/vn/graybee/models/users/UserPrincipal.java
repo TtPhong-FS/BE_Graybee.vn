@@ -28,7 +28,7 @@ public class UserPrincipal implements UserDetails {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getROLE_NAME().toUpperCase()));
         }
 
-        if (user.getPassword() != null && !user.getPermissions().isEmpty()) {
+        if (user.getPermissions() != null && !user.getPermissions().isEmpty()) {
             user.getPermissions().forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission.toUpperCase())));
         }
 

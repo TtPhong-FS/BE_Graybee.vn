@@ -1,5 +1,6 @@
 package vn.graybee.response.admin.auth;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import vn.graybee.enums.RolePermissionStatus;
 import vn.graybee.models.users.Role;
 
@@ -18,10 +19,11 @@ public class RoleResponse {
 
     private RolePermissionStatus status;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
-
 
     public RoleResponse(Role role, List<PermissionBasicResponse> permissions) {
         this.id = role.getId();

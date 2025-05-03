@@ -58,7 +58,7 @@ public class RoleServiceImpl implements RoleService {
         Map<Integer, List<PermissionBasicResponse>> rolePermissionMap = RolePermissionResponse
                 .stream()
                 .collect(Collectors.groupingBy(RolePermissionBasicResponse::getId,
-                        Collectors.mapping(p -> new PermissionBasicResponse(p.getId(), p.getPermissionName()), Collectors.toList()
+                        Collectors.mapping(p -> new PermissionBasicResponse(p.getPermissionId(), p.getPermissionName()), Collectors.toList()
                         )));
 
         roles.forEach(role -> {
@@ -83,7 +83,6 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessCustomException(ConstantAuth.permissions, ConstantAuth.permission_does_not_exists);
         }
 
-
         Role role = new Role();
         role.setName(request.getName().toUpperCase());
         role.setStatus(RolePermissionStatus.ACTIVE);
@@ -102,7 +101,6 @@ public class RoleServiceImpl implements RoleService {
 
             if (!rolePermission.isEmpty()) {
                 rolePermissionRepository.saveAll(rolePermission);
-
             }
         }
 

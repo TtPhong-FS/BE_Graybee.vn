@@ -10,6 +10,7 @@ import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.directories.SubCategory;
 import vn.graybee.models.directories.SubCategoryTag;
+import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.repositories.categories.SubCategoryRepository;
 import vn.graybee.repositories.categories.SubCategoryTagRepository;
 import vn.graybee.repositories.categories.TagRepository;
@@ -151,6 +152,32 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
         UpdateStatusResponse response = new UpdateStatusResponse(subcategory, status, LocalDateTime.now());
 
         return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<SubCategoryResponse> restoreById(int id, UserPrincipal userPrincipal) {
+
+        SubCategory subCategory = subCategoryRepository.findById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantSubcategory.does_not_exists));
+
+        DirectoryStatus status = subCategory.getStatus();
+
+        if (userPrincipal != null && !userPrincipal.getUser().isSuperAdmin() && status == DirectoryStatus.DELETED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.not_super_admin);
+        }
+
+        if (status != DirectoryStatus.DELETED && status != DirectoryStatus.REMOVED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantSubcategory.not_removed);
+        }
+
+        subCategoryRepository.updateStatusById(id, DirectoryStatus.INACTIVE);
+
+        List<TagResponse> tags = subCategoryTagRepository.findTagsBySubCategoryId(subCategory.getId());
+
+        SubCategoryResponse response = new SubCategoryResponse(subCategory, tags);
+
+        return new BasicMessageResponse<>(200, ConstantSubcategory.success_restore, response);
     }
 
     @Override

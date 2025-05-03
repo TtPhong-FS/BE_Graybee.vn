@@ -10,8 +10,8 @@ services:
       - "6379:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
-      interval: 30s
-      timeout: 10s
+      interval: 15s
+      timeout: 5s
       retries: 3
     env_file:
       - .env
@@ -46,8 +46,8 @@ services:
       - .env
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 30s
-      timeout: 10s
+      interval: 15s
+      timeout: 5s
       retries: 3
     networks:
       - graybee
@@ -65,8 +65,8 @@ services:
       - xpack.security.enabled=false
     healthcheck:
       test: [ "CMD", "curl", "-s", "-f", "http://localhost:9200/_cluster/health" ]
-      interval: 30s
-      timeout: 10s
+      interval: 15s
+      timeout: 5s
       retries: 3
     networks:
       - graybee
@@ -92,7 +92,8 @@ services:
     image: ecommerce_graybee_server
     container_name: ecommerce_graybee_server
     ports:
-      - 8080:8080
+      - "8080:8080"
+      - "5005:5005"
     environment:
       - MYSQL_HOST=${MYSQL_HOST_DOCKER}
       - REDIS_HOST=${REDIS_HOST_DOCKER}
@@ -108,13 +109,10 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
-
-
 networks:
   graybee:
     driver: bridge
     external: true
-
 volumes:
   ecommerce_graybee_redis_volume:
     external: true

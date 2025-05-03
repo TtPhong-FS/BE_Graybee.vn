@@ -9,7 +9,9 @@ public class ProductSubcategoryAndTagResponse {
 
     private long id;
 
-    private String code;
+    private String productName;
+
+    private String productCode;
 
     private List<SubcateDto> subcategories;
 
@@ -18,11 +20,26 @@ public class ProductSubcategoryAndTagResponse {
     public ProductSubcategoryAndTagResponse() {
     }
 
-    public ProductSubcategoryAndTagResponse(long id, String code, List<SubcateDto> subcategories, List<TagResponse> tags) {
+    public ProductSubcategoryAndTagResponse(long id, String productName, String productCode) {
         this.id = id;
-        this.code = code;
-        this.subcategories = subcategories;
-        this.tags = tags;
+        this.productName = productName;
+        this.productCode = productCode;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
     }
 
     public long getId() {
@@ -33,13 +50,6 @@ public class ProductSubcategoryAndTagResponse {
         this.id = id;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
 
     public List<SubcateDto> getSubcategories() {
         return subcategories;

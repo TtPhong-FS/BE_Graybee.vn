@@ -14,6 +14,7 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.directories.Category;
 import vn.graybee.models.directories.CategoryManufacturer;
 import vn.graybee.models.directories.CategorySubCategory;
+import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.repositories.categories.CategoryManufacturerRepository;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.categories.CategorySubCategoryRepository;
@@ -34,6 +35,7 @@ import vn.graybee.response.publics.sidebar.SidebarDto;
 import vn.graybee.response.publics.sidebar.SubcategoryDto;
 import vn.graybee.services.categories.CategoryService;
 import vn.graybee.services.categories.SubCategoryServices;
+import vn.graybee.services.products.RedisProductService;
 import vn.graybee.utils.TextUtils;
 
 import java.time.LocalDateTime;
@@ -61,12 +63,14 @@ public class CategoryServiceImp implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-
     private final SubCategoryServices subCategoryServices;
 
     private final StringRedisTemplate redisTemplate;
 
-    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, SubCategoryServices subCategoryServices, StringRedisTemplate redisTemplate) {
+    private final RedisProductService redisProductService;
+
+
+    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, SubCategoryServices subCategoryServices, StringRedisTemplate redisTemplate, RedisProductService redisProductService) {
         this.subCategoryRepository = subCategoryRepository;
         this.categorySubCategoryRepository = categorySubCategoryRepository;
         this.cmRepository = cmRepository;
@@ -74,6 +78,7 @@ public class CategoryServiceImp implements CategoryService {
         this.categoryRepository = categoryRepository;
         this.subCategoryServices = subCategoryServices;
         this.redisTemplate = redisTemplate;
+        this.redisProductService = redisProductService;
     }
 
     @Override
@@ -177,6 +182,8 @@ public class CategoryServiceImp implements CategoryService {
 
         categoryRepository.deleteById(id);
 
+        redisProductService.deleteProductListPattern(category.getName());
+
         return new BasicMessageResponse<>(200, ConstantCategory.success_delete, category.getId());
     }
 
@@ -214,7 +221,7 @@ public class CategoryServiceImp implements CategoryService {
         if (category.getProductCount() == 0) {
             category.setName(request.getName());
         }
-        
+
         category.setStatus(status);
         category.setUpdatedAt(LocalDateTime.now());
 
@@ -261,6 +268,8 @@ public class CategoryServiceImp implements CategoryService {
         );
         categoryResponse.setSubcategories(subcategories);
         categoryResponse.setManufacturers(manufacturers);
+
+        redisProductService.deleteProductListPattern(category.getName());
 
         return new BasicMessageResponse<>(200, ConstantCategory.success_update, categoryResponse);
 
@@ -320,14 +329,45 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status) {
-        int category = categoryRepository.findIdById(id)
+        String name = categoryRepository.findNameById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists));
 
-        categoryRepository.updateStatusById(category, status);
+        categoryRepository.updateStatusById(id, status);
 
-        UpdateStatusResponse response = new UpdateStatusResponse(category, status, LocalDateTime.now());
+        UpdateStatusResponse response = new UpdateStatusResponse(id, status, LocalDateTime.now());
+
+        redisProductService.deleteProductListPattern(name);
 
         return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<CategoryResponse> restoreById(int id, UserPrincipal userPrincipal) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantCategory.does_not_exists));
+
+        DirectoryStatus status = category.getStatus();
+
+        if (userPrincipal != null && !userPrincipal.getUser().isSuperAdmin() && status == DirectoryStatus.DELETED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.not_super_admin);
+        }
+
+        if (status != DirectoryStatus.DELETED && status != DirectoryStatus.REMOVED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantCategory.not_removed);
+        }
+
+        categoryRepository.updateStatusById(id, DirectoryStatus.INACTIVE);
+
+        CategoryResponse categoryResponse = new CategoryResponse(category);
+
+        List<SubcateDto> subcategories = categorySubCategoryRepository.findByCategoryId(category.getId());
+        List<ManuDto> manufacturers = cmRepository.findByCategoryId(category.getId());
+
+        categoryResponse.setSubcategories(subcategories);
+        categoryResponse.setManufacturers(manufacturers);
+
+        return new BasicMessageResponse<>(200, ConstantCategory.success_restore, categoryResponse);
     }
 
     @Override

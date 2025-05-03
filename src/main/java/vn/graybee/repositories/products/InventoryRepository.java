@@ -21,23 +21,11 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
     @Query("Select new vn.graybee.response.admin.products.ProductQuantityResponse(p.id, COALESCE(i.quantity, 0)) from Product p left join Inventory i on i.productId = p.id where p.id = :productId ")
     ProductQuantityResponse findQuantityByProductId(@Param("productId") long productId);
 
-    @Query("Select p.code from Product p join Inventory i on p.id = i.productId where i.id = :id ")
-    Optional<String> getProductCodeById(@Param("id") int id);
-
-    @Query("Select p.code from Product p join Inventory i on p.id = i.productId where i.id = :id ")
-    Optional<String> getProductCodeByProductId(@Param("id") int id);
-
-
-    @Query("Select i.quantity from Inventory i join Product p on i.productId = p.id where p.id = :productId")
+    @Query("Select COALESCE(i.quantity, 0) from Inventory i left join Product p on i.productId = p.id where p.id = :productId and i.status = 'STOCK' ")
     Integer findStockByProductId(@Param("productId") long productId);
 
-    @Query("Select new vn.graybee.response.admin.products.InventoryResponse(i, p.code) from Inventory i left join Product p on i.productId = p.id")
+    @Query("Select new vn.graybee.response.admin.products.InventoryResponse(i.id, p.id, p.thumbnail, p.name, p.code, i.quantity, i.status, i.createdAt, i.updatedAt) from Inventory i left join Product p on i.productId = p.id")
     List<InventoryResponse> fetchAll();
-
-    @Transactional
-    @Modifying
-    @Query("Delete from Inventory i where i.id = :id ")
-    void deleteById(@Param("id") int id);
 
     @Query("Select new vn.graybee.response.admin.products.InventoryQuantityResponse(i.id, i.quantity) from Inventory i where i.id = :id ")
     Optional<InventoryQuantityResponse> checkExistsById(@Param("id") int id);

@@ -1,6 +1,7 @@
 package vn.graybee.serviceImps.auth;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantAuth;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.enums.RolePermissionStatus;
@@ -29,11 +30,12 @@ public class PermissionServiceImpl implements PermissionService {
     public BasicMessageResponse<List<Permission>> findAll() {
         List<Permission> response = permissionRepository.findAll();
         String message = response.isEmpty() ? ConstantGeneral.empty_list : ConstantAuth.success_fetch_permissions;
-        
+
         return new BasicMessageResponse<>(200, message, response);
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Permission> create(PermissionCreateRequest request) {
 
         if (permissionRepository.validateName(request.getName()).isPresent()) {
@@ -53,6 +55,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Permission> update(int id, PermissionUpdateRequest request) {
 
         RolePermissionStatus status = request.getStatusEnum();
@@ -76,6 +79,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> delete(int id) {
         PermissionUserCountResponse permission = permissionRepository.getUserCountBeforeDelete(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.permission_does_not_exists));

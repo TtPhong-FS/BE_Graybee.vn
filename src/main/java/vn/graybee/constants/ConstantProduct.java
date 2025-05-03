@@ -8,7 +8,7 @@ public class ConstantProduct {
 
     public static final String subcategory_relation_does_not_exists = "Danh mục con hiện chưa được liên kết với sản phẩm";
 
-    public static final String temporarily_flagged = "Không thể thực hiện, sản phẩm tạm thời đang bị xoá";
+    public static final String soft_delete = "Sản phẩm đã bị xoá hoàn toàn, không thể chuyển trạng thái.";
 
     public static final String name_exists = "Tên sản phẩm đã tồn tại trong hệ thống";
 
@@ -18,6 +18,14 @@ public class ConstantProduct {
 
     public static final String does_not_exists_in_inventory = "Không thể thực hiện vì sản phẩm chưa được thêm vào kho";
 
+    public static final String not_removed = "Sản phẩm không nằm trong thùng rác. Không thể khôi phục.";
+
+    public static final String pending_to_published = "Sản phẩm chưa duyệt hoặc chưa ra mắt, không thể công khai.";
+
+    public static final String removed = "Sản phẩm đã bị loại bỏ, không thể chuyển trạng thái.";
+
+    public static final String published = "Sản phẩm đã xuất bản, không thể chuyển sang trạng thái ";
+    
     //    Response
 
     public static final String view_detail_of_name = "Bạn đang xem chi tiết sản phẩm ";
@@ -44,5 +52,6 @@ public class ConstantProduct {
 
     public static final String success_delete_subcategory_relation = "Danh mục con đã được loại bỏ khỏi sản phẩm";
 
+    public static final String success_restore = "Sản phẩm đã được khôi phục thành công";
 
 }
