@@ -6,6 +6,8 @@ public class ConstantCategory {
 
     public static final String categoryId = "categoryId";
 
+    public static final String categoryName = "categoryName";
+
     public static final String manufacturer_relation_does_not_exists = "Nhà sản xuất chưa được liên kết với danh mục";
 
     public static final String subcategory_relation_does_not_exists = "Danh mục con chưa được liên kết với danh mục";
@@ -26,6 +28,9 @@ public class ConstantCategory {
     public static final String success_update = "Cập nhật danh mục thành công";
 
     public static final String success_delete = "Xoá danh mục thành công";
+
+    public static final String success_delete_multiple = "Xoá nhiều danh mục thành công";
+
 
     public static final String success_find_by_id = "Tìm danh mục thành công";
 

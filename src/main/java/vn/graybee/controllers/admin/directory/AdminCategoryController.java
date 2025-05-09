@@ -57,6 +57,11 @@ public class AdminCategoryController {
         return ResponseEntity.ok(categoryService.delete(id));
     }
 
+    @DeleteMapping("/delete-by-ids")
+    public ResponseEntity<BasicMessageResponse<List<Integer>>> deleteByIds(@RequestParam("ids") List<Integer> ids) {
+        return ResponseEntity.ok(categoryService.deleteByIds(ids));
+    }
+
     @DeleteMapping("/manufacturers/delete")
     public ResponseEntity<BasicMessageResponse<CategoryManufacturerIdResponse>> deleteRelationManufacturer(@RequestParam("categoryId") int categoryId, @RequestParam("manufacturerId") int manufacturerId) {
         return ResponseEntity.ok(categoryService.deleteRelationByCategoryIdAndManufacturerId(categoryId, manufacturerId));

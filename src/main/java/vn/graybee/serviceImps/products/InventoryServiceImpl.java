@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantInventory;
 import vn.graybee.constants.ConstantProduct;
-import vn.graybee.enums.InventoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.products.Inventory;
@@ -39,8 +38,8 @@ public class InventoryServiceImpl implements InventoryService {
                 product.getThumbnail(),
                 product.getProductName(),
                 product.getProductCode(),
+                inventory.getStock(),
                 inventory.getQuantity(),
-                inventory.getStatus(),
                 inventory.getCreatedAt(),
                 inventory.getUpdatedAt()
         );
@@ -53,12 +52,10 @@ public class InventoryServiceImpl implements InventoryService {
         AdminInventoryProductResponse product = productRepository.findAdminInventoryProductById(request.getProductId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
-        InventoryStatus status = request.getStatusEnum();
-
         Inventory inventory = new Inventory();
         inventory.setProductId(product.getId());
-        inventory.setQuantity(request.getQuantity());
-        inventory.setStatus(request.getQuantity() > 0 ? status : InventoryStatus.OUT_OF_STOCK);
+        inventory.setQuantity(request.getQuantity() != null ? request.getQuantity() : 0);
+        inventory.setStock(request.getQuantity() != null && request.getQuantity() > 0);
 
         inventory = inventoryRepository.save(inventory);
 
@@ -96,16 +93,14 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<InventoryResponse> update(int id, InventoryRequest request) {
 
-        InventoryStatus status = request.getStatusEnum();
-
         AdminInventoryProductResponse product = productRepository.findAdminInventoryProductById(request.getProductId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists_in_inventory));
 
-        inventory.setQuantity(request.getQuantity());
-        inventory.setStatus(request.getQuantity() > 0 ? status : InventoryStatus.OUT_OF_STOCK);
+        inventory.setQuantity(request.getQuantity() != null ? request.getQuantity() : 0);
+        inventory.setStock(request.getQuantity() != null && request.getQuantity() > 0);
         inventory.setUpdatedAt(LocalDateTime.now());
 
         inventory = inventoryRepository.save(inventory);

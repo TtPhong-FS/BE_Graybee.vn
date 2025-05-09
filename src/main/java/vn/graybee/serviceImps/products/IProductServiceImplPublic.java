@@ -25,7 +25,7 @@ import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductDetailResponse;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 import vn.graybee.response.publics.products.ReviewCommentDto;
-import vn.graybee.services.products.ProductService_public;
+import vn.graybee.services.products.IProductServicePublic;
 import vn.graybee.services.products.ProductStatisticService;
 import vn.graybee.services.products.RedisProductService;
 
@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class ProductServiceImpl_public implements ProductService_public {
+public class IProductServiceImplPublic implements IProductServicePublic {
 
     private static final String PRODUCT_DETAIL_KEY = "product:detail:";
 
@@ -53,7 +53,7 @@ public class ProductServiceImpl_public implements ProductService_public {
 
     private final RedisProductService redisProductService;
 
-    public ProductServiceImpl_public(ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
+    public IProductServiceImplPublic(ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
         this.productRepository = productRepository;
         this.favouriteRepository = favouriteRepository;
         this.productStatisticService = productStatisticService;

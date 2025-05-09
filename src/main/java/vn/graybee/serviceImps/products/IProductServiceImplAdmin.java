@@ -11,7 +11,6 @@ import vn.graybee.constants.ConstantManufacturer;
 import vn.graybee.constants.ConstantProduct;
 import vn.graybee.constants.ConstantSubcategory;
 import vn.graybee.constants.ConstantTag;
-import vn.graybee.enums.InventoryStatus;
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
@@ -54,7 +53,7 @@ import vn.graybee.response.admin.products.ProductSubcategoryDto;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.response.admin.products.ProductTagDto;
 import vn.graybee.response.admin.products.ProductUpdateResponse;
-import vn.graybee.services.products.ProductService_admin;
+import vn.graybee.services.products.IProductServiceAdmin;
 import vn.graybee.services.products.RedisProductService;
 import vn.graybee.utils.TextUtils;
 
@@ -70,7 +69,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class ProductServiceImpl_admin implements ProductService_admin {
+public class IProductServiceImplAdmin implements IProductServiceAdmin {
 
     private static final String PRODUCT_DETAIL_KEY = "product:detail:";
 
@@ -102,7 +101,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
     private final RedisProductService redisProductService;
 
-    public ProductServiceImpl_admin(ProductDocumentService productDocumentService, ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductStatisticRepository productStatisticRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository, RedisProductService redisProductService) {
+    public IProductServiceImplAdmin(ProductDocumentService productDocumentService, ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductStatisticRepository productStatisticRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository, RedisProductService redisProductService) {
         this.productDocumentService = productDocumentService;
         this.productDescriptionRepository = productDescriptionRepository;
         this.tagRepository = tagRepository;
@@ -162,13 +161,14 @@ public class ProductServiceImpl_admin implements ProductService_admin {
                 throw new BusinessCustomException(ConstantSubcategory.subcategories, ConstantSubcategory.does_not_exists);
             }
         }
-        String categoryName = categoryRepository.getNameById(request.getCategoryId())
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.does_not_exists));
+
+        Integer categoryId = categoryRepository.findIdByName(request.getCategoryName())
+                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryName, ConstantCategory.does_not_exists));
 
         String manufacturerName = manufacturerRepository.getNameById(request.getManufacturerId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.does_not_exists));
 
-        String productCode = codeGenerator.generateProductCode(categoryName);
+        String productCode = codeGenerator.generateProductCode(request.getCategoryName());
 
         BigDecimal finalPrice = BigDecimal.ZERO;
 
@@ -184,7 +184,7 @@ public class ProductServiceImpl_admin implements ProductService_admin {
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
         product.setFinalPrice(finalPrice);
-        product.setCategoryId(request.getCategoryId());
+        product.setCategoryId(categoryId);
         product.setManufacturerId(request.getManufacturerId());
 
         product.setConditions(request.getConditions().toUpperCase());
@@ -218,10 +218,9 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         Inventory inventory = new Inventory();
 
-        inventory.setStock(request.isStock());
+        inventory.setStock(request.isStock() && request.getQuantity() > 0);
         inventory.setQuantity(request.isStock() ? request.getQuantity() : 0);
         inventory.setProductId(product.getId());
-        inventory.setStatus(request.isStock() && request.getQuantity() > 0 ? InventoryStatus.STOCK : InventoryStatus.OUT_OF_STOCK);
 
         inventory = inventoryRepository.save(inventory);
 
@@ -252,12 +251,12 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         productDescriptionRepository.save(description);
 
-        updateProductCountCategory(request.getCategoryId(), true);
+        updateProductCountCategory(categoryId, true);
         updateProductCountManufacturer(request.getManufacturerId(), true);
 
-        redisProductService.deleteProductListPattern(categoryName);
+        redisProductService.deleteProductListPattern(request.getCategoryName());
 
-        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity(), inventory.getStock());
+        ProductResponse response = getProductResponse(product, request.getCategoryName(), manufacturerName, inventory.getQuantity(), inventory.getStock());
 
 
         return new BasicMessageResponse<>(201, ConstantProduct.success_create, response);
@@ -404,9 +403,8 @@ public class ProductServiceImpl_admin implements ProductService_admin {
 
         boolean isNewInventory = inventory.getId() == null;
 
-        inventory.setStock(request.isStock());
+        inventory.setStock(request.isStock() && request.getQuantity() > 0);
         inventory.setQuantity(request.isStock() ? request.getQuantity() : 0);
-        inventory.setStatus(request.isStock() && request.getQuantity() > 0 ? InventoryStatus.STOCK : InventoryStatus.OUT_OF_STOCK);
         inventory.setUpdatedAt(LocalDateTime.now());
 
         if (isNewInventory) {

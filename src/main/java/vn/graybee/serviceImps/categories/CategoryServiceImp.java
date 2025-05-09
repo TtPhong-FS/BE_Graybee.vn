@@ -11,6 +11,7 @@ import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
+import vn.graybee.models.classifications.CategoryClassification;
 import vn.graybee.models.directories.Category;
 import vn.graybee.models.directories.CategoryManufacturer;
 import vn.graybee.models.directories.CategorySubCategory;
@@ -20,6 +21,7 @@ import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.repositories.categories.CategorySubCategoryRepository;
 import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.repositories.categories.SubCategoryRepository;
+import vn.graybee.repositories.classifications.CategoryClassificationRepository;
 import vn.graybee.requests.directories.CategoryCreateRequest;
 import vn.graybee.requests.directories.CategoryUpdateRequest;
 import vn.graybee.response.admin.directories.category.CategoryManuDto;
@@ -69,8 +71,9 @@ public class CategoryServiceImp implements CategoryService {
 
     private final RedisProductService redisProductService;
 
+    private final CategoryClassificationRepository categoryClassificationRepository;
 
-    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, SubCategoryServices subCategoryServices, StringRedisTemplate redisTemplate, RedisProductService redisProductService) {
+    public CategoryServiceImp(SubCategoryRepository subCategoryRepository, CategorySubCategoryRepository categorySubCategoryRepository, CategoryManufacturerRepository cmRepository, ManufacturerRepository manufacturerRepository, CategoryRepository categoryRepository, SubCategoryServices subCategoryServices, StringRedisTemplate redisTemplate, RedisProductService redisProductService, CategoryClassificationRepository categoryClassificationRepository) {
         this.subCategoryRepository = subCategoryRepository;
         this.categorySubCategoryRepository = categorySubCategoryRepository;
         this.cmRepository = cmRepository;
@@ -79,6 +82,7 @@ public class CategoryServiceImp implements CategoryService {
         this.subCategoryServices = subCategoryServices;
         this.redisTemplate = redisTemplate;
         this.redisProductService = redisProductService;
+        this.categoryClassificationRepository = categoryClassificationRepository;
     }
 
     @Override
@@ -89,23 +93,33 @@ public class CategoryServiceImp implements CategoryService {
             throw new BusinessCustomException(ConstantCategory.name, ConstantCategory.name_exists);
         }
 
-        List<SubcateDto> subcategories = subCategoryRepository.findByIds(request.getSubcategories());
+        List<SubcateDto> subcategories = new ArrayList<>();
+        Set<Integer> foundSubcategoryIds = new HashSet<>();
+        if (request.getSubcategories() != null && !request.getSubcategories().isEmpty()) {
 
-        Set<Integer> foundSubcategoryIds = subcategories.stream()
-                .map(SubcateDto::getId)
-                .collect(Collectors.toSet());
+            subcategories = subCategoryRepository.findByIds(request.getSubcategories());
 
-        if (!foundSubcategoryIds.containsAll(request.getSubcategories())) {
-            throw new BusinessCustomException(ConstantSubcategory.subcategories, ConstantSubcategory.does_not_exists);
+            foundSubcategoryIds = subcategories.stream()
+                    .map(SubcateDto::getId)
+                    .collect(Collectors.toSet());
+
+            if (!foundSubcategoryIds.containsAll(request.getSubcategories())) {
+                throw new BusinessCustomException(ConstantSubcategory.subcategories, ConstantSubcategory.does_not_exists);
+            }
         }
 
-        List<ManuDto> manufacturers = manufacturerRepository.findByIds(request.getManufacturers());
-        Set<Integer> foundManufacturerIds = manufacturers.stream()
-                .map(ManuDto::getId)
-                .collect(Collectors.toSet());
+        List<ManuDto> manufacturers = new ArrayList<>();
+        Set<Integer> foundManufacturerIds = new HashSet<>();
+        if (request.getManufacturers() != null && !request.getManufacturers().isEmpty()) {
 
-        if (!foundManufacturerIds.containsAll(request.getManufacturers())) {
-            throw new BusinessCustomException(ConstantManufacturer.manufacturers, ConstantManufacturer.does_not_exists);
+            manufacturers = manufacturerRepository.findByIds(request.getManufacturers());
+            foundManufacturerIds = manufacturers.stream()
+                    .map(ManuDto::getId)
+                    .collect(Collectors.toSet());
+
+            if (!foundManufacturerIds.containsAll(request.getManufacturers())) {
+                throw new BusinessCustomException(ConstantManufacturer.manufacturers, ConstantManufacturer.does_not_exists);
+            }
         }
 
         Category category = new Category();
@@ -113,12 +127,8 @@ public class CategoryServiceImp implements CategoryService {
         category.setStatus(DirectoryStatus.ACTIVE);
         category = categoryRepository.save(category);
 
-        if (request.getSubcategories() != null && !request.getSubcategories().isEmpty()) {
-            handleSubCategories(category.getId(), foundSubcategoryIds);
-        }
-
-        if (request.getManufacturers() != null && !request.getManufacturers().isEmpty()) {
-            handleManufacturers(category.getId(), foundManufacturerIds);
+        if ((request.getSubcategories() != null && !request.getSubcategories().isEmpty()) && (request.getManufacturers() != null && !request.getManufacturers().isEmpty())) {
+            handleClassification(category.getId(), foundSubcategoryIds, foundManufacturerIds);
         }
 
         CategoryResponse categoryResponse = new CategoryResponse(
@@ -130,29 +140,32 @@ public class CategoryServiceImp implements CategoryService {
         return new BasicMessageResponse<>(201, ConstantCategory.success_create, categoryResponse);
     }
 
-    private void handleSubCategories(int category, Set<Integer> subCateIds) {
+    private void handleClassification(Integer categoryId, Set<Integer> subcategoryIds, Set<Integer> manufacturerIds) {
 
-        List<CategorySubCategory> categorySubCategories = subCateIds.stream()
-                .map(sub -> new CategorySubCategory(category, sub))
-                .collect(Collectors.toList());
+        List<CategoryClassification> classifications = new ArrayList<>();
 
-        if (!categorySubCategories.isEmpty()) {
-            categorySubCategoryRepository.saveAll(categorySubCategories);
+        List<Integer> subcategoryList = new ArrayList<>(subcategoryIds);
+        List<Integer> manufacturerList = new ArrayList<>(manufacturerIds);
+
+        int maxLength = Math.max(subcategoryList.size(), manufacturerList.size());
+
+        for (int i = 0; i < maxLength; i++) {
+            CategoryClassification cf = new CategoryClassification();
+
+            if (i < subcategoryList.size()) {
+                cf.setSubcategoryId(subcategoryList.get(i));
+            }
+            if (i < manufacturerList.size()) {
+                cf.setManufacturerId(manufacturerList.get(i));
+            }
+
+            cf.setCategoryId(categoryId);
+            cf.setStatus(DirectoryStatus.ACTIVE);
+
+            classifications.add(cf);
         }
 
-    }
-
-    private void handleManufacturers(int category, Set<Integer> manuIds) {
-
-        List<CategoryManufacturer> categoryManufacturers = manuIds.stream()
-                .map(manu -> new CategoryManufacturer(category, manu))
-                .collect(Collectors.toList());
-
-        if (!categoryManufacturers.isEmpty()) {
-            cmRepository.saveAll(categoryManufacturers);
-
-        }
-
+        categoryClassificationRepository.saveAll(classifications);
     }
 
     @Override
@@ -185,6 +198,13 @@ public class CategoryServiceImp implements CategoryService {
         redisProductService.deleteProductListPattern(category.getName());
 
         return new BasicMessageResponse<>(200, ConstantCategory.success_delete, category.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<List<Integer>> deleteByIds(List<Integer> ids) {
+        System.out.println(ids);
+        return new BasicMessageResponse<>(200, ConstantCategory.success_delete_multiple, ids);
     }
 
     @Override

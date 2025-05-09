@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantAuth;
 import vn.graybee.constants.ConstantGeneral;
-import vn.graybee.enums.RolePermissionStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.users.Role;
@@ -72,7 +71,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<RoleResponse> create(RoleCreateRequest request) {
 
-        if (roleRepository.validateName(request.getName()).isPresent()) {
+        if (roleRepository.existsByName(request.getName())) {
             throw new BusinessCustomException(ConstantAuth.name, ConstantAuth.role_name_exists);
         }
 
@@ -85,7 +84,7 @@ public class RoleServiceImpl implements RoleService {
 
         Role role = new Role();
         role.setName(request.getName().toUpperCase());
-        role.setStatus(RolePermissionStatus.ACTIVE);
+        role.setActive(request.isActive());
 
         role.setUserCount(0);
 
@@ -113,8 +112,6 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<RoleResponse> update(int id, RoleUpdateRequest request) {
 
-        RolePermissionStatus status = request.getStatusEnum();
-
         List<PermissionBasicResponse> permissions = permissionRepository.findByIds(request.getPermissions());
         Set<Integer> foundPermissionIds = permissions.stream().map(PermissionBasicResponse::getId).collect(Collectors.toSet());
 
@@ -129,7 +126,7 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessCustomException(ConstantAuth.name, ConstantAuth.role_name_exists);
         }
 
-        role.setStatus(status);
+        role.setActive(request.isActive());
         role.setName(request.getName().toUpperCase());
         role.setUpdatedAt(LocalDateTime.now());
 

@@ -23,6 +23,8 @@ public interface CategoryService {
 
     BasicMessageResponse<Integer> delete(int id);
 
+    BasicMessageResponse<List<Integer>> deleteByIds(List<Integer> ids);
+
     BasicMessageResponse<List<CategoryResponse>> fetchCategories_ADMIN();
 
     BasicMessageResponse<CategoryManufacturerIdResponse> deleteRelationByCategoryIdAndManufacturerId(int categoryId, int manufacturerId);

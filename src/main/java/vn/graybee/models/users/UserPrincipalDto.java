@@ -1,7 +1,5 @@
 package vn.graybee.models.users;
 
-import vn.graybee.enums.RolePermissionStatus;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -11,43 +9,58 @@ public class UserPrincipalDto {
 
     private Integer userUid;
 
-    private boolean isActive;
+    private boolean userActive;
 
     private boolean isSuperAdmin;
-
-    private Integer roleId;
 
     private String username;
 
     private String password;
 
-    private String ROLE_NAME;
+    private Integer roleId;
 
-    private RolePermissionStatus status;
+    private String roleName;
+
+    private boolean roleActive;
 
     private List<String> permissions;
 
     public UserPrincipalDto() {
     }
 
-    public UserPrincipalDto(Integer id, Integer userUid, boolean isActive, boolean isSuperAdmin, Integer roleId, String username, String password, String ROLE_NAME, RolePermissionStatus status) {
+    public UserPrincipalDto(Integer id, Integer userUid, boolean userActive, boolean isSuperAdmin, String username, String password, Integer roleId, String roleName) {
         this.id = id;
         this.userUid = userUid;
-        this.isActive = isActive;
+        this.userActive = userActive;
         this.isSuperAdmin = isSuperAdmin;
-        this.roleId = roleId;
         this.username = username;
         this.password = password;
-        this.ROLE_NAME = ROLE_NAME;
-        this.status = status;
+        this.roleId = roleId;
+        this.roleName = roleName;
     }
 
-    public RolePermissionStatus getStatus() {
-        return status;
+    public boolean isUserActive() {
+        return userActive;
     }
 
-    public void setStatus(RolePermissionStatus status) {
-        this.status = status;
+    public void setUserActive(boolean userActive) {
+        this.userActive = userActive;
+    }
+
+    public boolean isRoleActive() {
+        return roleActive;
+    }
+
+    public void setRoleActive(boolean roleActive) {
+        this.roleActive = roleActive;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     public boolean isSuperAdmin() {
@@ -82,14 +95,6 @@ public class UserPrincipalDto {
         this.roleId = roleId;
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -104,14 +109,6 @@ public class UserPrincipalDto {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getROLE_NAME() {
-        return ROLE_NAME;
-    }
-
-    public void setROLE_NAME(String ROLE_NAME) {
-        this.ROLE_NAME = ROLE_NAME;
     }
 
     public List<String> getPermissions() {

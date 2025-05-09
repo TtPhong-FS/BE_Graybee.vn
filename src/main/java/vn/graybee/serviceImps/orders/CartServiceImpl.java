@@ -18,7 +18,7 @@ import vn.graybee.response.publics.carts.DecreaseQuantityResponse;
 import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 import vn.graybee.services.orders.CartService;
-import vn.graybee.services.products.ProductService_public;
+import vn.graybee.services.products.IProductServicePublic;
 import vn.graybee.services.users.UserService;
 
 import java.math.BigDecimal;
@@ -35,9 +35,9 @@ public class CartServiceImpl implements CartService {
 
     private final CartItemRepository cartItemRepository;
 
-    private final ProductService_public productServicePublic;
+    private final IProductServicePublic productServicePublic;
 
-    public CartServiceImpl(UserService userService, CartRepository cartRepository, CartItemRepository cartItemRepository, ProductService_public productServicePublic) {
+    public CartServiceImpl(UserService userService, CartRepository cartRepository, CartItemRepository cartItemRepository, IProductServicePublic productServicePublic) {
         this.userService = userService;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;

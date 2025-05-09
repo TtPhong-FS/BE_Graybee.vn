@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("Select new vn.graybee.response.users.UserAuthenDto(u.password, r.name, u.uid, u.isActive) from User u left join Role r on u.roleId = r.id where u.username = :username")
     UserAuthenDto getAuthenBasicByUsername(@Param("username") String username);
 
-    @Query("Select new vn.graybee.models.users.UserPrincipalDto(u.id,u.uid, u.isActive, u.isSuperAdmin, u.roleId, u.username, u.password, r.name, r.status) from User u left join Role r on u.roleId = r.id where u.username = :username")
+    @Query("Select new vn.graybee.models.users.UserPrincipalDto(u.id, u.uid, u.isActive, u.isSuperAdmin, u.username, u.password, u.roleId, r.name) from User u left join Role r on u.roleId = r.id where u.username = :username")
     Optional<UserPrincipalDto> findByUserName(@Param("username") String username);
 
     @Query("Select u.phoneNumber from User u where u.phoneNumber = :phoneNumber")

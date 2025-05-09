@@ -59,7 +59,7 @@ public class ConstantAuth {
     public static final String success_fetch_permissions = "Danh sách quyền đã được lấy thành công";
 
     public static final String account_locked = "Tài khoản hiện đang bị khoá!. Vui lòng liên hệ với quản trị viên/quản lý để biết thêm thông tin";
-
-    public static final String role_inactive = "Vai trò hiện không hoạt động hoặc không tồn tại. Vui lòng liên hệ với quản trị viên/quản lý để biết thêm thông tin";
+    
+    public static final String no_role_assigned = "Người dùng không có quyền truy cập hệ thống. Vui lòng liên hệ với quản trị viên/quản lý để biết thêm thông tin";
 
 }

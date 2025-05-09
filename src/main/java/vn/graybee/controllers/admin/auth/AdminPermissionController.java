@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.users.Permission;
-import vn.graybee.requests.auth.PermissionCreateRequest;
-import vn.graybee.requests.auth.PermissionUpdateRequest;
+import vn.graybee.requests.auth.PermissionRequest;
 import vn.graybee.services.auth.PermissionService;
 
 import java.util.List;
@@ -40,12 +39,12 @@ public class AdminPermissionController {
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<Permission>> create(@RequestBody @Valid PermissionCreateRequest request) {
+    public ResponseEntity<BasicMessageResponse<Permission>> create(@RequestBody @Valid PermissionRequest request) {
         return ResponseEntity.ok(permissionService.create(request));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<Permission>> update(@RequestParam("id") int id, @RequestBody @Valid PermissionUpdateRequest request) {
+    public ResponseEntity<BasicMessageResponse<Permission>> update(@RequestParam("id") int id, @RequestBody @Valid PermissionRequest request) {
         return ResponseEntity.ok(permissionService.update(id, request));
     }
 

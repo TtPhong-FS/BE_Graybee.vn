@@ -1,7 +1,6 @@
 package vn.graybee.response.admin.auth;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import vn.graybee.enums.RolePermissionStatus;
 import vn.graybee.models.users.Role;
 
 import java.time.LocalDateTime;
@@ -17,7 +16,7 @@ public class RoleResponse {
 
     private int userCount;
 
-    private RolePermissionStatus status;
+    private boolean isActive;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
@@ -32,7 +31,15 @@ public class RoleResponse {
         this.userCount = role.getUserCount();
         this.createdAt = role.getCreatedAt();
         this.updatedAt = role.getUpdatedAt();
-        this.status = role.getStatus();
+        this.isActive = role.isActive();
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -83,12 +90,5 @@ public class RoleResponse {
         this.userCount = userCount;
     }
 
-    public RolePermissionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(RolePermissionStatus status) {
-        this.status = status;
-    }
 
 }

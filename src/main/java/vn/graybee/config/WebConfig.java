@@ -54,12 +54,6 @@ public class WebConfig {
                         cors -> cors.configurationSource(corsConfigurationSource())
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(customAuthenticationEndpoint)
-                        .accessDeniedHandler(customAccessDenied))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .userDetailsService(userDetailService)
                 .authorizeHttpRequests(
                         endpoint -> endpoint
                                 .requestMatchers(apiConfig.getAdmin() + "/**").permitAll()
@@ -69,7 +63,12 @@ public class WebConfig {
 
                                 .anyRequest().authenticated()
                 )
-
+                .userDetailsService(userDetailService)
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(customAuthenticationEndpoint)
+                        .accessDeniedHandler(customAccessDenied))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -82,7 +81,7 @@ public class WebConfig {
         ));
         cors.setAllowCredentials(true);
         cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
-        cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         cors.setExposedHeaders(Collections.singletonList("Authorization"));
         cors.setMaxAge(3600L);
 

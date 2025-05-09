@@ -12,7 +12,7 @@ import vn.graybee.models.products.ProductDocument;
 import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductDetailResponse;
 import vn.graybee.serviceImps.products.ProductDocumentService;
-import vn.graybee.services.products.ProductService_public;
+import vn.graybee.services.products.IProductServicePublic;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,10 +23,10 @@ public class ProductController {
 
     private final ProductDocumentService productDocumentService;
 
-    private final ProductService_public productServicePublic;
+    private final IProductServicePublic productServicePublic;
 
 
-    public ProductController(ProductDocumentService productDocumentService, ProductService_public productServicePublic) {
+    public ProductController(ProductDocumentService productDocumentService, IProductServicePublic productServicePublic) {
         this.productDocumentService = productDocumentService;
         this.productServicePublic = productServicePublic;
     }

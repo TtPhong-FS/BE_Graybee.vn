@@ -14,7 +14,7 @@ import vn.graybee.response.publics.auth.AuthResponse;
 import vn.graybee.services.auth.AuthService;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("${api.auth}")
 public class AuthController {
 
     private final AuthService authService;

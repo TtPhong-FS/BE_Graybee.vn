@@ -17,7 +17,7 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
     @Query("Select new vn.graybee.response.admin.auth.RoleResponse(r, null) from Role r ")
     List<RoleResponse> fetchAll();
 
-    @Query("Select r.id from Role r where r.name = 'CUSTOMER' ")
+    @Query("Select r.id from Role r where r.name = 'CUSTOMER' and r.isActive = true")
     Optional<Integer> getIdByRoleCustomer();
 
     @Query("Select r.name from Role r where r.id = :id ")
@@ -34,8 +34,8 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
     @Query("Select new vn.graybee.response.admin.auth.RoleResponse(r, null) from Role r where r.id = :id")
     Optional<RoleResponse> getById(@Param("id") int id);
 
-    @Query("Select r.name from Role r where r.name = :name ")
-    Optional<String> validateName(@Param("name") String name);
+    @Query("Select exists (Select 1 from Role r where r.name = :name )")
+    boolean existsByName(@Param("name") String name);
 
     @Query("Select exists (Select 1 from Role r where r.name = :name and r.id <> :id)")
     boolean existsByNameNotId(@Param("name") String name, @Param("id") int id);

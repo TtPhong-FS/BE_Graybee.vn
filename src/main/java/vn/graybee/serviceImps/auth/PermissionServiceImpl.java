@@ -4,13 +4,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantAuth;
 import vn.graybee.constants.ConstantGeneral;
-import vn.graybee.enums.RolePermissionStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.users.Permission;
 import vn.graybee.repositories.auths.PermissionRepository;
-import vn.graybee.requests.auth.PermissionCreateRequest;
-import vn.graybee.requests.auth.PermissionUpdateRequest;
+import vn.graybee.requests.auth.PermissionRequest;
 import vn.graybee.response.admin.auth.PermissionUserCountResponse;
 import vn.graybee.services.auth.PermissionService;
 
@@ -36,7 +34,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<Permission> create(PermissionCreateRequest request) {
+    public BasicMessageResponse<Permission> create(PermissionRequest request) {
 
         if (permissionRepository.validateName(request.getName()).isPresent()) {
             throw new BusinessCustomException(ConstantAuth.name, ConstantAuth.permission_name_exists);
@@ -45,7 +43,7 @@ public class PermissionServiceImpl implements PermissionService {
         Permission permission = new Permission();
 
         permission.setName(request.getName().toUpperCase());
-        permission.setStatus(RolePermissionStatus.ACTIVE);
+        permission.setActive(request.isActive());
         permission.setDescription(request.getDescription());
         permission.setUserCount(0);
 
@@ -56,9 +54,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<Permission> update(int id, PermissionUpdateRequest request) {
-
-        RolePermissionStatus status = request.getStatusEnum();
+    public BasicMessageResponse<Permission> update(int id, PermissionRequest request) {
 
         Permission permission = permissionRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.permission_does_not_exists));
@@ -69,7 +65,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         permission.setName(request.getName().toUpperCase());
         permission.setDescription(request.getDescription());
-        permission.setStatus(status);
+        permission.setActive(request.isActive());
 
         permission.setUpdatedAt(LocalDateTime.now());
 
@@ -81,6 +77,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> delete(int id) {
+        
         PermissionUserCountResponse permission = permissionRepository.getUserCountBeforeDelete(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.permission_does_not_exists));
 

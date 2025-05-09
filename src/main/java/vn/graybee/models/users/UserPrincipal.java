@@ -24,8 +24,8 @@ public class UserPrincipal implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        if (user.getROLE_NAME() != null) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getROLE_NAME().toUpperCase()));
+        if (user.getRoleName() != null && !user.getRoleName().isEmpty()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRoleName().toUpperCase()));
         }
 
         if (user.getPermissions() != null && !user.getPermissions().isEmpty()) {
@@ -47,22 +47,22 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return user.isActive();
+        return user.isUserActive();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.isActive();
+        return user.isUserActive();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return user.isActive();
+        return user.isUserActive();
     }
 
     @Override
     public boolean isEnabled() {
-        return user.isActive();
+        return user.isUserActive();
     }
 
 }

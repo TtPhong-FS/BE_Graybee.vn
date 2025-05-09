@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface UserPermissionRepository extends JpaRepository<UserPermission, Integer> {
 
-    @Query("Select p.name from UserPermission up join Permission p on up.permissionId = p.id where up.userId = :userId and p.status = 'ACTIVE' ")
+    @Query("Select p.name from UserPermission up join Permission p on up.permissionId = p.id where up.userId = :userId and p.isActive = true")
     List<String> getPermissionOfUserByUserId(@Param("userId") Integer userId);
 
 }

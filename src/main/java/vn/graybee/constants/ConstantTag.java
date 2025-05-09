@@ -21,4 +21,6 @@ public class ConstantTag {
 
     public static final String success_fetch_tags = "Danh sách thẻ phân loại đã được lấy thành công";
 
+    public static final String success_delete_multiple = "Xoá nhiều thẻ phân loại thành công";
+
 }

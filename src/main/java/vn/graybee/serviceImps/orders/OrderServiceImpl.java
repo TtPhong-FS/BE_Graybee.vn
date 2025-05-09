@@ -336,9 +336,8 @@ public class OrderServiceImpl implements OrderService {
 
         for (OrderDetail orderDetail : orderDetails) {
             orderDetail.setOrderId(order.getId());
-            inventoryRepository.updateQuantityAfterSuccessOrder(orderDetail.getQuantity(), orderDetail.getProductId());
 
-            inventoryRepository.updateStatusIfQuantityZero(orderDetail.getProductId());
+            inventoryRepository.updateQuantityAfterSuccessOrder(orderDetail.getQuantity(), orderDetail.getProductId());
         }
 
         orderDetailRepository.saveAll(orderDetails);

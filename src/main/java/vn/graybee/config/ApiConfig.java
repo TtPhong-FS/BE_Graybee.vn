@@ -21,6 +21,26 @@ public class ApiConfig {
 
     private String subcategories;
 
+    private String auth;
+
+    private String account;
+
+    public String getAuth() {
+        return auth;
+    }
+
+    public void setAuth(String auth) {
+        this.auth = auth;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
     public String getAdmin() {
         return admin;
     }

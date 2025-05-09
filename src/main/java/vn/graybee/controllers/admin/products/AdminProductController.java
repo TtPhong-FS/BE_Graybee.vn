@@ -26,7 +26,7 @@ import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.response.admin.products.ProductUpdateResponse;
 import vn.graybee.serviceImps.products.ProductDocumentService;
-import vn.graybee.services.products.ProductService_admin;
+import vn.graybee.services.products.IProductServiceAdmin;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,9 +39,9 @@ public class AdminProductController {
 
     private final ProductDocumentService productDocumentService;
 
-    private final ProductService_admin productServiceADMIN;
+    private final IProductServiceAdmin productServiceADMIN;
 
-    public AdminProductController(ProductDocumentService productDocumentService, ProductService_admin productServiceADMIN) {
+    public AdminProductController(ProductDocumentService productDocumentService, IProductServiceAdmin productServiceADMIN) {
         this.productDocumentService = productDocumentService;
         this.productServiceADMIN = productServiceADMIN;
     }

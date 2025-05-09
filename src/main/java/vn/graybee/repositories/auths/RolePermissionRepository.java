@@ -38,7 +38,7 @@ public interface RolePermissionRepository extends JpaRepository<RolePermission, 
 
     @Query("SELECT p.name FROM Permission p " +
             "JOIN RolePermission rp ON p.id = rp.permissionId " +
-            "WHERE rp.roleId = :roleId and p.status = 'ACTIVE' ")
+            "WHERE rp.roleId = :roleId and p.isActive = true")
     List<String> getPermissionOfRoleByRoleId(@Param("roleId") int roleId);
 
 }

@@ -18,9 +18,9 @@ import java.util.List;
 @MappedSuperclass
 public class ProductCreateRequest {
 
-    @NotNull(message = "Vui lòng chọn danh mục")
-    @PositiveOrZero(message = "Vui lòng nhập số dương")
-    private int categoryId;
+    @NotBlank(message = "Vui lòng chọn danh mục")
+    @Size(max = 35, message = "Độ dài tối đa 35 ký tự")
+    private String categoryName;
 
     @NotNull(message = "Vui lòng chọn nhà sản xuất")
     @PositiveOrZero(message = "Vui lòng nhập số dương")
@@ -76,6 +76,14 @@ public class ProductCreateRequest {
 
     private List<String> images;
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
     public ProductStatus getStatusEnum() {
         try {
             return ProductStatus.valueOf(status.toUpperCase());
@@ -123,15 +131,7 @@ public class ProductCreateRequest {
     public void setStock(boolean stock) {
         isStock = stock;
     }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
+    
     public int getManufacturerId() {
         return manufacturerId;
     }

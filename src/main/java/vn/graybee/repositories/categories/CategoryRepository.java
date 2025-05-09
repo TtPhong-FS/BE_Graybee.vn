@@ -30,6 +30,9 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     @Query("SELECT EXISTS (SELECT 1 FROM Category c WHERE c.name = :name)")
     boolean checkExistsByName(@Param("name") String name);
+    
+    @Query("SELECT c.id FROM Category c WHERE c.name = :name")
+    Optional<Integer> findIdByName(String name);
 
     @Query("Select c.name from Category c where c.id = :id")
     Optional<String> findNameById(@Param("id") int id);

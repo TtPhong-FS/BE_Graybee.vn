@@ -23,25 +23,25 @@ import vn.graybee.response.users.DefaultAddressDto;
 import vn.graybee.response.users.PersonalAddressDto;
 import vn.graybee.response.users.UserProfileResponse;
 import vn.graybee.services.orders.OrderService;
-import vn.graybee.services.products.ProductService_public;
+import vn.graybee.services.products.IProductServicePublic;
 import vn.graybee.services.users.AddressService;
 import vn.graybee.services.users.UserService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/account")
+@RequestMapping("${api.account}")
 public class AccountController {
 
     private final AddressService addressService;
 
-    private final ProductService_public productServicePublic;
+    private final IProductServicePublic productServicePublic;
 
     private final OrderService orderService;
 
     private final UserService userService;
 
-    public AccountController(AddressService addressService, ProductService_public productServicePublic, OrderService orderService, UserService userService) {
+    public AccountController(AddressService addressService, IProductServicePublic productServicePublic, OrderService orderService, UserService userService) {
         this.addressService = addressService;
         this.productServicePublic = productServicePublic;
         this.orderService = orderService;

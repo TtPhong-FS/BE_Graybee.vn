@@ -41,4 +41,7 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
     @Query("SELECT new vn.graybee.response.admin.directories.tag.TagResponse(t.id, t.name) FROM Tag t WHERE t.id IN :ids")
     List<TagResponse> findByIds(@Param("ids") List<Integer> ids);
 
+    @Query("Select t.id from Tag t where t.id IN :ids")
+    List<Integer> findIdByIds(@Param("ids") List<Integer> ids);
+
 }

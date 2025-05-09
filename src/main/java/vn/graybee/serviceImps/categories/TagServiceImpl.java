@@ -83,4 +83,15 @@ public class TagServiceImpl implements TagServices {
         return new BasicMessageResponse<>(200, ConstantTag.success_delete, tagId);
     }
 
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public BasicMessageResponse<List<Integer>> deleteByIds(List<Integer> ids) {
+
+        List<Integer> tagIds = tagRepository.findIdByIds(ids);
+
+        tagRepository.deleteAllByIdInBatch(tagIds);
+
+        return new BasicMessageResponse<>(200, ConstantTag.success_delete_multiple, tagIds);
+    }
+
 }

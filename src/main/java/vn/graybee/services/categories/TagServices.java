@@ -18,4 +18,6 @@ public interface TagServices {
 
     BasicMessageResponse<Integer> delete(int id);
 
+    BasicMessageResponse<List<Integer>> deleteByIds(List<Integer> ids);
+
 }

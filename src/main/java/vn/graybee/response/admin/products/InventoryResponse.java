@@ -1,6 +1,6 @@
 package vn.graybee.response.admin.products;
 
-import vn.graybee.enums.InventoryStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
@@ -16,27 +16,37 @@ public class InventoryResponse {
 
     private String productCode;
 
+    private boolean isStock;
+
     private int quantity;
 
-    private InventoryStatus status;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
     public InventoryResponse() {
     }
 
-    public InventoryResponse(int id, long productId, String thumbnail, String productName, String productCode, int quantity, InventoryStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public InventoryResponse(int id, long productId, String thumbnail, String productName, String productCode, boolean isStock, int quantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.productId = productId;
         this.thumbnail = thumbnail;
         this.productName = productName;
         this.productCode = productCode;
+        this.isStock = isStock;
         this.quantity = quantity;
-        this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isStock() {
+        return isStock;
+    }
+
+    public void setStock(boolean stock) {
+        isStock = stock;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -85,14 +95,6 @@ public class InventoryResponse {
 
     public void setProductName(String productName) {
         this.productName = productName;
-    }
-
-    public InventoryStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(InventoryStatus status) {
-        this.status = status;
     }
 
     public int getId() {

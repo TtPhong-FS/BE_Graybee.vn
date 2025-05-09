@@ -2,13 +2,10 @@ package vn.graybee.models.users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import vn.graybee.enums.RolePermissionStatus;
 import vn.graybee.models.BaseModel;
 
 @Entity
@@ -25,11 +22,18 @@ public class Role extends BaseModel {
     @Column(name = "user_count")
     private int userCount;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RolePermissionStatus status;
+    @Column(name = "is_active")
+    private boolean isActive;
 
     public Role() {
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public int getUserCount() {
@@ -56,12 +60,5 @@ public class Role extends BaseModel {
         this.name = name;
     }
 
-    public RolePermissionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(RolePermissionStatus status) {
-        this.status = status;
-    }
 
 }

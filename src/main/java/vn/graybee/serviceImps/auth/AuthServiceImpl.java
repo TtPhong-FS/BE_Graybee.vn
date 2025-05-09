@@ -79,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = new User();
 
-        user.setActive(false);
+        user.setActive(true);
         user.setSuperAdmin(false);
         user.setRoleId(roleId);
         user.setFullName(TextUtils.capitalizeEachWord(request.getFullName()));
@@ -109,9 +109,9 @@ public class AuthServiceImpl implements AuthService {
 
         UserPrincipalDto userPrincipalDto = new UserPrincipalDto();
         userPrincipalDto.setUsername(user.getUsername());
-        userPrincipalDto.setROLE_NAME("CUSTOMER");
+        userPrincipalDto.setRoleName("CUSTOMER");
 
-        String token = jwtServices.generateToken(user.getUsername(), userPrincipalDto.getROLE_NAME());
+        String token = jwtServices.generateToken(user.getUsername(), userPrincipalDto.getRoleName());
         redisAuthServices.saveToken(user.getUid(), token, 1440, TimeUnit.MINUTES);
 
         AuthResponse response = new AuthResponse();
@@ -123,15 +123,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public BasicMessageResponse<AuthResponse> Login(LoginRequest request) {
 
-        if (!userRepository.checkExistsByUsername(request.getUsername())) {
-            throw new BusinessCustomException(ConstantAuth.username, ConstantAuth.wrong_username);
-        }
-
         UserAuthenDto user = userRepository.getAuthenBasicByUsername(request.getUsername());
-
-        if (!user.isActive()) {
-            throw new BusinessCustomException(ConstantGeneral.general, ConstantAuth.account_locked);
-        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessCustomException(ConstantAuth.password, ConstantAuth.wrong_password);
@@ -142,10 +134,6 @@ public class AuthServiceImpl implements AuthService {
                         request.getUsername(), request.getPassword()
                 )
         );
-
-        if (request.getUsername().equals("root")) {
-            user.setRole("SUPER_ADMIN");
-        }
 
         String token = jwtServices.generateToken(request.getUsername(), user.getRole());
 

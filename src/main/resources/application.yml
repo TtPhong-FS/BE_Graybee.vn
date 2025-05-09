@@ -50,6 +50,8 @@ servlet:
 
 logging:
   level:
+    org.springframework.security: DEBUG
+    org.springframework.security.web.access.ExceptionTranslationFilter: ERROR
     com:
       zaxxer: ERROR
 
@@ -61,6 +63,8 @@ api:
   orders: ${api.admin}/orders
   tags: ${api.admin}/tags
   subcategories: ${api.admin}/subcategories
+  auth: /api/v1/auth
+  account: /api/v1/account
 
 
 jwt:

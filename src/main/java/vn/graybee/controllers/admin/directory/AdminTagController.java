@@ -54,4 +54,9 @@ public class AdminTagController {
         return ResponseEntity.ok(tagServices.delete(id));
     }
 
+    @DeleteMapping("/delete-by-ids")
+    public ResponseEntity<BasicMessageResponse<List<Integer>>> deleteByIds(@RequestParam("ids") List<Integer> ids) {
+        return ResponseEntity.ok(tagServices.deleteByIds(ids));
+    }
+
 }

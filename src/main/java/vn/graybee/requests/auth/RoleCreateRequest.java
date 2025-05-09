@@ -14,6 +14,16 @@ public class RoleCreateRequest {
 
     private List<Integer> permissions;
 
+    private boolean isActive;
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     public List<Integer> getPermissions() {
         return permissions != null ? permissions : Collections.emptyList();
     }

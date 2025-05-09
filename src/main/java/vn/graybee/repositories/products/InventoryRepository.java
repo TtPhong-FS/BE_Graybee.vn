@@ -21,10 +21,10 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
     @Query("Select new vn.graybee.response.admin.products.ProductQuantityResponse(p.id, COALESCE(i.quantity, 0)) from Product p left join Inventory i on i.productId = p.id where p.id = :productId ")
     ProductQuantityResponse findQuantityByProductId(@Param("productId") long productId);
 
-    @Query("Select COALESCE(i.quantity, 0) from Inventory i left join Product p on i.productId = p.id where p.id = :productId and i.status = 'STOCK' ")
+    @Query("Select COALESCE(i.quantity, 0) from Inventory i left join Product p on i.productId = p.id where p.id = :productId ")
     Integer findStockByProductId(@Param("productId") long productId);
 
-    @Query("Select new vn.graybee.response.admin.products.InventoryResponse(i.id, p.id, p.thumbnail, p.name, p.code, i.quantity, i.status, i.createdAt, i.updatedAt) from Inventory i left join Product p on i.productId = p.id")
+    @Query("Select new vn.graybee.response.admin.products.InventoryResponse(i.id, p.id, p.thumbnail, p.name, p.code, i.isStock, i.quantity, i.createdAt, i.updatedAt) from Inventory i left join Product p on i.productId = p.id")
     List<InventoryResponse> fetchAll();
 
     @Query("Select new vn.graybee.response.admin.products.InventoryQuantityResponse(i.id, i.quantity) from Inventory i where i.id = :id ")
@@ -35,9 +35,9 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
     @Query(" Update Inventory i SET i.quantity = i.quantity - :totalQuantity where i.productId = :productId and i.quantity >= :totalQuantity")
     void updateQuantityAfterSuccessOrder(@Param("totalQuantity") int totalQuantity, @Param("productId") long productId);
 
-    @Transactional
-    @Modifying
-    @Query("Update Inventory i set i.status = vn.graybee.enums.InventoryStatus.OUT_OF_STOCK where i.productId = :productId and i.quantity = 0 ")
-    void updateStatusIfQuantityZero(@Param("productId") long productId);
+//    @Transactional
+//    @Modifying
+//    @Query("Update Inventory i set i.isStock = false where i.productId = :productId and i.quantity = 0 ")
+//    void updateIsStockWhenQuantityByZero(@Param("productId") long productId);
 
 }

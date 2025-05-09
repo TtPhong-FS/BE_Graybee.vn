@@ -9,7 +9,7 @@ import vn.graybee.response.publics.products.ProductPriceResponse;
 
 import java.util.List;
 
-public interface ProductService_public {
+public interface IProductServicePublic {
 
     MessageResponse<List<ProductBasicResponse>> findByCategoryName(String categoryName, int page, int size, String sortBy, String order);
 

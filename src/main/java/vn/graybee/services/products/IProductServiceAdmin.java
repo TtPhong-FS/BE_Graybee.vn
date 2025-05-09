@@ -16,7 +16,7 @@ import vn.graybee.response.admin.products.ProductUpdateResponse;
 
 import java.util.List;
 
-public interface ProductService_admin {
+public interface IProductServiceAdmin {
 
     void checkExistById(long id);
 

@@ -1,5 +1,6 @@
 package vn.graybee.serviceImps.users;
 
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -7,7 +8,6 @@ import org.springframework.stereotype.Service;
 import vn.graybee.constants.ConstantAuth;
 import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantUser;
-import vn.graybee.enums.RolePermissionStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.models.users.UserPrincipalDto;
@@ -38,34 +38,41 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserPrincipalDto user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantUser.does_not_exists));
+                .orElseThrow(() -> new UsernameNotFoundException(ConstantUser.does_not_exists));
+
+        if (!user.isUserActive()) {
+            throw new DisabledException(ConstantAuth.account_locked);
+        }
 
         if (user.isSuperAdmin()) {
-            user.setROLE_NAME("SUPER_ADMIN");
+            user.setRoleName("SUPER_ADMIN");
             return new UserPrincipal(user);
         }
 
-        if (user.getStatus() == null || user.getStatus().equals(RolePermissionStatus.INACTIVE)) {
-            throw new BusinessCustomException(ConstantGeneral.general, ConstantAuth.role_inactive);
+        if (user.getRoleId() == null) {
+            throw new BusinessCustomException(
+                    ConstantGeneral.general, ConstantAuth.no_role_assigned);
         }
 
-        List<String> rolePermissions = rolePermissionRepository.getPermissionOfRoleByRoleId(user.getRoleId());
-        List<String> userPermissions = userPermissionRepository.getPermissionOfUserByUserId(user.getId());
-
-        Set<String> allPermission = new LinkedHashSet<>();
-        if (!rolePermissions.isEmpty()) {
-            allPermission.addAll(rolePermissions);
-        }
-        if (!userPermissions.isEmpty()) {
-            allPermission.addAll(userPermissions);
-        }
-
-        if (!allPermission.isEmpty()) {
-            List<String> permissions = new ArrayList<>(allPermission);
-            user.setPermissions(permissions);
-        }
+        List<String> permissions = getPermissions(user.getId(), user.getRoleId());
+        user.setPermissions(permissions);
 
         return new UserPrincipal(user);
     }
+
+    private List<String> getPermissions(Integer userId, Integer roleId) {
+        Set<String> permissionSet = new LinkedHashSet<>();
+
+        if (roleId != null) {
+            List<String> rolePermissions = rolePermissionRepository.getPermissionOfRoleByRoleId(roleId);
+            permissionSet.addAll(rolePermissions);
+        }
+
+        List<String> userPermissions = userPermissionRepository.getPermissionOfUserByUserId(userId);
+        permissionSet.addAll(userPermissions);
+
+        return new ArrayList<>(permissionSet);
+    }
+
 
 }
