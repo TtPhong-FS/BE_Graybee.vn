@@ -6,7 +6,7 @@ import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantProduct;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.admin.products.ReviewCommentProjection;
+import vn.graybee.models.products.ReviewComment;
 import vn.graybee.repositories.products.ReviewCommentRepository;
 import vn.graybee.services.products.ReviewCommentService_admin;
 
@@ -22,8 +22,8 @@ public class ReviewCommentServiceImpl_admin implements ReviewCommentService_admi
     }
 
     @Override
-    public BasicMessageResponse<List<ReviewCommentProjection>> fetchAll() {
-        List<ReviewCommentProjection> reviewComments = reviewCommentRepository.fetchAll();
+    public BasicMessageResponse<List<ReviewComment>> fetchAll() {
+        List<ReviewComment> reviewComments = reviewCommentRepository.findAll();
         if (reviewComments.isEmpty()) {
             return new BasicMessageResponse<>(200, ConstantGeneral.empty_list, reviewComments);
         }

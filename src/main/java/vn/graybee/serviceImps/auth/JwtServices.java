@@ -6,7 +6,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import vn.graybee.config.JwtConfig;
+import vn.graybee.config.PrefixJwtConfig;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -17,14 +17,14 @@ public class JwtServices {
 
     private final SecretKey secretKey;
 
-    private final JwtConfig jwtConfig;
+    private final PrefixJwtConfig prefixJwtConfig;
 
     public JwtServices(
-            JwtConfig jwtconfig
+            PrefixJwtConfig jwtconfig
     ) {
         byte[] keyBytes = Decoders.BASE64.decode(jwtconfig.getSecretKey());
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
-        this.jwtConfig = jwtconfig;
+        this.prefixJwtConfig = jwtconfig;
 
     }
 
@@ -40,7 +40,7 @@ public class JwtServices {
                 .claim("role", role)
                 .subject(username)
                 .issuedAt(new Date(now))
-                .expiration(new Date(now + jwtConfig.getExpiration()))
+                .expiration(new Date(now + prefixJwtConfig.getExpiration()))
                 .signWith(getKey())
                 .compact();
 

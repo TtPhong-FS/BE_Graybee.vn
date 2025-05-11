@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "api")
-public class ApiConfig {
+public class PrefixApiConfig {
 
     private String admin;
 
@@ -24,6 +24,7 @@ public class ApiConfig {
     private String auth;
 
     private String account;
+
 
     public String getAuth() {
         return auth;

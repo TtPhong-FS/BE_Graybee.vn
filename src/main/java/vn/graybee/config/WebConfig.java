@@ -31,7 +31,7 @@ public class WebConfig {
 
     private final JwtFilter jwtFilter;
 
-    private final ApiConfig apiConfig;
+    private final PrefixApiConfig prefixApiConfig;
 
     private final UserDetailServiceImpl userDetailService;
 
@@ -39,9 +39,9 @@ public class WebConfig {
 
     private final CustomAuthenticationEndpoint customAuthenticationEndpoint;
 
-    public WebConfig(JwtFilter jwtFilter, ApiConfig apiConfig, UserDetailServiceImpl userDetailService, CustomAccessDenied customAccessDenied, CustomAuthenticationEndpoint customAuthenticationEndpoint) {
+    public WebConfig(JwtFilter jwtFilter, PrefixApiConfig prefixApiConfig, UserDetailServiceImpl userDetailService, CustomAccessDenied customAccessDenied, CustomAuthenticationEndpoint customAuthenticationEndpoint) {
         this.jwtFilter = jwtFilter;
-        this.apiConfig = apiConfig;
+        this.prefixApiConfig = prefixApiConfig;
         this.userDetailService = userDetailService;
         this.customAccessDenied = customAccessDenied;
         this.customAuthenticationEndpoint = customAuthenticationEndpoint;
@@ -56,8 +56,9 @@ public class WebConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         endpoint -> endpoint
-                                .requestMatchers(apiConfig.getAdmin() + "/**").permitAll()
+                                .requestMatchers(prefixApiConfig.getAdmin() + "/**").permitAll()
                                 .requestMatchers("/api/v1/account/**").authenticated()
+                                .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/api/v1/public/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
 

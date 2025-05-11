@@ -28,6 +28,7 @@ import vn.graybee.response.admin.directories.category.CategoryManuDto;
 import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
 import vn.graybee.response.admin.directories.category.CategoryProductCountResponse;
 import vn.graybee.response.admin.directories.category.CategoryResponse;
+import vn.graybee.response.admin.directories.category.CategoryStatusDto;
 import vn.graybee.response.admin.directories.category.CategorySubDto;
 import vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse;
 import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
@@ -186,7 +187,7 @@ public class CategoryServiceImp implements CategoryService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> delete(int id) {
 
-        CategoryProductCountResponse category = categoryRepository.checkExistsAndGetProductCountById(id)
+        CategoryProductCountResponse category = categoryRepository.getProductCountById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists));
 
         if (category.getProductCount() > 0) {
@@ -349,14 +350,22 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status) {
-        String name = categoryRepository.findNameById(id)
+        CategoryStatusDto category = categoryRepository.findNameAndStatusById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists));
+
+        if (category.getStatus() == DirectoryStatus.REMOVED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantCategory.in_removed);
+        }
+
+        if (category.getStatus() == DirectoryStatus.DELETED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantCategory.in_deleted);
+        }
 
         categoryRepository.updateStatusById(id, status);
 
-        UpdateStatusResponse response = new UpdateStatusResponse(id, status, LocalDateTime.now());
+        UpdateStatusResponse response = new UpdateStatusResponse(category.getId(), status, LocalDateTime.now());
 
-        redisProductService.deleteProductListPattern(name);
+        redisProductService.deleteProductListPattern(category.getName());
 
         return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
     }
@@ -367,13 +376,13 @@ public class CategoryServiceImp implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantCategory.does_not_exists));
 
-        DirectoryStatus status = category.getStatus();
+        DirectoryStatus currentStatus = category.getStatus();
 
-        if (userPrincipal != null && !userPrincipal.getUser().isSuperAdmin() && status == DirectoryStatus.DELETED) {
+        if (userPrincipal != null && !userPrincipal.getUser().isSuperAdmin() && currentStatus == DirectoryStatus.DELETED) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantGeneral.not_super_admin);
         }
 
-        if (status != DirectoryStatus.DELETED && status != DirectoryStatus.REMOVED) {
+        if (currentStatus != DirectoryStatus.DELETED && currentStatus != DirectoryStatus.REMOVED) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantCategory.not_removed);
         }
 

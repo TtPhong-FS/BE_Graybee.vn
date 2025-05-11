@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import vn.graybee.config.JwtConfig;
+import vn.graybee.config.PrefixJwtConfig;
 import vn.graybee.serviceImps.auth.JwtServices;
 import vn.graybee.serviceImps.auth.RedisAuthServices;
 import vn.graybee.serviceImps.users.UserDetailServiceImpl;
@@ -34,25 +34,25 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final RedisAuthServices redisAuthServices;
 
-    private final JwtConfig jwtConfig;
+    private final PrefixJwtConfig prefixJwtConfig;
 
     private final UserDetailServiceImpl userDetailService;
 
-    public JwtFilter(ObjectMapper objectMapper, UserService userService, JwtServices jwtServices, RedisAuthServices redisAuthServices, JwtConfig jwtConfig, UserDetailServiceImpl userDetailService) {
+    public JwtFilter(ObjectMapper objectMapper, UserService userService, JwtServices jwtServices, RedisAuthServices redisAuthServices, PrefixJwtConfig prefixJwtConfig, UserDetailServiceImpl userDetailService) {
         this.objectMapper = objectMapper;
         this.userService = userService;
         this.jwtServices = jwtServices;
         this.redisAuthServices = redisAuthServices;
-        this.jwtConfig = jwtConfig;
+        this.prefixJwtConfig = prefixJwtConfig;
         this.userDetailService = userDetailService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String authHeader = request.getHeader(jwtConfig.getHeader());
+        String authHeader = request.getHeader(prefixJwtConfig.getHeader());
 
-        if (authHeader == null || !authHeader.startsWith(jwtConfig.getPrefix() + " ")) {
+        if (authHeader == null || !authHeader.startsWith(prefixJwtConfig.getPrefix() + " ")) {
             filterChain.doFilter(request, response);
             return;
         }

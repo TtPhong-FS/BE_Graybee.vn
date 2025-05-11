@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.directories.Tag;
-import vn.graybee.projections.admin.category.TagProjection;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
 import java.util.List;
@@ -14,9 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface TagRepository extends JpaRepository<Tag, Integer> {
-
-    @Query("SELECT t FROM Tag t")
-    List<TagProjection> fetchAll();
+    
 
     @Transactional
     @Modifying

@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.response.admin.directories.manufacturer.ManuDto;
-import vn.graybee.response.admin.directories.manufacturer.ManufacturerProductCountResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerStatusDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,20 @@ public interface ManufacturerRepository extends JpaRepository<Manufacturer, Inte
     @Query("Select m.name from Manufacturer m where m.id = :manufacturerId and m.status != 'DELETED'")
     Optional<String> getNameById(@Param("manufacturerId") int manufacturerId);
 
-    @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManufacturerProductCountResponse(m.id, m.productCount) from Manufacturer m where m.id = :id ")
-    Optional<ManufacturerProductCountResponse> checkExistsByIdAndGetProductCount(int id);
+    @Query("Select m.productCount from Manufacturer m where m.id = :id ")
+    Optional<Integer> getProductCountById(int id);
+
+    @Transactional
+    @Modifying
+    @Query("Update Manufacturer m set m.productCount = m.productCount + 1 where m.id = :id")
+    void increaseProductCountById(int id);
+
+    @Transactional
+    @Modifying
+    @Query("Update Manufacturer m set m.productCount = m.productCount - 1 where m.id = :id")
+    void decreaseProductCountById(int id);
+
+    @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManufacturerStatusDto(m.id, m.name, m.status) from Manufacturer m where m.id = :id")
+    Optional<ManufacturerStatusDto> findNameAndStatusById(int id);
 
 }

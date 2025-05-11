@@ -14,8 +14,8 @@ import vn.graybee.repositories.categories.ManufacturerRepository;
 import vn.graybee.requests.directories.ManufacturerCreateRequest;
 import vn.graybee.requests.directories.ManufacturerUpdateRequest;
 import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
-import vn.graybee.response.admin.directories.manufacturer.ManufacturerProductCountResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerStatusDto;
 import vn.graybee.services.categories.ManufacturerService;
 import vn.graybee.utils.TextUtils;
 
@@ -86,8 +86,15 @@ public class ManufacturerServiceImp implements ManufacturerService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status) {
-        if (!manufacturerRepository.checkExistsById(id)) {
-            throw new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists);
+        ManufacturerStatusDto manufacturer = manufacturerRepository.findNameAndStatusById(id)
+                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
+
+        if (manufacturer.getStatus() == DirectoryStatus.REMOVED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantCategory.in_removed);
+        }
+
+        if (manufacturer.getStatus() == DirectoryStatus.DELETED) {
+            throw new BusinessCustomException(ConstantGeneral.general, ConstantCategory.in_deleted);
         }
 
         manufacturerRepository.updateStatusById(id, status);
@@ -146,16 +153,16 @@ public class ManufacturerServiceImp implements ManufacturerService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> delete(int id) {
 
-        ManufacturerProductCountResponse manufacturer = manufacturerRepository.checkExistsByIdAndGetProductCount(id)
+        Integer productCount = manufacturerRepository.getProductCountById(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.does_not_exists));
 
-        if (manufacturer.getProductCount() > 0) {
+        if (productCount > 0) {
             throw new BusinessCustomException(ConstantGeneral.general, ConstantManufacturer.products_in_use);
         }
 
         manufacturerRepository.deleteById(id);
 
-        return new BasicMessageResponse<>(200, ConstantManufacturer.success_delete, manufacturer.getId());
+        return new BasicMessageResponse<>(200, ConstantManufacturer.success_delete, id);
     }
 
 }

@@ -34,8 +34,5 @@ public class ConstantGeneral {
 
     public static final String discount_not_exists = "Mã giảm giá không tồn tại";
 
-    public static final String success_delete = "Sản phẩm đã bị xóa hoàn toàn.";
-
-    public static final String success_published = "Sản phẩm đã được xuất bản thành công.";
 
 }

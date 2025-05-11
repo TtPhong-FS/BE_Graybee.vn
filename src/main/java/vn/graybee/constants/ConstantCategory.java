@@ -12,7 +12,9 @@ public class ConstantCategory {
 
     public static final String subcategory_relation_does_not_exists = "Danh mục con chưa được liên kết với danh mục";
 
-    public static final String temporarily_flagged = "Không thể thực hiện, danh mục đang tạm thời bị xoá";
+    public static final String in_removed = "Danh mục bị xoá tạm thời. Hãy khôi phục trước khi thực hiện thao tác này";
+
+    public static final String in_deleted = "Danh mục đã bị xoá. Hãy khôi phục trước khi thực hiện thao tác này";
 
     public static final String does_not_exists = "Danh mục không tồn tại";
 

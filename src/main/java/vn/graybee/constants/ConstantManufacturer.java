@@ -14,7 +14,7 @@ public class ConstantManufacturer {
 
     public static final String does_not_exists = "Thương hiệu không tồn tại trong hệ thống";
 
-    public static final String products_in_use = "Không thể thực hiện vì thương hiệu đang được sử dụng bởi một sản phẩm";
+    public static final String products_in_use = "Không thể thực hiện vì thương hiệu đang được sử dụng bởi sản phẩm";
 
 //    Response
 

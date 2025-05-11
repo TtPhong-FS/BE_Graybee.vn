@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.graybee.models.users.Permission;
-import vn.graybee.projections.admin.auth.PermissionProjection;
 import vn.graybee.response.admin.auth.PermissionBasicResponse;
 import vn.graybee.response.admin.auth.PermissionUserCountResponse;
 
@@ -13,14 +12,11 @@ import java.util.Optional;
 
 public interface PermissionRepository extends JpaRepository<Permission, Integer> {
 
-    @Query("Select p from Permission p")
-    List<PermissionProjection> fetchAll();
-
     @Query("Select new vn.graybee.response.admin.auth.PermissionUserCountResponse(p.id, p.userCount) from Permission p where p.id = :id")
     Optional<PermissionUserCountResponse> getUserCountBeforeDelete(@Param("id") int id);
 
     @Query("Select p from Permission p where p.id = :id")
-    Optional<PermissionProjection> getById(@Param("id") int id);
+    Optional<Permission> getById(@Param("id") int id);
 
     @Query("Select p.name from Permission p where p.name = :name ")
     Optional<String> validateName(@Param("name") String name);

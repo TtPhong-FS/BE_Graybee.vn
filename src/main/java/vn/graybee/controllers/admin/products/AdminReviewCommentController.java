@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.messages.BasicMessageResponse;
-import vn.graybee.projections.admin.products.ReviewCommentProjection;
+import vn.graybee.models.products.ReviewComment;
 import vn.graybee.services.products.ReviewCommentService_admin;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class AdminReviewCommentController {
     }
 
     @GetMapping
-    public ResponseEntity<BasicMessageResponse<List<ReviewCommentProjection>>> fetchAll() {
+    public ResponseEntity<BasicMessageResponse<List<ReviewComment>>> fetchAll() {
         return ResponseEntity.ok(services.fetchAll());
     }
 

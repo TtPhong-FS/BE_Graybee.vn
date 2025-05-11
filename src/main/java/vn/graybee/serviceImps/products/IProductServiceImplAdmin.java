@@ -11,6 +11,7 @@ import vn.graybee.constants.ConstantManufacturer;
 import vn.graybee.constants.ConstantProduct;
 import vn.graybee.constants.ConstantSubcategory;
 import vn.graybee.constants.ConstantTag;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.exceptions.CustomNotFoundException;
@@ -18,13 +19,10 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
 import vn.graybee.messages.other.PaginationInfo;
 import vn.graybee.messages.other.SortInfo;
-import vn.graybee.models.directories.Category;
-import vn.graybee.models.directories.Manufacturer;
 import vn.graybee.models.products.Inventory;
 import vn.graybee.models.products.Product;
 import vn.graybee.models.products.ProductDescription;
 import vn.graybee.models.products.ProductImage;
-import vn.graybee.models.products.ProductStatistic;
 import vn.graybee.models.products.ProductSubcategory;
 import vn.graybee.models.products.ProductTag;
 import vn.graybee.models.users.UserPrincipal;
@@ -42,6 +40,8 @@ import vn.graybee.repositories.products.ProductTagRepository;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductRelationUpdateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
+import vn.graybee.response.admin.directories.category.CategoryStatusDto;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerStatusDto;
 import vn.graybee.response.admin.directories.subcate.SubcateDto;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
@@ -129,6 +129,42 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         );
     }
 
+    private BigDecimal calculateFinalPrice(BigDecimal price, int discount) {
+        return price.subtract(
+                price.multiply(BigDecimal.valueOf(discount)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
+        );
+    }
+
+    private CategoryStatusDto getCategory(String categoryName) {
+        CategoryStatusDto category = categoryRepository.findNameAndStatusByName(categoryName).orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryName, ConstantCategory.does_not_exists));
+
+        if (category.getStatus().equals(DirectoryStatus.REMOVED)) {
+            throw new BusinessCustomException(ConstantCategory.categoryName, ConstantCategory.in_removed);
+        }
+
+        if (category.getStatus().equals(DirectoryStatus.DELETED)) {
+            throw new BusinessCustomException(ConstantCategory.categoryName, ConstantCategory.in_deleted);
+        }
+
+        return category;
+    }
+
+    private ManufacturerStatusDto getManufacturer(Integer manufacturerId) {
+
+        ManufacturerStatusDto manufacturer = manufacturerRepository.findNameAndStatusById(manufacturerId)
+                .orElseThrow(() -> new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantManufacturer.does_not_exists));
+
+        if (manufacturer.getStatus() == DirectoryStatus.REMOVED) {
+            throw new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.in_removed);
+        }
+
+        if (manufacturer.getStatus() == DirectoryStatus.DELETED) {
+            throw new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.in_deleted);
+        }
+
+        return manufacturer;
+    }
+
     @Override
     public void checkExistById(long id) {
         if (!productRepository.checkExistsById(id)) {
@@ -162,11 +198,9 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
             }
         }
 
-        Integer categoryId = categoryRepository.findIdByName(request.getCategoryName())
-                .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryName, ConstantCategory.does_not_exists));
+        CategoryStatusDto category = getCategory(request.getCategoryName());
 
-        String manufacturerName = manufacturerRepository.getNameById(request.getManufacturerId())
-                .orElseThrow(() -> new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.does_not_exists));
+        ManufacturerStatusDto manufacturer = getManufacturer(request.getManufacturerId());
 
         String productCode = codeGenerator.generateProductCode(request.getCategoryName());
 
@@ -184,10 +218,12 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
         product.setFinalPrice(finalPrice);
-        product.setCategoryId(categoryId);
+        product.setCategoryId(category.getId());
         product.setManufacturerId(request.getManufacturerId());
 
         product.setConditions(request.getConditions().toUpperCase());
+
+
         product.setDimension(request.getDimension());
         product.setWeight(request.getWeight());
         product.setColor(request.getColor());
@@ -202,13 +238,13 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
 
         long productId = product.getId();
 
-        ProductStatistic statistic = new ProductStatistic();
-        statistic.setProductId(productId);
-        statistic.setViewCount(0);
-        statistic.setPurchaseCount(0);
-        statistic.setHasPromotion(request.isHasPromotion());
-
-        productStatisticRepository.save(statistic);
+//        ProductStatistic statistic = new ProductStatistic();
+//        statistic.setProductId(productId);
+//        statistic.setViewCount(0);
+//        statistic.setPurchaseCount(0);
+//        statistic.setHasPromotion(request.isHasPromotion());
+//
+//        productStatisticRepository.save(statistic);
 
         if (request.getImages() != null && !request.getImages().isEmpty()) {
             List<ProductImage> productImages = request.getImages()
@@ -251,13 +287,12 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
 
         productDescriptionRepository.save(description);
 
-        updateProductCountCategory(categoryId, true);
+        updateProductCountCategory(category.getId(), true);
         updateProductCountManufacturer(request.getManufacturerId(), true);
 
         redisProductService.deleteProductListPattern(request.getCategoryName());
 
-        ProductResponse response = getProductResponse(product, request.getCategoryName(), manufacturerName, inventory.getQuantity(), inventory.getStock());
-
+        ProductResponse response = getProductResponse(product, category.getName(), manufacturer.getName(), inventory.getQuantity(), inventory.getStock());
 
         return new BasicMessageResponse<>(201, ConstantProduct.success_create, response);
     }
@@ -291,19 +326,17 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
             throw new BusinessCustomException(ConstantProduct.name, ConstantProduct.name_exists);
         }
 
-        if (request.getManufacturerId() != 0 && request.getManufacturerId() != product.getManufacturerId()) {
-            if (product.getManufacturerId() != 0) {
-                updateProductCountManufacturer(product.getManufacturerId(), false);
-            }
-            product.setManufacturerId(request.getManufacturerId());
-            updateProductCountManufacturer(request.getManufacturerId(), true);
+        ManufacturerStatusDto manufacturer = getManufacturer(request.getManufacturerId());
+
+        if (manufacturer.getId() != product.getManufacturerId()) {
+            updateProductCountManufacturer(product.getManufacturerId(), false);
+
+            product.setManufacturerId(manufacturer.getId());
+            updateProductCountManufacturer(manufacturer.getId(), true);
         }
 
         String categoryName = categoryRepository.getNameById(product.getCategoryId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.does_not_exists));
-
-        String manufacturerName = manufacturerRepository.getNameById(request.getManufacturerId())
-                .orElseThrow(() -> new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.does_not_exists));
 
         BigDecimal finalPrice = BigDecimal.ZERO;
 
@@ -311,11 +344,11 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
             finalPrice = calculateFinalPrice(request.getPrice(), request.getDiscountPercent());
         }
 
-        ProductStatistic statistic = productStatisticRepository.findByProductId(product.getId());
-        statistic.setHasPromotion(request.isHasPromotion());
-        statistic.setUpdatedAt(LocalDateTime.now());
-
-        productStatisticRepository.save(statistic);
+//        ProductStatistic statistic = productStatisticRepository.findByProductId(product.getId());
+//        statistic.setHasPromotion(request.isHasPromotion());
+//        statistic.setUpdatedAt(LocalDateTime.now());
+//
+//        productStatisticRepository.save(statistic);
 
         product.setName(TextUtils.capitalizeEachWord(request.getName()));
         product.setWarranty(request.getWarranty());
@@ -413,7 +446,7 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
 
         inventory = inventoryRepository.save(inventory);
 
-        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, inventory.getQuantity(), inventory.getStock());
+        ProductResponse response = getProductResponse(product, categoryName, manufacturer.getName(), inventory.getQuantity(), inventory.getStock());
 
         String key = PRODUCT_DETAIL_KEY + productId;
 
@@ -592,42 +625,31 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         return new BasicMessageResponse<>(200, ConstantProduct.success_find_by_id, response);
     }
 
-    public BigDecimal calculateFinalPrice(BigDecimal price, int discount) {
-        return price.subtract(
-                price.multiply(BigDecimal.valueOf(discount)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
-        );
-    }
-
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void updateProductCountCategory(int CategoryId, boolean isIncrease) {
-        Category category = categoryRepository.findById(CategoryId)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantCategory.does_not_exists));
-
+    public void updateProductCountCategory(int categoryId, boolean isIncrease) {
         if (isIncrease) {
-            category.increaseProductCount();
+            categoryRepository.increaseProductCountById(categoryId);
         } else {
-            category.decreaseProductCount();
+            categoryRepository.decreaseProductCountById(categoryId);
         }
-
-        categoryRepository.save(category);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void updateProductCountManufacturer(int ManufacturerId, boolean isIncrease) {
-        Manufacturer manufacturer = manufacturerRepository.findById(ManufacturerId)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general
-                        , ConstantManufacturer.does_not_exists));
+    public void updateProductCountManufacturer(int manufacturerId, boolean isIncrease) {
         if (isIncrease) {
-            manufacturer.increaseProductCount();
+            manufacturerRepository.increaseProductCountById(manufacturerId);
         } else {
-            manufacturer.decreaseProductCount();
+            manufacturerRepository.decreaseProductCountById(manufacturerId);
         }
+    }
 
-        manufacturerRepository.save(manufacturer);
-
+    private BasicMessageResponse<ProductStatusResponse> updateStatus(Long id, ProductStatus status, String message) {
+        productRepository.updateStatusById(id, status);
+        ProductStatusResponse response = new ProductStatusResponse(id, status, LocalDateTime.now());
+        return new BasicMessageResponse<>(200, message, response);
     }
 
     @Override
@@ -639,39 +661,31 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         ProductStatus currentStatus = productRepository.findStatusById(id);
 
         if (currentStatus == ProductStatus.REMOVED && status == ProductStatus.DELETED) {
+            return updateStatus(id, status, ConstantProduct.success_in_deleted);
+        }
 
-            productRepository.updateStatusById(id, status);
-
-            ProductStatusResponse response = new ProductStatusResponse(id, status, LocalDateTime.now());
-
-            return new BasicMessageResponse<>(200, ConstantGeneral.success_delete, response);
-
-        } else if (currentStatus == ProductStatus.REMOVED) {
+        if (currentStatus == ProductStatus.REMOVED) {
             throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.removed);
+        }
 
-        } else if (currentStatus == ProductStatus.DELETED) {
+        if (currentStatus == ProductStatus.DELETED) {
             throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.soft_delete);
+        }
 
-        } else if (currentStatus == ProductStatus.PUBLISHED && (status == ProductStatus.DRAFT || status == ProductStatus.REMOVED || status == ProductStatus.COMING_SOON || status == ProductStatus.DELETED)) {
+        if (Set.of(ProductStatus.DRAFT, ProductStatus.REMOVED, ProductStatus.COMING_SOON, ProductStatus.DELETED, ProductStatus.PENDING).contains(status) && currentStatus == ProductStatus.PUBLISHED) {
             throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.published + status.getDisplayName());
         }
 
-        if ((currentStatus == ProductStatus.PENDING || currentStatus == ProductStatus.COMING_SOON) && status == ProductStatus.PUBLISHED) {
+        if (Set.of(ProductStatus.OUT_OF_STOCK, ProductStatus.COMING_SOON, ProductStatus.PENDING).contains(currentStatus) &&
+                status == ProductStatus.PUBLISHED) {
+            return updateStatus(id, status, ConstantProduct.success_published);
+        }
 
-            productRepository.updateStatusById(id, status);
-
-            ProductStatusResponse response = new ProductStatusResponse(id, status, LocalDateTime.now());
-
-            return new BasicMessageResponse<>(200, ConstantGeneral.success_published, response);
-        } else if (status == ProductStatus.PUBLISHED) {
+        if (status == ProductStatus.PUBLISHED) {
             throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.pending_to_published);
         }
 
-        productRepository.updateStatusById(id, status);
-
-        ProductStatusResponse response = new ProductStatusResponse(id, status, LocalDateTime.now());
-
-        return new BasicMessageResponse<>(200, ConstantGeneral.success_update_status, response);
+        throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid);
     }
 
     @Override

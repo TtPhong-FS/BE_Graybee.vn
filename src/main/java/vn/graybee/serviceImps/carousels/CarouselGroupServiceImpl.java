@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.constants.ConstantCarousel;
 import vn.graybee.constants.ConstantCategory;
 import vn.graybee.constants.ConstantGeneral;
+import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.exceptions.BusinessCustomException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.carousels.CarouselGroup;
@@ -12,6 +13,7 @@ import vn.graybee.repositories.carousels.CarouselGroupRepository;
 import vn.graybee.repositories.categories.CategoryRepository;
 import vn.graybee.requests.carousels.CarouselGroupRequest;
 import vn.graybee.response.admin.carousels.CarouselActiveResponse;
+import vn.graybee.response.admin.directories.category.CategoryStatusDto;
 import vn.graybee.services.carousels.CarouselGroupService;
 
 import java.util.List;
@@ -43,12 +45,20 @@ public class CarouselGroupServiceImpl implements CarouselGroupService {
             throw new BusinessCustomException(ConstantCarousel.name, ConstantCarousel.name_exists);
         }
 
-        String categoryName = categoryRepository.getNameById(request.getCategoryId())
+        CategoryStatusDto category = categoryRepository.findNameAndStatusById(request.getCategoryId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.does_not_exists));
+
+        if (category.getStatus().equals(DirectoryStatus.REMOVED)) {
+            throw new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.in_removed);
+        }
+
+        if (category.getStatus().equals(DirectoryStatus.DELETED)) {
+            throw new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.in_deleted);
+        }
 
         CarouselGroup carouselGroup = new CarouselGroup();
 
-        carouselGroup.setCategoryName(categoryName);
+        carouselGroup.setCategoryName(category.getName());
         carouselGroup.setType(request.getType());
         carouselGroup.setName(request.getName());
         carouselGroup.setActive(request.isActive());
@@ -88,12 +98,20 @@ public class CarouselGroupServiceImpl implements CarouselGroupService {
             throw new BusinessCustomException(ConstantCarousel.name, ConstantCarousel.name_exists);
         }
 
-        String categoryName = categoryRepository.getNameById(request.getCategoryId())
+        CategoryStatusDto category = categoryRepository.findNameAndStatusById(request.getCategoryId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.does_not_exists));
+
+        if (category.getStatus().equals(DirectoryStatus.REMOVED)) {
+            throw new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.in_removed);
+        }
+
+        if (category.getStatus().equals(DirectoryStatus.DELETED)) {
+            throw new BusinessCustomException(ConstantCategory.categoryId, ConstantCategory.in_deleted);
+        }
 
         carouselGroup.setType(request.getType());
         carouselGroup.setName(request.getName());
-        carouselGroup.setCategoryName(categoryName);
+        carouselGroup.setCategoryName(category.getName());
         carouselGroup.setActive(request.isActive());
 
         carouselGroup = carouselGroupRepository.save(carouselGroup);
