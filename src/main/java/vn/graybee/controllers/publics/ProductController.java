@@ -65,9 +65,9 @@ public class ProductController {
         return ResponseEntity.ok(productServicePublic.findByCategoryName(category, page, size, sortBy, order));
     }
 
-    @GetMapping("/detail")
+    @GetMapping("/detail/{id}")
     public ResponseEntity<BasicMessageResponse<ProductDetailResponse
-            >> findDetailById(@RequestParam("id") long id) {
+            >> findDetailById(@PathVariable("id") long id) {
         return ResponseEntity.ok(productServicePublic.getDetailById(id));
     }
 

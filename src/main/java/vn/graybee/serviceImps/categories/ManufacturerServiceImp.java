@@ -45,7 +45,7 @@ public class ManufacturerServiceImp implements ManufacturerService {
 
         Manufacturer manufacturer = new Manufacturer();
         manufacturer.setName(TextUtils.capitalize(request.getName()));
-        manufacturer.setStatus(DirectoryStatus.ACTIVE);
+        manufacturer.setStatus(DirectoryStatus.INACTIVE);
 
         manufacturer = manufacturerRepository.save(manufacturer);
 

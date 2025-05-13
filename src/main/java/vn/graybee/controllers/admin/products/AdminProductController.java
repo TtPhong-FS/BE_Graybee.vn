@@ -39,31 +39,31 @@ public class AdminProductController {
 
     private final ProductDocumentService productDocumentService;
 
-    private final IProductServiceAdmin productServiceADMIN;
+    private final IProductServiceAdmin iProductServiceAdmin;
 
-    public AdminProductController(ProductDocumentService productDocumentService, IProductServiceAdmin productServiceADMIN) {
+    public AdminProductController(ProductDocumentService productDocumentService, IProductServiceAdmin iProductServiceAdmin) {
         this.productDocumentService = productDocumentService;
-        this.productServiceADMIN = productServiceADMIN;
+        this.iProductServiceAdmin = iProductServiceAdmin;
     }
 
     @PostMapping
     public ResponseEntity<BasicMessageResponse<ProductResponse>> create(@RequestBody @Valid ProductCreateRequest request) {
-        return ResponseEntity.ok(productServiceADMIN.create(request));
+        return ResponseEntity.ok(iProductServiceAdmin.create(request));
     }
 
     @PutMapping("/update")
     public ResponseEntity<BasicMessageResponse<ProductResponse>> update(@RequestParam("id") long id, @RequestBody @Valid ProductUpdateRequest request) {
-        return ResponseEntity.ok(productServiceADMIN.update(id, request));
+        return ResponseEntity.ok(iProductServiceAdmin.update(id, request));
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<BasicMessageResponse<Long>> delete(@RequestParam("id") long id) {
-        return ResponseEntity.ok(productServiceADMIN.delete(id));
+        return ResponseEntity.ok(iProductServiceAdmin.delete(id));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BasicMessageResponse<ProductUpdateResponse>> getById(@PathVariable("id") long id) {
-        return ResponseEntity.ok(productServiceADMIN.getById(id));
+        return ResponseEntity.ok(iProductServiceAdmin.getById(id));
     }
 
     @GetMapping
@@ -76,17 +76,17 @@ public class AdminProductController {
             @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
             @RequestParam(value = "order", defaultValue = "desc") String order
     ) {
-        return ResponseEntity.ok(productServiceADMIN.fetchAll(status, category, manufacturer, page, size, sortBy, order));
+        return ResponseEntity.ok(iProductServiceAdmin.fetchAll(status, category, manufacturer, page, size, sortBy, order));
     }
 
     @PutMapping("/update/status/{id}/{status}")
     public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@PathVariable("id") long id, @PathVariable("status") ProductStatus status) {
-        return ResponseEntity.ok(productServiceADMIN.updateStatus(id, status));
+        return ResponseEntity.ok(iProductServiceAdmin.updateStatus(id, status));
     }
 
     @PutMapping("/restore/{id}")
     public ResponseEntity<BasicMessageResponse<ProductResponse>> restoreProduct(@PathVariable("id") long id, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(productServiceADMIN.restoreProduct(id, userPrincipal));
+        return ResponseEntity.ok(iProductServiceAdmin.restoreProduct(id, userPrincipal));
     }
 
     @GetMapping("/load-elastic")
@@ -98,25 +98,25 @@ public class AdminProductController {
 
     @GetMapping("/subcategories&tags")
     public ResponseEntity<BasicMessageResponse<List<ProductSubcategoryAndTagResponse>>> fetchProductsWithSubcategoriesAndTags() {
-        return ResponseEntity.ok(productServiceADMIN.fetchAllWithSubcategoriesAndTags());
+        return ResponseEntity.ok(iProductServiceAdmin.fetchAllWithSubcategoriesAndTags());
     }
 
     @PutMapping("/update/relation")
     public ResponseEntity<BasicMessageResponse<ProductSubcategoryAndTagResponse>> updateSubcategoriesAndTags(@RequestParam("id") long id, @RequestBody ProductRelationUpdateRequest request) {
-        return ResponseEntity.ok(productServiceADMIN.updateSubcategoriesAndTagIds(id, request));
+        return ResponseEntity.ok(iProductServiceAdmin.updateSubcategoriesAndTagIds(id, request));
     }
 
 
     //    Subcategory - Product
     @DeleteMapping("/subcategories/delete")
     public ResponseEntity<BasicMessageResponse<ProductSubcategoryIDResponse>> deleteRelationByProductIdAndSubcategoryId(@RequestParam("productId") long productId, @RequestParam("subcategoryId") int subcategoryId) {
-        return ResponseEntity.ok(productServiceADMIN.deleteRelationByProductIdAndSubcategoryId(productId, subcategoryId));
+        return ResponseEntity.ok(iProductServiceAdmin.deleteRelationByProductIdAndSubcategoryId(productId, subcategoryId));
     }
 
     //    Tag - Product
     @DeleteMapping("/tags/delete")
     public ResponseEntity<BasicMessageResponse<ProductIdAndTagIdResponse>> deleteRelationByProductIdAndTagId(@RequestParam("productId") long productId, @RequestParam("tagId") int tagId) {
-        return ResponseEntity.ok(productServiceADMIN.deleteRelationByProductIdAndTagId(productId, tagId));
+        return ResponseEntity.ok(iProductServiceAdmin.deleteRelationByProductIdAndTagId(productId, tagId));
     }
 
 }

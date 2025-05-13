@@ -125,7 +125,7 @@ public class CategoryServiceImp implements CategoryService {
 
         Category category = new Category();
         category.setName(TextUtils.capitalize(request.getName()));
-        category.setStatus(DirectoryStatus.ACTIVE);
+        category.setStatus(DirectoryStatus.INACTIVE);
         category = categoryRepository.save(category);
 
         if ((request.getSubcategories() != null && !request.getSubcategories().isEmpty()) && (request.getManufacturers() != null && !request.getManufacturers().isEmpty())) {

@@ -1,5 +1,6 @@
 package vn.graybee.requests.products;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -69,6 +70,17 @@ public class ProductUpdateRequest {
     private String description;
 
     private List<String> images;
+
+    @Valid
+    private DetailTemplateRequest detail;
+
+    public DetailTemplateRequest getDetail() {
+        return detail;
+    }
+
+    public void setDetail(DetailTemplateRequest detail) {
+        this.detail = detail;
+    }
 
     public ProductStatus getStatusEnum() {
         try {

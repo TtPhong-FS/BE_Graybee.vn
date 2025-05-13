@@ -118,13 +118,11 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         this.redisProductService = redisProductService;
     }
 
-    public ProductResponse getProductResponse(Product product, String categoryName, String manufacturerName, int quantity, Boolean isStock) {
+    public ProductResponse getProductResponse(Product product, String categoryName, String manufacturerName) {
         return new ProductResponse(
                 product,
                 categoryName,
-                manufacturerName,
-                quantity,
-                isStock
+                manufacturerName
 
         );
     }
@@ -254,7 +252,6 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
 
         Inventory inventory = new Inventory();
 
-        inventory.setStock(request.isStock() && request.getQuantity() > 0);
         inventory.setQuantity(request.isStock() ? request.getQuantity() : 0);
         inventory.setProductId(product.getId());
 
@@ -292,7 +289,7 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
 
         redisProductService.deleteProductListPattern(request.getCategoryName());
 
-        ProductResponse response = getProductResponse(product, category.getName(), manufacturer.getName(), inventory.getQuantity(), inventory.getStock());
+        ProductResponse response = getProductResponse(product, category.getName(), manufacturer.getName());
 
         return new BasicMessageResponse<>(201, ConstantProduct.success_create, response);
     }
@@ -444,9 +441,9 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
             inventory.setProductId(product.getId());
         }
 
-        inventory = inventoryRepository.save(inventory);
+        inventoryRepository.save(inventory);
 
-        ProductResponse response = getProductResponse(product, categoryName, manufacturer.getName(), inventory.getQuantity(), inventory.getStock());
+        ProductResponse response = getProductResponse(product, categoryName, manufacturer.getName());
 
         String key = PRODUCT_DETAIL_KEY + productId;
 
@@ -713,7 +710,7 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         String manufacturerName = manufacturerRepository.getNameById(product.getManufacturerId())
                 .orElseThrow(() -> new BusinessCustomException(ConstantManufacturer.manufacturerId, ConstantCategory.does_not_exists));
 
-        ProductResponse response = getProductResponse(product, categoryName, manufacturerName, 0, false);
+        ProductResponse response = getProductResponse(product, categoryName, manufacturerName);
 
         return new BasicMessageResponse<>(200, ConstantProduct.success_restore, response);
     }

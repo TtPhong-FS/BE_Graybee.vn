@@ -67,7 +67,7 @@ public class SubCategoryServiceImpl implements SubCategoryServices {
 
         SubCategory subCategory = new SubCategory();
         subCategory.setName(TextUtils.capitalize(request.getName()));
-        subCategory.setStatus(DirectoryStatus.ACTIVE);
+        subCategory.setStatus(DirectoryStatus.INACTIVE);
 
         SubCategory savedSubcategory = subCategoryRepository.save(subCategory);
 

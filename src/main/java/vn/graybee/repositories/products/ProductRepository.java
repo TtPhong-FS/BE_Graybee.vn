@@ -24,11 +24,10 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT new vn.graybee.response.admin.products.ProductResponse(p,c.name, m.name, COALESCE(i.quantity, 0), i.isStock) " +
+    @Query("SELECT new vn.graybee.response.admin.products.ProductResponse(p,c.name, m.name) " +
             "FROM Product p " +
             "INNER JOIN Category c ON p.categoryId = c.id " +
             "INNER JOIN Manufacturer m ON p.manufacturerId = m.id " +
-            "LEFT JOIN Inventory i on p.id = i.productId " +
             "Where (:status IS NULL or p.status = :status) and (:categoryName IS NULL or c.name = :categoryName) and (:manufacturerName IS NULL or m.name = :manufacturerName)"
     )
     Page<ProductResponse> fetchProducts(
@@ -95,7 +94,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("Select new vn.graybee.response.publics.products.ProductPriceResponse(p.id, p.finalPrice) from Product p where p.id = :id and p.status = 'PUBLISHED'")
     Optional<ProductPriceResponse> getPriceById(@Param("id") long id);
 
-    @Query("Select new vn.graybee.response.publics.products.ProductDetailResponse(p.id, p.name, m.name, p.warranty, p.conditions, p.weight,p.color, p.thumbnail, p.price, p.finalPrice, p.discountPercent) from Product p join Manufacturer m on p.manufacturerId = m.id where p.id = :id and p.status = 'PUBLISHED' ")
+    @Query("Select new vn.graybee.response.publics.products.ProductDetailResponse(p.id, p.name, c.name, m.name, p.warranty, p.conditions, p.weight,p.color, p.thumbnail, p.price, p.finalPrice, p.discountPercent) from Product p " +
+            "INNER JOIN Category c ON p.categoryId = c.id " +
+            "Inner join Manufacturer m on p.manufacturerId = m.id where p.id = :id and p.status = 'PUBLISHED' ")
     Optional<ProductDetailResponse> getDetailByProductId(@Param("id") long id);
 
     @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p join Category c on p.categoryId = c.id where p.status = 'PUBLISHED' and c.name = :category and c.status = 'ACTIVE' ")

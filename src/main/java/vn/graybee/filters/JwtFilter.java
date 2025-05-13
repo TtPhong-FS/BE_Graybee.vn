@@ -1,6 +1,5 @@
 package vn.graybee.filters;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,8 +25,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
-    private final ObjectMapper objectMapper;
-
     private final UserService userService;
 
     private final JwtServices jwtServices;
@@ -38,8 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailServiceImpl userDetailService;
 
-    public JwtFilter(ObjectMapper objectMapper, UserService userService, JwtServices jwtServices, RedisAuthServices redisAuthServices, PrefixJwtConfig prefixJwtConfig, UserDetailServiceImpl userDetailService) {
-        this.objectMapper = objectMapper;
+    public JwtFilter(UserService userService, JwtServices jwtServices, RedisAuthServices redisAuthServices, PrefixJwtConfig prefixJwtConfig, UserDetailServiceImpl userDetailService) {
         this.userService = userService;
         this.jwtServices = jwtServices;
         this.redisAuthServices = redisAuthServices;

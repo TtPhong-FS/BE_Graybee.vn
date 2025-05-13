@@ -58,4 +58,8 @@ public class ConstantProduct {
 
     public static final String success_in_deleted = "Sản phẩm đã bị xóa hoàn toàn.";
 
+    public static final String missing_type_detail = "Vui lòng chọn danh mục phù hợp để tạo sản phẩm với loại: ";
+
+    public static final String not_available = "Sản phẩm này hiện chưa được phát hành.";
+
 }

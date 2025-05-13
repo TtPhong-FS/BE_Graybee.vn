@@ -21,7 +21,7 @@ public class Inventory extends BaseModel {
 
     private Integer quantity;
 
-    @Column(name = "is_stock")
+    @Column(name = "is_stock", insertable = false, updatable = false)
     private Boolean isStock;
 
     public Inventory() {

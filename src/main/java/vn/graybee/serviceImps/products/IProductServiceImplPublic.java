@@ -10,6 +10,7 @@ import vn.graybee.constants.ConstantGeneral;
 import vn.graybee.constants.ConstantProduct;
 import vn.graybee.constants.ConstantUser;
 import vn.graybee.exceptions.BusinessCustomException;
+import vn.graybee.exceptions.CustomNotFoundException;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
 import vn.graybee.messages.other.PaginationInfo;
@@ -21,6 +22,7 @@ import vn.graybee.repositories.products.ProductRepository;
 import vn.graybee.repositories.products.ReviewCommentRepository;
 import vn.graybee.repositories.users.FavouriteRepository;
 import vn.graybee.response.favourites.ProductFavourite;
+import vn.graybee.response.publics.products.DetailTemplateResponse;
 import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductDetailResponse;
 import vn.graybee.response.publics.products.ProductPriceResponse;
@@ -28,6 +30,7 @@ import vn.graybee.response.publics.products.ReviewCommentDto;
 import vn.graybee.services.products.IProductServicePublic;
 import vn.graybee.services.products.ProductStatisticService;
 import vn.graybee.services.products.RedisProductService;
+import vn.graybee.services.products.detail.DetailFetcher;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +41,8 @@ public class IProductServiceImplPublic implements IProductServicePublic {
     private static final String PRODUCT_DETAIL_KEY = "product:detail:";
 
     private static final String PRODUCT_LIST_KEY = "product:list:";
+
+    private final List<DetailFetcher> detailFetchers;
 
     private final ProductRepository productRepository;
 
@@ -53,7 +58,8 @@ public class IProductServiceImplPublic implements IProductServicePublic {
 
     private final RedisProductService redisProductService;
 
-    public IProductServiceImplPublic(ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
+    public IProductServiceImplPublic(List<DetailFetcher> detailFetchers, ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
+        this.detailFetchers = detailFetchers;
         this.productRepository = productRepository;
         this.favouriteRepository = favouriteRepository;
         this.productStatisticService = productStatisticService;
@@ -181,22 +187,41 @@ public class IProductServiceImplPublic implements IProductServicePublic {
             return new BasicMessageResponse<>(200, null, cache);
         }
 
-        ProductDetailResponse response = productRepository.getDetailByProductId(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+        ProductDetailResponse productResponse = productRepository.getDetailByProductId(id)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantProduct.not_available));
 
-        List<String> images = productImageRepository.findImageUrlsByProductId(response.getId());
-        List<ReviewCommentDto> reviews = reviewCommentRepository.getReviewsByProductId(response.getId());
-        String description = productDescriptionRepository.getDescriptionByProductId(response.getId());
+        String type = detailFetchers.stream()
+                .map(DetailFetcher::getDetailType)
+                .filter(detailType -> detailType.equalsIgnoreCase(productResponse.getCategoryName()))
+                .findFirst()
+                .orElse(null);
 
-        response.setImages(images);
-        response.setDescription(description);
-        response.setReviews(reviews);
+        if (type != null) {
 
-        productStatisticService.updateViewCount(response.getId());
+            DetailFetcher fetcher = detailFetchers.stream()
+                    .filter(f -> f.getDetailType().equalsIgnoreCase(type))
+                    .findFirst()
+                    .orElse(null);
 
-        redisProductService.setProduct(key, response, 6, TimeUnit.HOURS);
+            if (fetcher != null) {
+                DetailTemplateResponse detail = fetcher.fetchDetail(productResponse.getId());
+                productResponse.setDetail(detail);
+            }
+        }
 
-        return new BasicMessageResponse<>(200, null, response);
+        List<String> images = productImageRepository.findImageUrlsByProductId(productResponse.getId());
+        List<ReviewCommentDto> reviews = reviewCommentRepository.getReviewsByProductId(productResponse.getId());
+        String description = productDescriptionRepository.getDescriptionByProductId(productResponse.getId());
+
+        productResponse.setImages(images);
+        productResponse.setDescription(description);
+        productResponse.setReviews(reviews);
+
+//        productStatisticService.updateViewCount(productResponse.getId());
+
+        redisProductService.setProduct(key, productResponse, 6, TimeUnit.HOURS);
+
+        return new BasicMessageResponse<>(200, null, productResponse);
     }
 
     @Override

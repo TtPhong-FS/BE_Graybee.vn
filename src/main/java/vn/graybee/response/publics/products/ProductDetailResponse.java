@@ -1,5 +1,7 @@
 package vn.graybee.response.publics.products;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +11,9 @@ public class ProductDetailResponse {
     private long id;
 
     private String name;
+
+    @JsonIgnore
+    private String categoryName;
 
     private String manufacturerName;
 
@@ -34,12 +39,15 @@ public class ProductDetailResponse {
 
     private List<ReviewCommentDto> reviews;
 
+    private DetailTemplateResponse detail;
+
     public ProductDetailResponse() {
     }
 
-    public ProductDetailResponse(long id, String name, String manufacturerName, int warranty, String conditions, float weight, String color, String thumbnail, BigDecimal price, BigDecimal finalPrice, int discountPercent) {
+    public ProductDetailResponse(long id, String name, String categoryName, String manufacturerName, int warranty, String conditions, float weight, String color, String thumbnail, BigDecimal price, BigDecimal finalPrice, int discountPercent) {
         this.id = id;
         this.name = name;
+        this.categoryName = categoryName;
         this.manufacturerName = manufacturerName;
         this.warranty = warranty;
         this.conditions = conditions;
@@ -49,6 +57,22 @@ public class ProductDetailResponse {
         this.price = price;
         this.finalPrice = finalPrice;
         this.discountPercent = discountPercent;
+    }
+
+    public DetailTemplateResponse getDetail() {
+        return detail;
+    }
+
+    public void setDetail(DetailTemplateResponse detail) {
+        this.detail = detail;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public String getManufacturerName() {

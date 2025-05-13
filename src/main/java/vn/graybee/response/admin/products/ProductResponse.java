@@ -36,10 +36,6 @@ public class ProductResponse {
 
     private String conditions;
 
-    private Boolean isStock;
-
-    private int quantity;
-
     private StatusResponse status;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -48,7 +44,7 @@ public class ProductResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    public ProductResponse(Product product, String categoryName, String manufacturerName, int quantity, Boolean isStock) {
+    public ProductResponse(Product product, String categoryName, String manufacturerName) {
         this.id = product.getId();
         this.code = product.getCode();
         this.name = product.getName();
@@ -65,8 +61,6 @@ public class ProductResponse {
         this.conditions = product.getConditions();
         this.createdAt = product.getCreatedAt();
         this.updatedAt = product.getUpdatedAt();
-        this.isStock = isStock;
-        this.quantity = quantity;
         this.status = new StatusResponse(product.getStatus().getCode(), product.getStatus().getDisplayName());
     }
 
@@ -85,23 +79,7 @@ public class ProductResponse {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-    public Boolean getStock() {
-        return isStock;
-    }
-
-    public void setStock(Boolean stock) {
-        isStock = stock;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
+    
     public long getId() {
         return id;
     }
