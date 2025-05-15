@@ -18,7 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import vn.graybee.custom.CustomAccessDenied;
 import vn.graybee.custom.CustomAuthenticationEndpoint;
 import vn.graybee.filters.JwtFilter;
-import vn.graybee.serviceImps.users.UserDetailServiceImpl;
+import vn.graybee.services.users.UserDetailServiceImpl;
 
 import java.util.Arrays;
 import java.util.Collections;

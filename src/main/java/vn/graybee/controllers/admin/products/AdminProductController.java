@@ -25,8 +25,8 @@ import vn.graybee.response.admin.products.ProductStatusResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.response.admin.products.ProductUpdateResponse;
-import vn.graybee.serviceImps.products.ProductDocumentService;
 import vn.graybee.services.products.IProductServiceAdmin;
+import vn.graybee.services.products.ProductDocumentService;
 
 import java.io.IOException;
 import java.util.List;

@@ -55,6 +55,7 @@ services:
   elasticsearch:
     container_name: elasticsearch
     image: elasticsearch:8.15.0
+    restart: always
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -74,6 +75,7 @@ services:
   kibana:
     container_name: kibana
     image: kibana:8.15.0
+    restart: always
     ports:
       - "5601:5601"
     depends_on:
@@ -91,6 +93,7 @@ services:
       dockerfile: dockerfile
     image: ecommerce_graybee_server
     container_name: ecommerce_graybee_server
+    restart: always
     ports:
       - "8080:8080"
       - "5005:5005"

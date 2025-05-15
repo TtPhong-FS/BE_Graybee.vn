@@ -12,7 +12,7 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.products.ProductCreateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
 import vn.graybee.response.admin.products.ProductResponse;
-import vn.graybee.serviceImps.products.detail.PcDetailServices;
+import vn.graybee.services.products.detail.PcDetailServices;
 
 @RestController
 @RequestMapping("/api/v1/admin/products")

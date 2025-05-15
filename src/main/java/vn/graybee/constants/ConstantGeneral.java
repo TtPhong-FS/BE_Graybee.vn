@@ -35,4 +35,6 @@ public class ConstantGeneral {
     public static final String discount_not_exists = "Mã giảm giá không tồn tại";
 
 
+    public static final String root = "root";
+
 }

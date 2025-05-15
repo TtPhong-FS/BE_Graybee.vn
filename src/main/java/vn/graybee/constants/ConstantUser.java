@@ -35,4 +35,6 @@ public class ConstantUser {
 
     public static final String success_update_profile = "Cập nhật thông tin cá nhân thành công";
 
+    public static final String email_invalid = "Địa chỉ Email không hợp lệ. Vui lòng kiểm tra lại email!";
+
 }

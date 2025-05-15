@@ -13,9 +13,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import vn.graybee.config.PrefixJwtConfig;
-import vn.graybee.serviceImps.auth.JwtServices;
-import vn.graybee.serviceImps.auth.RedisAuthServices;
-import vn.graybee.serviceImps.users.UserDetailServiceImpl;
+import vn.graybee.services.auth.JwtServices;
+import vn.graybee.services.auth.RedisAuthServices;
+import vn.graybee.services.users.UserDetailServiceImpl;
 import vn.graybee.services.users.UserService;
 
 import java.io.IOException;

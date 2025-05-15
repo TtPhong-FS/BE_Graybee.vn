@@ -27,7 +27,7 @@ public class User extends BaseModel {
     @Column(name = "role_id", nullable = false)
     private Integer roleId;
 
-    @Column(length = 12)
+    @Column(length = 50, unique = true)
     private String username;
 
     @Column(name = "fullname", length = 100)

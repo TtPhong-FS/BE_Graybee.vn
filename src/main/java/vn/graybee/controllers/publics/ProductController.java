@@ -11,8 +11,8 @@ import vn.graybee.messages.MessageResponse;
 import vn.graybee.models.products.ProductDocument;
 import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductDetailResponse;
-import vn.graybee.serviceImps.products.ProductDocumentService;
 import vn.graybee.services.products.IProductServicePublic;
+import vn.graybee.services.products.ProductDocumentService;
 
 import java.io.IOException;
 import java.util.List;

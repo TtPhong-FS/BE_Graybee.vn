@@ -14,5 +14,6 @@ public interface UserService {
 
     void checkExistsByUid(Integer uid);
 
+    BasicMessageResponse<String> disableAccount(Integer id);
 
 }

@@ -59,7 +59,21 @@ public class ConstantAuth {
     public static final String success_fetch_permissions = "Danh sách quyền đã được lấy thành công";
 
     public static final String account_locked = "Tài khoản hiện đang bị khoá!. Vui lòng liên hệ với quản trị viên/quản lý để biết thêm thông tin";
-    
-    public static final String no_role_assigned = "Người dùng không có quyền truy cập hệ thống. Vui lòng liên hệ với quản trị viên/quản lý để biết thêm thông tin";
+
+    public static final String no_role_assigned = "Tài khoản không có quyền truy cập hệ thống. Vui lòng liên hệ với quản trị viên/quản lý để biết thêm thông tin";
+
+    public static final String success_verify_otp = "Xác thực OTP thành công!";
+
+    public static final String success_verify_email = "Mã OTP đã được gửi đến email ";
+
+    public static final String password_not_matches_repeatPassword = "Vui lòng nhập lại mật khẩu chính xác!";
+
+    public static final String success_reset_password = "Đặt lại mật khẩu thành công!";
+
+    public static final String invalid_otp = "Mã OTP không hợp lệ hoặc đã hết hạn!";
+
+    public static final String otp = "otp";
+
+    public static final String otp_expired = "Mã OTP đã hết hạn!";
 
 }

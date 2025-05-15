@@ -37,6 +37,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("Select exists (Select 1 from User u where u.username = :username)")
     boolean checkExistsByUsername(@Param("username") String username);
 
+    @Query("Select u.id from User u where u.email = :email")
+    Optional<Integer> getIdByEmail(@Param("email") String email);
+
     @Query("Select u.uid from User u where u.username = :username")
     Optional<Integer> getUidByUsername(@Param("username") String username);
 
@@ -51,5 +54,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("Select new vn.graybee.response.admin.users.AdminCustomerResponse(u.id, u.uid, u.fullName, u.phoneNumber, u.email) from User u where u.isSuperAdmin = false")
     List<AdminCustomerResponse> getAllCustomers();
+
+    @Transactional
+    @Modifying
+    @Query("Update User u set u.password = ?2 where u.email = ?1")
+    void updatePassword(@Param("email") String email, @Param("password") String password);
 
 }

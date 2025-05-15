@@ -34,5 +34,10 @@ public class CodeGenerator {
         return sb.toString();
     }
 
+    public static Integer generateOtp() {
+        SecureRandom random = new SecureRandom();
+        return random.nextInt(100_000, 999_999);
+    }
+
 
 }

@@ -35,8 +35,19 @@ spring:
       repositories:
         enabled: false
       uris: http://${ELS_HOST}:9200
-#      username: elastic
-#      password: admin123
+  #      username: elastic
+  #      password: admin123
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   address: 0.0.0.0
