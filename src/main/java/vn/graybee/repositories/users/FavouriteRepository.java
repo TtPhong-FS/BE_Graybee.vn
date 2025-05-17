@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface FavouriteRepository extends JpaRepository<Favourite, Integer> {
 
-    @Query("Select new vn.graybee.response.favourites.ProductFavourite(p.id, p.finalPrice, p.name, p.thumbnail) from Favourite f join Product p on f.productId = p.id where f.userUid = :userUid")
+    @Query("Select new vn.graybee.response.favourites.ProductFavourite(p.id, p.price, p.finalPrice, p.name, p.thumbnail) from Favourite f join Product p on f.productId = p.id where f.userUid = :userUid")
     List<ProductFavourite> getProductFavouritesByUserUId(@Param("userUid") Integer userUid);
 
     @Transactional

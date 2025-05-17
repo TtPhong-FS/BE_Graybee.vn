@@ -6,6 +6,8 @@ public class ProductFavourite {
 
     private Long id;
 
+    private double price;
+
     private double finalPrice;
 
     private String name;
@@ -15,11 +17,20 @@ public class ProductFavourite {
     public ProductFavourite() {
     }
 
-    public ProductFavourite(long id, BigDecimal finalPrice, String name, String thumbnail) {
+    public ProductFavourite(long id, BigDecimal price, BigDecimal finalPrice, String name, String thumbnail) {
         this.id = id;
+        this.price = price != null ? price.doubleValue() : 0.0;
         this.finalPrice = finalPrice != null ? finalPrice.doubleValue() : 0.0;
         this.name = name;
         this.thumbnail = thumbnail;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public Long getId() {

@@ -85,7 +85,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     //    Public
 
-    @Query("Select new vn.graybee.response.favourites.ProductFavourite(p.id, p.finalPrice,p.name, p.thumbnail) from Product p where p.id = :id and p.status = 'PUBLISHED' ")
+    @Query("Select new vn.graybee.response.favourites.ProductFavourite(p.id, p.price, p.finalPrice,p.name, p.thumbnail) from Product p where p.id = :id and p.status = 'PUBLISHED' ")
     Optional<ProductFavourite> findToAddToFavourite(@Param("id") long id);
 
     @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p where p.id = :id and p.status = 'PUBLISHED' ")

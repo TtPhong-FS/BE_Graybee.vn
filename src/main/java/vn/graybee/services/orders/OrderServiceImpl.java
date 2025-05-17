@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -116,10 +117,13 @@ public class OrderServiceImpl implements OrderService {
         ShippingMethod shippingMethod = request.getShippingMethodEnum();
         DeliveryType deliveryType = request.getDeliveryTypeEnum();
 
+        int extraDays = new Random().nextInt(10) + 2;
+
         Delivery delivery = new Delivery(LocalDate.now());
         delivery.setOrderId(orderId);
 
         delivery.setDeliveryType(deliveryType);
+
         if (deliveryType.equals(DeliveryType.STORE_PICKUP)) {
             delivery.setTrackingNumber(null);
             delivery.setDeliveryStatus(DeliveryStatus.DELIVERED);
@@ -131,6 +135,8 @@ public class OrderServiceImpl implements OrderService {
                 AddressUtil.formatFullAddress(address.getStreetAddress(), address.getCommune(), address.getDistrict(), address.getCity())
         );
         delivery.setShippingMethod(shippingMethod);
+        delivery.setOrderDate(LocalDate.now());
+        delivery.setEstimatedDeliveryDate(LocalDate.now().plusDays(extraDays));
         delivery.setUpdatedAt(LocalDateTime.now());
 
         return delivery;

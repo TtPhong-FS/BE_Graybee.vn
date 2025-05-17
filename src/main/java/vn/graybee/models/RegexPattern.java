@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "regex_patterns")
-public class RegexPattern extends BaseModel {
+public class RegexPattern {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
