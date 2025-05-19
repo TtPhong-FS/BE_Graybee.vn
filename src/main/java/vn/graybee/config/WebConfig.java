@@ -54,6 +54,10 @@ public class WebConfig {
                         cors -> cors.configurationSource(corsConfigurationSource())
                 )
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(customAuthenticationEndpoint)
+                        .accessDeniedHandler(customAccessDenied))
                 .authorizeHttpRequests(
                         endpoint -> endpoint
                                 .requestMatchers(prefixApiConfig.getAdmin() + "/**").permitAll()
@@ -61,15 +65,10 @@ public class WebConfig {
                                 .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/api/v1/public/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
-
                                 .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailService)
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(customAuthenticationEndpoint)
-                        .accessDeniedHandler(customAccessDenied))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

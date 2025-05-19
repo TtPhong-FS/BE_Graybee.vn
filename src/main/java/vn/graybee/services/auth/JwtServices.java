@@ -1,9 +1,11 @@
 package vn.graybee.services.auth;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import vn.graybee.config.PrefixJwtConfig;
@@ -52,7 +54,12 @@ public class JwtServices {
     }
 
     public String extractUsername(String token) {
-        return extractClaims(token, Claims::getSubject);
+        try {
+            return extractClaims(token, Claims::getSubject);
+
+        } catch (ExpiredJwtException ex) {
+            throw new BadCredentialsException("Jwt token is expired. Please login again.");
+        }
     }
 
     private boolean isTokenExpired(String token) {
@@ -69,12 +76,17 @@ public class JwtServices {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts
-                .parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts
+                    .parser()
+                    .verifyWith(getKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+        } catch (ExpiredJwtException ex) {
+            throw new BadCredentialsException("Jwt token is expired. Please login again.");
+        }
     }
 
 

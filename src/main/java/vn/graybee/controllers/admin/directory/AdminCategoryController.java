@@ -48,12 +48,14 @@ public class AdminCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<CategoryResponse>> create(@RequestBody @Valid CategoryCreateRequest request) {
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> create(
+            @RequestBody @Valid CategoryCreateRequest request
+    ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<BasicMessageResponse<Integer>> delete(@RequestParam("id") int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Integer>> delete(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(categoryService.delete(id));
     }
 
@@ -72,8 +74,8 @@ public class AdminCategoryController {
         return ResponseEntity.ok(categoryService.deleteRelationBySubcategoryByCategoryId(categoryId, subcategoryId));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<CategoryResponse>> update(@RequestParam("id") int id, @RequestBody @Valid CategoryUpdateRequest request) {
+    @PutMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> update(@PathVariable("id") Integer id, @RequestBody @Valid CategoryUpdateRequest request) {
         return ResponseEntity.ok(categoryService.update(id, request));
     }
 

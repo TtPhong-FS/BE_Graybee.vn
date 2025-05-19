@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -53,58 +54,37 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-//        try {
-        String token = authHeader.substring(7);
+        try {
+            String token = authHeader.substring(7);
 
-        String username = jwtServices.extractUsername(token);
-        Integer uid = userService.getUidByUsername(username);
+            String username = jwtServices.extractUsername(token);
+            Integer uid = userService.getUidByUsername(username);
 
-        if (username != null && !username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (redisAuthServices.isValidToken(uid, token)) {
-                UserDetails userDetails = userDetailService.loadUserByUsername(username);
+            if (username != null && !username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (redisAuthServices.isValidToken(uid, token)) {
+                    UserDetails userDetails = userDetailService.loadUserByUsername(username);
 
-                if (jwtServices.isValid(token, userDetails)) {
+                    if (jwtServices.isValid(token, userDetails)) {
 
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
-                    );
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities()
+                        );
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
                 }
+
             }
 
+        } catch (AuthenticationException ex) {
 
-        }
+            SecurityContextHolder.clearContext();
+            throw ex;
+
+        } //
+
         filterChain.doFilter(request, response);
-
-//        } catch (RedisConnectionFailureException ex) {
-//            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-//            response.getWriter().write("Redis server is not ready. Please try again later.");
-//        } catch (ExpiredJwtException | SignatureException | MalformedJwtException ex) {
-//
-//            String message;
-//
-//            if (ex instanceof ExpiredJwtException) {
-//                message = "Jwt token is expired. Please login again.";
-//            } else if (ex instanceof SignatureException) {
-//                message = "Jwt token is invalid. Please check your token.";
-//            } else {
-//                message = "Jwt token is malformed. Please check your token.";
-//            }
-//            logger.error("JWT error: {}", message);
-//
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            response.setContentType("application/json");
-//
-//            ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, message);
-//            problem.setTitle("Unauthorized");
-//            problem.setInstance(URI.create(request.getRequestURI()));
-//
-//            objectMapper.writeValue(response.getWriter(), problem);
-//
-//        }
-
     }
 
 

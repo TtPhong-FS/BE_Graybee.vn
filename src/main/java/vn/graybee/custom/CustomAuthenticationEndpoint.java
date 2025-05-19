@@ -17,9 +17,10 @@ public class CustomAuthenticationEndpoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-        String message = "Full authentication is required to access this resource";
 
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, message);
+        System.out.println(">> CustomAuthEntryPoint triggered: " + authException.getMessage());
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, authException.getMessage());
         problem.setTitle("Unauthorized");
         problem.setInstance(URI.create(request.getRequestURI()));
 

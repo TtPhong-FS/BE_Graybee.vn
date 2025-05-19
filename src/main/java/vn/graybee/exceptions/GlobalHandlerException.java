@@ -38,6 +38,16 @@ public class GlobalHandlerException {
     }
 
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public Map<String, String> handleGlobalException(Exception ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("error", "Đã xảy ra lỗi không mong muốn");
+        errorMap.put("message", ex.getMessage());
+        return errorMap;
+    }
+
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CustomNotFoundException.class)
     public ProblemDetail handlerResourceNotFoundException(CustomNotFoundException ex) {
