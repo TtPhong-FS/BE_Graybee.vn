@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.products.ProductSubcategory;
-import vn.graybee.response.admin.directories.subcate.SubcateDto;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
 import vn.graybee.response.admin.products.ProductSubcategoryDto;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 
@@ -21,11 +21,11 @@ public interface ProductSubcategoryRepository extends JpaRepository<ProductSubca
             " where ps.productId IN :productIds ")
     List<ProductSubcategoryDto> findSubcategoriesByProductIds(@Param("productIds") List<Long> productIds);
 
-    @Query("SELECT new vn.graybee.response.admin.directories.subcate.SubcateDto(sc.id, sc.name) " +
+    @Query("SELECT new vn.graybee.response.admin.directories.subcategory.SubcategoryDto(sc.id, sc.name) " +
             "FROM ProductSubcategory ps " +
             " inner join SubCategory sc ON ps.subcategoryId = sc.id " +
             " where ps.productId = :productId ")
-    List<SubcateDto> findSubcategoriesByProductId(@Param("productId") Long productId);
+    List<SubcategoryDto> findSubcategoriesByProductId(@Param("productId") Long productId);
 
     @Transactional
     @Modifying

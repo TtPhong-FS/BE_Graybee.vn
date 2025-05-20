@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.directories.SubCategoryTag;
-import vn.graybee.response.admin.directories.subcate.SubcategoryTagIdResponse;
-import vn.graybee.response.admin.directories.subcate.SubcategoryTagResponse;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryTagIdResponse;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryTagResponse;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
 import java.util.List;
@@ -31,10 +31,10 @@ public interface SubCategoryTagRepository extends JpaRepository<SubCategoryTag, 
     @Query("Select new vn.graybee.response.admin.directories.tag.TagResponse(t.id, t.name) from SubCategoryTag st join Tag t on st.tagId = t.id where st.subcategoryId = :subcategoryId")
     List<TagResponse> findTagsBySubCategoryId(@Param("subcategoryId") int subcategoryId);
 
-    @Query("Select new vn.graybee.response.admin.directories.subcate.SubcategoryTagIdResponse(st.subcategoryId, st.tagId) from SubCategoryTag st where st.subcategoryId = :subcategoryId and st.tagId = :tagId ")
+    @Query("Select new vn.graybee.response.admin.directories.subcategory.SubcategoryTagIdResponse(st.subcategoryId, st.tagId) from SubCategoryTag st where st.subcategoryId = :subcategoryId and st.tagId = :tagId ")
     Optional<SubcategoryTagIdResponse> findRelationsBySubcategoryIdAndTagId(@Param("subcategoryId") int subcategoryId, @Param("tagId") int tagId);
 
-    @Query("SELECT new vn.graybee.response.admin.directories.subcate.SubcategoryTagResponse(st.subcategoryId, t.id, t.name) " +
+    @Query("SELECT new vn.graybee.response.admin.directories.subcategory.SubcategoryTagResponse(st.subcategoryId, t.id, t.name) " +
             "FROM SubCategoryTag st " +
             "INNER JOIN Tag t ON st.tagId = t.id " +
             "WHERE st.subcategoryId IN :subcategoryIds ORDER BY st.subcategoryId")

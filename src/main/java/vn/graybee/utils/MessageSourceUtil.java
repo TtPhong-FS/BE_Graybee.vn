@@ -15,14 +15,12 @@ public class MessageSourceUtil {
         this.messageSource = messageSource;
     }
 
-    public String get(String baseKey, String key) {
-        String fullKey = baseKey + "." + key;
-        return messageSource.getMessage(fullKey, null, getLocale());
+    public String get(String key) {
+        return messageSource.getMessage(key, null, getLocale());
     }
 
-    public String get(String baseKey, String key, Object[] args) {
-        String fullKey = baseKey + "." + key;
-        return messageSource.getMessage(fullKey, args, getLocale());
+    public String get(String key, Object[] args) {
+        return messageSource.getMessage(key, args, getLocale());
     }
 
     public Locale getLocale() {

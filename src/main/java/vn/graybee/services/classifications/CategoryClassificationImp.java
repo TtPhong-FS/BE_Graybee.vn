@@ -46,6 +46,15 @@ public class CategoryClassificationImp implements ICategoryClassificationService
 
     }
 
+    private CategoryClassification buildClassification(Integer categoryId, Integer subId, Integer manuId) {
+        CategoryClassification cf = new CategoryClassification();
+        cf.setCategoryId(categoryId);
+        cf.setSubcategoryId(subId);
+        cf.setManufacturerId(manuId);
+        cf.setStatus(DirectoryStatus.ACTIVE);
+        return cf;
+    }
+
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void updateCategoryClassification(Integer categoryId, List<Integer> subcategoryIds, List<Integer> manufacturerIds) {
@@ -86,11 +95,9 @@ public class CategoryClassificationImp implements ICategoryClassificationService
 
         List<Integer> ids = toDelete.stream().map(CategoryClassification::getId).toList();
 
-
         if (!toDelete.isEmpty()) {
-            categoryClassificationRepository.deleteAll(toDelete);
+            categoryClassificationRepository.deleteByCategoryIdAndIds(categoryId, ids);
         }
-
 
         if (!toAdd.isEmpty()) {
             categoryClassificationRepository.saveAll(toAdd);
@@ -101,6 +108,5 @@ public class CategoryClassificationImp implements ICategoryClassificationService
         return (subId != null ? subId.toString() : "null") + "-" +
                 (manId != null ? manId.toString() : "null");
     }
-
 
 }

@@ -1,6 +1,5 @@
 package vn.graybee.services.categories;
 
-import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.requests.directories.ManufacturerCreateRequest;
@@ -16,7 +15,7 @@ public interface ManufacturerService {
 
     BasicMessageResponse<ManufacturerResponse> update(int id, ManufacturerUpdateRequest request);
 
-    BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, DirectoryStatus status);
+    BasicMessageResponse<UpdateStatusResponse> updateStatusById(int id, String status);
 
     BasicMessageResponse<ManufacturerResponse> restoreById(int id, UserPrincipal userPrincipal);
 

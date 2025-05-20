@@ -3,32 +3,31 @@ package vn.graybee.requests.directories;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CategoryCreateRequest {
 
-    @NotBlank(message = "Không được để trống")
-    @Size(max = 35, message = "Độ dài không được vượt quá 35 ký tự")
+    @NotBlank(message = "{category.name.not_blank}")
+    @Size(min = 2, max = 35, message = "{category.name.size}")
     private String name;
 
-    private List<Integer> subcategories;
+    private List<String> subcategories;
 
-    private List<Integer> manufacturers;
+    private List<String> manufacturers;
 
-    public List<Integer> getManufacturers() {
-        return manufacturers != null ? manufacturers : Collections.emptyList();
+    public List<String> getManufacturers() {
+        return manufacturers;
     }
 
-    public void setManufacturers(List<Integer> manufacturers) {
+    public void setManufacturers(List<String> manufacturers) {
         this.manufacturers = manufacturers;
     }
 
-    public List<Integer> getSubcategories() {
-        return subcategories != null ? subcategories : Collections.emptyList();
+    public List<String> getSubcategories() {
+        return subcategories;
     }
 
-    public void setSubcategories(List<Integer> subcategories) {
+    public void setSubcategories(List<String> subcategories) {
         this.subcategories = subcategories;
     }
 

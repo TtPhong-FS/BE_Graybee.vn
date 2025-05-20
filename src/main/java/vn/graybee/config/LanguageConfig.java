@@ -18,7 +18,8 @@ public class LanguageConfig {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasenames(
                 "i18n/taxonomy",
-                "i18n/product"
+                "i18n/product",
+                "i18n/common"
         ); // tên file base
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;

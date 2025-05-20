@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class IProductServiceImplPublic implements IProductServicePublic {
+public class ProductServiceImplPublic implements IProductServicePublic {
 
     private static final String PRODUCT_DETAIL_KEY = "product:detail:";
 
@@ -55,7 +55,7 @@ public class IProductServiceImplPublic implements IProductServicePublic {
 
     private final RedisProductService redisProductService;
 
-    public IProductServiceImplPublic(List<DetailFetcher> detailFetchers, ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
+    public ProductServiceImplPublic(List<DetailFetcher> detailFetchers, ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
         this.detailFetchers = detailFetchers;
         this.productRepository = productRepository;
         this.favouriteRepository = favouriteRepository;

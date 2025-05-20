@@ -7,9 +7,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.models.directories.SubCategory;
-import vn.graybee.response.admin.directories.subcate.SubCategoryResponse;
-import vn.graybee.response.admin.directories.subcate.SubcateDto;
-import vn.graybee.response.publics.sidebar.SubcategoryDto;
+import vn.graybee.response.admin.directories.subcategory.SubCategoryResponse;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,7 @@ import java.util.Set;
 
 public interface SubCategoryRepository extends JpaRepository<SubCategory, Integer> {
 
-    @Query("SELECT new vn.graybee.response.admin.directories.subcate.SubCategoryResponse(s, null) from SubCategory s")
+    @Query("SELECT new vn.graybee.response.admin.directories.subcategory.SubCategoryResponse(s, null) from SubCategory s")
     List<SubCategoryResponse> fetchAll();
 
     @Transactional
@@ -36,7 +35,7 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
     @Query("Select s.id from SubCategory s where s.id = :id ")
     Optional<Integer> checkExistsById(@Param("id") int id);
 
-    @Query("Select new vn.graybee.response.admin.directories.subcate.SubCategoryResponse(s, null) from SubCategory s where s.id = :id ")
+    @Query("Select new vn.graybee.response.admin.directories.subcategory.SubCategoryResponse(s, null) from SubCategory s where s.id = :id ")
     Optional<SubCategoryResponse> getById(@Param("id") int id);
 
     @Query("Select s.name from SubCategory s where s.name = :name ")
@@ -45,11 +44,14 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Intege
     @Query("Select s.id from SubCategory s where s.id IN :ids and s.status != 'DELETED' ")
     Set<Integer> findAllByIds(@Param("ids") List<Integer> ids);
 
-    @Query("Select new vn.graybee.response.admin.directories.subcate.SubcateDto(s.id, s.name) from SubCategory s where s.id IN :ids and s.status != 'DELETED' ")
-    List<SubcateDto> findByIds(@Param("ids") List<Integer> ids);
+    @Query("SELECT new vn.graybee.response.admin.directories.subcategory.SubcategoryDto(s.id, s.name) " +
+            "FROM SubCategory s " +
+            "WHERE s.name IN :names AND s.status = :status")
+    List<SubcategoryDto> findByNamesAndStatus(@Param("names") List<String> names, @Param("status") DirectoryStatus status);
+
 
     //    Public
     @Query("SELECT new vn.graybee.response.publics.sidebar.SubcategoryDto(s.id, s.name) from SubCategory s")
-    List<SubcategoryDto> getAllForSidebar();
+    List<vn.graybee.response.publics.sidebar.SubcategoryDto> getAllForSidebar();
 
 }

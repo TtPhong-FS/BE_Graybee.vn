@@ -1,6 +1,5 @@
 package vn.graybee.services.products;
 
-import vn.graybee.enums.ProductStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
 import vn.graybee.models.users.UserPrincipal;
@@ -34,11 +33,7 @@ public interface IProductServiceAdmin {
 
     BasicMessageResponse<ProductUpdateResponse> getById(long id);
 
-    void updateProductCountCategory(int CategoryId, boolean isIncrease);
-
-    void updateProductCountManufacturer(int ManufacturerId, boolean isIncrease);
-
-    BasicMessageResponse<ProductStatusResponse> updateStatus(long id, ProductStatus status);
+    BasicMessageResponse<ProductStatusResponse> updateStatus(long id, String status);
 
     BasicMessageResponse<ProductResponse> restoreProduct(long id, UserPrincipal userPrincipal);
 

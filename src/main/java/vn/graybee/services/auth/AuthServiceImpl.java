@@ -88,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
         int roleId = roleRepository.getIdByRoleCustomer()
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.role_does_not_exists));
 
-        int uid = CodeGenerator.generateUid();
+        Integer uid = Integer.valueOf(CodeGenerator.generateCode(6, CodeGenerator.DIGITS));
 
         User user = new User();
 
@@ -166,7 +166,7 @@ public class AuthServiceImpl implements AuthService {
 
 
         Integer userId = userRepository.getIdByEmail(email).orElseThrow(() -> new BusinessCustomException(ConstantUser.email, ConstantUser.email_invalid));
-        int otp = CodeGenerator.generateOtp();
+        Integer otp = Integer.valueOf(CodeGenerator.generateCode(6, CodeGenerator.DIGITS));
 
         MailBody mailBody = new MailBody(
                 email,

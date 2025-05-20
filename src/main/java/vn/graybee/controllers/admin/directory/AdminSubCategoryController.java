@@ -16,8 +16,8 @@ import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.directories.SubCategoryCreateRequest;
 import vn.graybee.requests.directories.SubCategoryUpdateRequest;
 import vn.graybee.response.admin.directories.general.UpdateStatusResponse;
-import vn.graybee.response.admin.directories.subcate.SubCategoryResponse;
-import vn.graybee.response.admin.directories.subcate.SubcategoryTagIdResponse;
+import vn.graybee.response.admin.directories.subcategory.SubCategoryResponse;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryTagIdResponse;
 import vn.graybee.services.categories.SubCategoryServices;
 
 import java.util.List;

@@ -42,7 +42,7 @@ import vn.graybee.requests.products.ProductRelationUpdateRequest;
 import vn.graybee.requests.products.ProductUpdateRequest;
 import vn.graybee.response.admin.directories.category.CategoryStatusDto;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerStatusDto;
-import vn.graybee.response.admin.directories.subcate.SubcateDto;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
 import vn.graybee.response.admin.products.ProductQuantityResponse;
@@ -53,6 +53,7 @@ import vn.graybee.response.admin.products.ProductSubcategoryDto;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
 import vn.graybee.response.admin.products.ProductTagDto;
 import vn.graybee.response.admin.products.ProductUpdateResponse;
+import vn.graybee.utils.MessageSourceUtil;
 import vn.graybee.utils.TextUtils;
 
 import java.math.BigDecimal;
@@ -67,9 +68,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class IProductServiceImplAdmin implements IProductServiceAdmin {
+public class ProductServiceImplAdmin implements IProductServiceAdmin {
 
     private static final String PRODUCT_DETAIL_KEY = "product:detail:";
+
+    private static final Set<ProductStatus> INVALID_PUBLISH_TARGET_STATUSES = Set.of(
+            ProductStatus.DRAFT,
+            ProductStatus.REMOVED,
+            ProductStatus.COMING_SOON,
+            ProductStatus.DELETED,
+            ProductStatus.PENDING
+    );
+
+    private static final Set<ProductStatus> CONDITIONAL_PUBLISHABLE_STATUSES = Set.of(
+            ProductStatus.OUT_OF_STOCK,
+            ProductStatus.COMING_SOON,
+            ProductStatus.PENDING
+    );
+
+    private final MessageSourceUtil messageSourceUtil;
 
     private final ProductDocumentService productDocumentService;
 
@@ -99,7 +116,8 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
 
     private final RedisProductService redisProductService;
 
-    public IProductServiceImplAdmin(ProductDocumentService productDocumentService, ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductStatisticRepository productStatisticRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository, RedisProductService redisProductService) {
+    public ProductServiceImplAdmin(MessageSourceUtil messageSourceUtil, ProductDocumentService productDocumentService, ProductDescriptionRepository productDescriptionRepository, TagRepository tagRepository, SubCategoryRepository subCategoryRepository, ProductStatisticRepository productStatisticRepository, ProductSubcategoryRepository productSubcategoryRepository, InventoryRepository inventoryRepository, ProductTagRepository productTagRepository, ProductCodeGenerator codeGenerator, ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, ManufacturerRepository manufacturerRepository, RedisProductService redisProductService) {
+        this.messageSourceUtil = messageSourceUtil;
         this.productDocumentService = productDocumentService;
         this.productDescriptionRepository = productDescriptionRepository;
         this.tagRepository = tagRepository;
@@ -463,12 +481,12 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
             throw new BusinessCustomException(ConstantTag.tags, ConstantTag.does_not_exists);
         }
 
-        List<SubcateDto> subcategories = subCategoryRepository.findByIds(request.getSubcategories());
-        Set<Integer> subcategoryIds = subcategories.stream().map(SubcateDto::getId).collect(Collectors.toSet());
-
-        if (!subcategoryIds.containsAll(request.getSubcategories())) {
-            throw new BusinessCustomException(ConstantSubcategory.subcategories, ConstantSubcategory.does_not_exists);
-        }
+//        List<SubcategoryDto> subcategories = subCategoryRepository.findByIds(request.getSubcategories());
+//        Set<Integer> subcategoryIds = subcategories.stream().map(SubcategoryDto::getId).collect(Collectors.toSet());
+//
+//        if (!subcategoryIds.containsAll(request.getSubcategories())) {
+//            throw new BusinessCustomException(ConstantSubcategory.subcategories, ConstantSubcategory.does_not_exists);
+//        }
 
         if (request.getSubcategories() != null && !request.getSubcategories().isEmpty()) {
 
@@ -508,7 +526,7 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         ProductSubcategoryAndTagResponse response = new ProductSubcategoryAndTagResponse();
         response.setId(id);
         response.setTags(tags);
-        response.setSubcategories(subcategories);
+//        response.setSubcategories(subcategories);
 
         return new BasicMessageResponse<>(200, ConstantProduct.success_update_relation, response);
     }
@@ -585,9 +603,9 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         List<ProductTagDto> productTags = productTagRepository.findTagsByProductIds(productIds);
         List<ProductSubcategoryDto> productSubcategories = productSubcategoryRepository.findSubcategoriesByProductIds(productIds);
 
-        Map<Long, List<SubcateDto>> productSubcategoryMap = productSubcategories
+        Map<Long, List<SubcategoryDto>> productSubcategoryMap = productSubcategories
                 .stream()
-                .collect(Collectors.groupingBy(ProductSubcategoryDto::getProductId, Collectors.mapping(s -> new SubcateDto(s.getId(), s.getName()), Collectors.toList())));
+                .collect(Collectors.groupingBy(ProductSubcategoryDto::getProductId, Collectors.mapping(s -> new SubcategoryDto(s.getId(), s.getName()), Collectors.toList())));
 
         Map<Long, List<TagResponse>> productTagMap = productTags.stream()
                 .collect(Collectors.groupingBy(
@@ -610,7 +628,7 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
                 .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantProduct.does_not_exists));
 
         List<TagResponse> tagResponses = productTagRepository.getTagsByProductId(response.getId());
-        List<SubcateDto> subcategories = productSubcategoryRepository.findSubcategoriesByProductId(response.getId());
+        List<SubcategoryDto> subcategories = productSubcategoryRepository.findSubcategoriesByProductId(response.getId());
         List<String> images = productImageRepository.findImageUrlsByProductId(response.getId());
 
         response.setSubcategories(subcategories);
@@ -620,8 +638,6 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         return new BasicMessageResponse<>(200, ConstantProduct.success_find_by_id, response);
     }
 
-
-    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void updateProductCountCategory(int categoryId, boolean isIncrease) {
         if (isIncrease) {
@@ -631,7 +647,6 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
         }
     }
 
-    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void updateProductCountManufacturer(int manufacturerId, boolean isIncrease) {
         if (isIncrease) {
@@ -649,38 +664,44 @@ public class IProductServiceImplAdmin implements IProductServiceAdmin {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ProductStatusResponse> updateStatus(long id, ProductStatus status) {
+    public BasicMessageResponse<ProductStatusResponse> updateStatus(long id, String status) {
+
+        ProductStatus newStatus = ProductStatus.getStatus(status, messageSourceUtil);
 
         checkExistById(id);
 
         ProductStatus currentStatus = productRepository.findStatusById(id);
 
-        if (currentStatus == ProductStatus.REMOVED && status == ProductStatus.DELETED) {
-            return updateStatus(id, status, ConstantProduct.success_in_deleted);
+        if (currentStatus == newStatus) {
+            return new BasicMessageResponse<>(200, messageSourceUtil.get("product.status.not_changed"), null);
+        }
+
+        if (currentStatus == ProductStatus.REMOVED && newStatus == ProductStatus.DELETED) {
+            return updateStatus(id, newStatus, messageSourceUtil.get("product.success_delete"));
         }
 
         if (currentStatus == ProductStatus.REMOVED) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.removed);
+            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.removed"));
         }
 
         if (currentStatus == ProductStatus.DELETED) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.soft_delete);
+            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.soft_delete"));
         }
 
-        if (Set.of(ProductStatus.DRAFT, ProductStatus.REMOVED, ProductStatus.COMING_SOON, ProductStatus.DELETED, ProductStatus.PENDING).contains(status) && currentStatus == ProductStatus.PUBLISHED) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.published + status.getDisplayName());
+        if (INVALID_PUBLISH_TARGET_STATUSES.contains(newStatus) && currentStatus == ProductStatus.PUBLISHED) {
+            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.published", new Object[]{newStatus.getDisplayName()}));
         }
 
-        if (Set.of(ProductStatus.OUT_OF_STOCK, ProductStatus.COMING_SOON, ProductStatus.PENDING).contains(currentStatus) &&
-                status == ProductStatus.PUBLISHED) {
-            return updateStatus(id, status, ConstantProduct.success_published);
+        if (CONDITIONAL_PUBLISHABLE_STATUSES.contains(currentStatus) &&
+                newStatus == ProductStatus.PUBLISHED) {
+            return updateStatus(id, newStatus, messageSourceUtil.get("product.success_published"));
         }
 
-        if (status == ProductStatus.PUBLISHED) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantProduct.pending_to_published);
+        if (newStatus == ProductStatus.PUBLISHED) {
+            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.pending_to_published"));
         }
 
-        throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid);
+        throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("common.status.invalid", new Object[]{newStatus.getCode()}));
     }
 
     @Override

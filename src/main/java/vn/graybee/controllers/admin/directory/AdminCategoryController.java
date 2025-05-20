@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.models.users.UserPrincipal;
 import vn.graybee.requests.directories.CategoryCreateRequest;
@@ -59,18 +58,18 @@ public class AdminCategoryController {
         return ResponseEntity.ok(categoryService.delete(id));
     }
 
-    @DeleteMapping("/delete-by-ids")
+    @DeleteMapping("/{ids}")
     public ResponseEntity<BasicMessageResponse<List<Integer>>> deleteByIds(@RequestParam("ids") List<Integer> ids) {
         return ResponseEntity.ok(categoryService.deleteByIds(ids));
     }
 
-    @DeleteMapping("/manufacturers/delete")
-    public ResponseEntity<BasicMessageResponse<CategoryManufacturerIdResponse>> deleteRelationManufacturer(@RequestParam("categoryId") int categoryId, @RequestParam("manufacturerId") int manufacturerId) {
+    @DeleteMapping("/{categoryId}/{manufacturerId}")
+    public ResponseEntity<BasicMessageResponse<CategoryManufacturerIdResponse>> deleteRelationManufacturer(@PathVariable("categoryId") Integer categoryId, @PathVariable("manufacturerId") Integer manufacturerId) {
         return ResponseEntity.ok(categoryService.deleteRelationByCategoryIdAndManufacturerId(categoryId, manufacturerId));
     }
 
-    @DeleteMapping("/subcategories/delete")
-    public ResponseEntity<BasicMessageResponse<CategorySubcategoryIdResponse>> deleteRelationSubcategory(@RequestParam("categoryId") int categoryId, @RequestParam("subcategoryId") int subcategoryId) {
+    @DeleteMapping("/{categoryId}/{subcategoryId}")
+    public ResponseEntity<BasicMessageResponse<CategorySubcategoryIdResponse>> deleteRelationSubcategory(@PathVariable("categoryId") Integer categoryId, @PathVariable("subcategoryId") Integer subcategoryId) {
         return ResponseEntity.ok(categoryService.deleteRelationBySubcategoryByCategoryId(categoryId, subcategoryId));
     }
 
@@ -79,13 +78,13 @@ public class AdminCategoryController {
         return ResponseEntity.ok(categoryService.update(id, request));
     }
 
-    @PutMapping("/update/status")
-    public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatusById(@RequestParam("id") int id, @RequestParam("status") DirectoryStatus status) {
+    @PutMapping("/{id}/{status}")
+    public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatusById(@PathVariable("id") Integer id, @PathVariable("status") String status) {
         return ResponseEntity.ok(categoryService.updateStatusById(id, status));
     }
 
-    @PutMapping("/restore/{id}")
-    public ResponseEntity<BasicMessageResponse<CategoryResponse>> updateStatusById(@PathVariable("id") int id, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<BasicMessageResponse<CategoryResponse>> updateStatusById(@PathVariable("id") Integer id, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(categoryService.restoreById(id, userPrincipal));
     }
 

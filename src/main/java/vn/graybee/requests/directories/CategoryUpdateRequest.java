@@ -2,47 +2,39 @@ package vn.graybee.requests.directories;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import vn.graybee.constants.ConstantGeneral;
-import vn.graybee.enums.DirectoryStatus;
-import vn.graybee.exceptions.BusinessCustomException;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CategoryUpdateRequest {
 
-    @NotBlank(message = "Không được để trống")
-    @Size(max = 35, message = "Độ dài không được vượt quá 35 ký tự")
+    @NotBlank(message = "{category.name.not_blank}")
+    @Size(min = 2, max = 35, message = "{category.name.size}")
     private String name;
 
-    @NotBlank(message = "Trạng thái không được để trống")
+    @NotBlank(message = "{common.status.not_blank}")
     private String status;
 
-    private List<Integer> subcategories;
+    private List<String> subcategories;
 
-    private List<Integer> manufacturers;
+    private List<String> manufacturers;
 
-    public DirectoryStatus getEnumStatus() {
-        try {
-            return DirectoryStatus.valueOf(status.toUpperCase());
-        } catch (Exception e) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid);
-        }
+
+    public CategoryUpdateRequest() {
     }
 
-    public List<Integer> getSubcategories() {
-        return subcategories != null ? subcategories : Collections.emptyList();
+    public List<String> getSubcategories() {
+        return subcategories;
     }
 
-    public void setSubcategories(List<Integer> subcategories) {
+    public void setSubcategories(List<String> subcategories) {
         this.subcategories = subcategories;
     }
 
-    public List<Integer> getManufacturers() {
-        return manufacturers != null ? manufacturers : Collections.emptyList();
+    public List<String> getManufacturers() {
+        return manufacturers;
     }
 
-    public void setManufacturers(List<Integer> manufacturers) {
+    public void setManufacturers(List<String> manufacturers) {
         this.manufacturers = manufacturers;
     }
 

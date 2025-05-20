@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.requests.directories.ManufacturerCreateRequest;
 import vn.graybee.requests.directories.ManufacturerUpdateRequest;
@@ -39,23 +37,23 @@ public class AdminManufacturerController {
                 manufacturerService.create(request));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> update(@RequestParam("id") int id, @RequestBody @Valid ManufacturerUpdateRequest request) {
+    @PutMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> update(@PathVariable("id") Integer id, @RequestBody @Valid ManufacturerUpdateRequest request) {
         return ResponseEntity.ok(manufacturerService.update(id, request));
     }
 
-    @PutMapping("/update/status")
-    public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatusById(@RequestParam("id") int id, @RequestParam("status") DirectoryStatus status) {
+    @PutMapping("/{id}/{status}")
+    public ResponseEntity<BasicMessageResponse<UpdateStatusResponse>> updateStatusById(@PathVariable("id") Integer id, @PathVariable("status") String status) {
         return ResponseEntity.ok(manufacturerService.updateStatusById(id, status));
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<BasicMessageResponse<Integer>> delete(@RequestParam("id") int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Integer>> delete(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(manufacturerService.delete(id));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> findById(@PathVariable("id") int id) {
+    public ResponseEntity<BasicMessageResponse<ManufacturerResponse>> findById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(manufacturerService.findById(id));
     }
 

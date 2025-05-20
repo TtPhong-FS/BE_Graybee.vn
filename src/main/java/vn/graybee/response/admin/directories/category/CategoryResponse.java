@@ -2,8 +2,8 @@ package vn.graybee.response.admin.directories.category;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import vn.graybee.models.directories.Category;
-import vn.graybee.response.admin.directories.manufacturer.ManuDto;
-import vn.graybee.response.admin.directories.subcate.SubcateDto;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerDto;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
 import vn.graybee.response.admin.products.StatusResponse;
 
 import java.time.LocalDateTime;
@@ -15,9 +15,9 @@ public class CategoryResponse {
 
     private String name;
 
-    private List<SubcateDto> subcategories;
+    private List<SubcategoryDto> subcategories;
 
-    private List<ManuDto> manufacturers;
+    private List<ManufacturerDto> manufacturers;
 
     private StatusResponse status;
 
@@ -55,19 +55,19 @@ public class CategoryResponse {
         this.updatedAt = updatedAt;
     }
 
-    public List<SubcateDto> getSubcategories() {
+    public List<SubcategoryDto> getSubcategories() {
         return subcategories;
     }
 
-    public void setSubcategories(List<SubcateDto> subcategories) {
+    public void setSubcategories(List<SubcategoryDto> subcategories) {
         this.subcategories = subcategories;
     }
 
-    public List<ManuDto> getManufacturers() {
+    public List<ManufacturerDto> getManufacturers() {
         return manufacturers;
     }
 
-    public void setManufacturers(List<ManuDto> manufacturers) {
+    public void setManufacturers(List<ManufacturerDto> manufacturers) {
         this.manufacturers = manufacturers;
     }
 

@@ -1,6 +1,6 @@
 package vn.graybee.response.publics.sidebar;
 
-import vn.graybee.response.admin.directories.manufacturer.ManuDto;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerDto;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +11,7 @@ public class SidebarDto {
 
     private String name;
 
-    private List<ManuDto> manufacturers;
+    private List<ManufacturerDto> manufacturers;
 
     private List<SubcategoryDto> subcategories;
 
@@ -39,11 +39,11 @@ public class SidebarDto {
         this.name = name;
     }
 
-    public List<ManuDto> getManufacturers() {
+    public List<ManufacturerDto> getManufacturers() {
         return manufacturers != null ? manufacturers : Collections.emptyList();
     }
 
-    public void setManufacturers(List<ManuDto> manufacturers) {
+    public void setManufacturers(List<ManufacturerDto> manufacturers) {
         this.manufacturers = manufacturers;
     }
 

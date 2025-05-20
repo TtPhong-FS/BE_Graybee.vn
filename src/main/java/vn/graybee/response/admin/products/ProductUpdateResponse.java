@@ -2,7 +2,7 @@ package vn.graybee.response.admin.products;
 
 import vn.graybee.enums.ProductStatus;
 import vn.graybee.models.products.Product;
-import vn.graybee.response.admin.directories.subcate.SubcateDto;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
 import vn.graybee.response.admin.directories.tag.TagResponse;
 
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ public class ProductUpdateResponse {
 
     private List<TagResponse> tags;
 
-    private List<SubcateDto> subcategories;
+    private List<SubcategoryDto> subcategories;
 
     private String name;
 
@@ -122,11 +122,11 @@ public class ProductUpdateResponse {
         this.tags = tags;
     }
 
-    public List<SubcateDto> getSubcategories() {
+    public List<SubcategoryDto> getSubcategories() {
         return subcategories;
     }
 
-    public void setSubcategories(List<SubcateDto> subcategories) {
+    public void setSubcategories(List<SubcategoryDto> subcategories) {
         this.subcategories = subcategories;
     }
 

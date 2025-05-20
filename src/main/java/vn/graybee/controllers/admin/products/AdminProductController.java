@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import vn.graybee.enums.ProductStatus;
 import vn.graybee.messages.BasicMessageResponse;
 import vn.graybee.messages.MessageResponse;
 import vn.graybee.models.users.UserPrincipal;
@@ -51,13 +50,13 @@ public class AdminProductController {
         return ResponseEntity.ok(iProductServiceAdmin.create(request));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<ProductResponse>> update(@RequestParam("id") long id, @RequestBody @Valid ProductUpdateRequest request) {
+    @PutMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<ProductResponse>> update(@PathVariable("id") long id, @RequestBody @Valid ProductUpdateRequest request) {
         return ResponseEntity.ok(iProductServiceAdmin.update(id, request));
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<BasicMessageResponse<Long>> delete(@RequestParam("id") long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Long>> delete(@PathVariable("id") long id) {
         return ResponseEntity.ok(iProductServiceAdmin.delete(id));
     }
 
@@ -79,8 +78,8 @@ public class AdminProductController {
         return ResponseEntity.ok(iProductServiceAdmin.fetchAll(status, category, manufacturer, page, size, sortBy, order));
     }
 
-    @PutMapping("/update/status/{id}/{status}")
-    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@PathVariable("id") long id, @PathVariable("status") ProductStatus status) {
+    @PutMapping("/{id}/{status}")
+    public ResponseEntity<BasicMessageResponse<ProductStatusResponse>> updateStatusById(@PathVariable("id") long id, @PathVariable("status") String status) {
         return ResponseEntity.ok(iProductServiceAdmin.updateStatus(id, status));
     }
 
@@ -96,27 +95,26 @@ public class AdminProductController {
 
 //    subcategory - tag - product
 
-    @GetMapping("/subcategories&tags")
+    @GetMapping("/subcategories-tags")
     public ResponseEntity<BasicMessageResponse<List<ProductSubcategoryAndTagResponse>>> fetchProductsWithSubcategoriesAndTags() {
         return ResponseEntity.ok(iProductServiceAdmin.fetchAllWithSubcategoriesAndTags());
     }
 
-    @PutMapping("/update/relation")
-    public ResponseEntity<BasicMessageResponse<ProductSubcategoryAndTagResponse>> updateSubcategoriesAndTags(@RequestParam("id") long id, @RequestBody ProductRelationUpdateRequest request) {
+    @PutMapping("/{id}/classification")
+    public ResponseEntity<BasicMessageResponse<ProductSubcategoryAndTagResponse>> updateSubcategoriesAndTags(@PathVariable("id") long id, @RequestBody ProductRelationUpdateRequest request) {
         return ResponseEntity.ok(iProductServiceAdmin.updateSubcategoriesAndTagIds(id, request));
     }
 
-
     //    Subcategory - Product
-    @DeleteMapping("/subcategories/delete")
-    public ResponseEntity<BasicMessageResponse<ProductSubcategoryIDResponse>> deleteRelationByProductIdAndSubcategoryId(@RequestParam("productId") long productId, @RequestParam("subcategoryId") int subcategoryId) {
-        return ResponseEntity.ok(iProductServiceAdmin.deleteRelationByProductIdAndSubcategoryId(productId, subcategoryId));
+    @DeleteMapping("/{id}/classification/{subcategoryId}")
+    public ResponseEntity<BasicMessageResponse<ProductSubcategoryIDResponse>> deleteRelationByProductIdAndSubcategoryId(@PathVariable("id") long id, @PathVariable("subcategoryId") int subcategoryId) {
+        return ResponseEntity.ok(iProductServiceAdmin.deleteRelationByProductIdAndSubcategoryId(id, subcategoryId));
     }
 
     //    Tag - Product
-    @DeleteMapping("/tags/delete")
-    public ResponseEntity<BasicMessageResponse<ProductIdAndTagIdResponse>> deleteRelationByProductIdAndTagId(@RequestParam("productId") long productId, @RequestParam("tagId") int tagId) {
-        return ResponseEntity.ok(iProductServiceAdmin.deleteRelationByProductIdAndTagId(productId, tagId));
+    @DeleteMapping("/{id}/classification/{tagId}")
+    public ResponseEntity<BasicMessageResponse<ProductIdAndTagIdResponse>> deleteRelationByProductIdAndTagId(@PathVariable("id") long id, @PathVariable("tagId") int tagId) {
+        return ResponseEntity.ok(iProductServiceAdmin.deleteRelationByProductIdAndTagId(id, tagId));
     }
 
 }

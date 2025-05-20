@@ -1,4 +1,4 @@
-package vn.graybee.response.admin.directories.subcate;
+package vn.graybee.response.admin.directories.subcategory;
 
 public class SubcategoryTagIdResponse {
 

@@ -129,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
             delivery.setDeliveryStatus(DeliveryStatus.DELIVERED);
         } else {
             delivery.setDeliveryStatus(DeliveryStatus.PENDING);
-            delivery.setTrackingNumber(CodeGenerator.trackingGenerate());
+            delivery.setTrackingNumber(CodeGenerator.generateCode(12, CodeGenerator.ALPHANUMERIC.toUpperCase()));
         }
         delivery.setShippingAddress(
                 AddressUtil.formatFullAddress(address.getStreetAddress(), address.getCommune(), address.getDistrict(), address.getCity())

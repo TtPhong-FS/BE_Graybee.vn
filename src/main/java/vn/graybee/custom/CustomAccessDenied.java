@@ -9,12 +9,19 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
+import vn.graybee.utils.MessageSourceUtil;
 
 import java.io.IOException;
 import java.net.URI;
 
 @Component
 public class CustomAccessDenied implements AccessDeniedHandler {
+
+    private final MessageSourceUtil messageSourceUtil;
+
+    public CustomAccessDenied(MessageSourceUtil messageSourceUtil) {
+        this.messageSourceUtil = messageSourceUtil;
+    }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
@@ -26,8 +33,8 @@ public class CustomAccessDenied implements AccessDeniedHandler {
                 HttpStatus.FORBIDDEN,
                 message
         );
-        problem.setTitle("Forbidden");
-        problem.setDetail("You don't have permission to access this point");
+        problem.setTitle(messageSourceUtil.get("error.403.title"));
+        problem.setDetail(messageSourceUtil.get("error.403.detail"));
         problem.setInstance(URI.create(request.getRequestURI()));
 
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

@@ -9,7 +9,6 @@ public class TextUtils {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    // Viết hoa chữ cái đầu tiên của từng từ trong chuỗi
     public static String capitalizeEachWord(String str) {
         if (str == null || str.isEmpty()) {
             return str;

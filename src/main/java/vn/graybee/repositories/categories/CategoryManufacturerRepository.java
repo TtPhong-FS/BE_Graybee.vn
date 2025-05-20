@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.directories.CategoryManufacturer;
 import vn.graybee.response.admin.directories.category.CategoryManuDto;
 import vn.graybee.response.admin.directories.category.CategoryManufacturerIdResponse;
-import vn.graybee.response.admin.directories.manufacturer.ManuDto;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +21,8 @@ public interface CategoryManufacturerRepository extends JpaRepository<CategoryMa
             "WHERE cm.categoryId IN :categoryIds ORDER BY cm.categoryId")
     List<CategoryManuDto> findManufacturersByCategoryId_ADMIN(@Param("categoryIds") List<Integer> categoryIds);
 
-    @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManuDto(m.id, m.name) from CategoryManufacturer cm join Manufacturer m on cm.manufacturerId = m.id where cm.categoryId = :categoryId order by m.id asc")
-    List<ManuDto> findByCategoryId(@Param("categoryId") int categoryId);
+    @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManufacturerDto(m.id, m.name) from CategoryManufacturer cm join Manufacturer m on cm.manufacturerId = m.id where cm.categoryId = :categoryId order by m.id asc")
+    List<ManufacturerDto> findByCategoryId(@Param("categoryId") int categoryId);
 
     @Transactional
     @Modifying

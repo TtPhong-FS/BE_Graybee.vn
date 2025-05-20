@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.enums.DirectoryStatus;
 import vn.graybee.models.directories.Manufacturer;
-import vn.graybee.response.admin.directories.manufacturer.ManuDto;
+import vn.graybee.response.admin.directories.manufacturer.ManufacturerDto;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerResponse;
 import vn.graybee.response.admin.directories.manufacturer.ManufacturerStatusDto;
 
@@ -33,13 +33,13 @@ public interface ManufacturerRepository extends JpaRepository<Manufacturer, Inte
     @Query("SELECT EXISTS (SELECT 1 FROM Manufacturer m WHERE m.name = :name AND m.id <> :id)")
     boolean existsByNameAndNotId(@Param("name") String name, @Param("id") int id);
 
-    @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManuDto(m.id, m.name) from Manufacturer m where m.id In :manuIds ")
-    List<ManuDto> findByIds(@Param("manuIds") List<Integer> manuIds);
+    @Query("Select new vn.graybee.response.admin.directories.manufacturer.ManufacturerDto(m.id, m.name) from Manufacturer m where m.name In :names and m.status = :status ")
+    List<ManufacturerDto> findByNamesAndStatus(@Param("names") List<String> names, @Param("status") DirectoryStatus status);
 
     @Query("Select m.name from Manufacturer m where m.id = :manufacturerId and m.status != 'DELETED'")
     Optional<String> getNameById(@Param("manufacturerId") int manufacturerId);
 
-    @Query("Select m.productCount from Manufacturer m where m.id = :id ")
+    @Query("Select COALESCE(m.productCount, 0) from Manufacturer m where m.id = :id ")
     Optional<Integer> getProductCountById(int id);
 
     @Transactional

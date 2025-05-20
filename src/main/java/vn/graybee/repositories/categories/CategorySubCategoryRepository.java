@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.directories.CategorySubCategory;
 import vn.graybee.response.admin.directories.category.CategorySubDto;
 import vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse;
-import vn.graybee.response.admin.directories.subcate.SubcateDto;
+import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +33,8 @@ public interface CategorySubCategoryRepository extends JpaRepository<CategorySub
     @Query("SELECT cs.subCategoryId FROM CategorySubCategory cs WHERE cs.categoryId = :categoryId")
     List<Integer> findSubcategoryIdsByCategoryId(@Param("categoryId") int categoryId);
 
-    @Query("Select new vn.graybee.response.admin.directories.subcate.SubcateDto(s.id, s.name) from CategorySubCategory cs join SubCategory s on cs.subCategoryId = s.id where cs.categoryId = :categoryId ORDER BY s.id ASC")
-    List<SubcateDto> findByCategoryId(@Param("categoryId") int categoryId);
+    @Query("Select new vn.graybee.response.admin.directories.subcategory.SubcategoryDto(s.id, s.name) from CategorySubCategory cs join SubCategory s on cs.subCategoryId = s.id where cs.categoryId = :categoryId ORDER BY s.id ASC")
+    List<SubcategoryDto> findByCategoryId(@Param("categoryId") int categoryId);
 
     @Query("Select new vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse(cs.categoryId, cs.subCategoryId) from CategorySubCategory cs where cs.categoryId =:categoryId and cs.subCategoryId = :subCategoryId ")
     Optional<CategorySubcategoryIdResponse> findSubcategoryIdWithCategoryId(@Param("categoryId") int categoryId, @Param("subCategoryId") int subCategoryId);

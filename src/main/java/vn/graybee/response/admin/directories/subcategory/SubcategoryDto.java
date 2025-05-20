@@ -1,15 +1,15 @@
-package vn.graybee.response.admin.directories.manufacturer;
+package vn.graybee.response.admin.directories.subcategory;
 
-public class ManuDto {
+public class SubcategoryDto {
 
     private int id;
 
     private String name;
 
-    public ManuDto() {
+    public SubcategoryDto() {
     }
 
-    public ManuDto(int id, String name) {
+    public SubcategoryDto(int id, String name) {
         this.id = id;
         this.name = name;
     }

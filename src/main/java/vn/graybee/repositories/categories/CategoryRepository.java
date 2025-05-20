@@ -43,7 +43,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("Select new vn.graybee.response.admin.directories.category.CategoryResponse(c) from Category c where c.id = :id ")
     Optional<CategoryResponse> getById(@Param("id") int id);
 
-    @Query("Select new vn.graybee.response.admin.directories.category.CategoryProductCountResponse(c.id, c.name, c.productCount) from Category c where c.id = :id ")
+    @Query("Select new vn.graybee.response.admin.directories.category.CategoryProductCountResponse(c.id, c.name, COALESCE(c.productCount, 0)) from Category c where c.id = :id ")
     Optional<CategoryProductCountResponse> getProductCountById(@Param("id") int id);
 
     @Query("Select c.name from Category c where c.name = :name ")
