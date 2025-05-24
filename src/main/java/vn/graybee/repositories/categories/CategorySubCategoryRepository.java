@@ -6,20 +6,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.directories.CategorySubCategory;
-import vn.graybee.response.admin.directories.category.CategorySubDto;
-import vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse;
-import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
+import vn.graybee.taxonomy.category.dto.response.CategoryIdSubcategoryIdDto;
+import vn.graybee.taxonomy.category.dto.response.CategorySubcategoryBasicDto;
+import vn.graybee.taxonomy.subcategory.dto.response.SubcategoryBasicDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CategorySubCategoryRepository extends JpaRepository<CategorySubCategory, Integer> {
 
-    @Query("SELECT new vn.graybee.response.admin.directories.category.CategorySubDto(cs.categoryId, s.id,  s.name) " +
+    @Query("SELECT new vn.graybee.taxonomy.category.dto.response.CategorySubcategoryBasicDto(cs.categoryId, s.id,  s.name) " +
             "FROM CategorySubCategory cs " +
-            "INNER JOIN SubCategory s ON cs.subCategoryId = s.id " +
+            "INNER JOIN Subcategory s ON cs.subCategoryId = s.id " +
             "WHERE cs.categoryId IN :categoryIds ORDER BY cs.categoryId")
-    List<CategorySubDto> findSubcategoriesByCategoryId_ADMIN(@Param("categoryIds") List<Integer> categoryIds);
+    List<CategorySubcategoryBasicDto> findSubcategoriesByCategoryId_ADMIN(@Param("categoryIds") List<Integer> categoryIds);
 
     @Transactional
     @Modifying
@@ -33,11 +33,11 @@ public interface CategorySubCategoryRepository extends JpaRepository<CategorySub
     @Query("SELECT cs.subCategoryId FROM CategorySubCategory cs WHERE cs.categoryId = :categoryId")
     List<Integer> findSubcategoryIdsByCategoryId(@Param("categoryId") int categoryId);
 
-    @Query("Select new vn.graybee.response.admin.directories.subcategory.SubcategoryDto(s.id, s.name) from CategorySubCategory cs join SubCategory s on cs.subCategoryId = s.id where cs.categoryId = :categoryId ORDER BY s.id ASC")
-    List<SubcategoryDto> findByCategoryId(@Param("categoryId") int categoryId);
+    @Query("Select new vn.graybee.taxonomy.subcategory.dto.response.SubcategoryBasicDto(s.id, s.name) from CategorySubCategory cs join Subcategory s on cs.subCategoryId = s.id where cs.categoryId = :categoryId ORDER BY s.id ASC")
+    List<SubcategoryBasicDto> findByCategoryId(@Param("categoryId") int categoryId);
 
-    @Query("Select new vn.graybee.response.admin.directories.category.CategorySubcategoryIdResponse(cs.categoryId, cs.subCategoryId) from CategorySubCategory cs where cs.categoryId =:categoryId and cs.subCategoryId = :subCategoryId ")
-    Optional<CategorySubcategoryIdResponse> findSubcategoryIdWithCategoryId(@Param("categoryId") int categoryId, @Param("subCategoryId") int subCategoryId);
+    @Query("Select new vn.graybee.taxonomy.category.dto.response.CategoryIdSubcategoryIdDto(cs.categoryId, cs.subCategoryId) from CategorySubCategory cs where cs.categoryId =:categoryId and cs.subCategoryId = :subCategoryId ")
+    Optional<CategoryIdSubcategoryIdDto> findSubcategoryIdWithCategoryId(@Param("categoryId") int categoryId, @Param("subCategoryId") int subCategoryId);
 
     @Query("SELECT cs.subCategoryId FROM CategorySubCategory cs WHERE cs.categoryId = :categoryId AND cs.subCategoryId IN :subCategoryIds")
     List<Integer> findExistingSubCategoryIds(@Param("categoryId") Integer categoryId, @Param("subCategoryIds") List<Integer> subCategoryIds);

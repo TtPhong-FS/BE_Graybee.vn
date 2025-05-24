@@ -1,7 +1,7 @@
 package vn.graybee.response.admin.products;
 
-import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
-import vn.graybee.response.admin.directories.tag.TagResponse;
+import vn.graybee.taxonomy.subcategory.dto.response.SubcategoryBasicDto;
+import vn.graybee.taxonomy.tag.dto.response.TagDto;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ public class ProductSubcategoryAndTagResponse {
 
     private String productCode;
 
-    private List<SubcategoryDto> subcategories;
+    private List<SubcategoryBasicDto> subcategories;
 
-    private List<TagResponse> tags;
+    private List<TagDto> tags;
 
     public ProductSubcategoryAndTagResponse() {
     }
@@ -51,19 +51,19 @@ public class ProductSubcategoryAndTagResponse {
     }
 
 
-    public List<SubcategoryDto> getSubcategories() {
+    public List<SubcategoryBasicDto> getSubcategories() {
         return subcategories;
     }
 
-    public void setSubcategories(List<SubcategoryDto> subcategories) {
+    public void setSubcategories(List<SubcategoryBasicDto> subcategories) {
         this.subcategories = subcategories;
     }
 
-    public List<TagResponse> getTags() {
+    public List<TagDto> getTags() {
         return tags;
     }
 
-    public void setTags(List<TagResponse> tags) {
+    public void setTags(List<TagDto> tags) {
         this.tags = tags;
     }
 

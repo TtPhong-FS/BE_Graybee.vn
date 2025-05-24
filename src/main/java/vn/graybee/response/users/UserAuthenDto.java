@@ -1,19 +1,21 @@
 package vn.graybee.response.users;
 
+import vn.graybee.auth.enums.Role;
+
 public class UserAuthenDto {
 
     private String password;
 
-    private String role;
+    private Role role;
 
-    private Integer uid;
+    private String uid;
 
     private boolean isActive;
 
     public UserAuthenDto() {
     }
 
-    public UserAuthenDto(String password, String role, Integer uid, boolean isActive) {
+    public UserAuthenDto(String password, Role role, String uid, boolean isActive) {
         this.password = password;
         this.role = role;
         this.uid = uid;
@@ -36,19 +38,19 @@ public class UserAuthenDto {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
-    public Integer getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public void setUid(Integer uid) {
+    public void setUid(String uid) {
         this.uid = uid;
     }
 

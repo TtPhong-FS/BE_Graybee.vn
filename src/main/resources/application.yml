@@ -67,6 +67,8 @@ logging:
       zaxxer: ERROR
 
 api:
+  public: /api/v1/public
+  auth: /api/v1/auth
   admin: /api/v1/admin
   categories: ${api.admin}/categories
   manufacturers: ${api.admin}/manufacturers
@@ -74,12 +76,14 @@ api:
   orders: ${api.admin}/orders
   tags: ${api.admin}/tags
   subcategories: ${api.admin}/subcategories
-  auth: /api/v1/auth
   account: /api/v1/account
+  cart: ${api.public}/carts
 
 
 jwt:
-  secretKey: ${SECRET_KEY}
-  expiration: ${EXPIRATION}
+  adminSecretKey: ${ADMIN_SECRET_KEY}
+  adminExpiration: ${ADMIN_EXPIRATION}
+  customerSecretKey: ${CUSTOMER_SECRET_KEY}
+  customerExpiration: ${CUSTOMER_EXPIRATION}
   header: ${HEADER}
   prefix: ${PREFIX}

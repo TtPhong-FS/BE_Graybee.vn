@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.models.products.ProductTag;
-import vn.graybee.response.admin.directories.tag.TagResponse;
 import vn.graybee.response.admin.products.ProductIdAndTagIdResponse;
 import vn.graybee.response.admin.products.ProductTagDto;
+import vn.graybee.taxonomy.tag.dto.response.TagDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +21,11 @@ public interface ProductTagRepository extends JpaRepository<ProductTag, Integer>
             "WHERE pt.productId IN :productIds ORDER BY pt.productId")
     List<ProductTagDto> findTagsByProductIds(@Param("productIds") List<Long> productIds);
 
-    @Query("SELECT new vn.graybee.response.admin.directories.tag.TagResponse(t.id, t.name) " +
+    @Query("SELECT new vn.graybee.taxonomy.tag.dto.response.TagDto(t.id, t.name) " +
             "FROM ProductTag pt " +
             "INNER JOIN Tag t ON pt.tagId = t.id " +
             "WHERE pt.productId = :productId ")
-    List<TagResponse> getTagsByProductId(@Param("productId") long productId);
+    List<TagDto> getTagsByProductId(@Param("productId") long productId);
 
     @Transactional
     @Modifying

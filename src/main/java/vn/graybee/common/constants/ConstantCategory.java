@@ -1,0 +1,48 @@
+package vn.graybee.common.constants;
+
+public class ConstantCategory {
+
+    public static final String name = "name";
+
+    public static final String categoryId = "categoryId";
+
+    public static final String categoryName = "categoryName";
+
+    public static final String manufacturer_relation_does_not_exists = "Nhà sản xuất chưa được liên kết với danh mục";
+
+    public static final String subcategory_relation_does_not_exists = "Danh mục con chưa được liên kết với danh mục";
+
+    public static final String in_removed = "Danh mục bị xoá tạm thời. Hãy khôi phục trước khi thực hiện thao tác này";
+
+    public static final String in_deleted = "Danh mục đã bị xoá. Hãy khôi phục trước khi thực hiện thao tác này";
+
+    public static final String does_not_exists = "Danh mục không tồn tại";
+
+    public static final String name_exists = "Tên danh mục đã tồn tại";
+
+    public static final String products_in_use = "Không thể thực hiện, danh mục đang được sử dụng bởi một sản phẩm";
+
+    public static final String not_removed = "Danh mục không nằm trong thùng rác. Không thể khôi phục";
+
+    //    Response
+    public static final String success_create = "Tạo danh mục thành công";
+
+    public static final String success_update = "Cập nhật danh mục thành công";
+
+    public static final String success_delete = "Xoá danh mục thành công";
+
+    public static final String success_delete_multiple = "Xoá nhiều danh mục thành công";
+
+
+    public static final String success_find_by_id = "Tìm danh mục thành công";
+
+    public static final String success_fetch_categories = "Danh sách danh mục đã được lấy thành công";
+
+    public static final String success_delete_manufacturer_relation = "Nhà sản xuất đã được loại bỏ khỏi danh mục";
+
+    public static final String success_delete_subcategory_relation = "Danh mục con đã được loại bỏ khỏi danh mục";
+
+
+    public static final String success_restore = "Khôi phục danh mục thành công";
+
+}

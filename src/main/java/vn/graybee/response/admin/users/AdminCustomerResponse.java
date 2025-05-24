@@ -27,13 +27,6 @@ public class AdminCustomerResponse {
     public AdminCustomerResponse() {
     }
 
-    public AdminCustomerResponse(int id, Integer uid, String fullName, String phoneNumber, String email) {
-        this.id = id;
-        this.uid = uid;
-        this.fullName = fullName;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-    }
 
     public String getPhoneNumber() {
         return phoneNumber;

@@ -1,7 +1,7 @@
 package vn.graybee.response.publics.products.detail;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import vn.graybee.models.products.detail.PcDetail;
+import vn.graybee.product.model.detail.PcDetail;
 import vn.graybee.response.publics.products.DetailTemplateResponse;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

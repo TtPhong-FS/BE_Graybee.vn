@@ -2,50 +2,51 @@ package vn.graybee.response.users;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import vn.graybee.account.enums.Gender;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class UserProfileResponse {
 
-    private Integer uid;
+    private String uid;
 
     private String fullName;
 
-    private String phoneNumber;
+    private String phone;
 
     private String email;
 
-    private String gender;
+    private Gender gender;
 
     @JsonFormat(pattern = "MM/dd/yyyy")
-    private LocalDate dateOfBirth;
+    private Date dateOfBirth;
 
     public UserProfileResponse() {
     }
 
-    public UserProfileResponse(Integer uid, String fullName, String phoneNumber, String email, String gender, LocalDate dateOfBirth) {
+    public UserProfileResponse(String uid, String fullName, String phone, String email, Gender gender, Date dateOfBirth) {
         this.uid = uid;
         this.fullName = fullName;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
         this.email = email;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public Integer getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public void setUid(Integer uid) {
+    public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
     public String getFullName() {
@@ -56,14 +57,6 @@ public class UserProfileResponse {
         this.fullName = fullName;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -72,11 +65,19 @@ public class UserProfileResponse {
         this.email = email;
     }
 
-    public LocalDate getDateOfBirth() {
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

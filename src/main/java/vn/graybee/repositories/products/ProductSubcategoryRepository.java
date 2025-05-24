@@ -5,10 +5,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.models.products.ProductSubcategory;
-import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
 import vn.graybee.response.admin.products.ProductSubcategoryDto;
 import vn.graybee.response.admin.products.ProductSubcategoryIDResponse;
+import vn.graybee.taxonomy.subcategory.dto.response.SubcategoryBasicDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,15 +16,15 @@ public interface ProductSubcategoryRepository extends JpaRepository<ProductSubca
 
     @Query("SELECT new vn.graybee.response.admin.products.ProductSubcategoryDto(ps.productId, sc.id,  sc.name) " +
             "FROM ProductSubcategory ps " +
-            " inner join SubCategory sc ON ps.subcategoryId = sc.id " +
+            " inner join Subcategory sc ON ps.subcategoryId = sc.id " +
             " where ps.productId IN :productIds ")
     List<ProductSubcategoryDto> findSubcategoriesByProductIds(@Param("productIds") List<Long> productIds);
 
-    @Query("SELECT new vn.graybee.response.admin.directories.subcategory.SubcategoryDto(sc.id, sc.name) " +
+    @Query("SELECT new vn.graybee.taxonomy.subcategory.dto.response.SubcategoryBasicDto(sc.id, sc.name) " +
             "FROM ProductSubcategory ps " +
-            " inner join SubCategory sc ON ps.subcategoryId = sc.id " +
+            " inner join Subcategory sc ON ps.subcategoryId = sc.id " +
             " where ps.productId = :productId ")
-    List<SubcategoryDto> findSubcategoriesByProductId(@Param("productId") Long productId);
+    List<SubcategoryBasicDto> findSubcategoriesByProductId(@Param("productId") Long productId);
 
     @Transactional
     @Modifying

@@ -1,9 +1,9 @@
 package vn.graybee.response.admin.products;
 
-import vn.graybee.enums.ProductStatus;
-import vn.graybee.models.products.Product;
-import vn.graybee.response.admin.directories.subcategory.SubcategoryDto;
-import vn.graybee.response.admin.directories.tag.TagResponse;
+import vn.graybee.product.enums.ProductStatus;
+import vn.graybee.product.model.Product;
+import vn.graybee.taxonomy.subcategory.dto.response.SubcategoryBasicDto;
+import vn.graybee.taxonomy.tag.dto.response.TagDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,9 +16,9 @@ public class ProductUpdateResponse {
 
     private int manufacturerId;
 
-    private List<TagResponse> tags;
+    private List<TagDto> tags;
 
-    private List<SubcategoryDto> subcategories;
+    private List<SubcategoryBasicDto> subcategories;
 
     private String name;
 
@@ -114,19 +114,19 @@ public class ProductUpdateResponse {
         this.manufacturerId = manufacturerId;
     }
 
-    public List<TagResponse> getTags() {
+    public List<TagDto> getTags() {
         return tags;
     }
 
-    public void setTags(List<TagResponse> tags) {
+    public void setTags(List<TagDto> tags) {
         this.tags = tags;
     }
 
-    public List<SubcategoryDto> getSubcategories() {
+    public List<SubcategoryBasicDto> getSubcategories() {
         return subcategories;
     }
 
-    public void setSubcategories(List<SubcategoryDto> subcategories) {
+    public void setSubcategories(List<SubcategoryBasicDto> subcategories) {
         this.subcategories = subcategories;
     }
 

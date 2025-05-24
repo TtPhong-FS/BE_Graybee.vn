@@ -1,7 +1,7 @@
 package vn.graybee.response.admin.products;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import vn.graybee.enums.ProductStatus;
+import vn.graybee.product.enums.ProductStatus;
 
 import java.time.LocalDateTime;
 
