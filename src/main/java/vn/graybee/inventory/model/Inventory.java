@@ -19,7 +19,8 @@ public class Inventory extends BaseModel {
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
-    private Integer quantity;
+    @Column(name = "available_quantity", nullable = false)
+    private Integer availableQuantity;
 
     @Column(name = "is_stock", insertable = false, updatable = false)
     private Boolean isStock;
@@ -51,12 +52,12 @@ public class Inventory extends BaseModel {
         this.productId = productId;
     }
 
-    public Integer getQuantity() {
-        return quantity;
+    public Integer getAvailableQuantity() {
+        return availableQuantity;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    public void setAvailableQuantity(Integer availableQuantity) {
+        this.availableQuantity = availableQuantity;
     }
 
 }

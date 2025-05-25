@@ -8,12 +8,20 @@ import java.util.List;
 
 public interface InventoryService {
 
-    BasicMessageResponse<InventoryResponse> create(InventoryRequest request);
+    BasicMessageResponse<InventoryResponse> createInventory(InventoryRequest request);
 
-    BasicMessageResponse<List<InventoryResponse>> fetchAll();
+    BasicMessageResponse<List<InventoryResponse>> getInventoryListForDashboard();
 
-    BasicMessageResponse<Integer> delete(int id);
+    BasicMessageResponse<Integer> deleteInventory(int id);
 
-    BasicMessageResponse<InventoryResponse> update(int id, InventoryRequest request);
+    BasicMessageResponse<InventoryResponse> updateInventory(int id, InventoryRequest request);
+
+    void validateStockAvailable(Long productId, int requestedQuantity);
+
+    int getAvailableStock(Long productId);
+
+    void decreaseStock(Long productId, int quantity);
+
+    void increaseStock(Long productId, int quantity);
 
 }

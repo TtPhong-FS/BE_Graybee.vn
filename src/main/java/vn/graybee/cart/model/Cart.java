@@ -1,4 +1,4 @@
-package vn.graybee.cart.entity;
+package vn.graybee.cart.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

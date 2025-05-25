@@ -21,7 +21,7 @@ import vn.graybee.auth.repository.ForgotPasswordRepository;
 import vn.graybee.auth.service.AuthService;
 import vn.graybee.auth.service.JwtService;
 import vn.graybee.auth.service.RedisAuthService;
-import vn.graybee.cart.entity.Cart;
+import vn.graybee.cart.model.Cart;
 import vn.graybee.cart.repository.CartRepository;
 import vn.graybee.common.constants.ConstantAuth;
 import vn.graybee.common.constants.ConstantProfile;

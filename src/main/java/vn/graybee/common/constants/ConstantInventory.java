@@ -14,4 +14,5 @@ public class ConstantInventory {
 
     public static final String success_create = "Tạo kho cho sản phẩm thành công";
 
+
 }

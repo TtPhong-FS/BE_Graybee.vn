@@ -261,29 +261,31 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     public BasicMessageResponse<List<CategoryDto>> fetchCategories_ADMIN() {
+//
+//        List<CategoryDto> categories = categoryRepository.fetchAll();
+//
+//        if (categories.isEmpty()) {
+//            return new BasicMessageResponse<>(200, messageSourceUtil.get("category.empty_list"), categories);
+//        }
+//
+//        List<Integer> categoryIds = categories.stream().map(CategoryDto::getId).toList();
+//        List<CategoryManufacturerBasicDto> categoryManufacturer = categoryManufacturerRepository.findManufacturersByCategoryId_ADMIN(categoryIds);
+//        List<CategorySubcategoryBasicDto> categorySubcategory = categorySubCategoryRepository.findSubcategoriesByCategoryId_ADMIN(categoryIds);
+//
+//        Map<Integer, List<ManufacturerBasicDto>> CateManuMap = categoryManufacturer.stream()
+//                .collect(Collectors.groupingBy(CategoryManufacturerBasicDto::getCategoryId, Collectors.mapping(manufacturer -> new ManufacturerBasicDto(manufacturer.getManufacturerId(), manufacturer.getManufacturerName()), Collectors.toList())));
+//
+//        Map<Integer, List<SubcategoryBasicDto>> CateSubMap = categorySubcategory.stream()
+//                .collect(Collectors.groupingBy(CategorySubcategoryBasicDto::getCategoryId, Collectors.mapping(subcategory -> new SubcategoryBasicDto(subcategory.getSubCategoryId(), subcategory.getSubcategoryName()), Collectors.toList())));
+//
+//        categories.forEach(category -> {
+//            category.setManufacturers(CateManuMap.getOrDefault(category.getId(), Collections.emptyList()));
+//            category.setSubcategories(CateSubMap.getOrDefault(category.getId(), Collections.emptyList()));
+//        });
+//
+//        return new BasicMessageResponse<>(200, messageSourceUtil.get("category.success_fetch_list"), categories);
 
-        List<CategoryDto> categories = categoryRepository.fetchAll();
-
-        if (categories.isEmpty()) {
-            return new BasicMessageResponse<>(200, messageSourceUtil.get("category.empty_list"), categories);
-        }
-
-        List<Integer> categoryIds = categories.stream().map(CategoryDto::getId).toList();
-        List<CategoryManufacturerBasicDto> categoryManufacturer = categoryManufacturerRepository.findManufacturersByCategoryId_ADMIN(categoryIds);
-        List<CategorySubcategoryBasicDto> categorySubcategory = categorySubCategoryRepository.findSubcategoriesByCategoryId_ADMIN(categoryIds);
-
-        Map<Integer, List<ManufacturerBasicDto>> CateManuMap = categoryManufacturer.stream()
-                .collect(Collectors.groupingBy(CategoryManufacturerBasicDto::getCategoryId, Collectors.mapping(manufacturer -> new ManufacturerBasicDto(manufacturer.getManufacturerId(), manufacturer.getManufacturerName()), Collectors.toList())));
-
-        Map<Integer, List<SubcategoryBasicDto>> CateSubMap = categorySubcategory.stream()
-                .collect(Collectors.groupingBy(CategorySubcategoryBasicDto::getCategoryId, Collectors.mapping(subcategory -> new SubcategoryBasicDto(subcategory.getSubCategoryId(), subcategory.getSubcategoryName()), Collectors.toList())));
-
-        categories.forEach(category -> {
-            category.setManufacturers(CateManuMap.getOrDefault(category.getId(), Collections.emptyList()));
-            category.setSubcategories(CateSubMap.getOrDefault(category.getId(), Collections.emptyList()));
-        });
-
-        return new BasicMessageResponse<>(200, messageSourceUtil.get("category.success_fetch_list"), categories);
+        return null;
     }
 
     @Override

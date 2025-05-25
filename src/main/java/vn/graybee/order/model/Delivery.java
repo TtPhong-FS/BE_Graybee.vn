@@ -43,6 +43,12 @@ public class Delivery {
     @Column(nullable = false, name = "delivery_status")
     private DeliveryStatus deliveryStatus;
 
+    @Column(name = "recipient_name", length = 100, nullable = false)
+    private String recipientName;
+
+    @Column(name = "recipient_phone", length = 12, nullable = false)
+    private String recipientPhone;
+
     @Column(name = "shipping_address")
     private String shippingAddress;
 
@@ -62,6 +68,22 @@ public class Delivery {
     public Delivery(LocalDate orderDate) {
         this.orderDate = orderDate;
         setEstimatedDeliveryDate();
+    }
+
+    public String getRecipientName() {
+        return recipientName;
+    }
+
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
+    }
+
+    public String getRecipientPhone() {
+        return recipientPhone;
+    }
+
+    public void setRecipientPhone(String recipientPhone) {
+        this.recipientPhone = recipientPhone;
     }
 
     public LocalDate getOrderDate() {

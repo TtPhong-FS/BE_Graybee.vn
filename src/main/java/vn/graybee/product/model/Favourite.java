@@ -9,15 +9,15 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "favourites", uniqueConstraints = @UniqueConstraint(columnNames = {"user_uid", "product_id"}))
+@Table(name = "favourites", uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "product_id"}))
 public class Favourite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_uid", nullable = false)
-    private String userUid;
+    @Column(name = "account_id", nullable = false)
+    private String accountId;
 
     @Column(name = "product_id", nullable = false)
     private Long productId;
@@ -25,8 +25,8 @@ public class Favourite {
     public Favourite() {
     }
 
-    public Favourite(String userUid, Long productId) {
-        this.userUid = userUid;
+    public Favourite(String accountId, Long productId) {
+        this.accountId = accountId;
         this.productId = productId;
     }
 
@@ -38,12 +38,12 @@ public class Favourite {
         this.id = id;
     }
 
-    public String getUserUid() {
-        return userUid;
+    public String getAccountId() {
+        return accountId;
     }
 
-    public void setUserUid(String userUid) {
-        this.userUid = userUid;
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public Long getProductId() {

@@ -27,17 +27,28 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
     @Query("Select new vn.graybee.response.admin.products.InventoryResponse(i.id, p.id, p.thumbnail, p.name, p.code, i.isStock, i.quantity, i.createdAt, i.updatedAt) from Inventory i left join Product p on i.productId = p.id")
     List<InventoryResponse> fetchAll();
 
-    @Query("Select new vn.graybee.response.admin.products.InventoryQuantityResponse(i.id, i.quantity) from Inventory i where i.id = :id ")
-    Optional<InventoryQuantityResponse> checkExistsById(@Param("id") int id);
+    @Query("Select new vn.graybee.response.admin.products.InventoryQuantityResponse(i.id, i.quantity) from Inventory i where i.id = :inventoryId ")
+    Optional<InventoryQuantityResponse> checkExistsById(@Param("inventoryId") Integer inventoryId);
 
     @Transactional
     @Modifying
     @Query(" Update Inventory i SET i.quantity = i.quantity - :totalQuantity where i.productId = :productId and i.quantity >= :totalQuantity")
     void updateQuantityAfterSuccessOrder(@Param("totalQuantity") int totalQuantity, @Param("productId") long productId);
 
-//    @Transactional
-//    @Modifying
-//    @Query("Update Inventory i set i.isStock = false where i.productId = :productId and i.quantity = 0 ")
-//    void updateIsStockWhenQuantityByZero(@Param("productId") long productId);
+    @Query("Select COALESCE(i.quantity, 0) from Inventory i where i.productId = :productId")
+    Integer getAvailableQuantityByProductId(Long productId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Inventory i SET i.availableQuantity = i.availableQuantity - :quantity WHERE i.productId = :productId AND i.availableQuantity >= :quantity")
+    int decreaseStock(@Param("productId") Long productId, @Param("quantity") int quantity);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Inventory i SET i.availableQuantity = i.availableQuantity + :quantity WHERE i.productId = :productId")
+    void increaseStock(@Param("productId") Long productId, @Param("quantity") int quantity);
+
+    @Query("Select exists (Select 1 from Inventory i where i.productId = :productId)")
+    boolean existsByProductId(@Param("productId") Long productId);
 
 }

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.cart.entity.CartItem;
+import vn.graybee.cart.model.CartItem;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
 
-    List<CartItem> findByCartId(Integer cartId);
+    List<CartItem> findAllByCartId(Integer cartId);
 
     @Query("Select c from CartItem c where c.id in :ids")
     List<CartItem> findByIds(List<Integer> ids);
@@ -33,7 +33,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Transactional
     @Modifying
     @Query("DELETE FROM CartItem c WHERE c.cartId = :cartId")
-    void deleteByCartId(@Param("cartId") int cartId);
+    void deleteAllByCartId(@Param("cartId") Integer cartId);
 
     @Transactional
     @Modifying
@@ -44,5 +44,16 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Modifying
     @Query("DELETE FROM CartItem c WHERE c.id in :ids")
     void deleteByIds(@Param("ids") List<Integer> ids);
+
+    @Query("SELECT c FROM CartItem c WHERE c.productId = :productId")
+    Optional<CartItem> findByProductId(@Param("productId") Long productId);
+
+    Optional<CartItem> findByProductIdAndCartId(@Param("productId") Long productId, @Param("cartId") Integer cartId);
+
+    @Query("SELECT c.id FROM CartItem c WHERE c.cartId = :cartId AND c.id = :id")
+    Optional<Integer> findByIdAndCartId(@Param("cartId") Integer cartId, @Param("id") Integer id);
+
+    @Query("SELECT c.total FROM CartItem c WHERE c.cartId = :cartId")
+    List<BigDecimal> findAllTotalByCartId(Integer cartId);
 
 }

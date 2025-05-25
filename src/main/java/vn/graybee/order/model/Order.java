@@ -33,9 +33,6 @@ public class Order extends BaseModel {
     @Column(name = "discount_id")
     private Integer discountId;
 
-    @Column(name = "is_guest")
-    private boolean isGuest;
-
     @Column(length = 200)
     private String note;
 
@@ -112,14 +109,6 @@ public class Order extends BaseModel {
 
     public void setDiscountId(Integer discountId) {
         this.discountId = discountId;
-    }
-
-    public boolean isGuest() {
-        return isGuest;
-    }
-
-    public void setGuest(boolean guest) {
-        isGuest = guest;
     }
 
     public String getNote() {

@@ -21,4 +21,8 @@ public class ConstantOrder {
 
     public static final String order_empty = "Chưa có đơn hàng nào.";
 
+    public static final String deliveryType = "deliveryType";
+
+    public static final String shippingMethod = "shippingMethod";
+
 }

@@ -2,11 +2,13 @@ package vn.graybee.product.service;
 
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.dto.MessageResponse;
+import vn.graybee.inventory.dto.response.InventoryProductResponse;
 import vn.graybee.response.favourites.ProductFavourite;
 import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductDetailResponse;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductService {
@@ -19,12 +21,16 @@ public interface ProductService {
 
     ProductPriceResponse getPriceById(long id);
 
-    ProductBasicResponse findBasicToAddToCartById(long id);
+    ProductBasicResponse getProductBasicInfoForCart(long id);
+
+    InventoryProductResponse getInventoryProductResponseById(long id);
 
     BasicMessageResponse<ProductDetailResponse> getDetailById(long id);
 
     BasicMessageResponse<List<ProductFavourite>> getFavouritesByUserUid(String userUid);
 
     BasicMessageResponse<?> addToFavourite(String userUid, long productId);
+
+    BigDecimal getProductPriceById(long id);
 
 }

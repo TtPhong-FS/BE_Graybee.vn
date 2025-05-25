@@ -1,33 +1,21 @@
 package vn.graybee.cart.service;
 
-import vn.graybee.cart.dto.request.AddCartItemRequest;
-import vn.graybee.cart.dto.request.RemoveCartItemRequest;
-import vn.graybee.cart.dto.response.CartItemBasicDto;
-import vn.graybee.cart.dto.response.CartItemDto;
-import vn.graybee.cart.entity.Cart;
-import vn.graybee.common.dto.BasicMessageResponse;
-
-import java.math.BigDecimal;
-import java.util.List;
+import vn.graybee.cart.model.Cart;
 
 public interface CartService {
 
-    BasicMessageResponse<CartItemDto> addItemToCart(AddCartItemRequest request, String uid, String sessionId);
+    Cart findOrCreateCart(Long accountId, String sessionId);
 
-    CartItemBasicDto updateCartItemQuantity(int cartItemId, int quantity, BigDecimal price);
+    Cart findCartByAccountIdOrSessionId(Long accountId, String sessionId);
 
-    BasicMessageResponse<Cart> findById(int id);
+    Cart getCartById(Integer cartId);
 
-    BasicMessageResponse<List<CartItemDto>> findCartByUserUidOrSessionId(String userUid, String sessionId);
+    void updateCartTotal(Integer cartId);
 
-    BasicMessageResponse<?> clearItemsToCart(String userUid, String sessionId);
+    void applyDiscount(Integer cartId, String discountCode);
 
-    BasicMessageResponse<Integer> deleteCartItemToCart(int cartItemId, String userUid, String sessionId);
+    void clearCartItems(Integer cartId);
 
-    BasicMessageResponse<CartItemBasicDto> decreaseQuantityToCartItem(RemoveCartItemRequest request, String userUid, String sessionId);
-
-    void updateTotalAmount(int cartId);
-
-    Integer findByUserIdOrSessionId(String userUid, String sessionId);
+    Integer getCartIdByAccountIdOrSessionId(Long accountId, String sessionId);
 
 }

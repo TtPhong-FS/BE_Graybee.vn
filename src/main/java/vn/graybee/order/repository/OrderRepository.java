@@ -7,13 +7,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.order.dto.response.admin.AdminCustomerOrderResponse;
 import vn.graybee.order.dto.response.admin.AdminOrderResponse;
 import vn.graybee.order.dto.response.user.OrderBasicDto;
 import vn.graybee.order.enums.OrderStatus;
 import vn.graybee.order.model.Order;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -24,8 +22,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "LEFT JOIN Delivery d on d.orderId = o.id ")
     Page<AdminOrderResponse> fetchAll(Pageable pageable);
 
-    @Query("Select new vn.graybee.order.dto.response.user.OrderBasicDto(o.id, o.status, o.createdAt, o.totalAmount) from Order o  where (:status IS NULL OR o.status = :status and o.userUid = :userUid)")
-    List<OrderBasicDto> findOrdersByUserUidAndStatusOptional(@Param("userUid") String userUid, @Param("status") OrderStatus status);
+    @Query("Select new vn.graybee.order.dto.response.user.OrderBasicDto(o.id, o.status, o.createdAt, o.totalAmount) from Order o  where (:status IS NULL OR o.status = :status and o.accountId = :accountId)")
+    List<OrderBasicDto> findAllOrdersByAccountIdAndStatus(@Param("accountId") Long accountId, @Param("status") OrderStatus status);
 
     @Transactional
     @Modifying
@@ -50,11 +48,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT exists (Select 1 FROM Order WHERE id = :id)")
     boolean checkExistsById(long id);
-
-    @Query("Select new vn.graybee.order.dto.response.admin.AdminCustomerOrderResponse(SUM(o.totalAmount), COUNT(o.userUid)) from Order o where o.userUid = :userUid")
-    AdminCustomerOrderResponse findCustomerOrderByUserUId(Integer userUid);
-
-    @Query("Select o.createdAt from Order o where o.userUid = :userUid order by o.createdAt desc limit 1")
-    LocalDateTime findLastOrderDateByUid(Integer userUid);
 
 }

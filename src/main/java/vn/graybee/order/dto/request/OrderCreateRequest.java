@@ -1,15 +1,8 @@
 package vn.graybee.order.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import vn.graybee.common.constants.ConstantGeneral;
-import vn.graybee.common.exception.BusinessCustomException;
-import vn.graybee.order.enums.DeliveryType;
-import vn.graybee.order.enums.PaymentMethod;
-import vn.graybee.order.enums.ShippingMethod;
+import vn.graybee.account.dto.request.AddressCreateRequest;
 
-import java.util.Collections;
 import java.util.List;
 
 public class OrderCreateRequest {
@@ -20,138 +13,22 @@ public class OrderCreateRequest {
 
     private Integer addressId;
 
-    @NotNull(message = "Vui lòng nhập họ và tên người nhận hàng")
-    @Size(max = 100, message = "Độ dài tối đa 100 ký tự")
-    private String fullName;
-
-    @Size(max = 12, message = "Độ dài tối đa 12 ký tự")
-    @NotNull(message = "Vui lòng nhập số điện thoại người nhận hàng")
-    private String phoneNumber;
-
-    @Size(max = 50, message = "Độ dài tối đa 50 ký tự")
-    @NotNull(message = "Chọn thành phố/tiểu bang")
-    private String city;
-
-    @Size(max = 150, message = "Độ dài tối đa 150 ký tự")
-    @NotNull(message = "Nhập địa chỉ nhận hàng")
-    private String streetAddress;
-
-    @Size(max = 50, message = "Độ dài tối đa 50 ký tự")
-    @NotNull(message = "Chọn xã")
-    private String commune;
-
-    @Size(max = 100, message = "Độ dài tối đa 100 ký tự")
-    @NotNull(message = "Chọn huyện/quận")
-    private String district;
-
     @Size(max = 200, message = "Độ dài tối đa không vượt quá 200 ký tự")
     private String note;
 
-    @NotBlank(message = "Chọn phương thức thanh toán")
-    private String paymentMethod;
+    private AddressCreateRequest addressCreateRequest;
 
-    @NotBlank(message = "Chọn phương thức vận chuyển")
-    private String shippingMethod;
+    private DeliveryCreateRequest deliveryCreateRequest;
 
-    @NotBlank(message = "Chọn hình thức nhận hàng")
-    private String deliveryType;
+    private PaymentCreateRequest paymentCreateRequest;
 
     @Size(max = 100, message = "Mã giảm giá không đúng")
     private String discountCode;
 
     private boolean issueInvoices;
 
-    public PaymentMethod getPaymentMethodEnum() {
-        try {
-            return PaymentMethod.valueOf(paymentMethod.toUpperCase());
-        } catch (RuntimeException e) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.method_invalid + paymentMethod);
-        }
-    }
-
-    public ShippingMethod getShippingMethodEnum() {
-        try {
-            return ShippingMethod.valueOf(shippingMethod.toUpperCase());
-        } catch (RuntimeException e) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.method_invalid + shippingMethod);
-        }
-    }
-
-
-    public DeliveryType getDeliveryTypeEnum() {
-        try {
-            return DeliveryType.valueOf(deliveryType.toUpperCase());
-        } catch (RuntimeException e) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.method_invalid + deliveryType);
-        }
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getStreetAddress() {
-        return streetAddress;
-    }
-
-    public void setStreetAddress(String streetAddress) {
-        this.streetAddress = streetAddress;
-    }
-
-    public String getCommune() {
-        return commune;
-    }
-
-    public void setCommune(String commune) {
-        this.commune = commune;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
-    public String getShippingMethod() {
-        return shippingMethod;
-    }
-
-    public void setShippingMethod(String shippingMethod) {
-        this.shippingMethod = shippingMethod;
-    }
-
-    public Integer getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(Integer addressId) {
-        this.addressId = addressId;
-    }
-
     public List<Integer> getCartItemIds() {
-        return cartItemIds != null ? cartItemIds : Collections.emptyList();
+        return cartItemIds;
     }
 
     public void setCartItemIds(List<Integer> cartItemIds) {
@@ -166,6 +43,14 @@ public class OrderCreateRequest {
         this.useExistingAddress = useExistingAddress;
     }
 
+    public Integer getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(Integer addressId) {
+        this.addressId = addressId;
+    }
+
     public String getNote() {
         return note;
     }
@@ -174,20 +59,28 @@ public class OrderCreateRequest {
         this.note = note;
     }
 
-    public String getPaymentMethod() {
-        return paymentMethod;
+    public AddressCreateRequest getAddressCreateRequest() {
+        return addressCreateRequest;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
+    public void setAddressCreateRequest(AddressCreateRequest addressCreateRequest) {
+        this.addressCreateRequest = addressCreateRequest;
     }
 
-    public String getDeliveryType() {
-        return deliveryType;
+    public DeliveryCreateRequest getDeliveryCreateRequest() {
+        return deliveryCreateRequest;
     }
 
-    public void setDeliveryType(String deliveryType) {
-        this.deliveryType = deliveryType;
+    public void setDeliveryCreateRequest(DeliveryCreateRequest deliveryCreateRequest) {
+        this.deliveryCreateRequest = deliveryCreateRequest;
+    }
+
+    public PaymentCreateRequest getPaymentCreateRequest() {
+        return paymentCreateRequest;
+    }
+
+    public void setPaymentCreateRequest(PaymentCreateRequest paymentCreateRequest) {
+        this.paymentCreateRequest = paymentCreateRequest;
     }
 
     public String getDiscountCode() {

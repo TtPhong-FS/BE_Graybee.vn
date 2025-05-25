@@ -10,15 +10,13 @@ public class InventoryResponse {
 
     private long productId;
 
-    private String thumbnail;
-
     private String productName;
 
     private String productCode;
 
     private boolean isStock;
 
-    private int quantity;
+    private int availableQuantity;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
@@ -29,14 +27,13 @@ public class InventoryResponse {
     public InventoryResponse() {
     }
 
-    public InventoryResponse(int id, long productId, String thumbnail, String productName, String productCode, boolean isStock, int quantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public InventoryResponse(int id, long productId, String productName, String productCode, boolean isStock, int availableQuantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.productId = productId;
-        this.thumbnail = thumbnail;
         this.productName = productName;
         this.productCode = productCode;
         this.isStock = isStock;
-        this.quantity = quantity;
+        this.availableQuantity = availableQuantity;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -81,13 +78,6 @@ public class InventoryResponse {
         this.productId = productId;
     }
 
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
 
     public String getProductName() {
         return productName;
@@ -105,12 +95,12 @@ public class InventoryResponse {
         this.id = id;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getAvailableQuantity() {
+        return availableQuantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setAvailableQuantity(int availableQuantity) {
+        this.availableQuantity = availableQuantity;
     }
 
 }

@@ -12,7 +12,7 @@ import vn.graybee.common.dto.MessageResponse;
 import vn.graybee.order.dto.response.admin.AdminOrderResponse;
 import vn.graybee.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.order.dto.response.admin.ConfirmOrderResponse;
-import vn.graybee.order.service.OrderService;
+import vn.graybee.order.service.AdminOrderService;
 
 import java.util.List;
 
@@ -20,31 +20,31 @@ import java.util.List;
 @RequestMapping("${api.orders}")
 public class AdminOrderController {
 
-    private final OrderService orderService;
+    private final AdminOrderService adminOrderService;
 
-    public AdminOrderController(OrderService orderService) {
-        this.orderService = orderService;
+    public AdminOrderController(AdminOrderService adminOrderService) {
+        this.adminOrderService = adminOrderService;
     }
 
     @PutMapping("/confirm/{id}")
     public ResponseEntity<BasicMessageResponse<ConfirmOrderResponse>> confirmOrderById(@PathVariable("id") long id) {
-        return ResponseEntity.ok(orderService.confirmOrder(id));
+        return ResponseEntity.ok(adminOrderService.confirmOrderById(id));
     }
 
     @PutMapping("/cancel/{id}")
     public ResponseEntity<BasicMessageResponse<CancelOrderResponse>> cancelOrderById(@PathVariable("id") long id) {
-        return ResponseEntity.ok(orderService.cancelOrder(id));
+        return ResponseEntity.ok(adminOrderService.cancelOrderById(id));
     }
 
     @GetMapping
-    public ResponseEntity<MessageResponse<List<AdminOrderResponse>>> fetchAll(
+    public ResponseEntity<MessageResponse<List<AdminOrderResponse>>> getOrderListForDashboard(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String order
     ) {
 
-        return ResponseEntity.ok(orderService.findAll(page, size, sortBy, order));
+        return ResponseEntity.ok(adminOrderService.getOrderListForDashboard(page, size, sortBy, order));
     }
 
 }

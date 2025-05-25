@@ -8,11 +8,11 @@ public class AddressCreateRequest {
 
     @NotBlank(message = "Nhập họ và tên người nhận")
     @Size(max = 50, message = "Họ và tên quá dài")
-    private String fullName;
+    private String recipientName;
 
     @NotBlank(message = "Nhập số điện thoại người nhận")
     @Size(min = 10, max = 12, message = "Số điện thoại phải từ 10 - 12 số")
-    private String phoneNumber;
+    private String phone;
 
     @NotBlank(message = "Chọn thành phố/tỉnh")
     @Size(max = 50, message = "Tên thành phố quá dài")
@@ -28,7 +28,7 @@ public class AddressCreateRequest {
 
     @NotBlank(message = "Nhập địa chỉ cụ thể")
     @Size(max = 150, message = "Địa chỉ quá dài")
-    private String streetAddress;
+    private String street;
 
     @JsonProperty("default")
     private boolean isDefault;
@@ -36,30 +36,21 @@ public class AddressCreateRequest {
     public AddressCreateRequest() {
     }
 
-    public boolean isDefault() {
-        return isDefault;
+    public String getRecipientName() {
+        return recipientName;
     }
 
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
 
     public String getCity() {
         return city;
@@ -85,12 +76,20 @@ public class AddressCreateRequest {
         this.commune = commune;
     }
 
-    public String getStreetAddress() {
-        return streetAddress;
+    public String getStreet() {
+        return street;
     }
 
-    public void setStreetAddress(String streetAddress) {
-        this.streetAddress = streetAddress;
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
     }
 
 }

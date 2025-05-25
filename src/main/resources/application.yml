@@ -78,7 +78,7 @@ api:
   subcategories: ${api.admin}/subcategories
   account: /api/v1/account
   cart: ${api.public}/carts
-
+  address: ${api.account}/addresses
 
 jwt:
   adminSecretKey: ${ADMIN_SECRET_KEY}

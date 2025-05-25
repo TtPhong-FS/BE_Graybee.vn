@@ -7,10 +7,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.inventory.dto.response.InventoryProductResponse;
 import vn.graybee.product.dto.response.ProductResponse;
 import vn.graybee.product.enums.ProductStatus;
 import vn.graybee.product.model.Product;
-import vn.graybee.response.admin.inventories.AdminInventoryProductResponse;
 import vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse;
 import vn.graybee.response.admin.products.ProductUpdateResponse;
 import vn.graybee.response.favourites.ProductFavourite;
@@ -39,8 +39,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p where p.id = :id")
     Optional<ProductBasicResponse> findBasicById(@Param("id") long id);
 
-    @Query("Select p.finalPrice from Product p where p.id = :id")
-    BigDecimal findFinalPriceById(@Param("id") long id);
+    @Query("Select COALESCE(p.finalPrice, 0) from Product p where p.id = :id")
+    Optional<BigDecimal> findFinalPriceById(@Param("id") long id);
 
     @Query("SELECT new vn.graybee.response.admin.products.ProductSubcategoryAndTagResponse(p.id, p.name,  p.code) FROM Product p")
     List<ProductSubcategoryAndTagResponse> fetchProductsWithoutSubcategoryAndTag();
@@ -80,8 +80,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p where p.status = 'PUBLISHED' ")
     List<ProductBasicResponse> getProductPublishedToLoadIntoElastic();
 
-    @Query("Select new vn.graybee.response.admin.inventories.AdminInventoryProductResponse(p.id,p.thumbnail,  p.name, p.code) from Product p where p.id = :id")
-    Optional<AdminInventoryProductResponse> findAdminInventoryProductById(@Param("id") long id);
+    @Query("Select new vn.graybee.inventory.dto.response.InventoryProductResponse(p.id, p.name, p.code) from Product p where p.id = :id")
+    Optional<InventoryProductResponse> findBasicInfoForInventory(@Param("id") long id);
 
     //    Public
 
@@ -89,7 +89,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<ProductFavourite> findToAddToFavourite(@Param("id") long id);
 
     @Query("Select new vn.graybee.response.publics.products.ProductBasicResponse(p.id, p.name, p.price, p.finalPrice, p.thumbnail) from Product p where p.id = :id and p.status = 'PUBLISHED' ")
-    Optional<ProductBasicResponse> findBasicToAddToCart(@Param("id") long id);
+    Optional<ProductBasicResponse> findBasicInfoForCart(@Param("id") long id);
 
     @Query("Select new vn.graybee.response.publics.products.ProductPriceResponse(p.id, p.finalPrice) from Product p where p.id = :id and p.status = 'PUBLISHED'")
     Optional<ProductPriceResponse> getPriceById(@Param("id") long id);

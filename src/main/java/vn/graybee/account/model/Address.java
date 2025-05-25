@@ -15,18 +15,14 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_uid")
-    private String userUid;
+    @Column(name = "customer_id")
+    private Long customerId;
 
-    @Column(name = "session_id", length = 50)
-    private String sessionId;
+    @Column(length = 50, nullable = false, name = "recipient_name")
+    private String recipientName;
 
-
-    @Column(length = 50, nullable = false, name = "fullname")
-    private String fullName;
-
-    @Column(length = 12, name = "phone_number", nullable = false)
-    private String phoneNumber;
+    @Column(length = 12, nullable = false)
+    private String phone;
 
     @Column(length = 50, nullable = false)
     private String city;
@@ -37,29 +33,13 @@ public class Address {
     @Column(length = 50, nullable = false)
     private String commune;
 
-    @Column(name = "street_address", length = 150, nullable = false)
-    private String streetAddress;
+    @Column(length = 150, nullable = false)
+    private String street;
 
     @Column(name = "is_default")
     private boolean isDefault;
 
     public Address() {
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
     }
 
     public Integer getId() {
@@ -70,12 +50,28 @@ public class Address {
         this.id = id;
     }
 
-    public String getUserUid() {
-        return userUid;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setUserUid(String userUid) {
-        this.userUid = userUid;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getRecipientName() {
+        return recipientName;
+    }
+
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getCity() {
@@ -102,28 +98,20 @@ public class Address {
         this.commune = commune;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getStreet() {
+        return street;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public boolean isDefault() {
+        return isDefault;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getStreetAddress() {
-        return streetAddress;
-    }
-
-    public void setStreetAddress(String streetAddress) {
-        this.streetAddress = streetAddress;
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
     }
 
 }

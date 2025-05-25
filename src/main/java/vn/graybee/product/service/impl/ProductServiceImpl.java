@@ -16,6 +16,8 @@ import vn.graybee.common.dto.PaginationInfo;
 import vn.graybee.common.dto.SortInfo;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
+import vn.graybee.common.utils.MessageSourceUtil;
+import vn.graybee.inventory.dto.response.InventoryProductResponse;
 import vn.graybee.product.model.Favourite;
 import vn.graybee.product.repository.FavouriteRepository;
 import vn.graybee.product.repository.ProductDescriptionRepository;
@@ -30,8 +32,8 @@ import vn.graybee.response.publics.products.ProductBasicResponse;
 import vn.graybee.response.publics.products.ProductDetailResponse;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 import vn.graybee.response.publics.products.ReviewCommentDto;
-import vn.graybee.services.products.ProductStatisticService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -42,13 +44,13 @@ public class ProductServiceImpl implements ProductService {
 
     private static final String PRODUCT_LIST_KEY = "product:list:";
 
+    private final MessageSourceUtil messageSourceUtil;
+
     private final List<DetailFetcher> detailFetchers;
 
     private final ProductRepository productRepository;
 
     private final FavouriteRepository favouriteRepository;
-
-    private final ProductStatisticService productStatisticService;
 
     private final ProductImageRepository productImageRepository;
 
@@ -58,11 +60,11 @@ public class ProductServiceImpl implements ProductService {
 
     private final RedisProductService redisProductService;
 
-    public ProductServiceImpl(List<DetailFetcher> detailFetchers, ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductStatisticService productStatisticService, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
+    public ProductServiceImpl(MessageSourceUtil messageSourceUtil, List<DetailFetcher> detailFetchers, ProductRepository productRepository, FavouriteRepository favouriteRepository, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
+        this.messageSourceUtil = messageSourceUtil;
         this.detailFetchers = detailFetchers;
         this.productRepository = productRepository;
         this.favouriteRepository = favouriteRepository;
-        this.productStatisticService = productStatisticService;
         this.productImageRepository = productImageRepository;
         this.productDescriptionRepository = productDescriptionRepository;
         this.reviewCommentRepository = reviewCommentRepository;
@@ -174,9 +176,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductBasicResponse findBasicToAddToCartById(long id) {
-        return productRepository.findBasicToAddToCart(id)
+    public ProductBasicResponse getProductBasicInfoForCart(long id) {
+        return productRepository.findBasicInfoForCart(id)
                 .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+    }
+
+    @Override
+    public InventoryProductResponse getInventoryProductResponseById(long id) {
+        return productRepository.findBasicInfoForInventory(id)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantProduct.product.toLowerCase(), messageSourceUtil.get("common.not_found", new Object[]{ConstantProduct.product})));
     }
 
     @Override
@@ -264,6 +272,12 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return new BasicMessageResponse<>(200, ConstantUser.success_add_favourite, product);
+    }
+
+    @Override
+    public BigDecimal getProductPriceById(long id) {
+        return productRepository.findFinalPriceById(id)
+                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("product.not.found.or.out_of_business")));
     }
 
 }
