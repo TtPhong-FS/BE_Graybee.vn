@@ -12,8 +12,6 @@ public class InventoryResponse {
 
     private String productName;
 
-    private String productCode;
-
     private boolean isStock;
 
     private int availableQuantity;
@@ -27,11 +25,10 @@ public class InventoryResponse {
     public InventoryResponse() {
     }
 
-    public InventoryResponse(int id, long productId, String productName, String productCode, boolean isStock, int availableQuantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public InventoryResponse(int id, long productId, String productName, boolean isStock, int availableQuantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.productId = productId;
         this.productName = productName;
-        this.productCode = productCode;
         this.isStock = isStock;
         this.availableQuantity = availableQuantity;
         this.createdAt = createdAt;
@@ -62,13 +59,6 @@ public class InventoryResponse {
         this.updatedAt = updatedAt;
     }
 
-    public String getProductCode() {
-        return productCode;
-    }
-
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
-    }
 
     public long getProductId() {
         return productId;

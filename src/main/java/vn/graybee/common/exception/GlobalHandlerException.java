@@ -60,21 +60,21 @@ public class GlobalHandlerException {
         return errorMap;
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ProblemDetail handleGlobalException(Exception ex) {
-//        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-//                HttpStatus.INTERNAL_SERVER_ERROR,
-//                messageSource.get("error.500.detail")
-//        );
-//        problemDetail.setProperty("description", ex.getMessage());
-//        problemDetail.setTitle(messageSource.get("error.500.title"));
-//        return problemDetail;
-//    }
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleGlobalException(Exception ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                messageSource.get("common.error.500.detail")
+        );
+        problemDetail.setProperty("description", ex.getMessage());
+        problemDetail.setTitle(messageSource.get("common.error.500.title"));
+        return problemDetail;
+    }
 
 
     @ExceptionHandler(CustomNotFoundException.class)
     public ProblemDetail handlerResourceNotFoundException(CustomNotFoundException ex) {
-        CustomNotFoundProblemDetail problemDetail = new CustomNotFoundProblemDetail(HttpStatus.NOT_FOUND.value(), messageSource.get("common.not_found"), ex.getField());
+        CustomNotFoundProblemDetail problemDetail = new CustomNotFoundProblemDetail(HttpStatus.NOT_FOUND.value(), messageSource.get("common.error.404.title"));
         problemDetail.setProperty(ex.getField(), ex.getMessage());
         problemDetail.setProperty("timestamp", DatetimeFormatted.formatted_datetime());
         return problemDetail;

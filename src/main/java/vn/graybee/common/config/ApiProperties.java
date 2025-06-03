@@ -1,101 +1,72 @@
 package vn.graybee.common.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Setter
+@Getter
 @Component
 @ConfigurationProperties(prefix = "api")
 public class ApiProperties {
 
-    private String admin;
+    private PublicApi publicApi;
 
-    private String categories;
+    private AdminApi adminApi;
 
-    private String products;
-
-    private String orders;
-
-    private String manufacturers;
-
-    private String tags;
-
-    private String subcategories;
-
-    private String auth;
-
-    private String account;
+    private PrivateApi privateApi;
 
 
-    public String getAuth() {
-        return auth;
+    @Setter
+    @Getter
+    public static class PublicApi {
+
+
+        private String base;
+
+        private String home;
+
+        private String auth;
+
+        private String carts;
+
+        private String products;
+
     }
 
-    public void setAuth(String auth) {
-        this.auth = auth;
+    @Setter
+    @Getter
+    public static class AdminApi {
+
+        private String base;
+
+        private String auth;
+
+        private String products;
+
+        private String categories;
+
+        private String attributes;
+
+        private String orders;
+
+        private String inventories;
+
     }
 
-    public String getAccount() {
-        return account;
-    }
+    @Setter
+    @Getter
+    public static class PrivateApi {
 
-    public void setAccount(String account) {
-        this.account = account;
-    }
+        private String account;
 
-    public String getAdmin() {
-        return admin;
-    }
+        private String profile;
 
-    public void setAdmin(String admin) {
-        this.admin = admin;
-    }
+        private String address;
 
-    public String getCategories() {
-        return categories;
-    }
+        private String favorites;
 
-    public void setCategories(String categories) {
-        this.categories = categories;
-    }
-
-    public String getProducts() {
-        return products;
-    }
-
-    public void setProducts(String products) {
-        this.products = products;
-    }
-
-    public String getOrders() {
-        return orders;
-    }
-
-    public void setOrders(String orders) {
-        this.orders = orders;
-    }
-
-    public String getManufacturers() {
-        return manufacturers;
-    }
-
-    public void setManufacturers(String manufacturers) {
-        this.manufacturers = manufacturers;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
-    public String getSubcategories() {
-        return subcategories;
-    }
-
-    public void setSubcategories(String subcategories) {
-        this.subcategories = subcategories;
     }
 
 }

@@ -67,18 +67,29 @@ logging:
       zaxxer: ERROR
 
 api:
-  public: /api/v1/public
-  auth: /api/v1/auth
-  admin: /api/v1/admin
-  categories: ${api.admin}/categories
-  manufacturers: ${api.admin}/manufacturers
-  products: ${api.admin}/products
-  orders: ${api.admin}/orders
-  tags: ${api.admin}/tags
-  subcategories: ${api.admin}/subcategories
-  account: /api/v1/account
-  cart: ${api.public}/carts
-  address: ${api.account}/addresses
+  publicApi:
+    base: /api/v1/public
+    home: ${api.publicApi.base}/home
+    auth: ${api.publicApi.base}/auth
+    carts: ${api.publicApi.base}/carts
+    products: ${api.publicApi.base}/products
+    orders: ${api.publicApi.base}/orders
+    search: ${api.publicApi.base}/search
+  adminApi:
+    base: /api/v1/admin
+    auth: ${api.adminApi.base}/auth
+    products: ${api.adminApi.base}/products
+    categories: ${api.adminApi.base}/categories
+    attributes: ${api.adminApi.base}/categories/attributes
+    orders: ${api.adminApi.base}/orders
+    inventories: ${api.adminApi.base}/inventories
+    permissions: ${api.adminApi.base}/permissions
+    imageKit: ${api.adminApi.base}/image-kit
+  privateApi:
+    account: /api/v1/account
+    profile: ${api.privateApi.account}/profile
+    address: ${api.privateApi.account}/addresses
+    favorites: ${api.privateApi.account}/favorites
 
 jwt:
   adminSecretKey: ${ADMIN_SECRET_KEY}

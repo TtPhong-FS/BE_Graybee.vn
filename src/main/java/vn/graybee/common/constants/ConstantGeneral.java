@@ -6,6 +6,8 @@ public class ConstantGeneral {
 
     public static final String status = "status";
 
+    public static final String not_found = "not_found";
+
     public static final String not_super_admin = "Bạn không có quyền khôi phục dữ liệu đã xóa";
 
     //    Response

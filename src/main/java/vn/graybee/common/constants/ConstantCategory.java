@@ -45,4 +45,11 @@ public class ConstantCategory {
 
     public static final String success_restore = "Khôi phục danh mục thành công";
 
+    public static final String parentName = "parentName";
+
+    public static final String productType = "productType";
+
+    public static final String brand = "brand";
+
+
 }

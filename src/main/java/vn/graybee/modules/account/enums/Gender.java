@@ -1,0 +1,17 @@
+package vn.graybee.modules.account.enums;
+
+import vn.graybee.common.constants.ConstantAccount;
+import vn.graybee.common.exception.BusinessCustomException;
+import vn.graybee.common.utils.MessageSourceUtil;
+
+public enum Gender {
+    MALE, FEMALE;
+
+    public static Gender fromString(String gender, MessageSourceUtil messageSourceUtil) {
+        try {
+            return Gender.valueOf(gender.toUpperCase());
+        } catch (RuntimeException e) {
+            throw new BusinessCustomException(ConstantAccount.gender, messageSourceUtil.get("account.gender.in_valid"));
+        }
+    }
+}

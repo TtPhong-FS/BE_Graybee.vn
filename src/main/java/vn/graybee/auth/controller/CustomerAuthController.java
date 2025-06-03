@@ -12,12 +12,12 @@ import vn.graybee.auth.dto.request.CustomerRegisterRequest;
 import vn.graybee.auth.dto.request.LoginRequest;
 import vn.graybee.auth.dto.response.AuthDto;
 import vn.graybee.auth.dto.response.RegisterDto;
+import vn.graybee.auth.record.ResetPassword;
 import vn.graybee.auth.service.AuthService;
 import vn.graybee.common.dto.BasicMessageResponse;
-import vn.graybee.record.ResetPassword;
 
 @RestController
-@RequestMapping("${api.auth}")
+@RequestMapping("${api.publicApi.auth}")
 public class CustomerAuthController {
 
     private final AuthService authService;

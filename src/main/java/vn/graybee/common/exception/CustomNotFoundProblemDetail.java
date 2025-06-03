@@ -6,10 +6,9 @@ import org.springframework.http.ProblemDetail;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomNotFoundProblemDetail extends ProblemDetail {
 
-    public CustomNotFoundProblemDetail(int status, String title, String resource) {
+    public CustomNotFoundProblemDetail(int status, String title) {
         this.setStatus(status);
         this.setTitle(title);
-        this.setProperty("resource", resource);
     }
 
 }

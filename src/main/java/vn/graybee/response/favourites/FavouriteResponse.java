@@ -1,5 +1,7 @@
 package vn.graybee.response.favourites;
 
+import vn.graybee.modules.product.dto.response.ProductFavourite;
+
 import java.util.Collections;
 import java.util.List;
 

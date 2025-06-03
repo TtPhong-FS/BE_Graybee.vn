@@ -3,7 +3,7 @@ package vn.graybee.response.publics.products;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import vn.graybee.response.publics.products.detail.PcDetailResponse;
+import vn.graybee.modules.product.dto.response.detail.PcDetailResponse;
 
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "detailType", visible = false)

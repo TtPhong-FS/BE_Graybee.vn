@@ -10,4 +10,10 @@ public class ConstantAccount {
 
     public static final String CUSTOMER = "Customer";
 
+    public static final String email = "email";
+
+    public static final String phone = "phone";
+
+    public static final String gender = "gender";
+
 }

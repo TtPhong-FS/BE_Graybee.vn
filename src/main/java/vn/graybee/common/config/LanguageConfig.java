@@ -17,11 +17,14 @@ public class LanguageConfig {
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasenames(
-                "i18n/taxonomy",
+                "i18n/category",
                 "i18n/product",
                 "i18n/common",
                 "i18n/auth",
-                "i18n/role"
+                "i18n/permission",
+                "i18n/order",
+                "i18n/inventory",
+                "i18n/account"
         ); // tên file base
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;

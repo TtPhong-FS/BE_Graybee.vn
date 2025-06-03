@@ -13,10 +13,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import vn.graybee.account.security.UserDetailService;
 import vn.graybee.auth.config.JwtProperties;
 import vn.graybee.auth.service.JwtService;
 import vn.graybee.auth.service.RedisAuthService;
+import vn.graybee.modules.account.security.UserDetailService;
 
 import java.io.IOException;
 
@@ -71,6 +71,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
 
             }
+            filterChain.doFilter(request, response);
 
         } catch (AuthenticationException ex) {
             SecurityContextHolder.clearContext();
@@ -78,7 +79,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         } //
 
-        filterChain.doFilter(request, response);
     }
 
 

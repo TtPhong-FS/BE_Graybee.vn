@@ -1,6 +1,6 @@
 package vn.graybee.auth.dto.response;
 
-import vn.graybee.account.model.Profile;
+import vn.graybee.modules.account.model.Profile;
 
 public class RegisterDto {
 

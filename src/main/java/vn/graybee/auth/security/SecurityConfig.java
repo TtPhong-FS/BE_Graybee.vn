@@ -16,11 +16,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import vn.graybee.account.security.UserDetailService;
 import vn.graybee.auth.custom.CustomAccessDenied;
 import vn.graybee.auth.custom.CustomAuthenticationEndpoint;
 import vn.graybee.auth.filter.JwtFilter;
 import vn.graybee.common.config.ApiProperties;
+import vn.graybee.modules.account.security.UserDetailService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,9 +62,9 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDenied))
                 .authorizeHttpRequests(
                         endpoint -> endpoint
-                                .requestMatchers(apiProperties.getAdmin() + "/**").permitAll()
-                                .requestMatchers(apiProperties.getAccount() + "/**").authenticated()
-                                .requestMatchers(apiProperties.getAuth() + "/**").permitAll()
+                                .requestMatchers(apiProperties.getAdminApi().getBase() + "/**").permitAll()
+                                .requestMatchers(apiProperties.getPrivateApi().getAccount() + "/**").authenticated()
+                                .requestMatchers(apiProperties.getPublicApi().getBase() + "/**").permitAll()
                                 .requestMatchers("/ws/**").permitAll()
                                 .anyRequest().authenticated()
                 )

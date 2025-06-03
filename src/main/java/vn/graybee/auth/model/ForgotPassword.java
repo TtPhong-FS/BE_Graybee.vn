@@ -22,8 +22,8 @@ public class ForgotPassword {
 
     private Date expiration;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @Column(name = "account_id", nullable = false)
+    private Long accountId;
 
     public ForgotPassword() {
     }
@@ -52,12 +52,12 @@ public class ForgotPassword {
         this.expiration = expiration;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Long getAccountId() {
+        return accountId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
     }
 
 }
