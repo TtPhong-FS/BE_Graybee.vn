@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vn.graybee.auth.dto.request.CustomerRegisterRequest;
-import vn.graybee.common.constants.ConstantAccount;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
@@ -41,22 +41,9 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Long getAccountIdByEmail(String email) {
-        return profileRepository.findAccountIdByEmail(email)
-                .orElseThrow(() -> new BusinessCustomException(ConstantAccount.email, messageSourceUtil.get("auth.mail.invalid")));
-    }
-
-    @Override
-    public void checkExistsByEmail(String email) {
-        if (profileRepository.checkExistsEmail(email)) {
-            throw new BusinessCustomException(ConstantAccount.email.toLowerCase(), messageSourceUtil.get("account.profile.email.exists", new Object[]{ConstantAccount.email}));
-        }
-    }
-
-    @Override
     public void checkExistsByPhone(String phone) {
         if (profileRepository.checkExistsPhone(phone)) {
-            throw new BusinessCustomException(ConstantAccount.phone, messageSourceUtil.get("account.profile.phone.exists"));
+            throw new BusinessCustomException(Constants.Common.phone, messageSourceUtil.get("account.profile.phone.exists"));
         }
     }
 
@@ -68,7 +55,6 @@ public class ProfileServiceImpl implements ProfileService {
         Profile profile = new Profile();
         profile.setAccountId(accountId);
         profile.setAvatarUrl(null);
-        profile.setEmail(request.getEmail());
         profile.setPhone(request.getPhone());
         profile.setBirthDay(request.getBirthDay());
         profile.setFullName(request.getFullName());

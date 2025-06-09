@@ -23,8 +23,7 @@ public class CategorySimpleDto {
 
     private Long parentId;
 
-    private int productCount;
-
+    private String type;
 
     private CategoryStatus status;
 

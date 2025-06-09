@@ -1,32 +1,33 @@
 package vn.graybee.modules.permission.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.common.constants.ConstantAuth;
-import vn.graybee.common.constants.ConstantGeneral;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
+import vn.graybee.common.exception.CustomNotFoundException;
+import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.permission.dto.request.PermissionRequest;
-import vn.graybee.modules.permission.dto.response.PermissionUserCountDto;
 import vn.graybee.modules.permission.model.Permission;
 import vn.graybee.modules.permission.repository.PermissionRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@AllArgsConstructor
 @Service
 public class PermissionServiceImpl implements PermissionService {
 
     private final PermissionRepository permissionRepository;
 
-    public PermissionServiceImpl(PermissionRepository permissionRepository) {
-        this.permissionRepository = permissionRepository;
-    }
+    private final MessageSourceUtil messageSourceUtil;
+
 
     @Override
     public BasicMessageResponse<List<Permission>> findAll() {
         List<Permission> response = permissionRepository.findAll();
-        String message = response.isEmpty() ? ConstantGeneral.empty_list : ConstantAuth.success_fetch_permissions;
+        String message = response.isEmpty() ? messageSourceUtil.get("") : messageSourceUtil.get("auth");
 
         return new BasicMessageResponse<>(200, message, response);
     }
@@ -35,8 +36,8 @@ public class PermissionServiceImpl implements PermissionService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Permission> create(PermissionRequest request) {
 
-        if (permissionRepository.validateName(request.getName()).isPresent()) {
-            throw new BusinessCustomException(ConstantAuth.name, ConstantAuth.permission_name_exists);
+        if (permissionRepository.existsByName(request.getName())) {
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("permission_name_exists"));
         }
 
         Permission permission = new Permission();
@@ -44,11 +45,10 @@ public class PermissionServiceImpl implements PermissionService {
         permission.setName(request.getName().toUpperCase());
         permission.setActive(request.isActive());
         permission.setDescription(request.getDescription());
-        permission.setUserCount(0);
 
         permission = permissionRepository.save(permission);
 
-        return new BasicMessageResponse<>(201, ConstantAuth.success_create_permission, permission);
+        return new BasicMessageResponse<>(201, messageSourceUtil.get(""), permission);
     }
 
     @Override
@@ -56,10 +56,10 @@ public class PermissionServiceImpl implements PermissionService {
     public BasicMessageResponse<Permission> update(int id, PermissionRequest request) {
 
         Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.permission_does_not_exists));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("")));
 
         if (!permission.getName().equals(request.getName()) && permissionRepository.existsByNameNotId(request.getName(), permission.getId())) {
-            throw new BusinessCustomException(ConstantAuth.name, ConstantAuth.permission_name_exists);
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get(""));
         }
 
         permission.setName(request.getName().toUpperCase());
@@ -70,31 +70,26 @@ public class PermissionServiceImpl implements PermissionService {
 
         permission = permissionRepository.save(permission);
 
-        return new BasicMessageResponse<>(200, ConstantAuth.success_update_permission, permission);
+        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), permission);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> delete(int id) {
 
-        PermissionUserCountDto permission = permissionRepository.getUserCountBeforeDelete(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.permission_does_not_exists));
+        permissionRepository.existsById(id);
 
-        if (permission.getUserCount() > 0) {
-            throw new BusinessCustomException(ConstantGeneral.general, ConstantAuth.users_in_use);
-        }
+        permissionRepository.deleteById(id);
 
-        permissionRepository.deleteById(permission.getId());
-
-        return new BasicMessageResponse<>(200, ConstantAuth.success_delete_permission, permission.getId());
+        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), id);
     }
 
     @Override
     public BasicMessageResponse<Permission> findById(int id) {
         Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantAuth.permission_does_not_exists));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("")));
 
-        return new BasicMessageResponse<>(200, ConstantAuth.success_permission_find_by_id, permission);
+        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), permission);
     }
 
 }

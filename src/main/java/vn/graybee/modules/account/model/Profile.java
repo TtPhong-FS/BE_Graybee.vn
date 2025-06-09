@@ -27,8 +27,6 @@ public class Profile {
 
     private String phone;
 
-    private String email;
-
     @Column(name = "avatar_url")
     private String avatarUrl;
 

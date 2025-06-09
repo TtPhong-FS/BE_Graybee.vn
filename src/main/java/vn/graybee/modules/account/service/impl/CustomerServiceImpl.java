@@ -1,7 +1,7 @@
 package vn.graybee.modules.account.service.impl;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.common.constants.ConstantAccount;
+import vn.graybee.common.Constants;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.repository.CustomerRepository;
@@ -28,7 +28,7 @@ public class CustomerServiceImpl implements CustomerService {
         accountService.isAccountExistById(accountId);
 
         return customerRepository.findIdByAccountId(accountId)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantAccount.CUSTOMER_NOT_FOUND, messageSourceUtil.get("common.not.found", new Object[]{ConstantAccount.CUSTOMER})));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("account.customer.not.found")));
     }
 
 }

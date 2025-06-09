@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import vn.graybee.auth.exception.AuthException;
-import vn.graybee.common.constants.ConstantAuth;
+import vn.graybee.common.Constants;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.dto.response.AccountPrincipal;
 import vn.graybee.modules.account.repository.AccountRepository;
@@ -34,14 +34,14 @@ public class UserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String uid) throws UsernameNotFoundException {
 
         AccountPrincipal user = accountRepository.findByUid(uid)
-                .orElseThrow(() -> new AuthException(ConstantAuth.AUTH_USER_NOT_FOUND, messageSourceUtil.get("auth.user.invalid_credentials")));
+                .orElseThrow(() -> new AuthException(Constants.Common.root, messageSourceUtil.get("auth.user.invalid_credentials")));
 
         if (user.isSuperAdmin()) {
             return new UserDetail(user);
         }
 
         if (!user.isActive()) {
-            throw new AuthException(ConstantAuth.auth_account_locked, messageSourceUtil.get("auth.account_locked"));
+            throw new AuthException(Constants.Common.root, messageSourceUtil.get("auth.account_locked"));
         }
 
 

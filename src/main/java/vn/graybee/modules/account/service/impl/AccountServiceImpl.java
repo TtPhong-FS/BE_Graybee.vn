@@ -7,8 +7,8 @@ import vn.graybee.auth.dto.request.CustomerRegisterRequest;
 import vn.graybee.auth.dto.response.AccountAuthDto;
 import vn.graybee.auth.enums.Role;
 import vn.graybee.auth.exception.AuthException;
-import vn.graybee.common.constants.ConstantAccount;
-import vn.graybee.common.constants.ConstantAuth;
+import vn.graybee.common.Constants;
+import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.CodeGenerator;
 import vn.graybee.common.utils.MessageSourceUtil;
@@ -29,7 +29,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void isAccountExistById(Long accountId) {
         if (!accountRepository.existsById(accountId)) {
-            throw new CustomNotFoundException(ConstantAccount.ACCOUNT_NOT_FOUND, messageSourceUtil.get("common.not.found", new Object[]{ConstantAccount.ACCOUNT}));
+            throw new CustomNotFoundException(Constants.Common.root, messageSourceUtil.get("account.not.found"));
         }
     }
 
@@ -44,7 +44,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = new Account();
         account.setUid(uid);
         account.setRole(Role.CUSTOMER);
-        account.setUsername(request.getPhone());
+        account.setEmail(request.getEmail());
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         account.setActive(true);
         account.setSuperAdmin(false);
@@ -52,9 +52,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountAuthDto getAccountAuthDtoByUsername(String username) {
-        return accountRepository.findByUsername(username)
-                .orElseThrow(() -> new AuthException(ConstantAuth.AUTH_USER_NOT_FOUND, messageSourceUtil.get("auth.user.invalid_credentials")));
+    public AccountAuthDto getAccountAuthDtoByEmail(String email) {
+        return accountRepository.findByEmail(email)
+                .orElseThrow(() -> new AuthException(Constants.Common.root, messageSourceUtil.get("auth.invalid_credentials")));
+    }
+
+    @Override
+    public Long getAccountIdByEmail(String email) {
+        return accountRepository.findIdByEmail(email).orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("auth.mail.invalid")));
+    }
+
+    @Override
+    public void checkExistsByEmail(String email) {
+        if (accountRepository.existsByEmail(email)) {
+            throw new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("account.email.exists"));
+        }
     }
 
 }

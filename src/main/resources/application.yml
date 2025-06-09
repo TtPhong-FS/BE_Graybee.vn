@@ -72,6 +72,7 @@ api:
     home: ${api.publicApi.base}/home
     auth: ${api.publicApi.base}/auth
     carts: ${api.publicApi.base}/carts
+    collections: ${api.publicApi.base}/collections
     products: ${api.publicApi.base}/products
     orders: ${api.publicApi.base}/orders
     search: ${api.publicApi.base}/search
@@ -80,7 +81,7 @@ api:
     auth: ${api.adminApi.base}/auth
     products: ${api.adminApi.base}/products
     categories: ${api.adminApi.base}/categories
-    attributes: ${api.adminApi.base}/categories/attributes
+    attributes: ${api.adminApi.base}/attributes
     orders: ${api.adminApi.base}/orders
     inventories: ${api.adminApi.base}/inventories
     permissions: ${api.adminApi.base}/permissions

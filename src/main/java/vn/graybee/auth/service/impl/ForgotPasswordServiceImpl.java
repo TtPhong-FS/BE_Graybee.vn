@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import vn.graybee.auth.model.ForgotPassword;
 import vn.graybee.auth.repository.ForgotPasswordRepository;
 import vn.graybee.auth.service.ForgotPasswordService;
-import vn.graybee.common.constants.ConstantGeneral;
+import vn.graybee.common.Constants;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
 
@@ -22,7 +22,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     @Override
     public ForgotPassword getByAccountIdAndOtp(Long accountId, Integer otp) {
         return forgotPasswordRepository.findByAccountIdAndOtp(accountId, otp)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("auth.otp.invalid")));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("auth.otp.invalid")));
     }
 
     @Override

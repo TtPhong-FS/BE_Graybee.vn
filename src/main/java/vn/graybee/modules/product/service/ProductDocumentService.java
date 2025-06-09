@@ -8,13 +8,13 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import vn.graybee.common.constants.ConstantGeneral;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
+import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.model.Product;
 import vn.graybee.modules.product.model.ProductDocument;
 import vn.graybee.modules.product.repository.ProductRepository;
-import vn.graybee.response.publics.products.ProductBasicResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -53,6 +53,7 @@ public class ProductDocumentService {
                 .map(doc -> new ProductDocument(
                                 doc.getId(),
                                 doc.getName(),
+                                doc.getSlug(),
                                 doc.getPrice(),
                                 doc.getFinalPrice(),
                                 doc.getThumbnail()
@@ -69,6 +70,7 @@ public class ProductDocumentService {
         for (ProductBasicResponse product : products) {
             ProductDocument productDocument = new ProductDocument();
             productDocument.setId(product.getId());
+            productDocument.setSlug(product.getSlug());
             productDocument.setName(product.getName());
             productDocument.setPrice(product.getPrice());
             productDocument.setFinalPrice(product.getFinalPrice());
@@ -79,12 +81,12 @@ public class ProductDocumentService {
                         i -> i.index("products").id(String.valueOf(productDocument.getId())).document(productDocument)
                 );
             } catch (IOException e) {
-                throw new BusinessCustomException(ConstantGeneral.general, e.getMessage());
+                throw new BusinessCustomException(Constants.Common.global, e.getMessage());
             }
 
         }
 
-        logger.info("✅ Đã index " + products.size() + " sản phẩm vào Elasticsearch.");
+        logger.info("Đã index " + products.size() + " sản phẩm vào Elasticsearch.");
 
         return new BasicMessageResponse<>(200, "Elasticsearch: Thành công tạo index cho " + products.size() + " sản phẩm!", null);
 
@@ -93,7 +95,9 @@ public class ProductDocumentService {
     public void insertProduct(Product product) {
         ProductDocument doc = new ProductDocument();
         doc.setId(product.getId());
+
         doc.setName(product.getName());
+        doc.setSlug(product.getSlug());
         doc.setPrice(product.getPrice());
         doc.setFinalPrice(product.getFinalPrice());
         doc.setThumbnail(product.getThumbnail());
@@ -103,7 +107,7 @@ public class ProductDocumentService {
                     i -> i.index("products").id(String.valueOf(doc.getId())).document(doc)
             );
         } catch (IOException e) {
-            throw new BusinessCustomException(ConstantGeneral.general, e.getMessage());
+            throw new BusinessCustomException(Constants.Common.global, e.getMessage());
         }
     }
 

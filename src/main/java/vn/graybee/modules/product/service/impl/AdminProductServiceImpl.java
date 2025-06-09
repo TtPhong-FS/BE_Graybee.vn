@@ -6,10 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.common.constants.ConstantGeneral;
-import vn.graybee.common.constants.ConstantProduct;
-import vn.graybee.common.dto.BasicMessageResponse;
-import vn.graybee.common.dto.MessageResponse;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.PaginationInfo;
 import vn.graybee.common.dto.SortInfo;
 import vn.graybee.common.exception.BusinessCustomException;
@@ -20,15 +17,20 @@ import vn.graybee.common.utils.TextUtils;
 import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.service.CategoryService;
-import vn.graybee.modules.product.dto.request.ProductCreateRequest;
+import vn.graybee.modules.product.dto.request.ProductRequest;
 import vn.graybee.modules.product.dto.request.ProductUpdateRequest;
 import vn.graybee.modules.product.dto.response.InventoryProductDto;
 import vn.graybee.modules.product.dto.response.ProductResponse;
 import vn.graybee.modules.product.dto.response.ProductUpdateDto;
+import vn.graybee.modules.product.dto.response.ProductWithClassifyDto;
 import vn.graybee.modules.product.enums.ProductStatus;
 import vn.graybee.modules.product.model.Product;
+import vn.graybee.modules.product.model.ProductClassifyView;
 import vn.graybee.modules.product.repository.ProductRepository;
 import vn.graybee.modules.product.service.AdminProductService;
+import vn.graybee.modules.product.service.ProductAttributeValueService;
+import vn.graybee.modules.product.service.ProductCategoryService;
+import vn.graybee.modules.product.service.ProductClassifyViewService;
 import vn.graybee.modules.product.service.ProductDescriptionService;
 import vn.graybee.modules.product.service.ProductDocumentService;
 import vn.graybee.modules.product.service.ProductImageService;
@@ -69,9 +71,11 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     private final ProductImageService productImageService;
 
+    private final ProductCategoryService productCategoryService;
 
     private final ProductInventoryHelperService productInventoryHelperService;
 
+    private final ProductAttributeValueService productAttributeValueService;
 
     private final ProductRepository productRepository;
 
@@ -79,8 +83,13 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     private final RedisProductService redisProductService;
 
-    public AdminProductServiceImpl(MessageSourceUtil messageSourceUtil, ProductDocumentService productDocumentService, ProductDescriptionService productDescriptionService, ProductImageService productImageService, @Lazy ProductInventoryHelperService productInventoryHelperService, ProductRepository productRepository, CategoryService categoryService, RedisProductService redisProductService) {
+    private final ProductClassifyViewService productClassifyViewService;
+
+    public AdminProductServiceImpl(MessageSourceUtil messageSourceUtil, ProductDocumentService productDocumentService, ProductDescriptionService productDescriptionService, ProductImageService productImageService, @Lazy ProductInventoryHelperService productInventoryHelperService, ProductRepository productRepository, CategoryService categoryService, RedisProductService redisProductService, ProductCategoryService productCategoryService, ProductClassifyViewService productClassifyViewService, ProductAttributeValueService productAttributeValueService) {
         this.messageSourceUtil = messageSourceUtil;
+        this.productAttributeValueService = productAttributeValueService;
+        this.productClassifyViewService = productClassifyViewService;
+        this.productCategoryService = productCategoryService;
         this.productDocumentService = productDocumentService;
         this.productDescriptionService = productDescriptionService;
         this.productImageService = productImageService;
@@ -93,8 +102,11 @@ public class AdminProductServiceImpl implements AdminProductService {
     public ProductResponse getProductResponse(Product product) {
         return new ProductResponse(
                 product
-
         );
+    }
+
+    private ProductWithClassifyDto getProductWithClassifyDto(Product product, ProductClassifyView classifyView) {
+        return new ProductWithClassifyDto(product, classifyView);
     }
 
     private BigDecimal calculateFinalPrice(BigDecimal price, int discount) {
@@ -106,37 +118,37 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     public void checkExistById(long id) {
         if (!productRepository.checkExistsById(id)) {
-            throw new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists);
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists"));
         }
+    }
+
+    public CategorySummaryDto getCategorySummaryDtoByNameOrId(String name, Long id) {
+        return categoryService.getCategorySummaryByNameOrId(name, id);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ProductResponse> createProduct(ProductCreateRequest request) {
-
+    public ProductWithClassifyDto createProduct(ProductRequest request) {
 
         ProductStatus status = ProductStatus.getStatus(request.getStatus(), messageSourceUtil);
 
         if (productRepository.existsByName(request.getName())) {
-            throw new BusinessCustomException(ConstantProduct.name, messageSourceUtil.get("product.name_exists", new Object[]{request.getName()}));
-        }
-
-        CategorySummaryDto categorySummaryDto = categoryService.getCategorySummaryByName(request.getProductType());
-
-        BigDecimal finalPrice = BigDecimal.ZERO;
-
-        if (request.getPrice().compareTo(BigDecimal.ZERO) > 0) {
-            finalPrice = calculateFinalPrice(request.getPrice(), request.getDiscountPercent());
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("product.name_exists", new Object[]{request.getName()}));
         }
 
         Product product = new Product();
 
+        if (request.getSlug() != null && !request.getSlug().isEmpty()) {
+            product.setSlug(SlugUtil.toSlug(request.getSlug()));
+        } else {
+            product.setSlug(SlugUtil.toSlug(request.getName()));
+        }
+
         product.setStatus(status);
         product.setName(TextUtils.capitalizeEachWord(request.getName()));
-        product.setSlug(SlugUtil.toSlug(request.getName()));
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
-        product.setFinalPrice(finalPrice);
+        product.setFinalPrice(product.calculateFinalPrice(request.getPrice(), request.getDiscountPercent()));
         product.setConditions(request.getConditions().toUpperCase());
         product.setDimension(request.getDimension());
         product.setWeight(request.getWeight());
@@ -146,57 +158,69 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         product = productRepository.save(product);
 
+        productCategoryService.createProductCategory(product.getId(), request.getCategoryName(), request.getBrandName(), request.getTagNames());
+
+//        Create Detail information for Product
+        productAttributeValueService.createProductAttributeValue(product.getId(), request.getCategoryName(), request.getAttributes());
+
+        ProductClassifyView productClassifyView = productClassifyViewService.createProductClassifyView(product.getId(), product.getName(), product.getSlug(), request.getCategoryName(), request.getBrandName(), request.getTagNames());
+
         productDescriptionService.saveProductDescription(product.getId(), request.getDescription());
-        productImageService.saveProductImages(product.getId(), request.getImages().stream().skip(0).toList());
+
+        productImageService.saveProductImages(product.getId(), request.getImages());
 
         productInventoryHelperService.saveInventoryByProductId(product.getId(), request.isStock(), request.getQuantity());
 
         productDocumentService.insertProduct(product);
 
-        categoryService.updateProductCount(categorySummaryDto.getId(), true);
+//        redisProductService.deleteProductListPattern(request.getCategoryName());
 
-        redisProductService.deleteProductListPattern(request.getProductType());
-
-        ProductResponse response = getProductResponse(product);
-
-        return new BasicMessageResponse<>(201, ConstantProduct.success_create, response);
+        return getProductWithClassifyDto(product, productClassifyView);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ProductResponse> updateProduct(long id, ProductUpdateRequest request) {
+    public ProductWithClassifyDto updateProduct(long id, ProductUpdateRequest request) {
 
         ProductStatus status = ProductStatus.getStatus(request.getStatus(), messageSourceUtil);
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.does_not_exists")));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists")));
 
         if (!product.getName().equals(request.getName()) && productRepository.existsByNameAndNotId(request.getName(), product.getId())) {
-            throw new BusinessCustomException(ConstantProduct.name, messageSourceUtil.get("product.name_exists", new Object[]{request.getName()}));
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("product.name_exists", new Object[]{request.getName()}));
         }
 
-        BigDecimal finalPrice = BigDecimal.ZERO;
-
-        if (request.getPrice().compareTo(BigDecimal.ZERO) > 0) {
-            finalPrice = calculateFinalPrice(request.getPrice(), request.getDiscountPercent());
+        if (request.getSlug() != null && !request.getSlug().isEmpty()) {
+            product.setSlug(SlugUtil.toSlug(request.getSlug()));
+        } else {
+            product.setSlug(SlugUtil.toSlug(request.getName()));
         }
 
         product.setName(TextUtils.capitalizeEachWord(request.getName()));
-        product.setSlug(SlugUtil.toSlug(request.getName()));
         product.setWarranty(request.getWarranty());
         product.setWeight(request.getWeight());
         product.setDimension(request.getDimension());
-        product.setThumbnail(request.getImages() != null && !request.getImages().isEmpty() ? request.getImages().get(0) : null);
+
+        if (product.getThumbnail() == null || product.getThumbnail().isEmpty()) {
+            product.setThumbnail(request.getImages() != null && !request.getImages().isEmpty() ? request.getImages().get(0) : null);
+        }
+
         product.setStatus(status);
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
-        product.setFinalPrice(finalPrice);
+        product.setFinalPrice(product.calculateFinalPrice(request.getPrice(), request.getDiscountPercent()));
         product.setColor(request.getColor());
 
         product.setUpdatedAt(LocalDateTime.now());
 
         product = productRepository.save(product);
 
+        productCategoryService.updateProductCategory(product.getId(), request.getBrandName(), request.getTagNames());
+
+        productAttributeValueService.updateProductAttributeValue(product.getId(), request.getAttributes());
+
+        ProductClassifyView productClassifyView = productClassifyViewService.updateProductClassifyViewByProductId(product.getId(), product.getName(), product.getSlug(), request.getBrandName(), request.getTagNames());
 
         productDescriptionService.updateProductDescription(product.getId(), request.getDescription());
 
@@ -204,46 +228,41 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         productInventoryHelperService.updateInventoryByProductId(product.getId(), request.isStock(), request.getQuantity());
 
-        ProductResponse response = getProductResponse(product);
+//        String key = PRODUCT_DETAIL_KEY + product.getId();
 
-        String key = PRODUCT_DETAIL_KEY + product.getId();
+//        redisProductService.deleteProduct(key);
+//        redisProductService.deleteProductListPattern(null);
 
-        redisProductService.deleteProduct(key);
-        redisProductService.deleteProductListPattern(null);
-
-        return new BasicMessageResponse<>(200, messageSourceUtil.get("product.success_update_by_id", new Object[]{product.getName()}), response);
+        return getProductWithClassifyDto(product, productClassifyView);
     }
 
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<Long> deleteProductById(long id) {
+    public Long deleteProductById(long id) {
 
         int leftQuantity = productInventoryHelperService.getAvailableStock(id);
 
         if (leftQuantity > 0) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.left_quantity", new Object[]{leftQuantity}));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.left_quantity", new Object[]{leftQuantity}));
         }
 
         productRepository.deleteById(id);
         productDocumentService.deleteProduct(id);
 
-        return new BasicMessageResponse<>(200, messageSourceUtil.get("product.success_delete"), id);
+        return id;
     }
 
     @Override
-    public MessageResponse<List<ProductResponse>> getAllProductDtoForDashboard(String status, String category, String manufacturer, int page, int size, String sortBy, String order) {
+    public Page<ProductResponse> getAllProductDtoForDashboard(String status, String category, String manufacturer, int page, int size, String sortBy, String order) {
 
         ProductStatus statusEnum = null;
 
-        try {
-            if (status != null && !status.isEmpty() && !"all".equals(status)) {
-                statusEnum = ProductStatus.valueOf(status.toUpperCase());
 
-            }
-        } catch (RuntimeException e) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid);
+        if (status != null && !status.isEmpty() && !"all".equals(status)) {
+            statusEnum = ProductStatus.getStatus(status, messageSourceUtil);
         }
+
 
         String categoryName = category.equals("all") ? null : category;
         String manufacturerName = manufacturer.equals("all") ? null : manufacturer;
@@ -257,44 +276,39 @@ public class AdminProductServiceImpl implements AdminProductService {
                 pageRequest);
 
         PaginationInfo paginationInfo = new PaginationInfo(
-                productPage.getNumber(),
-                productPage.getTotalPages(),
-                productPage.getTotalElements(),
-                productPage.getSize()
+
         );
 
         SortInfo sortInfo = new SortInfo(sortBy, order);
 
+        String message = productPage.getContent().isEmpty() ? messageSourceUtil.get("") : messageSourceUtil.get("s");
 
-        String message = productPage.getContent().isEmpty() ? ConstantGeneral.empty_list : ConstantProduct.success_fetch_products;
 
-
-        return new MessageResponse<>(200, message, productPage.getContent(), paginationInfo, sortInfo);
+        return productPage;
     }
 
     @Override
-    public BasicMessageResponse<ProductUpdateDto> getById(long productId) {
+    public ProductUpdateDto getById(long productId) {
 
         ProductUpdateDto response = productRepository.findProductUpdateDtoById(productId)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found")));
 
         List<String> images = productImageService.getProductImages(response.getId());
 
         response.setImages(images);
 
-        return new BasicMessageResponse<>(200, ConstantProduct.success_find_by_id, response);
+        return response;
     }
 
 
-    private BasicMessageResponse<ProductStatusResponse> updateStatus(Long id, ProductStatus status, String message) {
+    private ProductStatusResponse updateStatus(Long id, ProductStatus status, String message) {
         productRepository.updateStatusById(id, status);
-        ProductStatusResponse response = new ProductStatusResponse(id, status, LocalDateTime.now());
-        return new BasicMessageResponse<>(200, message, response);
+        return new ProductStatusResponse(id, status, LocalDateTime.now());
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ProductStatusResponse> updateStatus(long id, String status) {
+    public ProductStatusResponse updateStatus(long id, String status) {
 
         ProductStatus newStatus = ProductStatus.getStatus(status, messageSourceUtil);
 
@@ -303,7 +317,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         ProductStatus currentStatus = productRepository.findStatusById(id);
 
         if (currentStatus == newStatus) {
-            return new BasicMessageResponse<>(200, messageSourceUtil.get("product.status.not_changed"), null);
+            return null;
         }
 
         if (currentStatus == ProductStatus.REMOVED && newStatus == ProductStatus.DELETED) {
@@ -311,15 +325,11 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
 
         if (currentStatus == ProductStatus.REMOVED) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.removed"));
-        }
-
-        if (currentStatus == ProductStatus.DELETED) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.soft_delete"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.in_trash"));
         }
 
         if (INVALID_PUBLISH_TARGET_STATUSES.contains(newStatus) && currentStatus == ProductStatus.PUBLISHED) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.published", new Object[]{newStatus.getDisplayName()}));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.published", new Object[]{newStatus.getDisplayName()}));
         }
 
         if (CONDITIONAL_PUBLISHABLE_STATUSES.contains(currentStatus) &&
@@ -328,42 +338,40 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
 
         if (newStatus == ProductStatus.PUBLISHED) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.pending_to_published"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.pending_to_published"));
         }
 
-        throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("common.status.invalid", new Object[]{newStatus.getCode()}));
+        throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.status.invalid", new Object[]{newStatus.getCode()}));
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ProductResponse> restoreProduct(long id, UserDetail userDetail) {
+    public ProductWithClassifyDto restoreProduct(long id, UserDetail userDetail) {
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.does_not_exists")));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists")));
 
         ProductStatus status = product.getStatus();
 
         if (userDetail != null && !userDetail.user().isSuperAdmin() && status == ProductStatus.DELETED) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("auth.not_super_admin"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("auth.not_super_admin"));
         }
 
         if (status != ProductStatus.DELETED && status != ProductStatus.REMOVED) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.not_in_trash"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.not_in_trash"));
         }
 
         productRepository.updateStatusById(id, ProductStatus.INACTIVE);
 
+        ProductClassifyView productClassifyView = productClassifyViewService.findByProductId(product.getId());
 
-        ProductResponse response = getProductResponse(product);
-
-        return new BasicMessageResponse<>(200, messageSourceUtil.get("product.success.restore", new Object[]{product.getName()}), response);
+        return getProductWithClassifyDto(product, productClassifyView);
     }
 
     @Override
     public InventoryProductDto getProductBasicDtoById(long productId) {
-        InventoryProductDto inventoryProductDto = productRepository.findProductBasicDtoById(productId)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("product.does_not_exists")));
-        return inventoryProductDto;
+        return productRepository.findProductBasicDtoById(productId)
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists")));
     }
 
 

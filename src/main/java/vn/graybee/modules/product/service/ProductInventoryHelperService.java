@@ -21,7 +21,6 @@ public class ProductInventoryHelperService {
     }
 
     public void saveInventoryByProductId(Long productId, boolean stock, int quantity) {
-
         inventoryService.saveInventoryByProductId(productId, stock, quantity);
     }
 

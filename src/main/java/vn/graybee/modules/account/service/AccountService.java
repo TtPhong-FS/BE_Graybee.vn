@@ -12,6 +12,10 @@ public interface AccountService {
 
     Account saveAccount(CustomerRegisterRequest request);
 
-    AccountAuthDto getAccountAuthDtoByUsername(String username);
+    AccountAuthDto getAccountAuthDtoByEmail(String email);
+
+    Long getAccountIdByEmail(String email);
+
+    void checkExistsByEmail(String email);
 
 }

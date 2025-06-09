@@ -1,7 +1,7 @@
 package vn.graybee.modules.account.service.impl;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.common.constants.ConstantGeneral;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
@@ -30,7 +30,7 @@ public class AddressServiceImpl implements AddressService {
 
     private void checkExistsById(Integer id) {
         if (!addressRepository.checkExistsById(id)) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("account.customer.address.not-found"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("account.customer.address.not-found"));
         }
     }
 
@@ -88,7 +88,7 @@ public class AddressServiceImpl implements AddressService {
     public BasicMessageResponse<AddressResponse> updateAddress(Long customerId, Integer addressId, AddressCreateRequest request) {
 
         Address updateAddress = addressRepository.findByIdAndCustomerId(customerId, addressId)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("account.customer.address.not-found")));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("account.customer.address.not-found")));
 
         updateAddress.setRecipientName(request.getRecipientName());
         updateAddress.setPhone(request.getPhone());
@@ -122,7 +122,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public AddressResponse getAddressDefaultByIdAndCustomerId(Long customerId, Integer addressId) {
         return addressRepository.findAddressDefaultByIdAndCustomerId(customerId, addressId)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("account.customer.address.not-found")));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("account.customer.address.not-found")));
     }
 
 }

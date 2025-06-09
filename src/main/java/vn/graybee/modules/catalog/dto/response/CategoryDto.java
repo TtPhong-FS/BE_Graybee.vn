@@ -26,10 +26,9 @@ public class CategoryDto {
 
     private String name;
 
+    private String type;
 
     private CategoryStatus status;
-
-    private int productCount;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
@@ -41,7 +40,6 @@ public class CategoryDto {
         this.id = category.getId();
         this.name = category.getName();
         this.status = category.getStatus();
-        this.productCount = category.getProductCount();
         this.createdAt = category.getCreatedAt();
         this.updatedAt = category.getUpdatedAt();
     }

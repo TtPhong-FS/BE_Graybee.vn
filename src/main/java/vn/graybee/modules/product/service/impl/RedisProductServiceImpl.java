@@ -2,8 +2,8 @@ package vn.graybee.modules.product.service.impl;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.service.RedisProductService;
-import vn.graybee.response.publics.products.ProductBasicResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +43,7 @@ public class RedisProductServiceImpl implements RedisProductService {
     public void deleteProductListPattern(String category) {
         String pattern = "product:list:category:" + category.toLowerCase() + "*";
         Set<String> keys = redisTemplate.keys(pattern);
-        if (keys != null && !keys.isEmpty()) {
+        if (!keys.isEmpty()) {
             redisTemplate.delete(keys);
         }
     }

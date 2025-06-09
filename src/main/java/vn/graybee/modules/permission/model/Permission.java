@@ -7,8 +7,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import vn.graybee.common.model.BaseModel;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "permissions")
 public class Permission extends BaseModel {
@@ -23,53 +31,7 @@ public class Permission extends BaseModel {
     @Column(length = 150)
     private String description;
 
-    @Column(name = "user_count")
-    private int userCount;
-
     @Column(name = "is_active")
     private boolean isActive;
-
-    public Permission() {
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public int getUserCount() {
-        return userCount;
-    }
-
-    public void setUserCount(int userCount) {
-        this.userCount = userCount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
 }

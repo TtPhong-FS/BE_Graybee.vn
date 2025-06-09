@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 public class PaymentServiceImpl implements PaymentService {
 
     @Override
-    public Payment createPayment(Long orderId, BigDecimal totalAmount, PaymentCreateRequest request) {
+    public Payment savePaymentByOrderId(Long orderId, BigDecimal totalAmount, PaymentCreateRequest request) {
 
         PaymentMethod paymentMethod = PaymentMethod.valueOf(request.getPaymentMethod());
 

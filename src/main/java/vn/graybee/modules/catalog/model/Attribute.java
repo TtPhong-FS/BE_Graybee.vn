@@ -9,23 +9,38 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.graybee.common.model.BaseModel;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.List;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "attributes")
-public class Attribute extends BaseModel {
+public class Attribute {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
+
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 30)
+    @Column(length = 100, nullable = false)
+    private String label;
+
+    private boolean required;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "json")
+    private List<String> options;
+
+    @Column(length = 30)
     private String unit;
 
     @Column(name = "input_type", nullable = false, length = 30)

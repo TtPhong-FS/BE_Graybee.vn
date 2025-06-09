@@ -30,7 +30,7 @@ public class Account extends BaseModel {
     private String uid;
 
     @Column(nullable = false)
-    private String username;
+    private String email;
 
     @Column(nullable = false)
     private String password;

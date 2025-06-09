@@ -17,7 +17,7 @@ public class LanguageConfig {
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasenames(
-                "i18n/category",
+                "i18n/catalog",
                 "i18n/product",
                 "i18n/common",
                 "i18n/auth",

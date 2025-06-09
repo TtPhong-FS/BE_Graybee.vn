@@ -15,6 +15,7 @@ import vn.graybee.common.model.BaseModel;
 import vn.graybee.modules.product.enums.ProductStatus;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Setter
 @Getter
@@ -61,5 +62,14 @@ public class Product extends BaseModel {
 
     @Column(length = 250)
     private String thumbnail;
+
+    public BigDecimal calculateFinalPrice(BigDecimal price, int discountPercent) {
+        if (price.compareTo(BigDecimal.ZERO) > 0) {
+            return price.subtract(
+                    price.multiply(BigDecimal.valueOf(discountPercent)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
+            );
+        }
+        return price;
+    }
 
 }

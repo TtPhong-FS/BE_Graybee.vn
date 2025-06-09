@@ -1,6 +1,5 @@
 package vn.graybee.modules.product.dto.request;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,64 +10,66 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
 public class ProductUpdateRequest {
 
-    private List<String> usages;
+    @NotBlank(message = "product.validation.brandName.not.blank")
+    @Size(max = 35, message = "product.validation.brandName.size")
+    private String brandName;
 
-    private List<String> techSpecs;
+    @Size(max = 100)
+    private List<@Size(max = 100, message = "product.validation.tagName.size") String> tagNames;
 
-    private List<String> features;
+    private String slug;
 
-    private List<String> priceRanges;
-
-    @NotBlank(message = "{product.validation.name.not_blank}")
-    @Size(min = 5, max = 300, message = "{product.validation.name.size}")
+    @NotBlank(message = "product.validation.name.not.blank")
+    @Size(min = 5, max = 300, message = "product.validation.name.size")
     private String name;
 
-    @NotNull(message = "{product.validation.conditions.not_null}")
+    @NotNull(message = "product.validation.conditions.not.null")
     private String conditions;
 
-    @NotNull(message = "{product.validation.warranty.not_null}")
-    @PositiveOrZero(message = "{product.validation.quantity.not_negative}")
+    @NotNull(message = "product.validation.warranty.not.null")
+    @PositiveOrZero(message = "product.validation.warranty.not.negative")
     private int warranty;
 
-    @PositiveOrZero(message = "{product.validation.weight.not_negative}")
+    @PositiveOrZero(message = "product.validation.weight.not.negative")
     private float weight;
 
-    @Size(max = 50, message = "{product.validation.dimension.size}")
+    @Size(max = 50, message = "product.validation.dimension.size")
     private String dimension;
 
-    @NotNull(message = "{product.validation.price.not_null}")
-    @PositiveOrZero(message = "{product.validation.price.not_negative}")
-    @DecimalMax(value = "100000000.0", message = "{product.validation.price.max}")
+    @NotNull(message = "product.validation.price.not.null")
+    @PositiveOrZero(message = "product.validation.price.not.negative")
+    @DecimalMax(value = "100000000.0", message = "product.validation.price.max")
     private BigDecimal price;
 
-    @NotNull(message = "{product.validation.discountPercent.not_null}")
-    @PositiveOrZero(message = "{product.validation.discountPercent.not_negative}")
+    @NotNull(message = "product.validation.discountPercent.not.null")
+    @PositiveOrZero(message = "product.validation.discountPercent.not.negative")
     private int discountPercent;
 
-    @Size(max = 35, message = "{product.validation.color.size}")
+    @Size(max = 35, message = "product.validation.color.size")
     private String color;
 
     private boolean isStock;
 
     private boolean hasPromotion;
 
-    @NotNull(message = "{product.validation.quantity.not_null}")
-    @PositiveOrZero(message = "{product.validation.quantity.not_negative}")
-    private Integer quantity;
+    @NotNull(message = "product.validation.quantity.not.null")
+    @PositiveOrZero(message = "product.validation.quantity.not.negative")
+    private int quantity;
 
-    @NotBlank(message = "{common.status.not_blank}")
+    @NotBlank(message = "common.status.not.blank")
     private String status;
 
     private String description;
 
     private List<String> images;
 
-    @Valid
-    private DetailTemplateRequest detail;
+    @NotNull(message = "Thông tin chi tiết sản phẩm không được để trống")
+    private Map<String, String> attributes;
 
 }

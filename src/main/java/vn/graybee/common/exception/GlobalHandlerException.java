@@ -1,17 +1,22 @@
 package vn.graybee.common.exception;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.transaction.CannotCreateTransactionException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import vn.graybee.auth.exception.AuthException;
 import vn.graybee.common.utils.DatetimeFormatted;
 import vn.graybee.common.utils.MessageSourceUtil;
@@ -21,6 +26,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalHandlerException {
+
+    private final Logger logger = LoggerFactory.getLogger(GlobalHandlerException.class);
 
     private final MessageSourceUtil messageSource;
 
@@ -42,33 +49,33 @@ public class GlobalHandlerException {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handlerInValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handlerInValidException(MethodArgumentNotValidException ex) {
         Map<String, String> errorMap = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(
                 error -> {
-                    errorMap.put(error.getField(), error.getDefaultMessage());
+                    String message = messageSource.get(error.getDefaultMessage());
+                    errorMap.put(error.getField(), message);
                 }
         );
-        return errorMap;
+        return ResponseEntity.badRequest().body(errorMap);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BusinessCustomException.class)
-    public Map<String, String> handlerBusinessException(BusinessCustomException ex) {
+    public ResponseEntity<Map<String, String>> handlerBusinessException(BusinessCustomException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put(ex.getField(), ex.getMessage());
-        return errorMap;
+        return ResponseEntity
+                .badRequest()
+                .body(errorMap);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGlobalException(Exception ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                messageSource.get("common.error.500.detail")
-        );
-        problemDetail.setProperty("description", ex.getMessage());
-        problemDetail.setTitle(messageSource.get("common.error.500.title"));
-        return problemDetail;
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MultipleException.class)
+    public ResponseEntity<Map<String, String>> handlerMultipleException(MultipleException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ex.getFieldErrors());
     }
 
 
@@ -91,9 +98,44 @@ public class GlobalHandlerException {
                 HttpStatus.SERVICE_UNAVAILABLE,
                 messageSource.get("common.error.503.detail")
         );
+        logger.error("Service not ready: {}", ex.getMessage());
         problemDetail.setTitle(messageSource.get("common.error.503.title"));
         return problemDetail;
     }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ProblemDetail handleNotFound(NoHandlerFoundException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                messageSource.get("common.error.404.detail")
+        );
+        logger.error("Endpoint not found: {}", ex.getMessage());
+        problemDetail.setTitle(messageSource.get("common.error.404.title"));
+        return problemDetail;
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ProblemDetail handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                messageSource.get("common.method.not-support.detail")
+        );
+
+        problemDetail.setTitle(messageSource.get("common.method.not-support.title"));
+        return problemDetail;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleGlobalException(Exception ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                messageSource.get("common.error.500.detail")
+        );
+        logger.error("Unhandled exception: {}", ex.getMessage());
+        problemDetail.setTitle(messageSource.get("common.error.500.title"));
+        return problemDetail;
+    }
+
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleConnectFailed(HttpMessageNotReadableException ex) {
@@ -101,6 +143,7 @@ public class GlobalHandlerException {
                 HttpStatus.BAD_REQUEST,
                 messageSource.get("common.error.400.detail")
         );
+        logger.error("Error missing body: {}", ex.getMessage());
         problemDetail.setTitle(messageSource.get("common.error.400.title"));
         return problemDetail;
     }
@@ -111,6 +154,7 @@ public class GlobalHandlerException {
                 HttpStatus.BAD_REQUEST,
                 messageSource.get("common.error.400.detail")
         );
+        logger.error("Error missing params: {}", ex.getMessage());
         problemDetail.setTitle(messageSource.get("common.error.400.title"));
         return problemDetail;
     }

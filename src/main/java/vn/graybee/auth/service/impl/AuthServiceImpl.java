@@ -19,7 +19,7 @@ import vn.graybee.auth.service.AuthService;
 import vn.graybee.auth.service.ForgotPasswordService;
 import vn.graybee.auth.service.JwtService;
 import vn.graybee.auth.service.RedisAuthService;
-import vn.graybee.common.constants.ConstantGeneral;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.service.MailService;
@@ -69,14 +69,14 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<RegisterDto> signUp(CustomerRegisterRequest request, String sessionId) {
 
-        profileService.checkExistsByEmail(request.getEmail());
+        accountService.checkExistsByEmail(request.getEmail());
         profileService.checkExistsByPhone(request.getPhone());
 
         Account account = accountService.saveAccount(request);
 
         Profile profile = profileService.saveProfileByAccountId(account.getId(), request);
 
-        cartService.findOrCreateCart(account.getId(), sessionId);
+        cartService.syncGuestCartToAccount(account.getId(), sessionId);
 
         orderService.transformOrdersToAccountBySessionId(account.getId(), sessionId);
 
@@ -95,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<AuthDto> Login(LoginRequest request) {
 
-        AccountAuthDto auth = accountService.getAccountAuthDtoByUsername(request.getPhone());
+        AccountAuthDto auth = accountService.getAccountAuthDtoByEmail(request.getEmail());
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -117,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<String> verifyEmail(String email) {
 
-        Long accountId = profileService.getAccountIdByEmail(email);
+        Long accountId = accountService.getAccountIdByEmail(email);
 
         Integer otp = Integer.valueOf(CodeGenerator.generateCode(6, CodeGenerator.DIGITS));
 
@@ -139,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<String> verifyOtp(Integer otp, String email) {
 
-        Long accountId = profileService.getAccountIdByEmail(email);
+        Long accountId = accountService.getAccountIdByEmail(email);
 
         ForgotPassword forgotPassword = forgotPasswordService.getByAccountIdAndOtp(accountId, otp);
 
@@ -157,10 +157,10 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<String> resetPassword(String email, ResetPassword resetPassword) {
 
-        Long accountId = profileService.getAccountIdByEmail(email);
+        Long accountId = accountService.getAccountIdByEmail(email);
 
         if (!Objects.equals(resetPassword.password(), resetPassword.repeatPassword())) {
-            throw new BusinessCustomException(ConstantGeneral.root, messageSourceUtil.get("auth.password.not_match"));
+            throw new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("auth.password.not_match"));
         }
 
         String password = passwordEncoder.encode(resetPassword.password());

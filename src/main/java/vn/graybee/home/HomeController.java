@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
+import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.catalog.dto.response.SidebarDto;
 import vn.graybee.modules.catalog.service.CategoryService;
 import vn.graybee.modules.product.service.ProductService;
@@ -23,12 +24,14 @@ public class HomeController {
 
     @GetMapping("/sidebar")
     public ResponseEntity<BasicMessageResponse<List<SidebarDto>>> getSidebar() {
-        return ResponseEntity.ok(categoryService.getSidebar());
+        return ResponseEntity.ok(
+                MessageBuilder.ok(categoryService.getSidebar(), null)
+        );
     }
-
+//
 //    @GetMapping("/carousel")
-//    public ResponseEntity<BasicMessageResponse<List<SidebarDto>>> getSidebar() {
-//        return ResponseEntity.ok(categoryService.getSidebar());
+//    public ResponseEntity<BasicMessageResponse<List<ProductBasicResponse>>> findAllProductBasics() {
+//        return ResponseEntity.ok(productService.());
 //    }
 
 }

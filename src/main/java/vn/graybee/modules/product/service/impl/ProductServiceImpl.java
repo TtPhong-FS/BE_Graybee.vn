@@ -1,33 +1,31 @@
 package vn.graybee.modules.product.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import vn.graybee.common.constants.ConstantGeneral;
-import vn.graybee.common.constants.ConstantProduct;
-import vn.graybee.common.dto.BasicMessageResponse;
-import vn.graybee.common.dto.MessageResponse;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.PaginationInfo;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeDisplayDto;
 import vn.graybee.modules.comment.dto.response.ReviewCommentDto;
-import vn.graybee.modules.comment.repository.ReviewCommentRepository;
 import vn.graybee.modules.product.dto.response.FavoriteProductResponse;
-import vn.graybee.modules.product.repository.ProductDescriptionRepository;
-import vn.graybee.modules.product.repository.ProductImageRepository;
+import vn.graybee.modules.product.dto.response.ProductBasicResponse;
+import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.modules.product.repository.ProductRepository;
+import vn.graybee.modules.product.service.ProductAttributeValueService;
+import vn.graybee.modules.product.service.ProductCategoryService;
+import vn.graybee.modules.product.service.ProductImageService;
 import vn.graybee.modules.product.service.ProductService;
 import vn.graybee.modules.product.service.RedisProductService;
-import vn.graybee.modules.product.service.detail.DetailFetcher;
-import vn.graybee.response.publics.products.DetailTemplateResponse;
-import vn.graybee.response.publics.products.ProductBasicResponse;
-import vn.graybee.response.publics.products.ProductDetailResponse;
+import vn.graybee.modules.product.service.ReviewCommentSerivce;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+@AllArgsConstructor
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -37,27 +35,18 @@ public class ProductServiceImpl implements ProductService {
 
     private final MessageSourceUtil messageSourceUtil;
 
-    private final List<DetailFetcher> detailFetchers;
-
     private final ProductRepository productRepository;
 
-    private final ProductImageRepository productImageRepository;
+    private final ProductImageService productImageService;
 
-    private final ProductDescriptionRepository productDescriptionRepository;
+    private final ProductAttributeValueService productAttributeValueService;
 
-    private final ReviewCommentRepository reviewCommentRepository;
+    private final ReviewCommentSerivce reviewCommentSerivce;
+
+    private final ProductCategoryService productCategoryService;
 
     private final RedisProductService redisProductService;
 
-    public ProductServiceImpl(MessageSourceUtil messageSourceUtil, List<DetailFetcher> detailFetchers, ProductRepository productRepository, ProductImageRepository productImageRepository, ProductDescriptionRepository productDescriptionRepository, ReviewCommentRepository reviewCommentRepository, RedisProductService redisProductService) {
-        this.messageSourceUtil = messageSourceUtil;
-        this.detailFetchers = detailFetchers;
-        this.productRepository = productRepository;
-        this.productImageRepository = productImageRepository;
-        this.productDescriptionRepository = productDescriptionRepository;
-        this.reviewCommentRepository = reviewCommentRepository;
-        this.redisProductService = redisProductService;
-    }
 
     public PaginationInfo getPagination(Page<ProductBasicResponse> page) {
         return new PaginationInfo(
@@ -69,7 +58,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public MessageResponse<List<ProductBasicResponse>> findByCategoryName(String categoryName, int page, int size, String sortBy, String order) {
+    public List<ProductBasicResponse> findProductByCategorySlug(String categorySlug) {
+
+        return productCategoryService.findProductByCategorySlug(categorySlug);
 
 //        List<ProductBasicResponse> cachedProducts = redisProductService.getCachedListProductBasicBySortedSet(categoryName, sortBy, page, size, true);
 //
@@ -111,79 +102,50 @@ public class ProductServiceImpl implements ProductService {
 //        redisProductService.cacheListProductBasicBySortedSet(productPage.getContent(), categoryName, sortBy, 12, TimeUnit.HOURS);
 //
 //        return new MessageResponse<>(200, message, productPage.getContent(), paginationInfo, sortInfo);
-        return null;
+
     }
 
 
     @Override
     public ProductPriceResponse getPriceById(long id) {
         return productRepository.getPriceById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("")));
     }
 
     @Override
     public ProductBasicResponse getProductBasicInfoForCart(long id) {
         return productRepository.findBasicInfoForCart(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, ConstantProduct.does_not_exists));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("")));
     }
 
-
     @Override
-    public BasicMessageResponse<ProductDetailResponse> getDetailById(long id) {
-        String key = PRODUCT_DETAIL_KEY + id;
+    public ProductDetailDto findProductDetailBySlug(String slug) {
 
-        ProductDetailResponse cache = redisProductService.getProduct(key, ProductDetailResponse.class);
-        if (cache != null) {
-            return new BasicMessageResponse<>(200, null, cache);
-        }
+        ProductDetailDto productDetailDto = productRepository.findProductDetailDtoBySlug(slug)
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found")));
 
-        ProductDetailResponse productResponse = productRepository.getDetailByProductId(id)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, ConstantProduct.not_available));
+        List<String> imageUrls = productImageService.getProductImages(productDetailDto.getProductId());
 
-        String type = detailFetchers.stream()
-                .map(DetailFetcher::getDetailType)
-                .filter(detailType -> detailType.equalsIgnoreCase(productResponse.getCategoryName()))
-                .findFirst()
-                .orElse(null);
+        List<AttributeDisplayDto> attributeDisplayDtos = productAttributeValueService.getAttributeDisplayDtosByProductId(productDetailDto.getProductId());
 
-        if (type != null) {
+        List<ReviewCommentDto> reviewCommentDtos = reviewCommentSerivce.getReviewCommentDtosByProductId(productDetailDto.getProductId());
 
-            DetailFetcher fetcher = detailFetchers.stream()
-                    .filter(f -> f.getDetailType().equalsIgnoreCase(type))
-                    .findFirst()
-                    .orElse(null);
-
-            if (fetcher != null) {
-                DetailTemplateResponse detail = fetcher.fetchDetail(productResponse.getId());
-                productResponse.setDetail(detail);
-            }
-        }
-
-        List<String> images = productImageRepository.findImageUrlsByProductId(productResponse.getId());
-        List<ReviewCommentDto> reviews = reviewCommentRepository.getReviewsByProductId(productResponse.getId());
-        String description = productDescriptionRepository.getDescriptionByProductId(productResponse.getId());
-
-        productResponse.setImages(images);
-        productResponse.setDescription(description);
-        productResponse.setReviews(reviews);
-
-//        productStatisticService.updateViewCount(productResponse.getId());
-
-        redisProductService.setProduct(key, productResponse, 6, TimeUnit.HOURS);
-
-        return new BasicMessageResponse<>(200, null, productResponse);
+        productDetailDto.setReviews(reviewCommentDtos);
+        productDetailDto.setImages(imageUrls);
+        productDetailDto.setDetails(attributeDisplayDtos);
+        return productDetailDto;
     }
 
     @Override
     public BigDecimal getProductPriceById(long id) {
         return productRepository.findFinalPriceById(id)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("product.not.found.or.out_of_business")));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found.or.out_of_business")));
     }
 
     @Override
     public FavoriteProductResponse getProductFavouriteById(Long productId) {
         return productRepository.findProductFavouriteById(productId)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("product.not.found.or.out_of_business")));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found.or.out_of_business")));
     }
 
 }

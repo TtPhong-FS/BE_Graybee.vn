@@ -1,9 +1,17 @@
 package vn.graybee.modules.cart.dto.response;
 
-import vn.graybee.response.publics.products.ProductBasicResponse;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 
 import java.math.BigDecimal;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CartItemDto {
 
     private Integer cartItemId;
@@ -13,47 +21,5 @@ public class CartItemDto {
     private int quantity;
 
     private BigDecimal total;
-
-    public CartItemDto() {
-    }
-
-    public CartItemDto(Integer cartItemId, int quantity, BigDecimal total, ProductBasicResponse product) {
-        this.cartItemId = cartItemId;
-        this.product = product;
-        this.quantity = quantity;
-        this.total = total;
-    }
-
-    public Integer getCartItemId() {
-        return cartItemId;
-    }
-
-    public void setCartItemId(Integer cartItemId) {
-        this.cartItemId = cartItemId;
-    }
-
-    public ProductBasicResponse getProduct() {
-        return product;
-    }
-
-    public void setProduct(ProductBasicResponse product) {
-        this.product = product;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
 
 }

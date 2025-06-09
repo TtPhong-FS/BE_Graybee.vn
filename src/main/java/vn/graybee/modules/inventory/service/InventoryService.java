@@ -24,8 +24,8 @@ public interface InventoryService {
 
     void increaseStock(Long productId, int quantity);
 
-    void saveInventoryByProductId(Long productId, boolean stock, Integer quantity);
+    void saveInventoryByProductId(Long productId, boolean stock, int quantity);
 
-    void updateInventoryByProductId(Long productId, boolean stock, Integer quantity);
+    void updateInventoryByProductId(Long productId, boolean stock, int quantity);
 
 }

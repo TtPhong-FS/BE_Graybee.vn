@@ -22,7 +22,6 @@ public class ApiProperties {
     @Getter
     public static class PublicApi {
 
-
         private String base;
 
         private String home;

@@ -9,13 +9,12 @@ import lombok.Setter;
 @Getter
 public class LoginRequest {
 
-    @NotBlank(message = "account.validation.phone.not_blank")
-    @Size(max = 12, message = "Số điện thoại chỉ được từ 10 - 12 số")
-    private String phone;
+    @NotBlank(message = "{account.validation.phone.not_blank}")
+    @Size(max = 100, message = "{account.validation.email.too-long}")
+    private String email;
 
-    @NotBlank(message = "account.validation.password.not_blank")
-    @Size(max = 100, message = "Độ dài tối đa không vượt quá 100 ký tự")
+    @NotBlank(message = "{account.validation.password.not_blank}")
+    @Size(max = 100, message = "{account.validation.password.too-long}")
     private String password;
-
 
 }

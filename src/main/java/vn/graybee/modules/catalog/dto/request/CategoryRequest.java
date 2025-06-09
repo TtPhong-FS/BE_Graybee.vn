@@ -1,29 +1,28 @@
 package vn.graybee.modules.catalog.dto.request;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Setter
 @Getter
 public class CategoryRequest {
 
-    @NotBlank(message = "category.name.not_blank")
-    @Size(min = 2, max = 35, message = "category.name.size")
+    @NotBlank(message = "catalog.validation.category.name.not.blank")
+    @Size(min = 2, max = 100, message = "catalog.validation.category.name.size")
     private String name;
+
+    @Size(max = 100, message = "catalog.validation.category.slug.name.size")
+    private String slug;
+
+    @NotBlank(message = "catalog.validation.category.type.not.blank")
+    private String type;
 
     @NotBlank(message = "common.status.not_blank")
     private String status;
 
-    @Size(max = 35, message = "category.parentName.size")
+    @Size(max = 35, message = "catalog.validation.category.parentName.size")
     private String parentName;
-
-    @Valid
-    private List<AttributeRequest> attributes;
-
 
 }

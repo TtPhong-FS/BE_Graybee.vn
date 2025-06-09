@@ -2,8 +2,7 @@ package vn.graybee.modules.order.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.common.constants.ConstantGeneral;
-import vn.graybee.common.constants.ConstantOrder;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
@@ -68,18 +67,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public BasicMessageResponse<List<OrderHistoryResponse>> getOrderHistoryByAccountId(Long accountId, String status) {
         OrderStatus orderStatus = null;
-        try {
-            if (status != null && !status.isEmpty() && !"all".equals(status) && !"null".equals(status)) {
-                orderStatus = OrderStatus.valueOf(status.toUpperCase());
-            }
-        } catch (RuntimeException e) {
-            throw new BusinessCustomException(ConstantGeneral.status, ConstantGeneral.status_invalid);
+
+        if (status != null && !status.isEmpty() && !"all".equals(status) && !"null".equals(status)) {
+            orderStatus = OrderStatus.fromString(status, messageSourceUtil);
         }
+
 
         List<OrderBasicDto> orders = orderRepository.findAllOrdersByAccountIdAndStatus(accountId, orderStatus);
 
         if (orders.isEmpty()) {
-            return new BasicMessageResponse<>(200, ConstantOrder.order_history_empty, Collections.emptyList());
+            return new BasicMessageResponse<>(200, messageSourceUtil.get(""), Collections.emptyList());
         }
 
         List<Long> orderIds = orders.stream().map(OrderBasicDto::getId).toList();
@@ -123,16 +120,19 @@ public class OrderServiceImpl implements OrderService {
 //
 //        });
 
-        return new BasicMessageResponse<>(200, ConstantOrder.success_get_order_history, response);
+        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), response);
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void transformOrdersToAccountBySessionId(Long accountId, String sessionId) {
         if (sessionId == null || sessionId.isEmpty()) return;
 
         List<Long> orderIds = orderRepository.findIdsBySessionId(sessionId);
 
-        orderRepository.transformOrdersToAccountByIds(accountId, orderIds);
+        if (!orderIds.isEmpty()) {
+            orderRepository.transformOrdersToAccountByIds(accountId, orderIds);
+        }
 
     }
 
@@ -142,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
     public BasicMessageResponse<?> createOrder(OrderCreateRequest request, Long accountId, String sessionId) {
 
         if (accountId == null && sessionId == null) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("common.request.invalid")
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.request.invalid")
             );
         }
 
@@ -151,7 +151,7 @@ public class OrderServiceImpl implements OrderService {
         List<CartItem> cartItems = cartItemService.getCartItemByIdsAndCartId(request.getCartItemIds(), cartId);
 
         if (cartItems.isEmpty()) {
-            throw new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("cart.item.empty"));
+            throw new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.item.empty"));
         }
 
         Order order = new Order();
@@ -183,7 +183,7 @@ public class OrderServiceImpl implements OrderService {
 
         order = orderRepository.save(order);
 
-        paymentService.createPayment(order.getId(), order.getTotalAmount(), request.getPaymentCreateRequest());
+        paymentService.savePaymentByOrderId(order.getId(), order.getTotalAmount(), request.getPaymentCreateRequest());
 
         AddressResponse address;
         if (accountId != null) {
@@ -202,7 +202,7 @@ public class OrderServiceImpl implements OrderService {
 
         cartService.updateCartTotal(cartId);
 
-        return new BasicMessageResponse<>(201, ConstantOrder.success_create_order, cartItemIds);
+        return new BasicMessageResponse<>(201, messageSourceUtil.get(""), cartItemIds);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class OrderServiceImpl implements OrderService {
     public BasicMessageResponse<CancelOrderResponse> cancelOrderById(long orderId) {
 
         if (!orderRepository.checkExistsById(orderId)) {
-            throw new BusinessCustomException(ConstantGeneral.general, ConstantOrder.does_not_exists);
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get(""));
         }
 
         OrderStatus status = orderRepository.findStatusById(orderId);
@@ -218,12 +218,12 @@ public class OrderServiceImpl implements OrderService {
         if (status.equals(OrderStatus.PENDING) || status.equals(OrderStatus.CONFIRMED) || status.equals(OrderStatus.PROCESSING)) {
             orderRepository.cancelOrderById(orderId);
         } else {
-            throw new BusinessCustomException(ConstantGeneral.general, ConstantOrder.cannot_cancel_order_already_delivery);
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get(""));
         }
 
         CancelOrderResponse response = new CancelOrderResponse(orderId, true, OrderStatus.CANCELLED);
 
-        return new BasicMessageResponse<>(200, ConstantOrder.success_cancel, response);
+        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), response);
     }
 
 }

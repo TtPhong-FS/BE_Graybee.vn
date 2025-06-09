@@ -1,6 +1,6 @@
 package vn.graybee.modules.product.service;
 
-import vn.graybee.response.publics.products.ProductBasicResponse;
+import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

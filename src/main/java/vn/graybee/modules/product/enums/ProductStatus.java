@@ -1,6 +1,6 @@
 package vn.graybee.modules.product.enums;
 
-import vn.graybee.common.constants.ConstantGeneral;
+import vn.graybee.common.Constants;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
 
@@ -27,7 +27,7 @@ public enum ProductStatus {
         try {
             return ProductStatus.valueOf(status.toUpperCase());
         } catch (RuntimeException ex) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("common.status.invalid", new Object[]{status.toUpperCase()}));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.status.invalid", new Object[]{status.toUpperCase()}));
         }
     }
 

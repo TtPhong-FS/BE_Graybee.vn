@@ -1,13 +1,26 @@
 package vn.graybee.modules.catalog.service;
 
-import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.modules.catalog.dto.request.AttributeRequest;
-import vn.graybee.modules.catalog.dto.response.CategoryAttributesDto;
+import vn.graybee.modules.catalog.dto.request.MultipleAttributeRequest;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeDto;
 
 import java.util.List;
 
 public interface AttributeService {
 
-    BasicMessageResponse<CategoryAttributesDto> saveAttributesByCategoryId(Long categoryId, List<AttributeRequest> requests);
+    AttributeDto createAttribute(AttributeRequest request);
+
+    List<AttributeDto> createMultipleAttribute(MultipleAttributeRequest request);
+
+    AttributeDto updateAttribute(Long id, AttributeRequest request);
+
+    Long deleteById(Long id);
+
+    AttributeDto findById(Long id);
+
+    List<AttributeDto> findAllAttributeDto();
+
+    List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryId(Long categoryId);
 
 }

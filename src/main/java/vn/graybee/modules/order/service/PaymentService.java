@@ -7,6 +7,6 @@ import java.math.BigDecimal;
 
 public interface PaymentService {
 
-    Payment createPayment(Long orderId, BigDecimal totalAmount, PaymentCreateRequest request);
+    Payment savePaymentByOrderId(Long orderId, BigDecimal totalAmount, PaymentCreateRequest request);
 
 }

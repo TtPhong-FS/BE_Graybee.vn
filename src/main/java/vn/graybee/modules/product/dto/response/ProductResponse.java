@@ -2,21 +2,22 @@ package vn.graybee.modules.product.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.graybee.modules.product.enums.ProductStatus;
 import vn.graybee.modules.product.model.Product;
-import vn.graybee.response.admin.products.StatusResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
+@NoArgsConstructor
 @Setter
 @Getter
 public class ProductResponse {
 
     private long id;
 
-    private List<String> categoryNames;
+    private String slug;
 
     private String name;
 
@@ -38,7 +39,7 @@ public class ProductResponse {
 
     private String conditions;
 
-    private StatusResponse status;
+    private ProductStatus status;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
@@ -48,6 +49,7 @@ public class ProductResponse {
 
     public ProductResponse(Product product) {
         this.id = product.getId();
+        this.slug = product.getSlug();
         this.name = product.getName();
         this.warranty = product.getWarranty();
         this.weight = product.getWeight();
@@ -58,9 +60,9 @@ public class ProductResponse {
         this.color = product.getColor();
         this.thumbnail = product.getThumbnail();
         this.conditions = product.getConditions();
+        this.status = product.getStatus();
         this.createdAt = product.getCreatedAt();
         this.updatedAt = product.getUpdatedAt();
-        this.status = new StatusResponse(product.getStatus().getCode(), product.getStatus().getDisplayName());
     }
 
 }

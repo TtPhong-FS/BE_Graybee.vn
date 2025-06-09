@@ -1,6 +1,7 @@
 package vn.graybee.modules.cart.controller;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
+import vn.graybee.common.utils.MessageBuilder;
+import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.cart.dto.request.AddCartItemRequest;
 import vn.graybee.modules.cart.dto.request.DecreaseQuantityRequest;
@@ -22,6 +25,7 @@ import vn.graybee.modules.cart.service.CartService;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("${api.publicApi.carts}")
 public class CartController {
@@ -30,10 +34,7 @@ public class CartController {
 
     private final CartItemService cartItemService;
 
-    public CartController(CartService cartService, CartItemService cartItemService) {
-        this.cartService = cartService;
-        this.cartItemService = cartItemService;
-    }
+    private final MessageSourceUtil messageSourceUtil;
 
     @GetMapping
     public ResponseEntity<BasicMessageResponse<List<CartItemDto>>> getAllCartByAccountIdOrSessionId(
@@ -44,7 +45,12 @@ public class CartController {
         if (userDetail != null && userDetail.user().getId() != null) {
             accountId = userDetail.user().getId();
         }
-        return ResponseEntity.ok(cartService.findCartByAccountIdOrSessionId(accountId, sessionId));
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        cartService.findCartByAccountIdOrSessionId(accountId, sessionId), null
+                )
+        );
     }
 
     @PostMapping
@@ -56,12 +62,16 @@ public class CartController {
         if (userDetail != null && userDetail.user().getId() != null) {
             accountId = userDetail.user().getId();
         }
-        Integer cartId = cartService.findOrCreateCart(accountId, sessionId).getId();
 
-        return ResponseEntity.ok(cartItemService.addItemToCart(cartId, request));
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        cartService.findOrCreateCartAfterAddItem(accountId, sessionId, request),
+                        messageSourceUtil.get("cart.item.success_add")
+                )
+        );
     }
 
-    @PutMapping("/decrease")
+    @PutMapping("/decrease/quantity")
     public ResponseEntity<BasicMessageResponse<CartItemDto>> decreaseQuantityToCartItem(
             @RequestBody @Valid DecreaseQuantityRequest request,
             @CookieValue(value = "sessionId", required = false) String sessionId,
@@ -71,9 +81,11 @@ public class CartController {
             accountId = userDetail.user().getId();
         }
 
-        Integer cartId = cartService.findOrCreateCart(accountId, sessionId).getId();
+        Integer cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
 
-        return ResponseEntity.ok(cartItemService.decreaseItemQuantity(cartId, request.getProductId(), request.getQuantity()));
+        return ResponseEntity.ok(
+                MessageBuilder.ok(cartItemService.decreaseItemQuantity(cartId, request.getProductId(), request.getQuantity()), null)
+        );
     }
 
     @DeleteMapping("/{cartItemId}")
@@ -86,9 +98,12 @@ public class CartController {
             accountId = userDetail.user().getId();
         }
 
-        Integer cartId = cartService.findOrCreateCart(accountId, sessionId).getId();
+        Integer cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
 
-        return ResponseEntity.ok(cartItemService.removeItemFromCart(cartId, cartItemId));
+        return ResponseEntity.ok(
+                MessageBuilder.ok(cartItemService.removeItemFromCart(cartId, cartItemId),
+                        messageSourceUtil.get("cart.item.success_remove"))
+        );
     }
 
     @DeleteMapping("/clear-items")
@@ -99,8 +114,15 @@ public class CartController {
         if (userDetail != null && userDetail.user().getId() != null) {
             accountId = userDetail.user().getId();
         }
-        Integer cartId = cartService.findOrCreateCart(accountId, sessionId).getId();
-        return ResponseEntity.ok(cartService.clearCartItems(cartId));
+
+        Integer cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
+
+        cartService.clearCartItems(cartId);
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(null,
+                        messageSourceUtil.get("cart.item.success_clear_all"))
+        );
     }
 
 }

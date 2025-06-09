@@ -6,8 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import vn.graybee.common.model.BaseModel;
 
+@Setter
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "inventories")
 public class Inventory extends BaseModel {
@@ -23,41 +29,7 @@ public class Inventory extends BaseModel {
     private Integer availableQuantity;
 
     @Column(name = "is_stock", insertable = false, updatable = false)
-    private Boolean isStock;
+    private boolean isStock;
 
-    public Inventory() {
-    }
-
-    public Boolean getStock() {
-        return isStock;
-    }
-
-    public void setStock(Boolean stock) {
-        isStock = stock;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
-    public Integer getAvailableQuantity() {
-        return availableQuantity;
-    }
-
-    public void setAvailableQuantity(Integer availableQuantity) {
-        this.availableQuantity = availableQuantity;
-    }
 
 }

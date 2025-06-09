@@ -16,6 +16,8 @@ public class CategorySummaryDto {
 
     private String name;
 
+    private String type;
+
     private CategoryStatus status;
 
 }

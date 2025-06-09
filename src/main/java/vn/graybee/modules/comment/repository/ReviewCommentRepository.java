@@ -27,4 +27,11 @@ public interface ReviewCommentRepository extends JpaRepository<ReviewComment, In
     @Query("Select new vn.graybee.modules.comment.dto.response.ReviewCommentDto(p.fullName, rc.rating, rc.comment, rc.publishedAt) from ReviewComment rc JOIN Profile p on rc.accountId = p.accountId")
     List<ReviewCommentDto> getReviewsByProductId(@Param("productId") long productId);
 
+    @Query("""
+            Select new vn.graybee.modules.comment.dto.response.ReviewCommentDto(p.fullName, rc.rating, rc.comment, rc.publishedAt) 
+            from ReviewComment rc
+            JOIN Profile p on rc.accountId = p.accountId
+            """)
+    List<ReviewCommentDto> findReviewCommentDtosByProductId(long productId);
+
 }

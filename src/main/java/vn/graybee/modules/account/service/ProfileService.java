@@ -12,10 +12,6 @@ public interface ProfileService {
 
     ResponseEntity<BasicMessageResponse<Profile>> updateByAccountId(UpdateProfileRequest request, Long accountId);
 
-    Long getAccountIdByEmail(String email);
-
-    void checkExistsByEmail(String email);
-
     void checkExistsByPhone(String phone);
 
     Profile saveProfileByAccountId(Long accountId, CustomerRegisterRequest request);

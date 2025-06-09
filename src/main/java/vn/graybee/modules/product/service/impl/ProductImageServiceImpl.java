@@ -22,12 +22,13 @@ public class ProductImageServiceImpl implements ProductImageService {
     @Override
     public void saveProductImages(Long productId, List<String> imageUrls) {
 
-        if (imageUrls.isEmpty()) {
+        if (imageUrls == null || imageUrls.isEmpty()) {
             return;
         }
 
         List<ProductImage> productImages = imageUrls
                 .stream()
+                .skip(1)
                 .map(url -> {
                     ProductImage productImage = new ProductImage();
                     productImage.setProductId(productId);

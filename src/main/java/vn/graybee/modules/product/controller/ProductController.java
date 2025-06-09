@@ -1,5 +1,6 @@
 package vn.graybee.modules.product.controller;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,45 +8,44 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
-import vn.graybee.common.dto.MessageResponse;
+import vn.graybee.common.utils.MessageBuilder;
+import vn.graybee.modules.product.dto.response.ProductBasicResponse;
+import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.modules.product.model.ProductDocument;
+import vn.graybee.modules.product.service.ProductCategoryService;
 import vn.graybee.modules.product.service.ProductDocumentService;
 import vn.graybee.modules.product.service.ProductService;
-import vn.graybee.response.publics.products.ProductBasicResponse;
-import vn.graybee.response.publics.products.ProductDetailResponse;
 
 import java.io.IOException;
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("${api.publicApi.products}")
 public class ProductController {
 
     private final ProductDocumentService productDocumentService;
 
+    private final ProductCategoryService productCategoryService;
+
     private final ProductService productService;
 
-
-    public ProductController(ProductDocumentService productDocumentService, ProductService productService) {
-        this.productDocumentService = productDocumentService;
-        this.productService = productService;
-    }
-
-    @GetMapping("/{category}")
-    public ResponseEntity<MessageResponse<List<ProductBasicResponse>>> findByCategory(
-            @PathVariable("category") String category,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String order
+    @GetMapping("/{categorySlug}")
+    public ResponseEntity<BasicMessageResponse<List<ProductBasicResponse>>> findProductByCategorySlug(
+            @PathVariable("categorySlug") String categorySlug
     ) {
-        return ResponseEntity.ok(productService.findByCategoryName(category, page, size, sortBy, order));
+        return ResponseEntity.ok(
+                MessageBuilder.ok(productService.findProductByCategorySlug(categorySlug), null)
+        );
     }
 
-    @GetMapping("/detail/{id}")
-    public ResponseEntity<BasicMessageResponse<ProductDetailResponse
-            >> findDetailById(@PathVariable("id") long id) {
-        return ResponseEntity.ok(productService.getDetailById(id));
+    @GetMapping("/detail/{slug}")
+    public ResponseEntity<BasicMessageResponse<ProductDetailDto>> findProductDetailBySlug(
+            @PathVariable("slug") String slug
+    ) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(productService.findProductDetailBySlug(slug), null)
+        );
     }
 
     @GetMapping("/search")

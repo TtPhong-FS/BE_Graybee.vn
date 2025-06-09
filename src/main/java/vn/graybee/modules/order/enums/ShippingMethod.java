@@ -1,6 +1,6 @@
 package vn.graybee.modules.order.enums;
 
-import vn.graybee.common.constants.ConstantOrder;
+import vn.graybee.common.Constants;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
 
@@ -13,7 +13,7 @@ public enum ShippingMethod {
         try {
             return ShippingMethod.valueOf(method.toUpperCase());
         } catch (RuntimeException e) {
-            throw new BusinessCustomException(ConstantOrder.shippingMethod, messageSourceUtil.get("order.shipping_method.invalid", new Object[]{method}));
+            throw new BusinessCustomException(Constants.Order.shippingMethod, messageSourceUtil.get("order.shipping_method.invalid", new Object[]{method}));
         }
     }
 }

@@ -3,8 +3,7 @@ package vn.graybee.modules.inventory.service;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.common.constants.ConstantGeneral;
-import vn.graybee.common.constants.ConstantInventory;
+import vn.graybee.common.Constants;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
@@ -40,7 +39,7 @@ public class InventoryServiceImpl implements InventoryService {
                 inventory.getId(),
                 product.getProductId(),
                 product.getProductName(),
-                inventory.getStock(),
+                inventory.isStock(),
                 inventory.getAvailableQuantity(),
                 inventory.getCreatedAt(),
                 inventory.getUpdatedAt()
@@ -62,7 +61,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         InventoryResponse response = getInventoryResponse(inventory, product);
 
-        return new BasicMessageResponse<>(200, ConstantInventory.success_create, response);
+        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), response);
     }
 
     @Override
@@ -79,10 +78,10 @@ public class InventoryServiceImpl implements InventoryService {
     public BasicMessageResponse<Integer> deleteInventory(int id) {
 
         InventoryQuantityResponse inventory = inventoryRepository.checkExistsById(id)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("common.not-found", new Object[]{messageSourceUtil.get("inventory.name")})));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("common.not-found", new Object[]{messageSourceUtil.get("inventory.name")})));
 
         if (inventory.getQuantity() > 0) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("inventory.cannot-delete-when-has-quantity"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.cannot-delete-when-has-quantity"));
         }
 
         inventoryRepository.deleteById(inventory.getId());
@@ -97,7 +96,7 @@ public class InventoryServiceImpl implements InventoryService {
         InventoryProductDto product = productInventoryHelperService.getProductBasicDtoById(request.getProductId());
 
         Inventory inventory = inventoryRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("common.not-found", new Object[]{messageSourceUtil.get("inventory.name")})));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.not-found", new Object[]{messageSourceUtil.get("inventory.name")})));
 
         inventory.setAvailableQuantity(request.getQuantity() != null ? request.getQuantity() : 0);
         inventory.setStock(request.getQuantity() != null && request.getQuantity() > 0);
@@ -117,7 +116,7 @@ public class InventoryServiceImpl implements InventoryService {
         Integer availableQuantity = inventoryRepository.getAvailableQuantityByProductId(productId);
 
         if (availableQuantity < requestedQuantity) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("inventory.not-enough-stock"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.not-enough-stock"));
         }
     }
 
@@ -128,16 +127,18 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void decreaseStock(Long productId, int quantity) {
         checkExistsByProductId(productId);
         int updated = inventoryRepository.decreaseStock(productId, quantity);
 
         if (updated == 0) {
-            throw new BusinessCustomException(ConstantGeneral.general, messageSourceUtil.get("inventory.not-enough-stock"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.not-enough-stock"));
         }
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void increaseStock(Long productId, int quantity) {
         checkExistsByProductId(productId);
         inventoryRepository.increaseStock(productId, quantity);
@@ -145,7 +146,8 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public void saveInventoryByProductId(Long productId, boolean stock, Integer quantity) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void saveInventoryByProductId(Long productId, boolean stock, int quantity) {
         Inventory inventory = new Inventory();
         inventory.setStock(quantity > 0);
         inventory.setAvailableQuantity(quantity);
@@ -155,7 +157,8 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public void updateInventoryByProductId(Long productId, boolean stock, Integer quantity) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void updateInventoryByProductId(Long productId, boolean stock, int quantity) {
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseGet(Inventory::new);
@@ -174,7 +177,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     private void checkExistsByProductId(Long productId) {
         if (!inventoryRepository.existsByProductId(productId)) {
-            throw new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("inventory.not.found"));
+            throw new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("inventory.not.found"));
         }
 
     }

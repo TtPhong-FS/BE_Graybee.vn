@@ -43,8 +43,6 @@ public class ProductDetailResponse {
 
     private List<ReviewCommentDto> reviews;
 
-    private DetailTemplateResponse detail;
-
     public ProductDetailResponse(long id, String name, int warranty, String conditions, float weight, String color, String thumbnail, BigDecimal price, BigDecimal finalPrice, int discountPercent) {
         this.id = id;
         this.name = name;

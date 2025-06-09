@@ -1,6 +1,6 @@
 //package vn.graybee.response.publics.collections;
 //
-//import vn.graybee.response.publics.products.ProductBasicResponse;
+//import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 //import vn.graybee.utils.HardwareExtractor;
 //
 //public class PcSummaryResponse extends ProductBasicResponse {

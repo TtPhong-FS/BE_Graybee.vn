@@ -1,10 +1,8 @@
 package vn.graybee.modules.product.service;
 
-import vn.graybee.common.dto.BasicMessageResponse;
-import vn.graybee.common.dto.MessageResponse;
 import vn.graybee.modules.product.dto.response.FavoriteProductResponse;
-import vn.graybee.response.publics.products.ProductBasicResponse;
-import vn.graybee.response.publics.products.ProductDetailResponse;
+import vn.graybee.modules.product.dto.response.ProductBasicResponse;
+import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 
 import java.math.BigDecimal;
@@ -12,13 +10,13 @@ import java.util.List;
 
 public interface ProductService {
 
-    MessageResponse<List<ProductBasicResponse>> findByCategoryName(String categoryName, int page, int size, String sortBy, String order);
+    List<ProductBasicResponse> findProductByCategorySlug(String categorySlug);
 
     ProductPriceResponse getPriceById(long id);
 
     ProductBasicResponse getProductBasicInfoForCart(long id);
 
-    BasicMessageResponse<ProductDetailResponse> getDetailById(long id);
+    ProductDetailDto findProductDetailBySlug(String slug);
 
     BigDecimal getProductPriceById(long id);
 

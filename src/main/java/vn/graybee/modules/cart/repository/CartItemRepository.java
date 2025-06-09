@@ -56,4 +56,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Query("SELECT c.total FROM CartItem c WHERE c.cartId = :cartId")
     List<BigDecimal> findAllTotalByCartId(Integer cartId);
 
+    @Query("Select exists (Select 1 from CartItem ci where ci.id = :id)")
+    boolean existsById(@Param("id") Integer id);
+
 }

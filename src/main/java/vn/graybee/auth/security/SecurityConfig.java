@@ -66,7 +66,7 @@ public class SecurityConfig {
                                 .requestMatchers(apiProperties.getPrivateApi().getAccount() + "/**").authenticated()
                                 .requestMatchers(apiProperties.getPublicApi().getBase() + "/**").permitAll()
                                 .requestMatchers("/ws/**").permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .userDetailsService(userDetailService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

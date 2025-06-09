@@ -1,10 +1,12 @@
 package vn.graybee.modules.cart.service.impl;
 
 import org.springframework.stereotype.Service;
-import vn.graybee.common.constants.ConstantGeneral;
-import vn.graybee.common.dto.BasicMessageResponse;
+import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.common.Constants;
+import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
+import vn.graybee.modules.cart.dto.request.AddCartItemRequest;
 import vn.graybee.modules.cart.dto.response.CartItemDto;
 import vn.graybee.modules.cart.model.Cart;
 import vn.graybee.modules.cart.repository.CartRepository;
@@ -30,14 +32,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart findOrCreateCart(Long accountId, String sessionId) {
+    public CartItemDto findOrCreateCartAfterAddItem(Long accountId, String sessionId, AddCartItemRequest request) {
         if (accountId == null && sessionId == null) {
-            throw new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("common.not_found", new Object[]{messageSourceUtil.get("cart.name")}));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.bad_request"));
         }
 
-        Cart cart;
-
-        cart = cartRepository.findByAccountIdAndSessionId(accountId, sessionId)
+        Cart cart = cartRepository.findByAccountIdAndSessionId(accountId, sessionId)
                 .orElseGet(Cart::new);
 
         boolean isNewCart = cart.getId() == null;
@@ -55,30 +55,41 @@ public class CartServiceImpl implements CartService {
             cartRepository.save(cart);
         }
 
-        return cart;
-
+        return cartItemService.addItemToCart(cart.getId(), request);
     }
 
     @Override
-    public BasicMessageResponse<List<CartItemDto>> findCartByAccountIdOrSessionId(Long accountId, String sessionId) {
-        Cart cart;
-
-        cart = cartRepository.findByAccountIdAndSessionId(accountId, sessionId)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("cart.not.found")));
-
-        List<CartItemDto> cartItemDtos = cartItemService.getCartItemsByCartId(cart.getId());
-
-        if (cartItemDtos.isEmpty()) {
-            throw new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("cart.empty"));
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void syncGuestCartToAccount(Long accountId, String sessionId) {
+        if (accountId == null && sessionId == null) {
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.bad_request"));
         }
 
-        return new BasicMessageResponse<>(200, null, cartItemDtos);
+        Cart cart = cartRepository.findByAccountIdAndSessionId(accountId, sessionId)
+                .orElseGet(Cart::new);
+
+        boolean isNewCart = cart.getId() == null;
+
+        if (isNewCart) {
+            if (accountId != null) {
+                cart.setAccountId(accountId);
+                cart.setSessionId(null);
+            } else {
+                cart.setSessionId(sessionId);
+                cart.setAccountId(null);
+            }
+
+            cart.setTotalAmount(BigDecimal.ZERO);
+            cartRepository.save(cart);
+        }
     }
 
-
     @Override
-    public Cart getCartById(Integer cartId) {
-        return null;
+    public List<CartItemDto> findCartByAccountIdOrSessionId(Long accountId, String sessionId) {
+        Cart cart = cartRepository.findByAccountIdAndSessionId(accountId, sessionId)
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found")));
+
+        return cartItemService.getCartItemsByCartId(cart.getId());
     }
 
     @Override
@@ -93,23 +104,22 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public BasicMessageResponse<?> clearCartItems(Integer cartId) {
+    public void clearCartItems(Integer cartId) {
         checkExistsById(cartId);
         cartItemService.clearCartItems(cartId);
         cartRepository.updateCartTotal(cartId, BigDecimal.ZERO);
 
-        return new BasicMessageResponse<>(200, messageSourceUtil.get("cart.item.success_clear_all"), null);
     }
 
     @Override
     public Integer getCartIdByAccountIdOrSessionId(Long accountId, String sessionId) {
         return cartRepository.findIdByAccountIdOrSessionId(accountId, sessionId)
-                .orElseThrow(() -> new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("cart.not.found")));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found")));
     }
 
     private void checkExistsById(Integer cartId) {
         if (!cartRepository.existsById(cartId)) {
-            throw new CustomNotFoundException(ConstantGeneral.general, messageSourceUtil.get("common.not.found", new Object[]{messageSourceUtil.get("cart.name")}));
+            throw new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found"));
         }
     }
 

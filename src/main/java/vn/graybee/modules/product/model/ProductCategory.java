@@ -28,4 +28,7 @@ public class ProductCategory {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @Column(name = "is_primary", nullable = false)
+    private boolean isPrimary;
+
 }
