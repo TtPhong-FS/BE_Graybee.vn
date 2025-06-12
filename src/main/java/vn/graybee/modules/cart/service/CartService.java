@@ -15,8 +15,6 @@ public interface CartService {
 
     void updateCartTotal(Integer cartId);
 
-    void applyDiscount(Integer cartId, String discountCode);
-
     void clearCartItems(Integer cartId);
 
     Integer getCartIdByAccountIdOrSessionId(Long accountId, String sessionId);

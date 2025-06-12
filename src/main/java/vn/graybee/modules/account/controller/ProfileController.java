@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
+import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.account.dto.request.UpdateProfileRequest;
-import vn.graybee.modules.account.model.Profile;
+import vn.graybee.modules.account.dto.response.ProfileResponse;
 import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.account.service.ProfileService;
 
@@ -25,18 +26,26 @@ public class ProfileController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<BasicMessageResponse<Profile>> getProfileByUserUid(@AuthenticationPrincipal UserDetail userDetail) {
+    public ResponseEntity<BasicMessageResponse<ProfileResponse>> getProfileByUserUid(@AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = userDetail.user().getId();
-        return profileService.findByAccountId(accountId);
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        profileService.findByAccountId(accountId),
+                        null
+                )
+        );
     }
 
     @PutMapping("/profile/update")
-    public ResponseEntity<BasicMessageResponse<Profile>> updateProfile(
+    public ResponseEntity<BasicMessageResponse<ProfileResponse>> updateProfile(
             @RequestBody @Valid UpdateProfileRequest request,
             @AuthenticationPrincipal UserDetail userDetail
     ) {
         Long accountId = userDetail.user().getId();
-        return profileService.updateByAccountId(request, accountId);
+        return ResponseEntity.ok(
+                MessageBuilder.ok(profileService.updateByAccountId(request, accountId),
+                        null)
+        );
     }
 
 }

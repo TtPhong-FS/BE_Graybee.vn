@@ -8,6 +8,10 @@ public interface ForgotPasswordService {
 
     void deleteById(Integer id);
 
-    void saveByAccountIdAndDeleteAll(Long accountId, Integer otp, long now);
+    void saveByAccountIdAndDeleteAll(Long accountId, Integer otp);
+
+    ForgotPassword findByAccountId(Long accountId);
+
+    void verifyOtpById(Integer id);
 
 }

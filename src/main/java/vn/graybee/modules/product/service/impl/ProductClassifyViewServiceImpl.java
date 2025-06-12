@@ -68,7 +68,7 @@ public class ProductClassifyViewServiceImpl implements ProductClassifyViewServic
     public void removeTagByTagName(String tagName) {
         try {
             String jsonTag = new ObjectMapper().writeValueAsString(List.of(tagName));
-            List<ProductClassifyView> productClassifyViews = productClassifyViewRepository.findAllByTagName(tagName);
+            List<ProductClassifyView> productClassifyViews = productClassifyViewRepository.findAllByTagName(jsonTag);
 
             for (ProductClassifyView pcv : productClassifyViews) {
                 if (pcv.getTagNames() != null && pcv.getTagNames().contains(jsonTag)) {

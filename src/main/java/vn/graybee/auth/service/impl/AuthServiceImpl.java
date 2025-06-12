@@ -3,7 +3,6 @@ package vn.graybee.auth.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +10,8 @@ import vn.graybee.auth.dto.request.CustomerRegisterRequest;
 import vn.graybee.auth.dto.request.LoginRequest;
 import vn.graybee.auth.dto.response.AccountAuthDto;
 import vn.graybee.auth.dto.response.AuthDto;
-import vn.graybee.auth.dto.response.RegisterDto;
+import vn.graybee.auth.dto.response.LoginResponse;
+import vn.graybee.auth.dto.response.RegisterResponse;
 import vn.graybee.auth.model.ForgotPassword;
 import vn.graybee.auth.record.MailBody;
 import vn.graybee.auth.record.ResetPassword;
@@ -25,8 +25,8 @@ import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.service.MailService;
 import vn.graybee.common.utils.CodeGenerator;
 import vn.graybee.common.utils.MessageSourceUtil;
+import vn.graybee.modules.account.dto.response.ProfileResponse;
 import vn.graybee.modules.account.model.Account;
-import vn.graybee.modules.account.model.Profile;
 import vn.graybee.modules.account.service.AccountService;
 import vn.graybee.modules.account.service.ProfileService;
 import vn.graybee.modules.cart.service.CartService;
@@ -34,14 +34,11 @@ import vn.graybee.modules.order.service.OrderService;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
-
-    private static final long now = System.currentTimeMillis();
 
     private final OrderService orderService;
 
@@ -67,14 +64,18 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<RegisterDto> signUp(CustomerRegisterRequest request, String sessionId) {
+    public RegisterResponse signUp(CustomerRegisterRequest request, String sessionId) {
+
+        if (!request.getPassword().equals(request.getRepeatPassword())) {
+            throw new BusinessCustomException(Constants.Auth.password, messageSourceUtil.get("auth.password.not_match"));
+        }
 
         accountService.checkExistsByEmail(request.getEmail());
         profileService.checkExistsByPhone(request.getPhone());
 
         Account account = accountService.saveAccount(request);
 
-        Profile profile = profileService.saveProfileByAccountId(account.getId(), request);
+        ProfileResponse profile = profileService.saveProfileByAccountId(account.getId(), request);
 
         cartService.syncGuestCartToAccount(account.getId(), sessionId);
 
@@ -83,21 +84,22 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtService.generateToken(account.getUid(), account.getRole());
         redisAuthService.saveToken(account.getUid(), token, 1440, TimeUnit.MINUTES);
 
-        AuthDto authDto = new AuthDto();
-        authDto.setToken(token);
+        AuthDto authDto = new AuthDto(token);
 
-        RegisterDto registerDto = new RegisterDto(profile, authDto);
-
-        return new BasicMessageResponse<>(201, messageSourceUtil.get("auth.success.signup"), registerDto);
+        return new RegisterResponse(profile, authDto);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<AuthDto> Login(LoginRequest request) {
+    public LoginResponse Login(LoginRequest request) {
 
         AccountAuthDto auth = accountService.getAccountAuthDtoByEmail(request.getEmail());
 
-        Authentication authentication = authenticationManager.authenticate(
+        if (!passwordEncoder.matches(request.getPassword(), auth.getPassword())) {
+            throw new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("auth.invalid_credentials"));
+        }
+
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         auth.getUid(), request.getPassword()
                 )
@@ -105,12 +107,18 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(auth.getUid(), auth.getRole());
 
-        AuthDto authDto = new AuthDto();
-        authDto.setToken(token);
+        ProfileResponse profileResponse = profileService.findByAccountId(auth.getId());
+
+        AuthDto authDto = new AuthDto(token);
 
         redisAuthService.saveToken(auth.getUid(), token, 1440, TimeUnit.MINUTES);
 
-        return new BasicMessageResponse<>(200, messageSourceUtil.get("auth.success.login"), authDto);
+        accountService.updateLastLoginAt(auth.getId());
+
+        return new LoginResponse(
+                authDto,
+                profileResponse
+        );
     }
 
     @Override
@@ -119,15 +127,15 @@ public class AuthServiceImpl implements AuthService {
 
         Long accountId = accountService.getAccountIdByEmail(email);
 
-        Integer otp = Integer.valueOf(CodeGenerator.generateCode(6, CodeGenerator.DIGITS));
+        Integer otp = CodeGenerator.generateOtp();
 
         MailBody mailBody = new MailBody(
                 email,
                 messageSourceUtil.get("auth.mail.subject"),
-                messageSourceUtil.get("auth.mail.text", new Object[]{otp})
+                messageSourceUtil.get("auth.mail.text", new Object[]{String.valueOf(otp)})
         );
 
-        forgotPasswordService.saveByAccountIdAndDeleteAll(accountId, otp, now);
+        forgotPasswordService.saveByAccountIdAndDeleteAll(accountId, otp);
 
         mailService.sendMail(mailBody);
 
@@ -143,11 +151,19 @@ public class AuthServiceImpl implements AuthService {
 
         ForgotPassword forgotPassword = forgotPasswordService.getByAccountIdAndOtp(accountId, otp);
 
+        if (forgotPassword.isVerify()) {
+            forgotPasswordService.deleteById(forgotPassword.getId());
+
+            return new BasicMessageResponse<>(400, messageSourceUtil.get("auth.otp.invalid"), null);
+        }
+
         if (forgotPassword.getExpiration().before(Date.from(Instant.now()))) {
             forgotPasswordService.deleteById(forgotPassword.getId());
 
             return new BasicMessageResponse<>(400, messageSourceUtil.get("auth.otp.invalid"), null);
         }
+
+        forgotPasswordService.verifyOtpById(forgotPassword.getId());
 
         return new BasicMessageResponse<>(200, messageSourceUtil.get("auth.verify.otp"), null);
 
@@ -155,19 +171,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<String> resetPassword(String email, ResetPassword resetPassword) {
+    public void resetPassword(String email, ResetPassword resetPassword) {
 
         Long accountId = accountService.getAccountIdByEmail(email);
 
-        if (!Objects.equals(resetPassword.password(), resetPassword.repeatPassword())) {
+        ForgotPassword forgotPassword = forgotPasswordService.findByAccountId(accountId);
+
+        if (!forgotPassword.isVerify()) {
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("auth.not.verify.otp"));
+        }
+
+        if (!resetPassword.getPassword().equals(resetPassword.getRepeatPassword())) {
             throw new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("auth.password.not_match"));
         }
 
-        String password = passwordEncoder.encode(resetPassword.password());
+        String password = passwordEncoder.encode(resetPassword.getPassword());
 
         accountService.updatePasswordById(accountId, password);
-
-        return new BasicMessageResponse<>(200, messageSourceUtil.get("auth.success.reset_password"), null);
 
     }
 

@@ -1,25 +1,16 @@
 package vn.graybee.auth.dto.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthDto {
 
     private String token;
-
-
-    public AuthDto() {
-    }
-
-    public AuthDto(String token) {
-        this.token = token;
-
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
 
 }

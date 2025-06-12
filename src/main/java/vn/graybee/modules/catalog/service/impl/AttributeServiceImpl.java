@@ -8,26 +8,25 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
-import vn.graybee.common.exception.MultipleException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.common.utils.TextUtils;
 import vn.graybee.modules.catalog.dto.request.AttributeRequest;
-import vn.graybee.modules.catalog.dto.request.AttributesRequest;
-import vn.graybee.modules.catalog.dto.request.MultipleAttributeRequest;
-import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
+import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDto;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdActiveResponse;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdAllCategoryIdName;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryIdName;
 import vn.graybee.modules.catalog.enums.InputType;
 import vn.graybee.modules.catalog.model.Attribute;
 import vn.graybee.modules.catalog.repository.AttributeRepository;
 import vn.graybee.modules.catalog.service.AttributeService;
+import vn.graybee.modules.catalog.service.CategoryAttributeService;
 import vn.graybee.modules.catalog.service.CategoryService;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -38,6 +37,8 @@ public class AttributeServiceImpl implements AttributeService {
 
     private final CategoryService categoryService;
 
+    private final CategoryAttributeService categoryAttributeService;
+
     private final AttributeRepository attributeRepository;
 
     private final MessageSourceUtil messageSourceUtil;
@@ -46,71 +47,35 @@ public class AttributeServiceImpl implements AttributeService {
     @Transactional(rollbackFor = RuntimeException.class)
     public AttributeDto createAttribute(AttributeRequest request) {
 
-        CategorySummaryDto categorySummaryDto = categoryService.getCategorySummaryByNameOrId(request.getCategoryName(), null);
-
-        checkExistsByName(request.getName(), categorySummaryDto.getId());
+        checkExistsByName(request.getName());
 
         Attribute attribute = new Attribute();
-        attribute.setCategoryId(categorySummaryDto.getId());
         attribute.setName(convertName(request.getName()));
         attribute.setLabel(TextUtils.capitalizeEachWord(request.getLabel()));
-        attribute.setUnit(request.getUnit().toUpperCase());
+        attribute.setUnit(request.getUnit() != null && !request.getUnit().isEmpty() ? request.getUnit().toUpperCase() : null);
         attribute.setInputType(getInputType(request.getInputType()));
         attribute.setRequired(request.isRequired());
+        attribute.setActive(request.isActive());
         attribute.setOptions(request.getOptions());
 
-        attributeRepository.save(attribute);
+        attribute = attributeRepository.save(attribute);
 
-        return new AttributeDto(attribute, categorySummaryDto.getName());
+        categoryAttributeService.createCategoryAttribute(request.getCategoryNames(), attribute.getId());
+
+        List<CategoryIdNameDto> categories = categoryService.getCategoryIdNameDtos(request.getCategoryNames());
+
+        return toDto(attribute, categories);
     }
 
-    private AttributeDto toDto(Attribute attribute, String categoryName) {
+    private AttributeDto toDto(Attribute attribute, List<CategoryIdNameDto> categories) {
         return new AttributeDto(
                 attribute,
-                categoryName
+                categories
         );
     }
 
     private String getInputType(String type) {
         return InputType.getType(type, messageSourceUtil);
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public List<AttributeDto> createMultipleAttribute(MultipleAttributeRequest request) {
-
-        CategorySummaryDto categorySummaryDto = categoryService.getCategorySummaryByNameOrId(request.getCategoryName(), null);
-
-        if (request.getAttributes() == null || request.getAttributes().isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        Set<String> existingNames = attributeRepository
-                .findAllNamesByCategoryId(categorySummaryDto.getId())
-                .stream()
-                .map(String::toLowerCase)
-                .collect(Collectors.toSet());
-
-        checkExistsNameWithCategoryId(existingNames, request.getAttributes());
-
-        List<Attribute> attributes = request.getAttributes().stream()
-                .map(attr -> {
-                    Attribute attribute = new Attribute();
-                    attribute.setCategoryId(categorySummaryDto.getId());
-                    attribute.setName(convertName(attr.getName()));
-                    attribute.setLabel(TextUtils.capitalizeEachWord(attr.getLabel()));
-                    attribute.setUnit(attr.getUnit() != null && !attr.getUnit().isEmpty() ? attr.getUnit().toUpperCase() : null);
-                    attribute.setInputType(getInputType(attr.getInputType()));
-                    attribute.setRequired(attr.isRequired());
-                    attribute.setOptions(attr.getOptions());
-                    return attribute;
-                })
-                .collect(Collectors.toList());
-
-        attributeRepository.saveAll(attributes);
-
-        return attributes.stream().map(a -> toDto(a, categorySummaryDto.getName())).toList();
-
     }
 
     private String convertName(String name) {
@@ -120,30 +85,9 @@ public class AttributeServiceImpl implements AttributeService {
                 .replaceAll("^_+|_+$", "");
     }
 
-    private void checkExistsNameWithCategoryId(Set<String> existingNames, List<AttributesRequest> attributesRequests) {
-
-        if (existingNames.isEmpty()) {
-            return;
-        }
-
-        Map<String, String> errors = new HashMap<>();
-
-        for (int i = 0; i < attributesRequests.size(); i++) {
-            AttributesRequest attr = attributesRequests.get(i);
-
-            if (existingNames.contains(convertName(attr.getName()))) {
-                errors.put("attributes[" + i + "].name", attr.getName() + " name already exists");
-            }
-        }
-
-        if (!errors.isEmpty()) {
-            throw new MultipleException(errors);
-        }
-    }
-
-    public void checkExistsByName(String name, long categoryId) {
-        if (attributeRepository.existsByNameAndCategoryId(name, categoryId)) {
-            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("catalog.attribute.name.exists.with.category", new Object[]{name}));
+    public void checkExistsByName(String name) {
+        if (attributeRepository.existsByName(name)) {
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("catalog.attribute.name.exists", new Object[]{name}));
         }
     }
 
@@ -151,22 +95,30 @@ public class AttributeServiceImpl implements AttributeService {
     @Transactional(rollbackFor = RuntimeException.class)
     public AttributeDto updateAttribute(Long id, AttributeRequest request) {
 
-        CategorySummaryDto categorySummaryDto = categoryService.getCategorySummaryByNameOrId(request.getCategoryName(), null);
-
-        checkExistsByName(request.getName(), categorySummaryDto.getId());
-
         Attribute attribute = attributeRepository.findById(id)
                 .orElseGet(Attribute::new);
 
-        attribute.setCategoryId(categorySummaryDto.getId());
+        if (attribute.getId() != null) {
+            if (attributeRepository.checkExistsByNameNotId(request.getName(), attribute.getId())) {
+                throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("catalog.attribute.name.exists"));
+            }
+        }
+
         attribute.setName(convertName(request.getName()));
         attribute.setLabel(TextUtils.capitalizeEachWord(request.getLabel()));
         attribute.setUnit(request.getUnit().toUpperCase());
         attribute.setInputType(getInputType(request.getInputType()));
         attribute.setRequired(request.isRequired());
+        attribute.setActive(request.isActive());
         attribute.setOptions(request.getOptions());
 
-        return new AttributeDto(attribute, categorySummaryDto.getName());
+        attribute = attributeRepository.save(attribute);
+
+        categoryAttributeService.updateCategoryAttribute(request.getCategoryNames(), attribute.getId());
+
+        List<CategoryIdNameDto> categories = categoryService.getCategoryIdNameDtos(request.getCategoryNames());
+
+        return toDto(attribute, categories);
     }
 
     @Override
@@ -183,17 +135,66 @@ public class AttributeServiceImpl implements AttributeService {
 
     @Override
     public AttributeDto findById(Long id) {
-        return attributeRepository.findAttributeDtoById(id).orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.attribute.not.found")));
+        AttributeDto attributeDto = attributeRepository.findAttributeDtoById(id).orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.attribute.not.found")));
+
+        List<CategoryIdNameDto> categoryIdNameDtos = categoryAttributeService.getAllCategoryIdNameByAttributeId(attributeDto.getId());
+
+        attributeDto.setCategories(categoryIdNameDtos);
+
+        return attributeDto;
     }
 
     @Override
     public List<AttributeDto> findAllAttributeDto() {
-        return attributeRepository.findAllAttributeDto();
+        List<AttributeDto> attributeDtos = attributeRepository.findAllAttributeDto();
+
+        List<Long> attributeIds = attributeDtos.stream().map(AttributeDto::getId).toList();
+
+        List<AttributeIdCategoryIdName> attributeIdCategoryIdNames = categoryAttributeService.findAttributeIdMapCategoryByAttributeIds(attributeIds);
+
+        Map<Long, List<CategoryIdNameDto>> attributeMapCategory = attributeIdCategoryIdNames.stream().collect(
+                Collectors.groupingBy(AttributeIdCategoryIdName::getAttributeId, Collectors.mapping(a -> new CategoryIdNameDto(a.getCategoryId(), a.getCategoryName()), Collectors.toList()))
+        );
+
+        attributeDtos.forEach(
+                a -> {
+                    List<CategoryIdNameDto> categories = attributeMapCategory.getOrDefault(a.getId(), Collections.emptyList());
+                    a.setCategories(categories);
+                }
+        );
+
+        return attributeDtos;
     }
 
     @Override
-    public List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryId(Long categoryId) {
+    public List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryId(long categoryId) {
         return attributeRepository.findAllAttributeBasicDtoByCategoryId(categoryId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public AttributeIdActiveResponse setShowOrHideById(long id) {
+        Boolean active = attributeRepository.getActiveById(id)
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.attribute.not.found")));
+
+        attributeRepository.toggleActiveById(id);
+
+        return new AttributeIdActiveResponse(id, !active);
+    }
+
+    private void checkExistsById(long id) {
+        if (!attributeRepository.existsById(id)) {
+            throw new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.attribute.not.found"));
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public AttributeIdAllCategoryIdName addCategoriesToAttributeById(long id, List<String> categoryNames) {
+        checkExistsById(id);
+
+        List<CategoryIdNameDto> categories = categoryService.getCategoryIdNameDtos(categoryNames);
+        return new AttributeIdAllCategoryIdName(id, categories);
     }
 
 }

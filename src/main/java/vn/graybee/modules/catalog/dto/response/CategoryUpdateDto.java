@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.graybee.modules.catalog.enums.CategoryStatus;
+import vn.graybee.modules.catalog.enums.CategoryType;
 
 @AllArgsConstructor
 @Setter
@@ -12,15 +12,17 @@ import vn.graybee.modules.catalog.enums.CategoryStatus;
 @NoArgsConstructor
 public class CategoryUpdateDto {
 
+    private Long id;
+
     private String name;
 
     private String parentName;
 
     private String slug;
 
-    private String type;
+    private CategoryType type;
 
-    private CategoryStatus status;
+    private boolean isActive;
 
 
 }

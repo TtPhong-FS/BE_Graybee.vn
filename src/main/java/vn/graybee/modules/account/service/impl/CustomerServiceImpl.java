@@ -1,5 +1,6 @@
 package vn.graybee.modules.account.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.graybee.common.Constants;
 import vn.graybee.common.exception.CustomNotFoundException;
@@ -8,6 +9,7 @@ import vn.graybee.modules.account.repository.CustomerRepository;
 import vn.graybee.modules.account.service.AccountService;
 import vn.graybee.modules.account.service.CustomerService;
 
+@AllArgsConstructor
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
@@ -17,11 +19,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final MessageSourceUtil messageSourceUtil;
 
-    public CustomerServiceImpl(CustomerRepository customerRepository, AccountService accountService, MessageSourceUtil messageSourceUtil) {
-        this.customerRepository = customerRepository;
-        this.accountService = accountService;
-        this.messageSourceUtil = messageSourceUtil;
-    }
 
     @Override
     public Long getIdByAccountId(Long accountId) {

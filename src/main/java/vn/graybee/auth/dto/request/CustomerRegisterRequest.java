@@ -11,23 +11,27 @@ import java.util.Date;
 @Getter
 public class CustomerRegisterRequest {
 
-    @Size(max = 100, message = "Độ dài tối đa không vượt quá 100 ký tự")
+    @Size(max = 100, message = "auth.validation.fullname.size")
     private String fullName;
 
-    @NotBlank(message = "auth.phone.not_blank")
-    @Size(max = 12, message = "Số điện thoại chỉ được từ 10 - 12 số")
+    @Size(max = 12, message = "auth.validation.phone.size")
     private String phone;
 
-    @NotBlank(message = "auth.email.not_blank")
-    @Size(max = 50, message = "Độ dài tối đa không vượt quá 50 ký tự")
+    @NotBlank(message = "auth.validation.email.not.blank")
+    @Size(max = 50, message = "auth.validation.email.max")
     private String email;
 
-    @NotBlank(message = "auth.password.not_blank")
-    @Size(max = 100, message = "Độ dài tối đa không vượt quá 100 ký tự")
+    @Size(min = 6, max = 100, message = "auth.validation.password.size")
+    @NotBlank(message = "auth.validation.password.not.blank")
     private String password;
 
-    private Date birthDay;
+    @NotBlank(message = "auth.validation.password.not.blank")
+    @Size(min = 6, max = 100, message = "auth.validation.password.size")
+    private String repeatPassword;
 
+    private Date birthday;
+
+    @NotBlank(message = "auth.validation.gender.not.blank")
     private String gender;
 
 

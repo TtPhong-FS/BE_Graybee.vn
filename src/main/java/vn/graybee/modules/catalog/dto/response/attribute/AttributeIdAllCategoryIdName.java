@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
 
 import java.util.List;
 
@@ -11,18 +12,10 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttributeBasicDto {
+public class AttributeIdAllCategoryIdName {
 
     private Long id;
 
-    private String name;
-
-    private boolean required;
-
-    private String inputType;
-
-    private List<String> options;
-
-    private boolean active;
+    private List<CategoryIdNameDto> categories;
 
 }

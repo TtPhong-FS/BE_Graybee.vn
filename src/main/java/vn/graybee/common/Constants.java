@@ -6,29 +6,38 @@ public class Constants {
     public static class Category {
 
 
-        public static String parentName = "parentName";
+        public static final String parentName = "parentName";
 
     }
 
     public static class Product {
 
 
-        public static String brandName = "brandName";
+        public static final String brandName = "brandName";
 
-        public static String categoryName = "categoryName";
+        public static final String categoryName = "categoryName";
 
-        public static String tagNames = "tagNames";
+        public static final String tagNames = "tagNames";
+
+    }
+
+
+    public static class Attribute {
+
+
+        public static final String categoryNames = "categoryNames";
+
 
     }
 
     public static class Order {
 
 
-        public static String deliveryType = "deliveryType";
+        public static final String deliveryType = "deliveryType";
 
-        public static String categoryName = "categoryName";
+        public static final String categoryName = "categoryName";
 
-        public static String shippingMethod = "shippingMethod";
+        public static final String shippingMethod = "shippingMethod";
 
     }
 
@@ -41,19 +50,21 @@ public class Constants {
 
         public static final String name = "name";
 
-        public static String email = "email";
+        public static final String email = "email";
 
-        public static String phone = "phone";
+        public static final String phone = "phone";
 
-        public static String empty = "empty";
+        public static final String empty = "empty";
 
-        public static String gender = "gender";
+        public static final String gender = "gender";
 
-        public static String status = "status";
+        public static final String status = "status";
 
     }
 
     public static class Auth {
+
+        public static final String password = "password";
 
     }
 

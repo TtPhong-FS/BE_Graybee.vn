@@ -4,20 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.graybee.auth.enums.Role;
+import vn.graybee.modules.account.dto.response.ProfileResponse;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountAuthDto {
+public class RegisterResponse {
 
-    private Long id;
+    private ProfileResponse profile;
 
-    private String uid;
-
-    private Role role;
-
-    private String password;
+    private AuthDto auth;
 
 }

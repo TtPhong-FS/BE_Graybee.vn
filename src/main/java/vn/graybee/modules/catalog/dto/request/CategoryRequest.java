@@ -19,10 +19,9 @@ public class CategoryRequest {
     @NotBlank(message = "catalog.validation.category.type.not.blank")
     private String type;
 
-    @NotBlank(message = "common.status.not_blank")
-    private String status;
-
     @Size(max = 35, message = "catalog.validation.category.parentName.size")
     private String parentName;
+
+    private boolean active;
 
 }

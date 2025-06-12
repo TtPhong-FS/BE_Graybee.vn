@@ -33,8 +33,12 @@ public class UserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String uid) throws UsernameNotFoundException {
 
+        if (uid == null || uid.isEmpty()) {
+            throw new AuthException(Constants.Common.root, messageSourceUtil.get("auth.invalid_credentials"));
+        }
+
         AccountPrincipal user = accountRepository.findByUid(uid)
-                .orElseThrow(() -> new AuthException(Constants.Common.root, messageSourceUtil.get("auth.user.invalid_credentials")));
+                .orElseThrow(() -> new AuthException(Constants.Common.root, messageSourceUtil.get("auth.invalid_credentials")));
 
         if (user.isSuperAdmin()) {
             return new UserDetail(user);
@@ -49,6 +53,7 @@ public class UserDetailService implements UserDetailsService {
         user.setPermissions(permissions);
 
         return new UserDetail(user);
+
     }
 
     private List<String> getPermissions(Long accountId) {

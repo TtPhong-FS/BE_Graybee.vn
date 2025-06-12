@@ -1,20 +1,18 @@
-package vn.graybee.auth.dto.response;
+package vn.graybee.modules.catalog.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.graybee.modules.account.model.Profile;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterDto {
+public class CategoryIdActiveResponse {
 
-    private Profile profile;
+    private long id;
 
-    private AuthDto auth;
-
+    private boolean active;
 
 }

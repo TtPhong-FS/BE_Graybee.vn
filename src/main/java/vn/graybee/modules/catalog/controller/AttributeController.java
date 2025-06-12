@@ -15,8 +15,9 @@ import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.catalog.dto.request.AttributeRequest;
-import vn.graybee.modules.catalog.dto.request.MultipleAttributeRequest;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDto;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdActiveResponse;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdAllCategoryIdName;
 import vn.graybee.modules.catalog.service.AttributeService;
 
 import java.util.List;
@@ -51,20 +52,26 @@ public class AttributeController {
 
     @PostMapping
     public ResponseEntity<BasicMessageResponse<AttributeDto>> createAttribute(@Valid @RequestBody AttributeRequest request) {
-
         AttributeDto attributeDto = attributeService.createAttribute(request);
         return ResponseEntity.ok(
                 new BasicMessageResponse<>(200, messageSourceUtil.get("catalog.attribute.success.create", new Object[]{attributeDto.getName()}), attributeDto)
         );
     }
 
-    @PostMapping("/multiple")
-    public ResponseEntity<BasicMessageResponse<List<AttributeDto>>> createMultipleAttribute(@Valid @RequestBody MultipleAttributeRequest request) {
+    @PostMapping("/{id}/categories")
+    public ResponseEntity<BasicMessageResponse<AttributeIdAllCategoryIdName>> addCategoriesToAttribute(
+            @PathVariable long id,
+            @RequestBody List<String> categoryNames) {
 
-        List<AttributeDto> attributeDtos = attributeService.createMultipleAttribute(request);
+        System.out.println(categoryNames);
+
         return ResponseEntity.ok(
-                MessageBuilder.ok(attributeDtos, messageSourceUtil.get("catalog.attribute.success.create.multiple"))
+                MessageBuilder.ok(
+                        attributeService.addCategoriesToAttributeById(id, categoryNames),
+                        messageSourceUtil.get("catalog.attribute.success.add.category")
+                )
         );
+
     }
 
     @PutMapping("/{id}")
@@ -78,6 +85,21 @@ public class AttributeController {
                 new BasicMessageResponse<>(200, messageSourceUtil.get("catalog.attribute.success.update", new Object[]{attributeDto.getName()}), attributeDto)
         );
     }
+
+    @PutMapping("/active/{id}")
+    public ResponseEntity<BasicMessageResponse<AttributeIdActiveResponse>> setShowOrHideById(
+            @PathVariable("id") Long id) {
+
+        AttributeIdActiveResponse attribute = attributeService.setShowOrHideById(id);
+
+        final String message = attribute.isActive() ? messageSourceUtil.get("catalog.attribute.success.show") : messageSourceUtil.get("catalog.attribute.success.hide");
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(attribute, message
+                )
+        );
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BasicMessageResponse<Long>> deleteById(@PathVariable("id") Long id) {

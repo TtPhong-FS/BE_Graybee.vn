@@ -25,16 +25,11 @@ public class Attribute {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "category_id", nullable = false)
-    private Long categoryId;
-
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String name;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     private String label;
-
-    private boolean required;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
@@ -45,5 +40,11 @@ public class Attribute {
 
     @Column(name = "input_type", nullable = false, length = 30)
     private String inputType;
+
+    @Column(name = "is_required")
+    private boolean isRequired;
+
+    @Column(name = "is_active")
+    private boolean isActive;
 
 }

@@ -1,19 +1,17 @@
 package vn.graybee.modules.account.service;
 
-import org.springframework.http.ResponseEntity;
 import vn.graybee.auth.dto.request.CustomerRegisterRequest;
-import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.modules.account.dto.request.UpdateProfileRequest;
-import vn.graybee.modules.account.model.Profile;
+import vn.graybee.modules.account.dto.response.ProfileResponse;
 
 public interface ProfileService {
 
-    ResponseEntity<BasicMessageResponse<Profile>> findByAccountId(Long accountId);
+    ProfileResponse findByAccountId(Long accountId);
 
-    ResponseEntity<BasicMessageResponse<Profile>> updateByAccountId(UpdateProfileRequest request, Long accountId);
+    ProfileResponse updateByAccountId(UpdateProfileRequest request, Long accountId);
 
     void checkExistsByPhone(String phone);
 
-    Profile saveProfileByAccountId(Long accountId, CustomerRegisterRequest request);
+    ProfileResponse saveProfileByAccountId(Long accountId, CustomerRegisterRequest request);
 
 }

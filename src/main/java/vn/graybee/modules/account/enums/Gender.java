@@ -5,7 +5,7 @@ import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
 
 public enum Gender {
-    MALE, FEMALE;
+    MALE, FEMALE, OTHER;
 
     public static Gender fromString(String gender, MessageSourceUtil messageSourceUtil) {
         try {

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.graybee.modules.catalog.enums.CategoryStatus;
+import vn.graybee.modules.catalog.enums.CategoryType;
 
 import java.time.LocalDateTime;
 
@@ -23,9 +23,9 @@ public class CategorySimpleDto {
 
     private Long parentId;
 
-    private String type;
+    private CategoryType type;
 
-    private CategoryStatus status;
+    private boolean active;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

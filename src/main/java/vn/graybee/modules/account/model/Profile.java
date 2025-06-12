@@ -30,8 +30,7 @@ public class Profile {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(name = "birth_day")
-    private Date birthDay;
+    private Date birthday;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;

@@ -37,11 +37,10 @@ public class GlobalHandlerException {
 
     @ExceptionHandler(AuthException.class)
     public ProblemDetail handleAuthException(AuthException ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.UNAUTHORIZED,
-                ex.getMessage()
+        ProblemDetail problemDetail = ProblemDetail.forStatus(
+                HttpStatus.UNAUTHORIZED
         );
-        problemDetail.setProperty("code", ex.getErrorCode());
+        problemDetail.setProperty(ex.getErrorCode(), ex.getMessage());
         problemDetail.setTitle(messageSource.get("common.error.401.title"));
 
         return problemDetail;
@@ -122,17 +121,6 @@ public class GlobalHandlerException {
         );
 
         problemDetail.setTitle(messageSource.get("common.method.not-support.title"));
-        return problemDetail;
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGlobalException(Exception ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                messageSource.get("common.error.500.detail")
-        );
-        logger.error("Unhandled exception: {}", ex.getMessage());
-        problemDetail.setTitle(messageSource.get("common.error.500.title"));
         return problemDetail;
     }
 

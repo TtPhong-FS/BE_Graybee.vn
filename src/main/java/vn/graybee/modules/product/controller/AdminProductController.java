@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +19,6 @@ import vn.graybee.common.dto.PaginationInfo;
 import vn.graybee.common.dto.SortInfo;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.common.utils.MessageSourceUtil;
-import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.product.dto.request.ProductRequest;
 import vn.graybee.modules.product.dto.request.ProductUpdateRequest;
 import vn.graybee.modules.product.dto.response.ProductResponse;
@@ -105,12 +103,6 @@ public class AdminProductController {
         );
     }
 
-    @PutMapping("/restore/{id}")
-    public ResponseEntity<BasicMessageResponse<ProductWithClassifyDto>> restoreProduct(@PathVariable("id") long id, @AuthenticationPrincipal UserDetail UserDetail) {
-        return ResponseEntity.ok(
-                MessageBuilder.ok(adminProductService.restoreProduct(id, UserDetail), messageSourceUtil.get("product.success.restore"))
-        );
-    }
 
     @GetMapping("/load-elastic")
     public ResponseEntity<BasicMessageResponse<String>> loadProductsPublishedIndexIntoElastic() {

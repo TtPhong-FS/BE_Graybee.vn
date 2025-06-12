@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.graybee.modules.catalog.enums.CategoryStatus;
+import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.catalog.model.Category;
 
 import java.time.LocalDateTime;
@@ -26,9 +26,9 @@ public class CategoryDto {
 
     private String name;
 
-    private String type;
+    private CategoryType type;
 
-    private CategoryStatus status;
+    private boolean active;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
@@ -38,11 +38,13 @@ public class CategoryDto {
 
     public CategoryDto(Category category) {
         this.id = category.getId();
+        this.slug = category.getSlug();
+        this.parentId = category.getParentId();
         this.name = category.getName();
-        this.status = category.getStatus();
+        this.type = category.getType();
+        this.active = category.isActive();
         this.createdAt = category.getCreatedAt();
         this.updatedAt = category.getUpdatedAt();
     }
-
 
 }

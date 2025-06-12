@@ -9,15 +9,15 @@ import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.common.utils.SlugUtil;
 import vn.graybee.common.utils.TextUtils;
-import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.catalog.dto.request.CategoryRequest;
 import vn.graybee.modules.catalog.dto.response.CategoryDto;
+import vn.graybee.modules.catalog.dto.response.CategoryIdActiveResponse;
+import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
 import vn.graybee.modules.catalog.dto.response.CategorySimpleDto;
 import vn.graybee.modules.catalog.dto.response.CategorySlugWithParentId;
 import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryUpdateDto;
 import vn.graybee.modules.catalog.dto.response.SidebarDto;
-import vn.graybee.modules.catalog.dto.response.UpdateStatusDto;
 import vn.graybee.modules.catalog.enums.CategoryStatus;
 import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.catalog.model.Category;
@@ -29,8 +29,11 @@ import vn.graybee.modules.product.service.RedisProductService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -45,8 +48,8 @@ public class CategoryServiceImp implements CategoryService {
 
     private final ProductClassifyViewService productClassifyViewService;
 
-    private String getCategoryType(String type) {
-        return CategoryType.getType(type, messageSourceUtil).name();
+    private CategoryType getCategoryType(String type) {
+        return CategoryType.getType(type, messageSourceUtil);
     }
 
     private CategoryStatus getCategoryStatus(String status) {
@@ -60,7 +63,7 @@ public class CategoryServiceImp implements CategoryService {
                 category.getName(),
                 category.getParentId(),
                 category.getType(),
-                category.getStatus(),
+                category.isActive(),
                 category.getCreatedAt(),
                 category.getUpdatedAt()
         );
@@ -68,7 +71,8 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CategorySimpleDto createCategory(CategoryRequest request) {
+    public Category createCategory(CategoryRequest request) {
+        CategoryType type = getCategoryType(request.getType());
 
         Long parentId = null;
         if (request.getParentName() != null && !request.getParentName().isEmpty()) {
@@ -79,12 +83,9 @@ public class CategoryServiceImp implements CategoryService {
             throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("catalog.category.name.exists", new Object[]{request.getName()}));
         }
 
-        String type = getCategoryType(request.getType());
-
-        CategoryStatus categoryStatus = getCategoryStatus(request.getStatus());
 
         Category category = new Category();
-        category.setName(TextUtils.capitalize(request.getName()));
+        category.setName(TextUtils.capitalizeEachWord(request.getName()));
 
         if (request.getSlug() == null || request.getSlug().isEmpty()) {
             category.setSlug(null);
@@ -94,10 +95,9 @@ public class CategoryServiceImp implements CategoryService {
 
         category.setType(type);
         category.setParentId(parentId);
-        category.setStatus(categoryStatus);
-        category = categoryRepository.save(category);
+        category.setActive(request.isActive());
+        return categoryRepository.save(category);
 
-        return getCategorySimpleDto(category);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class CategoryServiceImp implements CategoryService {
 
         categoryRepository.deleteById(id);
 
-        CategoryType type = CategoryType.valueOf(categorySummaryDto.getType());
+        CategoryType type = categorySummaryDto.getType();
 
         switch (type) {
             case CATEGORY:
@@ -140,13 +140,14 @@ public class CategoryServiceImp implements CategoryService {
 
     private Long getIdByName(String name) {
         return categoryRepository.findIdByName(name)
-                .orElseThrow(() -> new BusinessCustomException(Constants.Category.parentName, messageSourceUtil.get("catalog.category.does.not.exists", new Object[]{name})));
+                .orElseThrow(() -> new BusinessCustomException(Constants.Category.parentName, messageSourceUtil.get("catalog.category.not.found", new Object[]{name})));
 
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public CategorySimpleDto updateCategory(Long id, CategoryRequest request) {
+    public Category updateCategory(Long id, CategoryRequest request) {
+        CategoryType type = getCategoryType(request.getType());
 
         Long parentId = null;
         if (request.getParentName() != null && !request.getParentName().isEmpty()) {
@@ -164,9 +165,6 @@ public class CategoryServiceImp implements CategoryService {
             throw new BusinessCustomException(Constants.Category.parentName, messageSourceUtil.get("catalog.category.parent_id_cannot_be_self"));
         }
 
-        String type = getCategoryType(request.getType());
-
-        CategoryStatus categoryStatus = getCategoryStatus(request.getStatus());
 
         category.setParentId(parentId);
         category.setName(TextUtils.capitalizeEachWord(request.getName()));
@@ -176,14 +174,13 @@ public class CategoryServiceImp implements CategoryService {
             category.setSlug(SlugUtil.toSlug(request.getSlug()));
         }
         category.setType(type);
-        category.setStatus(categoryStatus);
+        category.setActive(request.isActive());
         category.setUpdatedAt(LocalDateTime.now());
 
-        category = categoryRepository.save(category);
+        return categoryRepository.save(category);
 
         //        redisProductService.deleteProductListPattern(category.getName());
 
-        return getCategorySimpleDto(category);
 
     }
 
@@ -201,7 +198,7 @@ public class CategoryServiceImp implements CategoryService {
             dto.setName(cat.getName());
             dto.setType(cat.getType());
             dto.setSlug(cat.getSlug());
-            dto.setStatus(cat.getStatus());
+            dto.setActive(cat.isActive());
             dto.setCreatedAt(cat.getCreatedAt());
             dto.setUpdatedAt(cat.getUpdatedAt());
             categoryDtoMap.put(cat.getId(), dto);
@@ -222,75 +219,6 @@ public class CategoryServiceImp implements CategoryService {
 
         return roots;
 
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public UpdateStatusDto updateStatusById(Long id, String status) {
-
-        CategoryStatus newStatus = CategoryStatus.getStatus(status, messageSourceUtil);
-
-        CategorySummaryDto category = categoryRepository.findCategorySummaryDtoByNameOrId(null, id)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found")));
-
-        if (category.getStatus() == newStatus) {
-            return null;
-        }
-
-        if (category.getStatus() == CategoryStatus.REMOVED) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("catalog.category.in_trash"));
-        }
-
-        if (newStatus == CategoryStatus.PENDING
-                && (category.getStatus() == CategoryStatus.ACTIVE || category.getStatus() == CategoryStatus.INACTIVE)) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("catalog.category.status.cannot.return"));
-        }
-
-        categoryRepository.updateStatusById(id, newStatus);
-
-        UpdateStatusDto updateStatusDto = new UpdateStatusDto(category.getId(), newStatus, LocalDateTime.now());
-
-        redisProductService.deleteProductListPattern(category.getName());
-
-        return updateStatusDto;
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public CategoryDto restoreById(Long id, UserDetail userDetail) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found")));
-
-        CategoryStatus currentStatus = category.getStatus();
-        if (userDetail != null && !userDetail.user().isSuperAdmin() && currentStatus == CategoryStatus.REMOVED) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("auth.not_super_admin"));
-        }
-
-        if (currentStatus != CategoryStatus.REMOVED) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.in_trash", new Object[]{category.getName()}));
-        }
-
-        categoryRepository.updateStatusById(id, CategoryStatus.INACTIVE);
-
-        return new CategoryDto(category);
-    }
-
-    private String getNameById(Long id) {
-        return categoryRepository.findNameById(id)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found")));
-    }
-
-    @Override
-    public CategorySummaryDto getCategorySummaryByNameOrId(String name, Long id) {
-
-        CategorySummaryDto categorySummaryDto = categoryRepository.findCategorySummaryDtoByNameOrId(name, id)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found")));
-
-        if (categorySummaryDto.getStatus().equals(CategoryStatus.REMOVED)) {
-            throw new BusinessCustomException(Constants.Product.categoryName, messageSourceUtil.get("catalog.category.in_trash", new Object[]{categorySummaryDto.getName()}));
-        }
-
-        return categorySummaryDto;
     }
 
     @Override
@@ -345,5 +273,32 @@ public class CategoryServiceImp implements CategoryService {
 
     }
 
+    @Override
+    public List<CategoryIdNameDto> getCategoryIdNameDtos(List<String> categoryNames) {
+        List<CategoryIdNameDto> categoryIdNameDtos = categoryRepository.findCategoryIdNameDtoByNames(categoryNames);
+
+        Set<String> foundNamesLower = categoryIdNameDtos.stream().map(c -> c.getName().trim().toLowerCase()).collect(Collectors.toSet());
+        Set<String> requestNamesLower = new HashSet<>(categoryNames.stream().map(name -> name.trim().toLowerCase()).toList());
+        Set<String> notFoundNames = new HashSet<>(requestNamesLower);
+        notFoundNames.removeAll(foundNamesLower);
+
+        if (!notFoundNames.isEmpty()) {
+            throw new CustomNotFoundException(Constants.Attribute.categoryNames, messageSourceUtil.get("catalog.category.not.found", new Object[]{String.join(", ", notFoundNames)}));
+        }
+
+        return categoryIdNameDtos;
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public CategoryIdActiveResponse toggleActiveById(long id) {
+
+        Boolean active = categoryRepository.getActiveById(id)
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found")));
+
+        categoryRepository.toggleActiveById(id);
+
+        return new CategoryIdActiveResponse(id, !active);
+    }
 
 }

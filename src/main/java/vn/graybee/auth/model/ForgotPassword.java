@@ -6,9 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
+@Setter
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "forgot_password")
 public class ForgotPassword {
@@ -22,42 +28,11 @@ public class ForgotPassword {
 
     private Date expiration;
 
+    @Column(name = "is_verify")
+    private boolean isVerify;
+
     @Column(name = "account_id", nullable = false)
     private Long accountId;
 
-    public ForgotPassword() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getOtp() {
-        return otp;
-    }
-
-    public void setOtp(Integer otp) {
-        this.otp = otp;
-    }
-
-    public Date getExpiration() {
-        return expiration;
-    }
-
-    public void setExpiration(Date expiration) {
-        this.expiration = expiration;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
 
 }

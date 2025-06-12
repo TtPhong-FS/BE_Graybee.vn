@@ -1,15 +1,13 @@
 package vn.graybee.modules.account.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vn.graybee.auth.dto.request.CustomerRegisterRequest;
 import vn.graybee.common.Constants;
-import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.dto.request.UpdateProfileRequest;
+import vn.graybee.modules.account.dto.response.ProfileResponse;
 import vn.graybee.modules.account.enums.Gender;
 import vn.graybee.modules.account.model.Profile;
 import vn.graybee.modules.account.repository.ProfileRepository;
@@ -25,18 +23,19 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    public ResponseEntity<BasicMessageResponse<Profile>> findByAccountId(Long accountId) {
+    public ProfileResponse findByAccountId(Long accountId) {
 
         Profile profile = profileRepository.findByAccountId(accountId);
 
-        return new ResponseEntity<>(
-                new BasicMessageResponse<>(200, "", profile),
-                HttpStatus.OK
-        );
+        if (profile == null) {
+            return null;
+        }
+
+        return new ProfileResponse(profile);
     }
 
     @Override
-    public ResponseEntity<BasicMessageResponse<Profile>> updateByAccountId(UpdateProfileRequest request, Long accountId) {
+    public ProfileResponse updateByAccountId(UpdateProfileRequest request, Long accountId) {
         return null;
     }
 
@@ -48,7 +47,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Profile saveProfileByAccountId(Long accountId, CustomerRegisterRequest request) {
+    public ProfileResponse saveProfileByAccountId(Long accountId, CustomerRegisterRequest request) {
 
         Gender gender = Gender.fromString(request.getGender(), messageSourceUtil);
 
@@ -56,11 +55,13 @@ public class ProfileServiceImpl implements ProfileService {
         profile.setAccountId(accountId);
         profile.setAvatarUrl(null);
         profile.setPhone(request.getPhone());
-        profile.setBirthDay(request.getBirthDay());
+        profile.setBirthday(request.getBirthday());
         profile.setFullName(request.getFullName());
         profile.setGender(gender);
 
-        return profileRepository.save(profile);
+        profile = profileRepository.save(profile);
+
+        return new ProfileResponse(profile);
     }
 
 }

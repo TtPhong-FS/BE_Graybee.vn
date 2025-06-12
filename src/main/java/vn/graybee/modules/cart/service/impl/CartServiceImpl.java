@@ -65,23 +65,14 @@ public class CartServiceImpl implements CartService {
             throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.bad_request"));
         }
 
-        Cart cart = cartRepository.findByAccountIdAndSessionId(accountId, sessionId)
+        Cart cart = cartRepository.findBySessionId(sessionId)
                 .orElseGet(Cart::new);
 
-        boolean isNewCart = cart.getId() == null;
+        cart.setAccountId(accountId);
+        cart.setSessionId(null);
+        cart.setTotalAmount(BigDecimal.ZERO);
 
-        if (isNewCart) {
-            if (accountId != null) {
-                cart.setAccountId(accountId);
-                cart.setSessionId(null);
-            } else {
-                cart.setSessionId(sessionId);
-                cart.setAccountId(null);
-            }
-
-            cart.setTotalAmount(BigDecimal.ZERO);
-            cartRepository.save(cart);
-        }
+        cartRepository.save(cart);
     }
 
     @Override
@@ -96,11 +87,6 @@ public class CartServiceImpl implements CartService {
     public void updateCartTotal(Integer cartId) {
         BigDecimal totalAmount = cartItemService.getCartItemTotals(cartId);
         cartRepository.updateCartTotal(cartId, totalAmount);
-    }
-
-    @Override
-    public void applyDiscount(Integer cartId, String discountCode) {
-
     }
 
     @Override

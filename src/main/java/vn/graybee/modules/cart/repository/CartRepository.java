@@ -26,5 +26,7 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
     @Query("SELECT c.id FROM Cart c WHERE c.accountId = :accountId OR c.sessionId = :sessionId")
     Optional<Integer> findIdByAccountIdOrSessionId(@Param("accountId") Long accountId, @Param("sessionId") String sessionId);
 
+    @Query("Select c from Cart c where c.sessionId = :sessionId")
+    Optional<Cart> findBySessionId(String sessionId);
 
 }

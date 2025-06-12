@@ -3,7 +3,6 @@ package vn.graybee.modules.catalog.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,12 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.common.utils.MessageSourceUtil;
-import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.catalog.dto.request.CategoryRequest;
 import vn.graybee.modules.catalog.dto.response.CategoryDto;
-import vn.graybee.modules.catalog.dto.response.CategorySimpleDto;
+import vn.graybee.modules.catalog.dto.response.CategoryIdActiveResponse;
 import vn.graybee.modules.catalog.dto.response.CategoryUpdateDto;
-import vn.graybee.modules.catalog.dto.response.UpdateStatusDto;
+import vn.graybee.modules.catalog.model.Category;
 import vn.graybee.modules.catalog.service.CategoryService;
 
 import java.util.List;
@@ -56,13 +54,24 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<CategorySimpleDto>> create(
+    public ResponseEntity<BasicMessageResponse<Category>> create(
             @RequestBody @Valid CategoryRequest request
     ) {
-        final String message = messageSourceUtil.get("catalog.category.success.create");
+        Category category = categoryService.createCategory(request);
+        final String message = messageSourceUtil.get("catalog.category.success.create", new Object[]{category.getName()});
 
         return ResponseEntity.ok(
-                MessageBuilder.ok(categoryService.createCategory(request), message)
+                MessageBuilder.ok(category, message)
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Category>> update(@PathVariable("id") Long id, @RequestBody @Valid CategoryRequest request) {
+        Category category = categoryService.updateCategory(id, request);
+        final String message = messageSourceUtil.get("catalog.category.success.update", new Object[]{category.getName()});
+        
+        return ResponseEntity.ok(
+                MessageBuilder.ok(category, message)
         );
     }
 
@@ -76,32 +85,14 @@ public class CategoryController {
         );
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<CategorySimpleDto>> update(@PathVariable("id") Long id, @RequestBody @Valid CategoryRequest request) {
-        final String message = messageSourceUtil.get("catalog.category.success.update");
+    @PutMapping("/active/{id}")
+    public ResponseEntity<BasicMessageResponse<CategoryIdActiveResponse>> toggleActiveById(@PathVariable("id") Long id) {
+        CategoryIdActiveResponse category = categoryService.toggleActiveById(id);
 
+        final String message = category.isActive() ? messageSourceUtil.get("catalog.category.success.show") : messageSourceUtil.get("catalog.category.success.hide");
         return ResponseEntity.ok(
-                MessageBuilder.ok(categoryService.updateCategory(id, request), message)
+                MessageBuilder.ok(category, message)
         );
     }
-
-    @PutMapping("/{id}/{status}")
-    public ResponseEntity<BasicMessageResponse<UpdateStatusDto>> updateStatusById(@PathVariable("id") Long id, @PathVariable("status") String status) {
-        final String message = messageSourceUtil.get("catalog.category.success.update.status");
-
-        return ResponseEntity.ok(
-                MessageBuilder.ok(categoryService.updateStatusById(id, status), message)
-        );
-    }
-
-    @PutMapping("/restore/{id}")
-    public ResponseEntity<BasicMessageResponse<CategoryDto>> restoreById(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetail userDetail) {
-        final String message = messageSourceUtil.get("catalog.category.success.restore");
-
-        return ResponseEntity.ok(
-                MessageBuilder.ok(categoryService.restoreById(id, userDetail), message)
-        );
-    }
-
 
 }

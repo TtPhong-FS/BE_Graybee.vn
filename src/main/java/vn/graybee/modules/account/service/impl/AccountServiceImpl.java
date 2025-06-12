@@ -3,6 +3,7 @@ package vn.graybee.modules.account.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.auth.dto.request.CustomerRegisterRequest;
 import vn.graybee.auth.dto.response.AccountAuthDto;
 import vn.graybee.auth.enums.Role;
@@ -15,6 +16,8 @@ import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.model.Account;
 import vn.graybee.modules.account.repository.AccountRepository;
 import vn.graybee.modules.account.service.AccountService;
+
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Service
@@ -40,7 +43,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account saveAccount(CustomerRegisterRequest request) {
+
         String uid = CodeGenerator.generateCode(10, CodeGenerator.DIGITS);
+
         Account account = new Account();
         account.setUid(uid);
         account.setRole(Role.CUSTOMER);
@@ -48,6 +53,7 @@ public class AccountServiceImpl implements AccountService {
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         account.setActive(true);
         account.setSuperAdmin(false);
+        account.setLastLoginAt(LocalDateTime.now());
         return accountRepository.save(account);
     }
 
@@ -59,7 +65,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Long getAccountIdByEmail(String email) {
-        return accountRepository.findIdByEmail(email).orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("auth.mail.invalid")));
+        return accountRepository.findIdByEmail(email).orElseThrow(() -> new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("auth.mail.invalid")));
     }
 
     @Override
@@ -67,6 +73,12 @@ public class AccountServiceImpl implements AccountService {
         if (accountRepository.existsByEmail(email)) {
             throw new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("account.email.exists"));
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void updateLastLoginAt(long id) {
+        accountRepository.updateLastLoginAt(id);
     }
 
 }

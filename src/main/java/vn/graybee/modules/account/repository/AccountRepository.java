@@ -16,7 +16,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("Select new vn.graybee.modules.account.dto.response.AccountPrincipal(a.id, a.uid, a.password, a.role, a.isActive, a.isSuperAdmin) from Account a where a.uid = :uid")
     Optional<AccountPrincipal> findByUid(@Param("uid") String uid);
 
-    @Query("Select new vn.graybee.auth.dto.response.AccountAuthDto(a.uid, a.role) from Account a where a.email = :email")
+    @Query("Select new vn.graybee.auth.dto.response.AccountAuthDto(a.id, a.uid, a.role, a.password) from Account a where a.email = :email")
     Optional<AccountAuthDto> findByEmail(@Param("email") String email);
 
     @Query("Select exists (Select 1 from Account a where a.id = :id)")
@@ -32,5 +32,10 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("Select exists (Select 1 from Account a where a.email = :email)")
     boolean existsByEmail(String email);
+
+    @Transactional
+    @Modifying
+    @Query("Update Account a set a.lastLoginAt = CURRENT_TIMESTAMP where a.id = :id")
+    void updateLastLoginAt(@Param("id") long id);
 
 }

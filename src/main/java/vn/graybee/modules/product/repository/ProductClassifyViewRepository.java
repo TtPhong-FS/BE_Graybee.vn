@@ -26,9 +26,10 @@ public interface ProductClassifyViewRepository extends JpaRepository<ProductClas
     void nullifyBrand(@Param("brandName") String brandName);
 
     @Query(value = """
-                    SELECT * FROM product_classify_view
-                    WHERE tag_names @> cast(:jsonTag as jsonb)
+                SELECT * FROM product_classify_view
+                WHERE JSON_CONTAINS(tag_names, :jsonTag)
             """, nativeQuery = true)
     List<ProductClassifyView> findAllByTagName(@Param("jsonTag") String jsonTag);
+
 
 }

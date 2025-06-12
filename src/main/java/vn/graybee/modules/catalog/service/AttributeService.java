@@ -1,17 +1,16 @@
 package vn.graybee.modules.catalog.service;
 
 import vn.graybee.modules.catalog.dto.request.AttributeRequest;
-import vn.graybee.modules.catalog.dto.request.MultipleAttributeRequest;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDto;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdActiveResponse;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdAllCategoryIdName;
 
 import java.util.List;
 
 public interface AttributeService {
 
     AttributeDto createAttribute(AttributeRequest request);
-
-    List<AttributeDto> createMultipleAttribute(MultipleAttributeRequest request);
 
     AttributeDto updateAttribute(Long id, AttributeRequest request);
 
@@ -21,6 +20,10 @@ public interface AttributeService {
 
     List<AttributeDto> findAllAttributeDto();
 
-    List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryId(Long categoryId);
+    List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryId(long categoryId);
+
+    AttributeIdActiveResponse setShowOrHideById(long id);
+
+    AttributeIdAllCategoryIdName addCategoriesToAttributeById(long id, List<String> categoryNames);
 
 }

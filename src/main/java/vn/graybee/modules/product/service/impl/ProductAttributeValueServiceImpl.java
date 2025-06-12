@@ -125,6 +125,9 @@ public class ProductAttributeValueServiceImpl implements ProductAttributeValueSe
             if (attribute == null) {
                 errors.put("attributes." + name,
                         "Attribute " + name + " is not allowed for category " + categoryName);
+            } else if (!attribute.isActive()) {
+                errors.put("attributes." + name,
+                        "Attribute " + name + " is currently hidden. Let's open attribute and try again");
             } else {
                 checkInputTypeAndRequired(errors, name, value, attribute);
             }

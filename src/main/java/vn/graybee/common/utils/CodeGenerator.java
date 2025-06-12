@@ -23,4 +23,8 @@ public class CodeGenerator {
         return sb.toString();
     }
 
+    public static Integer generateOtp() {
+        return random.nextInt(100_000, 899_999);
+    }
+
 }

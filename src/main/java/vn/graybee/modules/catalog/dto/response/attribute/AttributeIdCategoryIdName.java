@@ -5,24 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttributeBasicDto {
+public class AttributeIdCategoryIdName {
 
-    private Long id;
+    private Long attributeId;
 
-    private String name;
+    private Long categoryId;
 
-    private boolean required;
-
-    private String inputType;
-
-    private List<String> options;
-
-    private boolean active;
+    private String categoryName;
 
 }

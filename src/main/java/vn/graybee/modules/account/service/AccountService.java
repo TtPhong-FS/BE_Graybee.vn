@@ -18,4 +18,6 @@ public interface AccountService {
 
     void checkExistsByEmail(String email);
 
+    void updateLastLoginAt(long id);
+
 }

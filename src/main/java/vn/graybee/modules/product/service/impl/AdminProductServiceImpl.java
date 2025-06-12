@@ -14,8 +14,6 @@ import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.common.utils.SlugUtil;
 import vn.graybee.common.utils.TextUtils;
-import vn.graybee.modules.account.security.UserDetail;
-import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.service.CategoryService;
 import vn.graybee.modules.product.dto.request.ProductRequest;
 import vn.graybee.modules.product.dto.request.ProductUpdateRequest;
@@ -122,10 +120,6 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
     }
 
-    public CategorySummaryDto getCategorySummaryDtoByNameOrId(String name, Long id) {
-        return categoryService.getCategorySummaryByNameOrId(name, id);
-    }
-
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public ProductWithClassifyDto createProduct(ProductRequest request) {
@@ -167,11 +161,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         productDescriptionService.saveProductDescription(product.getId(), request.getDescription());
 
-        productImageService.saveProductImages(product.getId(), request.getImages());
-
         productInventoryHelperService.saveInventoryByProductId(product.getId(), request.isStock(), request.getQuantity());
-
-        productDocumentService.insertProduct(product);
 
 //        redisProductService.deleteProductListPattern(request.getCategoryName());
 
@@ -224,14 +214,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         productDescriptionService.updateProductDescription(product.getId(), request.getDescription());
 
-        productImageService.updateProductImages(product.getId(), request.getImages());
-
         productInventoryHelperService.updateInventoryByProductId(product.getId(), request.isStock(), request.getQuantity());
-
-//        String key = PRODUCT_DETAIL_KEY + product.getId();
-
-//        redisProductService.deleteProduct(key);
-//        redisProductService.deleteProductListPattern(null);
 
         return getProductWithClassifyDto(product, productClassifyView);
     }
@@ -342,30 +325,6 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
 
         throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.status.invalid", new Object[]{newStatus.getCode()}));
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public ProductWithClassifyDto restoreProduct(long id, UserDetail userDetail) {
-
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists")));
-
-        ProductStatus status = product.getStatus();
-
-        if (userDetail != null && !userDetail.user().isSuperAdmin() && status == ProductStatus.DELETED) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("auth.not_super_admin"));
-        }
-
-        if (status != ProductStatus.DELETED && status != ProductStatus.REMOVED) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.not_in_trash"));
-        }
-
-        productRepository.updateStatusById(id, ProductStatus.INACTIVE);
-
-        ProductClassifyView productClassifyView = productClassifyViewService.findByProductId(product.getId());
-
-        return getProductWithClassifyDto(product, productClassifyView);
     }
 
     @Override

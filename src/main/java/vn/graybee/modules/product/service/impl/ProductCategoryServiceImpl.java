@@ -138,7 +138,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             if (dto == null) {
                 errorMessages.put(Constants.Product.categoryName,
                         messageSourceUtil.get("catalog.category.not.found", new Object[]{categoryName}));
-            } else if (!CategoryType.CATEGORY.name().equalsIgnoreCase(dto.getType())) {
+            } else if (dto.getType() != CategoryType.CATEGORY) {
                 errorMessages.put(Constants.Product.categoryName,
                         messageSourceUtil.get("catalog.category.invalid.type", new Object[]{categoryName, "CATEGORY"}));
             }
@@ -150,7 +150,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             if (dto == null) {
                 errorMessages.put(Constants.Product.brandName,
                         messageSourceUtil.get("catalog.category.not.found", new Object[]{brand}));
-            } else if (!CategoryType.BRAND.name().equalsIgnoreCase(dto.getType())) {
+            } else if (dto.getType() != CategoryType.BRAND) {
                 errorMessages.put(Constants.Product.brandName,
                         messageSourceUtil.get("catalog.category.invalid.type", new Object[]{brand, "BRAND"}));
             }
@@ -166,7 +166,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                 CategorySummaryDto dto = nameToDtoMap.get(key);
                 if (dto == null) {
                     notFoundTags.add(key);
-                } else if (!CategoryType.TAG.name().equalsIgnoreCase(dto.getType())) {
+                } else if (dto.getType() != CategoryType.TAG) {
                     invalidTypeTags.add(key);
                 }
             }
