@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.exception.MultipleException;
 import vn.graybee.modules.catalog.dto.response.CategoryBasicDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicValueDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDisplayDto;
 import vn.graybee.modules.catalog.service.AttributeService;
 import vn.graybee.modules.catalog.service.CategoryService;
@@ -35,8 +36,7 @@ public class ProductAttributeValueServiceImpl implements ProductAttributeValueSe
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void createProductAttributeValue(long productId, String categoryName, Map<String, String> attributes) {
-        Long categoryId = categoryService.findCategoryIdByName(categoryName);
+    public void createProductAttributeValue(long productId, long categoryId, String categoryName, Map<String, String> attributes) {
 
         List<AttributeBasicDto> attributeBasicDtos = attributeService.findAllAttributeBasicDtoByCategoryId(categoryId);
 
@@ -108,6 +108,11 @@ public class ProductAttributeValueServiceImpl implements ProductAttributeValueSe
         return productAttributeValueRepository.findAttributeDisplayDtosByProductId(productId);
     }
 
+    @Override
+    public List<AttributeBasicValueDto> getAllAttributeValueByCategoryAndProduct(long categoryId, long productId) {
+        return productAttributeValueRepository.AllAttributeValueByCategoryAndProductId(categoryId, productId);
+    }
+
     private void checkAttributeExistsWithCategoryAfterCheck(
             Map<String, AttributeBasicDto> attributeMap,
             String categoryName,
@@ -125,9 +130,6 @@ public class ProductAttributeValueServiceImpl implements ProductAttributeValueSe
             if (attribute == null) {
                 errors.put("attributes." + name,
                         "Attribute " + name + " is not allowed for category " + categoryName);
-            } else if (!attribute.isActive()) {
-                errors.put("attributes." + name,
-                        "Attribute " + name + " is currently hidden. Let's open attribute and try again");
             } else {
                 checkInputTypeAndRequired(errors, name, value, attribute);
             }

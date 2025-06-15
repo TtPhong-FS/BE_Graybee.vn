@@ -1,33 +1,19 @@
 package vn.graybee.response.admin.products;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class InventoryQuantityResponse {
 
-    private int id;
+    private long productId;
 
     private int quantity;
 
-    public InventoryQuantityResponse() {
-    }
-
-    public InventoryQuantityResponse(int id, int quantity) {
-        this.id = id;
-        this.quantity = quantity;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
 
 }

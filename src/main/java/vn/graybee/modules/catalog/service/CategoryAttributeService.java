@@ -9,7 +9,7 @@ public interface CategoryAttributeService {
 
     void createCategoryAttribute(List<String> categoryNames, long attributeId);
 
-    void updateCategoryAttribute(List<String> categoryNames, long attributeId);
+    String updateCategoryAttribute(List<CategoryIdNameDto> incommingCategory, List<String> categoryNames, long attributeId);
 
     void deleteCategoryAttribute(long categoryId, long attributeId);
 

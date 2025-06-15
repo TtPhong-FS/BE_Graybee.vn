@@ -34,8 +34,9 @@ public class Category extends BaseModel {
     @Column(name = "parent_id")
     private Long parentId;
 
+    @Column(name = "category_type")
     @Enumerated(EnumType.STRING)
-    private CategoryType type;
+    private CategoryType categoryType;
 
     @Column(name = "is_active")
     private boolean isActive;

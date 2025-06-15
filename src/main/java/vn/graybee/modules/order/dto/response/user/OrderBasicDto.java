@@ -1,11 +1,19 @@
 package vn.graybee.modules.order.dto.response.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import vn.graybee.modules.order.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderBasicDto {
 
     private long id;
@@ -16,47 +24,5 @@ public class OrderBasicDto {
     private LocalDateTime orderDate;
 
     private BigDecimal totalAmount;
-
-    public OrderBasicDto() {
-    }
-
-    public OrderBasicDto(long id, OrderStatus status, LocalDateTime orderDate, BigDecimal totalAmount) {
-        this.id = id;
-        this.status = status;
-        this.orderDate = orderDate;
-        this.totalAmount = totalAmount;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
 
 }

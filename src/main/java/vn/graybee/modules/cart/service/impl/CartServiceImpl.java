@@ -6,7 +6,6 @@ import vn.graybee.common.Constants;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
-import vn.graybee.modules.cart.dto.request.AddCartItemRequest;
 import vn.graybee.modules.cart.dto.response.CartItemDto;
 import vn.graybee.modules.cart.model.Cart;
 import vn.graybee.modules.cart.repository.CartRepository;
@@ -32,7 +31,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartItemDto findOrCreateCartAfterAddItem(Long accountId, String sessionId, AddCartItemRequest request) {
+    public CartItemDto findOrCreateCartAfterAddItem(Long accountId, String sessionId, long productId) {
         if (accountId == null && sessionId == null) {
             throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.bad_request"));
         }
@@ -55,7 +54,7 @@ public class CartServiceImpl implements CartService {
             cartRepository.save(cart);
         }
 
-        return cartItemService.addItemToCart(cart.getId(), request);
+        return cartItemService.addItemToCart(cart.getId(), productId);
     }
 
     @Override

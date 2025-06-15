@@ -20,20 +20,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             SELECT new vn.graybee.modules.order.dto.response.admin.AdminOrderResponse(
                 o.id,
                 o.totalAmount,
-                pro.phone,
-                pro.fullName,
+                d.recipientName,
+                d.recipientPhone,
                 pro.avatarUrl,
                 pay.paymentStatus,
                 d.deliveryType,
                 o.status,
-                o.isCancelled,
-                o.isConfirmed,
                 o.createdAt
             )
             FROM Order o
-            JOIN Profile pro on pro.accountId = o.accountId
-            LEFT JOIN Payment pay ON pay.orderId = o.id
-            LEFT JOIN Delivery d ON d.orderId = o.id
+            LEFT JOIN Profile pro on pro.accountId = o.accountId
+            JOIN Payment pay ON pay.orderId = o.id
+            JOIN Delivery d ON d.orderId = o.id
             """)
     Page<AdminOrderResponse> fetchAll(Pageable pageable);
 
@@ -42,13 +40,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Order o set o.isConfirmed = true, o.status = 'CONFIRMED' where o.id = :id")
-    void confirmOrderById(@Param("id") long id);
-
-    @Transactional
-    @Modifying
-    @Query("Update Order o set o.isCancelled = true, o.status = 'CANCELLED' where o.id = :id")
-    void cancelOrderById(@Param("id") long id);
+    @Query("UPDATE Order o set o.status = :status where o.id = :id")
+    void updateStatusByIdAndStatus(@Param("id") long id, @Param("status") OrderStatus status);
 
     @Query("Select o.status from Order o where o.id = :id")
     OrderStatus findStatusById(long id);

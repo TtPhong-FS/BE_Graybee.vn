@@ -20,7 +20,7 @@ public class CategoryUpdateDto {
 
     private String slug;
 
-    private CategoryType type;
+    private CategoryType categoryType;
 
     private boolean isActive;
 

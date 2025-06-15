@@ -1,13 +1,12 @@
 package vn.graybee.modules.cart.service;
 
-import vn.graybee.modules.cart.dto.request.AddCartItemRequest;
 import vn.graybee.modules.cart.dto.response.CartItemDto;
 
 import java.util.List;
 
 public interface CartService {
 
-    CartItemDto findOrCreateCartAfterAddItem(Long accountId, String sessionId, AddCartItemRequest request);
+    CartItemDto findOrCreateCartAfterAddItem(Long accountId, String sessionId, long productId);
 
     void syncGuestCartToAccount(Long accountId, String sessionId);
 

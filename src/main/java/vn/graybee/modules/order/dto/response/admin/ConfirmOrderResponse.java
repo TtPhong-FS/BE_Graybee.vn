@@ -1,46 +1,20 @@
 package vn.graybee.modules.order.dto.response.admin;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import vn.graybee.modules.order.enums.OrderStatus;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ConfirmOrderResponse {
 
-    private long orderId;
-
-    private boolean isConfirmed;
+    private long id;
 
     private OrderStatus status;
 
-    public ConfirmOrderResponse(long orderId, boolean isConfirmed, OrderStatus status) {
-        this.orderId = orderId;
-        this.isConfirmed = isConfirmed;
-        this.status = status;
-    }
-
-    public ConfirmOrderResponse() {
-    }
-
-    public long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(long orderId) {
-        this.orderId = orderId;
-    }
-
-    public boolean isConfirmed() {
-        return isConfirmed;
-    }
-
-    public void setConfirmed(boolean confirmed) {
-        isConfirmed = confirmed;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
 
 }

@@ -12,32 +12,36 @@ import vn.graybee.response.admin.products.InventoryResponse;
 import java.util.List;
 import java.util.Optional;
 
-public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
+public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
-    @Query("Select i from Inventory i join Product p on i.productId = p.id where p.id = :productId ")
+    @Query("Select i from Inventory i where i.productId = :productId ")
     Optional<Inventory> findByProductId(@Param("productId") long productId);
 
+    @Query("Select new vn.graybee.response.admin.products.InventoryResponse(i.productId, p.name, i.quantity, i.createdAt, i.updatedAt) from Inventory i join Product p on i.productId = p.id")
+    List<InventoryResponse> getAllInventoryResponse();
 
-    @Query("Select new vn.graybee.response.admin.products.InventoryResponse(i.id, p.id, p.name, i.isStock, i.availableQuantity, i.createdAt, i.updatedAt) from Inventory i left join Product p on i.productId = p.id")
-    List<InventoryResponse> fetchAll();
+    @Query("Select new vn.graybee.response.admin.products.InventoryQuantityResponse(i.productId, i.quantity) from Inventory i where i.productId = :productId ")
+    Optional<InventoryQuantityResponse> checkExistsById(@Param("productId") long productId);
 
-    @Query("Select new vn.graybee.response.admin.products.InventoryQuantityResponse(i.id, i.availableQuantity) from Inventory i where i.id = :inventoryId ")
-    Optional<InventoryQuantityResponse> checkExistsById(@Param("inventoryId") Integer inventoryId);
-
-    @Query("Select COALESCE(i.availableQuantity, 0) from Inventory i where i.productId = :productId")
-    Integer getAvailableQuantityByProductId(Long productId);
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE Inventory i SET i.availableQuantity = i.availableQuantity - :quantity WHERE i.productId = :productId AND i.availableQuantity >= :quantity")
-    int decreaseStock(@Param("productId") Long productId, @Param("quantity") int quantity);
+    @Query("Select COALESCE(i.quantity, 0) from Inventory i where i.productId = :productId")
+    Integer getAvailableQuantityByProductId(long productId);
 
     @Transactional
     @Modifying
-    @Query("UPDATE Inventory i SET i.availableQuantity = i.availableQuantity + :quantity WHERE i.productId = :productId")
-    void increaseStock(@Param("productId") Long productId, @Param("quantity") int quantity);
+    @Query("UPDATE Inventory i SET i.quantity = i.quantity - :quantity WHERE i.productId = :productId AND i.quantity >= :quantity")
+    int decreaseQuantity(@Param("productId") long productId, @Param("quantity") int quantity);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Inventory i SET i.quantity = i.quantity + :quantity WHERE i.productId = :productId")
+    void increaseQuantity(@Param("productId") long productId, @Param("quantity") int quantity);
 
     @Query("Select exists (Select 1 from Inventory i where i.productId = :productId)")
-    boolean existsByProductId(@Param("productId") Long productId);
+    boolean existsByProductId(@Param("productId") long productId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Inventory i SET i.quantity = :quantity WHERE i.productId = :productId")
+    void updateQuantityByProductId(long productId, int quantity);
 
 }

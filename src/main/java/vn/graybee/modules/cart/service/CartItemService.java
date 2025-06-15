@@ -1,6 +1,5 @@
 package vn.graybee.modules.cart.service;
 
-import vn.graybee.modules.cart.dto.request.AddCartItemRequest;
 import vn.graybee.modules.cart.dto.response.CartItemDto;
 import vn.graybee.modules.cart.model.CartItem;
 
@@ -9,9 +8,9 @@ import java.util.List;
 
 public interface CartItemService {
 
-    CartItemDto addItemToCart(Integer cartId, AddCartItemRequest request);
+    CartItemDto addItemToCart(Integer cartId, long productId);
 
-    CartItemDto decreaseItemQuantity(Integer cartId, Long productId, int decreaseQuantity);
+    CartItemDto decreaseItemQuantity(Integer cartId, long productId);
 
     Integer removeItemFromCart(Integer cartId, Integer cartItemId);
 

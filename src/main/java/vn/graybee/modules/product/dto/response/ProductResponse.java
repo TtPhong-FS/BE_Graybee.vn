@@ -9,6 +9,7 @@ import vn.graybee.modules.product.model.Product;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Setter
@@ -17,23 +18,23 @@ public class ProductResponse {
 
     private long id;
 
+    private String categoryName;
+
+    private String brandName;
+
+    private List<String> tagNames;
+
     private String slug;
 
     private String name;
 
     private int warranty;
 
-    private float weight;
-
-    private String dimension;
-
     private BigDecimal price;
 
     private int discountPercent;
 
     private BigDecimal finalPrice;
-
-    private String color;
 
     private String thumbnail;
 
@@ -47,17 +48,17 @@ public class ProductResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    public ProductResponse(Product product) {
+    public ProductResponse(Product product, String categoryName, String brandName, List<String> tagNames) {
         this.id = product.getId();
+        this.categoryName = categoryName;
+        this.brandName = brandName;
+        this.tagNames = tagNames;
         this.slug = product.getSlug();
         this.name = product.getName();
         this.warranty = product.getWarranty();
-        this.weight = product.getWeight();
-        this.dimension = product.getDimension();
         this.price = product.getPrice();
         this.discountPercent = product.getDiscountPercent();
         this.finalPrice = product.getFinalPrice();
-        this.color = product.getColor();
         this.thumbnail = product.getThumbnail();
         this.conditions = product.getConditions();
         this.status = product.getStatus();

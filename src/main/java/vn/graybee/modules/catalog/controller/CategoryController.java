@@ -53,6 +53,7 @@ public class CategoryController {
         );
     }
 
+
     @PostMapping
     public ResponseEntity<BasicMessageResponse<Category>> create(
             @RequestBody @Valid CategoryRequest request
@@ -69,7 +70,7 @@ public class CategoryController {
     public ResponseEntity<BasicMessageResponse<Category>> update(@PathVariable("id") Long id, @RequestBody @Valid CategoryRequest request) {
         Category category = categoryService.updateCategory(id, request);
         final String message = messageSourceUtil.get("catalog.category.success.update", new Object[]{category.getName()});
-        
+
         return ResponseEntity.ok(
                 MessageBuilder.ok(category, message)
         );

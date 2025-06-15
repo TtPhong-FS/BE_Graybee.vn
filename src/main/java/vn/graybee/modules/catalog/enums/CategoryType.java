@@ -12,7 +12,7 @@ public enum CategoryType {
             return CategoryType.valueOf(type.toUpperCase());
 
         } catch (RuntimeException e) {
-            throw new BusinessCustomException(Constants.Common.status, messageSourceUtil.get("catalog.category.type.invalid", new Object[]{type}));
+            throw new BusinessCustomException(Constants.Category.categoryType, messageSourceUtil.get("catalog.category.type.invalid", new Object[]{type}));
         }
 
     }

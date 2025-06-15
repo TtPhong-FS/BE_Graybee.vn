@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
-import vn.graybee.modules.cart.dto.request.AddCartItemRequest;
 import vn.graybee.modules.cart.dto.response.CartItemDto;
 import vn.graybee.modules.cart.model.CartItem;
 import vn.graybee.modules.cart.repository.CartItemRepository;
@@ -31,34 +30,34 @@ public class CartItemServiceImpl implements CartItemService {
 
     private CartItemDto convertToCartItemDto(CartItem cartItem, ProductBasicResponse product) {
         return new CartItemDto(
-                cartItem.getCartId(),
+                cartItem.getId(),
                 product,
                 cartItem.getQuantity(),
-                cartItem.getTotal()
+                cartItem.getTotalAmount()
         );
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public CartItemDto addItemToCart(Integer cartId, AddCartItemRequest request) {
+    public CartItemDto addItemToCart(Integer cartId, long productId) {
 
-        ProductBasicResponse product = productService.getProductBasicInfoForCart(request.getProductId());
+        ProductBasicResponse product = productService.getProductBasicInfoForCart(productId);
 
-        Optional<CartItem> existingCartItem = cartItemRepository.findByProductIdAndCartId(request.getProductId(), cartId);
+        Optional<CartItem> existingCartItem = cartItemRepository.findByProductIdAndCartId(productId, cartId);
 
         CartItem cartItem;
 
         if (existingCartItem.isPresent()) {
             cartItem = existingCartItem.get();
-            int newQuantity = cartItem.getQuantity() + request.getQuantity();
+            int newQuantity = cartItem.getQuantity() + 1;
             cartItem.setQuantity(newQuantity);
-            cartItem.setTotal(cartItem.getTotal().add(cartItem.calculateTotal(product.getFinalPrice(), request.getQuantity())));
+            cartItem.setTotalAmount(cartItem.getTotalAmount().add(cartItem.calculateTotal(product.getFinalPrice(), 1)));
         } else {
             cartItem = new CartItem();
             cartItem.setCartId(cartId);
-            cartItem.setProductId(request.getProductId());
-            cartItem.setQuantity(request.getQuantity());
-            cartItem.setTotal(cartItem.calculateTotal(product.getFinalPrice(), request.getQuantity()));
+            cartItem.setProductId(productId);
+            cartItem.setQuantity(1);
+            cartItem.setTotalAmount(cartItem.calculateTotal(product.getFinalPrice(), 1));
         }
 
         cartItem = cartItemRepository.save(cartItem);
@@ -69,20 +68,20 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public CartItemDto decreaseItemQuantity(Integer cartId, Long productId, int decreaseQuantity) {
+    public CartItemDto decreaseItemQuantity(Integer cartId, long productId) {
         CartItem cartItem = cartItemRepository.findByProductIdAndCartId(productId, cartId)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.item.not.found")));
 
         ProductBasicResponse product = productService.getProductBasicInfoForCart(productId);
 
-        int remainingQuantity = cartItem.getQuantity() - decreaseQuantity;
+        int remainingQuantity = cartItem.getQuantity() - 1;
 
         if (remainingQuantity == 0) {
             cartItemRepository.deleteById(cartItem.getId());
             return null;
         } else {
             cartItem.setQuantity(remainingQuantity);
-            cartItem.setTotal(cartItem.getTotal().add(cartItem.calculateTotal(product.getFinalPrice(), decreaseQuantity)));
+            cartItem.setTotalAmount(cartItem.getTotalAmount().add(cartItem.calculateTotal(product.getFinalPrice(), 1)));
             cartItem = cartItemRepository.save(cartItem);
         }
 
@@ -115,10 +114,10 @@ public class CartItemServiceImpl implements CartItemService {
         for (CartItem cartItem : cartItems) {
             ProductBasicResponse product = productService.getProductBasicInfoForCart(cartItem.getProductId());
             cartItemDtos.add(new CartItemDto(
-                    cartItem.getCartId(),
+                    cartItem.getId(),
                     product,
                     cartItem.getQuantity(),
-                    cartItem.getTotal()
+                    cartItem.getTotalAmount()
             ));
         }
 

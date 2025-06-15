@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
-import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.permission.dto.request.PermissionRequest;
+import vn.graybee.modules.permission.dto.response.PermissionForUpdateResponse;
 import vn.graybee.modules.permission.model.Permission;
 import vn.graybee.modules.permission.repository.PermissionRepository;
 
@@ -25,17 +25,13 @@ public class PermissionServiceImpl implements PermissionService {
 
 
     @Override
-    public BasicMessageResponse<List<Permission>> findAll() {
-        List<Permission> response = permissionRepository.findAll();
-        String message = response.isEmpty() ? messageSourceUtil.get("") : messageSourceUtil.get("auth");
-
-        return new BasicMessageResponse<>(200, message, response);
+    public List<Permission> getAllPermission() {
+        return permissionRepository.findAll();
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<Permission> create(PermissionRequest request) {
-
+    public Permission createPermission(PermissionRequest request) {
         if (permissionRepository.existsByName(request.getName())) {
             throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("permission_name_exists"));
         }
@@ -46,20 +42,18 @@ public class PermissionServiceImpl implements PermissionService {
         permission.setActive(request.isActive());
         permission.setDescription(request.getDescription());
 
-        permission = permissionRepository.save(permission);
+        return permissionRepository.save(permission);
 
-        return new BasicMessageResponse<>(201, messageSourceUtil.get(""), permission);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<Permission> update(int id, PermissionRequest request) {
-
+    public Permission updatePermissionById(int id, PermissionRequest request) {
         Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("")));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, "Quyền không tồn tại"));
 
         if (!permission.getName().equals(request.getName()) && permissionRepository.existsByNameNotId(request.getName(), permission.getId())) {
-            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get(""));
+            throw new BusinessCustomException(Constants.Common.name, "Tên quyền đã tồn tại");
         }
 
         permission.setName(request.getName().toUpperCase());
@@ -68,28 +62,24 @@ public class PermissionServiceImpl implements PermissionService {
 
         permission.setUpdatedAt(LocalDateTime.now());
 
-        permission = permissionRepository.save(permission);
-
-        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), permission);
+        return permissionRepository.save(permission);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<Integer> delete(int id) {
+    public Integer deletePermissionById(int id) {
 
         permissionRepository.existsById(id);
 
         permissionRepository.deleteById(id);
 
-        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), id);
+        return id;
     }
 
     @Override
-    public BasicMessageResponse<Permission> findById(int id) {
-        Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("")));
-
-        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), permission);
+    public PermissionForUpdateResponse findPermissionForUpdateById(int id) {
+        return permissionRepository.findPermissionForUpdateById(id).orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, "Quyền không tồn tại"));
     }
+
 
 }

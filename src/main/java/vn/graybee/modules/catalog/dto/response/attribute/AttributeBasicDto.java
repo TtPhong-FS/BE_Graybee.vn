@@ -17,12 +17,12 @@ public class AttributeBasicDto {
 
     private String name;
 
+    private String label;
+
     private boolean required;
 
     private String inputType;
 
     private List<String> options;
-
-    private boolean active;
 
 }

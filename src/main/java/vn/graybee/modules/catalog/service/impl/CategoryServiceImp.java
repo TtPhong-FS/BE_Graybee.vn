@@ -13,12 +13,10 @@ import vn.graybee.modules.catalog.dto.request.CategoryRequest;
 import vn.graybee.modules.catalog.dto.response.CategoryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryIdActiveResponse;
 import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
-import vn.graybee.modules.catalog.dto.response.CategorySimpleDto;
 import vn.graybee.modules.catalog.dto.response.CategorySlugWithParentId;
 import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryUpdateDto;
 import vn.graybee.modules.catalog.dto.response.SidebarDto;
-import vn.graybee.modules.catalog.enums.CategoryStatus;
 import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.catalog.model.Category;
 import vn.graybee.modules.catalog.repository.CategoryRepository;
@@ -28,10 +26,12 @@ import vn.graybee.modules.product.service.RedisProductService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,51 +52,31 @@ public class CategoryServiceImp implements CategoryService {
         return CategoryType.getType(type, messageSourceUtil);
     }
 
-    private CategoryStatus getCategoryStatus(String status) {
-        return CategoryStatus.getStatus(status, messageSourceUtil);
-    }
-
-    private CategorySimpleDto getCategorySimpleDto(Category category) {
-        return new CategorySimpleDto(
-                category.getId(),
-                category.getSlug(),
-                category.getName(),
-                category.getParentId(),
-                category.getType(),
-                category.isActive(),
-                category.getCreatedAt(),
-                category.getUpdatedAt()
-        );
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Category createCategory(CategoryRequest request) {
-        CategoryType type = getCategoryType(request.getType());
-
-        Long parentId = null;
-        if (request.getParentName() != null && !request.getParentName().isEmpty()) {
-            parentId = getIdByName(request.getParentName());
-        }
+        CategoryType type = getCategoryType(request.getCategoryType());
 
         if (categoryRepository.existsByName(request.getName())) {
             throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("catalog.category.name.exists", new Object[]{request.getName()}));
         }
 
+        Long parentId = checkWithParentName(request.getParentName());
 
         Category category = new Category();
         category.setName(TextUtils.capitalizeEachWord(request.getName()));
-
+        category.setParentId(parentId);
         if (request.getSlug() == null || request.getSlug().isEmpty()) {
             category.setSlug(null);
         } else {
             category.setSlug(SlugUtil.toSlug(request.getSlug()));
         }
 
-        category.setType(type);
-        category.setParentId(parentId);
+        category.setCategoryType(type);
         category.setActive(request.isActive());
         return categoryRepository.save(category);
+
 
     }
 
@@ -111,21 +91,9 @@ public class CategoryServiceImp implements CategoryService {
 
         CategoryType type = categorySummaryDto.getType();
 
-        switch (type) {
-            case CATEGORY:
-                productClassifyViewService.removeCategoryByCategoryName(categorySummaryDto.getName());
-                break;
-            case BRAND:
-                productClassifyViewService.removeBrandByBrandName(categorySummaryDto.getName());
-                break;
-            case TAG:
-                productClassifyViewService.removeTagByTagName(categorySummaryDto.getName());
-                break;
-            default:
-                break;
+        if (Objects.requireNonNull(type) == CategoryType.TAG) {
+            productClassifyViewService.removeTagByTagName(categorySummaryDto.getName());
         }
-
-        redisProductService.deleteProductListPattern(categorySummaryDto.getName());
 
         return id;
     }
@@ -138,21 +106,20 @@ public class CategoryServiceImp implements CategoryService {
         }
     }
 
-    private Long getIdByName(String name) {
-        return categoryRepository.findIdByName(name)
-                .orElseThrow(() -> new BusinessCustomException(Constants.Category.parentName, messageSourceUtil.get("catalog.category.not.found", new Object[]{name})));
-
+    private Long checkWithParentName(String parentName) {
+        if (parentName == null || parentName.isEmpty()) {
+            return null;
+        }
+        return categoryRepository.findIdByName(parentName).orElseThrow(() -> new CustomNotFoundException(Constants.Category.parentName, messageSourceUtil.get("catalog.category.not.found", new Object[]{parentName})));
     }
+
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Category updateCategory(Long id, CategoryRequest request) {
-        CategoryType type = getCategoryType(request.getType());
+        CategoryType type = getCategoryType(request.getCategoryType());
 
-        Long parentId = null;
-        if (request.getParentName() != null && !request.getParentName().isEmpty()) {
-            parentId = getIdByName(request.getParentName());
-        }
+        Long parentId = checkWithParentName(request.getParentName());
 
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found")));
@@ -165,7 +132,6 @@ public class CategoryServiceImp implements CategoryService {
             throw new BusinessCustomException(Constants.Category.parentName, messageSourceUtil.get("catalog.category.parent_id_cannot_be_self"));
         }
 
-
         category.setParentId(parentId);
         category.setName(TextUtils.capitalizeEachWord(request.getName()));
         if (request.getSlug() == null || request.getSlug().isEmpty()) {
@@ -173,15 +139,11 @@ public class CategoryServiceImp implements CategoryService {
         } else {
             category.setSlug(SlugUtil.toSlug(request.getSlug()));
         }
-        category.setType(type);
+        category.setCategoryType(type);
         category.setActive(request.isActive());
         category.setUpdatedAt(LocalDateTime.now());
 
         return categoryRepository.save(category);
-
-        //        redisProductService.deleteProductListPattern(category.getName());
-
-
     }
 
     @Override
@@ -196,7 +158,7 @@ public class CategoryServiceImp implements CategoryService {
             dto.setId(cat.getId());
             dto.setParentId(cat.getParentId());
             dto.setName(cat.getName());
-            dto.setType(cat.getType());
+            dto.setCategoryType(cat.getCategoryType());
             dto.setSlug(cat.getSlug());
             dto.setActive(cat.isActive());
             dto.setCreatedAt(cat.getCreatedAt());
@@ -267,14 +229,18 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
-    public Long findCategoryIdByName(String categoryName) {
-        return categoryRepository.findIdByName(categoryName)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found", new Object[]{categoryName})));
-
+    public String findNameById(long id) {
+        return categoryRepository.findNameById(id).orElseThrow(() -> new CustomNotFoundException(Constants.Product.categoryName, messageSourceUtil.get("catalog.category.not.found")));
     }
+
 
     @Override
     public List<CategoryIdNameDto> getCategoryIdNameDtos(List<String> categoryNames) {
+
+        if (categoryNames == null || categoryNames.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<CategoryIdNameDto> categoryIdNameDtos = categoryRepository.findCategoryIdNameDtoByNames(categoryNames);
 
         Set<String> foundNamesLower = categoryIdNameDtos.stream().map(c -> c.getName().trim().toLowerCase()).collect(Collectors.toSet());
@@ -299,6 +265,34 @@ public class CategoryServiceImp implements CategoryService {
         categoryRepository.toggleActiveById(id);
 
         return new CategoryIdActiveResponse(id, !active);
+    }
+
+    @Override
+    public CategorySummaryDto findCategorySummaryDtoByName(String name, String prefix) {
+        return categoryRepository.findCategorySummaryDtoByNameOrId(name, null).orElseThrow(() -> new CustomNotFoundException(prefix, messageSourceUtil.get("catalog.category.not.found", new Object[]{name})));
+    }
+
+    @Override
+    public CategorySummaryDto checkType(String name, CategoryType type) {
+
+        CategorySummaryDto category = new CategorySummaryDto();
+
+        switch (type) {
+            case CATEGORY:
+                category = findCategorySummaryDtoByName(name, Constants.Product.categoryName);
+                if (category.getType() != CategoryType.CATEGORY) {
+                    throw new CustomNotFoundException(Constants.Product.categoryName, "Danh mục " + category.getName() + " phải thuộc loại 'CATEGORY' nhưng nhận về loại " + category.getType());
+                }
+                break;
+            case BRAND:
+                category = findCategorySummaryDtoByName(name, Constants.Product.brandName);
+                if (category.getType() != CategoryType.BRAND) {
+                    throw new CustomNotFoundException(Constants.Product.categoryName, "Danh mục " + category.getName() + " phải thuộc loại 'BRAND' nhưng nhận về loại " + category.getType());
+                }
+                break;
+
+        }
+        return category;
     }
 
 }

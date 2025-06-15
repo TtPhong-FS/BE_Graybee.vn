@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "products_categories", uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "category_id"}))
+@Table(name = "products_categories", uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "tag_id"}))
 public class ProductCategory {
 
     @Id
@@ -25,10 +25,7 @@ public class ProductCategory {
     @Column(name = "product_id")
     private Long productId;
 
-    @Column(name = "category_id")
-    private Long categoryId;
-
-    @Column(name = "is_primary", nullable = false)
-    private boolean isPrimary;
+    @Column(name = "tag_id")
+    private Long tagId;
 
 }

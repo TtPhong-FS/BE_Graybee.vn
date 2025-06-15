@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.graybee.modules.product.model.Product;
-import vn.graybee.modules.product.model.ProductClassifyView;
 
 @Setter
 @Getter
@@ -13,9 +11,6 @@ import vn.graybee.modules.product.model.ProductClassifyView;
 @AllArgsConstructor
 public class ProductWithClassifyDto {
 
-    private Product product;
-
-    private ProductClassifyView classify;
-
+    private ProductResponse product;
 
 }

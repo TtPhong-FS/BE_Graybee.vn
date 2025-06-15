@@ -15,9 +15,12 @@ import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.catalog.dto.request.AttributeRequest;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdActiveResponse;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdAllCategoryIdName;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryId;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdRequiredResponse;
 import vn.graybee.modules.catalog.service.AttributeService;
 
 import java.util.List;
@@ -37,6 +40,16 @@ public class AttributeController {
                 new BasicMessageResponse<>(200, null, attributeService.findById(id))
         );
     }
+
+    @GetMapping("/categories/{categoryName}")
+    public ResponseEntity<BasicMessageResponse<List<AttributeBasicDto>>> getAllAttributeDto(
+            @PathVariable("categoryName") String categoryName
+    ) {
+        return ResponseEntity.ok(
+                new BasicMessageResponse<>(200, null, attributeService.findAllAttributeBasicDtoByCategoryName(categoryName))
+        );
+    }
+
 
     @GetMapping
     public ResponseEntity<BasicMessageResponse<List<AttributeDto>>> findAllAttributeDto() {
@@ -63,12 +76,24 @@ public class AttributeController {
             @PathVariable long id,
             @RequestBody List<String> categoryNames) {
 
-        System.out.println(categoryNames);
-
         return ResponseEntity.ok(
                 MessageBuilder.ok(
                         attributeService.addCategoriesToAttributeById(id, categoryNames),
                         messageSourceUtil.get("catalog.attribute.success.add.category")
+                )
+        );
+
+    }
+
+    @DeleteMapping("/{id}/{categoryId}")
+    public ResponseEntity<BasicMessageResponse<AttributeIdCategoryId>> removeCategoryByCategoryIdAndId(
+            @PathVariable("id") long id,
+            @PathVariable("categoryId") long categoryId) {
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        attributeService.removeCategoryByCategoryIdAndId(id, categoryId),
+                        messageSourceUtil.get("catalog.attribute.success.remove.category")
                 )
         );
 
@@ -93,6 +118,20 @@ public class AttributeController {
         AttributeIdActiveResponse attribute = attributeService.setShowOrHideById(id);
 
         final String message = attribute.isActive() ? messageSourceUtil.get("catalog.attribute.success.show") : messageSourceUtil.get("catalog.attribute.success.hide");
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(attribute, message
+                )
+        );
+    }
+
+    @PutMapping("/required/{id}")
+    public ResponseEntity<BasicMessageResponse<AttributeIdRequiredResponse>> toggleRequiredById(
+            @PathVariable("id") Long id) {
+
+        AttributeIdRequiredResponse attribute = attributeService.toggleRequiredById(id);
+
+        final String message = attribute.isRequired() ? messageSourceUtil.get("catalog.attribute.success.required") : messageSourceUtil.get("catalog.attribute.success.un.required");
 
         return ResponseEntity.ok(
                 MessageBuilder.ok(attribute, message

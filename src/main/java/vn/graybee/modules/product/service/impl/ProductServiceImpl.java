@@ -8,9 +8,9 @@ import vn.graybee.common.dto.PaginationInfo;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
+import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDisplayDto;
 import vn.graybee.modules.comment.dto.response.ReviewCommentDto;
-import vn.graybee.modules.product.dto.response.FavoriteProductResponse;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.modules.product.repository.ProductRepository;
@@ -57,11 +57,10 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
+
     @Override
     public List<ProductBasicResponse> findProductByCategorySlug(String categorySlug) {
-
-        return productCategoryService.findProductByCategorySlug(categorySlug);
-
+        return productRepository.findProductByCategorySlug(categorySlug);
 //        List<ProductBasicResponse> cachedProducts = redisProductService.getCachedListProductBasicBySortedSet(categoryName, sortBy, page, size, true);
 //
 //        if (cachedProducts != null && !cachedProducts.isEmpty()) {
@@ -124,15 +123,12 @@ public class ProductServiceImpl implements ProductService {
         ProductDetailDto productDetailDto = productRepository.findProductDetailDtoBySlug(slug)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found")));
 
-        List<String> imageUrls = productImageService.getProductImages(productDetailDto.getProductId());
-
         List<AttributeDisplayDto> attributeDisplayDtos = productAttributeValueService.getAttributeDisplayDtosByProductId(productDetailDto.getProductId());
 
         List<ReviewCommentDto> reviewCommentDtos = reviewCommentSerivce.getReviewCommentDtosByProductId(productDetailDto.getProductId());
 
         productDetailDto.setReviews(reviewCommentDtos);
-        productDetailDto.setImages(imageUrls);
-        productDetailDto.setDetails(attributeDisplayDtos);
+        productDetailDto.setSpecifications(attributeDisplayDtos);
         return productDetailDto;
     }
 
@@ -146,6 +142,11 @@ public class ProductServiceImpl implements ProductService {
     public FavoriteProductResponse getProductFavouriteById(Long productId) {
         return productRepository.findProductFavouriteById(productId)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found.or.out_of_business")));
+    }
+
+    @Override
+    public List<ProductBasicResponse> getAllProductPublished() {
+        return productRepository.findAllProductPublished();
     }
 
 }

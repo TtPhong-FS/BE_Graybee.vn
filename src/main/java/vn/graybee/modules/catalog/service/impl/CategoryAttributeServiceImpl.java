@@ -3,6 +3,9 @@ package vn.graybee.modules.catalog.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.graybee.common.Constants;
+import vn.graybee.common.exception.BusinessCustomException;
+import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryIdName;
 import vn.graybee.modules.catalog.model.CategoryAttribute;
@@ -23,11 +26,13 @@ public class CategoryAttributeServiceImpl implements CategoryAttributeService {
 
     private final CategoryService categoryService;
 
+    private final MessageSourceUtil messageSourceUtil;
+
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void createCategoryAttribute(List<String> categoryNames, long attributeId) {
 
-        if (categoryNames.isEmpty()) {
+        if (categoryNames == null || categoryNames.isEmpty()) {
             return;
         }
 
@@ -46,20 +51,18 @@ public class CategoryAttributeServiceImpl implements CategoryAttributeService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void updateCategoryAttribute(List<String> categoryNames, long attributeId) {
+    public String updateCategoryAttribute(List<CategoryIdNameDto> incommingCategory, List<String> categoryNames, long attributeId) {
         if (categoryNames.isEmpty()) {
             categoryAttributeRepository.deleteByAttributeId(attributeId);
-            return;
+            return "clear";
         }
-
-        List<CategoryIdNameDto> categoryIdNameDtos = categoryService.getCategoryIdNameDtos(categoryNames);
-
 //        List categoryId to new relation
-        Set<Long> desiredCategoryIds = categoryIdNameDtos.stream()
+        Set<Long> desiredCategoryIds = incommingCategory.stream()
                 .map(CategoryIdNameDto::getId)
                 .collect(Collectors.toSet());
 
         List<CategoryAttribute> existingRelations = categoryAttributeRepository.findAllByAttributeId(attributeId);
+
 
 //        Fill relation don't need in new relation
         List<CategoryAttribute> relationsToDelete = existingRelations.stream()
@@ -68,6 +71,8 @@ public class CategoryAttributeServiceImpl implements CategoryAttributeService {
 
         if (!relationsToDelete.isEmpty()) {
             categoryAttributeRepository.deleteAll(relationsToDelete);
+
+            return "unset";
         }
 //      List categoryId is existing
         Set<Long> existingCategoryIds = existingRelations.stream()
@@ -87,11 +92,19 @@ public class CategoryAttributeServiceImpl implements CategoryAttributeService {
         if (!relationsToSave.isEmpty()) {
             categoryAttributeRepository.saveAll(relationsToSave);
         }
+
+        return "add";
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteCategoryAttribute(long categoryId, long attributeId) {
+        categoryService.checkExistsById(categoryId);
+
+        if (!categoryAttributeRepository.existsByCategoryIdAndAttributeId(categoryId, attributeId)) {
+            throw new BusinessCustomException(Constants.Common.global, "Thuộc tính chưa được gắn với danh mục này");
+        }
+
         categoryAttributeRepository.deleteByCategoryIdAndAttributeId(categoryId, attributeId);
     }
 

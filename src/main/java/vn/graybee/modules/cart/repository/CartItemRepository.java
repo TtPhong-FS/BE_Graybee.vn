@@ -24,7 +24,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Query("Select ci from CartItem ci where ci.cartId = :cartId and ci.productId = :productId ")
     Optional<CartItem> findByCartIdAndProductId(@Param("cartId") int cartId, @Param("productId") long productId);
 
-    @Query("SELECT COALESCE(SUM(c.total), 0) FROM CartItem c WHERE c.cartId = :cartId")
+    @Query("SELECT COALESCE(SUM(c.totalAmount), 0) FROM CartItem c WHERE c.cartId = :cartId")
     BigDecimal sumTotalByCartId(@Param("cartId") int cartId);
 
     @Query("SELECT c.id FROM CartItem c WHERE c.id = :id")
@@ -53,7 +53,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Query("SELECT c.id FROM CartItem c WHERE c.cartId = :cartId AND c.id = :id")
     Optional<Integer> findByIdAndCartId(@Param("cartId") Integer cartId, @Param("id") Integer id);
 
-    @Query("SELECT c.total FROM CartItem c WHERE c.cartId = :cartId")
+    @Query("SELECT c.totalAmount FROM CartItem c WHERE c.cartId = :cartId")
     List<BigDecimal> findAllTotalByCartId(Integer cartId);
 
     @Query("Select exists (Select 1 from CartItem ci where ci.id = :id)")

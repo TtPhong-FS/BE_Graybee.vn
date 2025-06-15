@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
+import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.permission.dto.request.PermissionRequest;
+import vn.graybee.modules.permission.dto.response.PermissionForUpdateResponse;
 import vn.graybee.modules.permission.model.Permission;
 import vn.graybee.modules.permission.service.PermissionService;
 
@@ -30,27 +31,54 @@ public class AdminPermissionController {
 
     @GetMapping
     public ResponseEntity<BasicMessageResponse<List<Permission>>> fetchAll() {
-        return ResponseEntity.ok(permissionService.findAll());
+        List<Permission> permissions = permissionService.getAllPermission();
+
+        final String msg = permissions.isEmpty() ? "Danh sách quyền đang trống!" : "Lấy tất cả quyền thành công";
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        permissions, msg
+                )
+        );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BasicMessageResponse<Permission>> getById(@PathVariable("id") int id) {
-        return ResponseEntity.ok(permissionService.findById(id));
+    @GetMapping("/for-update/{id}")
+    public ResponseEntity<BasicMessageResponse<PermissionForUpdateResponse>> findPermissionForUpdateById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        permissionService.findPermissionForUpdateById(id),
+                        null
+                )
+        );
     }
 
     @PostMapping
-    public ResponseEntity<BasicMessageResponse<Permission>> create(@RequestBody @Valid PermissionRequest request) {
-        return ResponseEntity.ok(permissionService.create(request));
+    public ResponseEntity<BasicMessageResponse<Permission>> createPermission(@RequestBody @Valid PermissionRequest request) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        permissionService.createPermission(request),
+                        "Tạo quyền thành công"
+                )
+        );
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<BasicMessageResponse<Permission>> update(@RequestParam("id") int id, @RequestBody @Valid PermissionRequest request) {
-        return ResponseEntity.ok(permissionService.update(id, request));
+    @PutMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Permission>> updatePermissionById(@PathVariable("id") int id, @RequestBody @Valid PermissionRequest request) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        permissionService.updatePermissionById(id, request),
+                        "Cập nhật quyền thành công"
+                )
+        );
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<BasicMessageResponse<Integer>> delete(@RequestParam("id") int id) {
-        return ResponseEntity.ok(permissionService.delete(id));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Integer>> deletePermissionById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        permissionService.deletePermissionById(id),
+                        "Xoá quyền thành công"
+                )
+        );
     }
 
 }

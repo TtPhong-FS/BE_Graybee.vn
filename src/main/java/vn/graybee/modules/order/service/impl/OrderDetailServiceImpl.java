@@ -38,7 +38,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         List<OrderDetail> orderDetails = new ArrayList<>();
         for (CartItem cartItem : cartItems) {
 
-            inventoryService.validateStockAvailable(cartItem.getProductId(), cartItem.getQuantity());
+            inventoryService.validateQuantityAvailable(cartItem.getProductId(), cartItem.getQuantity());
 
             BigDecimal priceAtTime = productService.getProductPriceById(cartItem.getProductId());
             BigDecimal subtotal = calculateSubtotal(priceAtTime, cartItem.getQuantity());
@@ -52,7 +52,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
             orderDetails.add(orderDetail);
 
-            inventoryService.decreaseStock(orderDetail.getProductId(), orderDetail.getQuantity());
+            inventoryService.decreaseQuantity(orderDetail.getProductId(), orderDetail.getQuantity());
         }
 
         return orderDetailRepository.saveAll(orderDetails);

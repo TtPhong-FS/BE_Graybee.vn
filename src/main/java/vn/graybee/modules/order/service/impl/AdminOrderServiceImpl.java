@@ -8,8 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
-import vn.graybee.common.dto.BasicMessageResponse;
-import vn.graybee.common.dto.MessageResponse;
 import vn.graybee.common.dto.PaginationInfo;
 import vn.graybee.common.dto.SortInfo;
 import vn.graybee.common.exception.BusinessCustomException;
@@ -35,43 +33,51 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<ConfirmOrderResponse> confirmOrderById(long orderId) {
+    public ConfirmOrderResponse confirmOrderById(long orderId) {
 
-        if (!orderRepository.checkExistsById(orderId)) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get(""));
+        OrderStatus currentStatus = orderRepository.findStatusById(orderId);
+
+        if (currentStatus == OrderStatus.CONFIRMED) {
+            throw new BusinessCustomException(Constants.Common.global, "Đơn hàng đã được xác nhận, không thể xác nhận lại.");
         }
 
-        orderRepository.confirmOrderById(orderId);
+        if (currentStatus == OrderStatus.CANCELLED) {
+            throw new BusinessCustomException(Constants.Common.global, "Đơn hàng đã bị huỷ, không thể xác nhận.");
+        }
 
-        ConfirmOrderResponse response = new ConfirmOrderResponse(orderId, true, OrderStatus.CONFIRMED);
+        orderRepository.updateStatusByIdAndStatus(orderId, OrderStatus.CONFIRMED);
 
-        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), response);
+        return new ConfirmOrderResponse(orderId, OrderStatus.CONFIRMED);
+    }
+
+    @Override
+    public void checkExistsById(long id) {
+        if (!orderRepository.checkExistsById(id)) {
+            throw new BusinessCustomException(Constants.Common.global, "Đơn hàng không tồn tại");
+        }
+
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<CancelOrderResponse> cancelOrderById(long orderId) {
+    public CancelOrderResponse cancelOrderById(long orderId) {
 
-        if (!orderRepository.checkExistsById(orderId)) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get(""));
-        }
+        checkExistsById(orderId);
 
-        OrderStatus status = orderRepository.findStatusById(orderId);
+        OrderStatus currentStatus = orderRepository.findStatusById(orderId);
 
-        if (status.equals(OrderStatus.PENDING) || status.equals(OrderStatus.CONFIRMED) || status.equals(OrderStatus.PROCESSING)) {
-            orderRepository.cancelOrderById(orderId);
+        if (currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.CONFIRMED || currentStatus == OrderStatus.PROCESSING) {
+            orderRepository.updateStatusByIdAndStatus(orderId, OrderStatus.CANCELLED);
         } else {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get(""));
+            throw new BusinessCustomException(Constants.Common.global, "Không thể huỷ, đơn hàng đã được giao cho vận chuyển.");
         }
 
-        CancelOrderResponse response = new CancelOrderResponse(orderId, true, OrderStatus.CANCELLED);
-
-        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), response);
+        return new CancelOrderResponse(orderId, OrderStatus.CANCELLED);
     }
 
 
     @Override
-    public MessageResponse<List<AdminOrderResponse>> getOrderListForDashboard(int page, int size, String sortBy, String order) {
+    public List<AdminOrderResponse> getOrderListForDashboard(int page, int size, String sortBy, String order) {
 
         Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
@@ -97,9 +103,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
             }
         }
 
-        String message = orderPage.getContent().isEmpty() ? messageSourceUtil.get("") : null;
-
-        return new MessageResponse<>(200, message, orderPage.getContent(), paginationInfo, sortInfo);
+        return orderPage.getContent();
     }
 
 

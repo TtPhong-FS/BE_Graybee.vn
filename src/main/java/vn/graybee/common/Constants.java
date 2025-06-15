@@ -8,6 +8,8 @@ public class Constants {
 
         public static final String parentName = "parentName";
 
+        public static final String categoryType = "categoryType";
+
     }
 
     public static class Product {
@@ -27,6 +29,8 @@ public class Constants {
 
         public static final String categoryNames = "categoryNames";
 
+        public static final String inputType = "inputType";
+
 
     }
 
@@ -38,6 +42,12 @@ public class Constants {
         public static final String categoryName = "categoryName";
 
         public static final String shippingMethod = "shippingMethod";
+
+        public static final String deliveryStatus = "deliveryStatus";
+
+        public static final String paymentStatus = "paymentStatus";
+
+        public static final String paymentMethod = "paymentMethod";
 
     }
 

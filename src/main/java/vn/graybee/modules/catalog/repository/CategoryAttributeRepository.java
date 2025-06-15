@@ -41,4 +41,7 @@ public interface CategoryAttributeRepository extends JpaRepository<CategoryAttri
             """)
     List<AttributeIdCategoryIdName> findAllAttributeIdMapCategoryIdNameByAttributeIds(List<Long> attributeIds);
 
+    @Query("Select exists (Select 1 from CategoryAttribute ca where ca.categoryId = :categoryId and ca.attributeId = :attributeId)")
+    boolean existsByCategoryIdAndAttributeId(long categoryId, long attributeId);
+
 }

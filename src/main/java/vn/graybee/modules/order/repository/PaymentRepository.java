@@ -8,7 +8,7 @@ import vn.graybee.modules.order.model.Payment;
 
 import java.util.List;
 
-public interface PaymentRepository extends JpaRepository<Payment, Integer> {
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("Select new vn.graybee.modules.order.dto.response.user.OrderPaymentMethodDto(o.id, p.paymentMethod) from Payment p join Order o on p.orderId = o.id where p.orderId IN :orderIds")
     List<OrderPaymentMethodDto> getPaymentMethodByOrderIds(@Param("orderIds") List<Long> orderIds);

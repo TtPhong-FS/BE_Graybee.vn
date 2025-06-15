@@ -17,7 +17,7 @@ public class CategoryRequest {
     private String slug;
 
     @NotBlank(message = "catalog.validation.category.type.not.blank")
-    private String type;
+    private String categoryType;
 
     @Size(max = 35, message = "catalog.validation.category.parentName.size")
     private String parentName;

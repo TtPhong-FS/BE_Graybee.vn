@@ -7,6 +7,7 @@ import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
 import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryUpdateDto;
 import vn.graybee.modules.catalog.dto.response.SidebarDto;
+import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.catalog.model.Category;
 
 import java.util.List;
@@ -31,10 +32,14 @@ public interface CategoryService {
 
     List<CategorySummaryDto> findCategorySummaryDtoByNames(List<String> names);
 
-    Long findCategoryIdByName(String categoryName);
+    String findNameById(long id);
 
     List<CategoryIdNameDto> getCategoryIdNameDtos(List<String> categoryNames);
 
     CategoryIdActiveResponse toggleActiveById(long id);
+
+    CategorySummaryDto findCategorySummaryDtoByName(String name, String prefix);
+
+    CategorySummaryDto checkType(String name, CategoryType type);
 
 }

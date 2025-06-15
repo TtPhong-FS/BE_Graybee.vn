@@ -37,7 +37,10 @@ public class ProductImageServiceImpl implements ProductImageService {
                 })
                 .toList();
 
-        productImageRepository.saveAll(productImages);
+        if (!productImages.isEmpty()) {
+
+            productImageRepository.saveAll(productImages);
+        }
 
     }
 

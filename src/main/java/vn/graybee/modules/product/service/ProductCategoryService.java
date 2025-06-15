@@ -7,12 +7,12 @@ import java.util.List;
 
 public interface ProductCategoryService {
 
-    List<ProductBasicResponse> findProductByCategorySlug(String categorySlug);
+    void createProductCategoryByTags(Long productId, List<String> tags);
 
-    void createProductCategory(Long productId, String categoryName, String brand, List<String> tags);
-
-    void updateProductCategory(Long productId, String brand, List<String> tags);
+    void updateProductCategoryByTags(Long productId, List<String> tags);
 
     CategoryBasicDto findCategoryBasicDtoByProductId(long productId);
+
+    List<ProductBasicResponse> findProductByTagSlug(String tagSlug);
 
 }

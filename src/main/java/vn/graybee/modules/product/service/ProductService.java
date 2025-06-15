@@ -1,6 +1,6 @@
 package vn.graybee.modules.product.service;
 
-import vn.graybee.modules.product.dto.response.FavoriteProductResponse;
+import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.response.publics.products.ProductPriceResponse;
@@ -21,5 +21,7 @@ public interface ProductService {
     BigDecimal getProductPriceById(long id);
 
     FavoriteProductResponse getProductFavouriteById(Long productId);
+
+    List<ProductBasicResponse> getAllProductPublished();
 
 }

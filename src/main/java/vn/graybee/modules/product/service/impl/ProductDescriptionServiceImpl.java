@@ -1,6 +1,7 @@
 package vn.graybee.modules.product.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.modules.product.model.ProductDescription;
 import vn.graybee.modules.product.repository.ProductDescriptionRepository;
 import vn.graybee.modules.product.service.ProductDescriptionService;
@@ -15,6 +16,7 @@ public class ProductDescriptionServiceImpl implements ProductDescriptionService 
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void saveProductDescription(Long productId, String description) {
         ProductDescription productDescription = new ProductDescription();
 
@@ -30,11 +32,12 @@ public class ProductDescriptionServiceImpl implements ProductDescriptionService 
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void updateProductDescription(Long productId, String description) {
         ProductDescription productDescription = productDescriptionRepository.findByProductId(productId)
                 .orElseGet(ProductDescription::new);
 
-        boolean isDescriptionExists = productDescription.getId() == null;
+        boolean isDescriptionExists = productDescription.getProductId() == null;
 
         if (isDescriptionExists) {
             productDescription.setProductId(productId);

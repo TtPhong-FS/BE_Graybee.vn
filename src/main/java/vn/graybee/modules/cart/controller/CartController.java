@@ -1,6 +1,5 @@
 package vn.graybee.modules.cart.controller;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,15 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.security.UserDetail;
-import vn.graybee.modules.cart.dto.request.AddCartItemRequest;
-import vn.graybee.modules.cart.dto.request.DecreaseQuantityRequest;
 import vn.graybee.modules.cart.dto.response.CartItemDto;
 import vn.graybee.modules.cart.service.CartItemService;
 import vn.graybee.modules.cart.service.CartService;
@@ -53,9 +49,9 @@ public class CartController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/products/{productId}")
     public ResponseEntity<BasicMessageResponse<CartItemDto>> addItemToCart(
-            @RequestBody @Valid AddCartItemRequest request,
+            @PathVariable long productId,
             @CookieValue(value = "sessionId", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = null;
@@ -65,15 +61,15 @@ public class CartController {
 
         return ResponseEntity.ok(
                 MessageBuilder.ok(
-                        cartService.findOrCreateCartAfterAddItem(accountId, sessionId, request),
+                        cartService.findOrCreateCartAfterAddItem(accountId, sessionId, productId),
                         messageSourceUtil.get("cart.item.success_add")
                 )
         );
     }
 
-    @PutMapping("/decrease/quantity")
+    @PutMapping("/decrease/{productId}")
     public ResponseEntity<BasicMessageResponse<CartItemDto>> decreaseQuantityToCartItem(
-            @RequestBody @Valid DecreaseQuantityRequest request,
+            @PathVariable long productId,
             @CookieValue(value = "sessionId", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = null;
@@ -84,7 +80,7 @@ public class CartController {
         Integer cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
 
         return ResponseEntity.ok(
-                MessageBuilder.ok(cartItemService.decreaseItemQuantity(cartId, request.getProductId(), request.getQuantity()), null)
+                MessageBuilder.ok(cartItemService.decreaseItemQuantity(cartId, productId), null)
         );
     }
 

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import vn.graybee.modules.product.dto.response.FavoriteProductResponse;
+import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
 import vn.graybee.modules.product.dto.response.InventoryProductDto;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.dto.response.ProductDetailDto;
@@ -23,21 +23,28 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT new vn.graybee.modules.product.dto.response.ProductResponse(p) " +
-            "FROM Product p " +
-            "Where (:status IS NULL or p.status = :status)"
-    )
-    Page<ProductResponse> fetchProducts(
+    @Query("""
+            SELECT new vn.graybee.modules.product.dto.response.ProductResponse(p, ca.name, bra.name, null)
+            FROM Product p
+            JOIN Category ca on p.categoryId = ca.id
+            JOIN Category bra on p.brandId = bra.id
+            """)
+    Page<ProductResponse> getAllProductResponse(
             @Param("status") ProductStatus status,
             Pageable pageable);
 
     @Query("Select COALESCE(p.finalPrice, 0) from Product p where p.id = :id")
     Optional<BigDecimal> findFinalPriceById(@Param("id") long id);
 
-    @Query("SELECT new vn.graybee.modules.product.dto.response.ProductUpdateDto(p, pd.description, COALESCE(i.availableQuantity, 0), COALESCE(i.isStock, false)) " +
-            "FROM Product p " +
-            "LEFT JOIN Inventory i on p.id = i.productId " +
-            "LEFT JOIN ProductDescription pd on p.id = pd.productId where p.id = :id"
+    @Query("""
+            SELECT new vn.graybee.modules.product.dto.response.ProductUpdateDto(p, ca.name, bra.name, COALESCE(i.quantity, 0), pd.description)
+                        FROM Product p
+                        JOIN Category ca on ca.id = p.categoryId
+                        LEFT JOIN Category bra on p.brandId = bra.id
+                        LEFT JOIN Inventory i on p.id = i.productId
+                        LEFT JOIN ProductDescription pd on p.id = pd.productId
+                        where p.id = :id
+            """
     )
     Optional<ProductUpdateDto> findProductUpdateDtoById(@Param("id") long id);
 
@@ -50,6 +57,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("Select exists (Select 1 from Product p where p.name = :name)")
     boolean existsByName(String name);
 
+    @Query("SELECT EXISTS (SELECT 1 FROM Product p WHERE p.name = :name AND p.id <> :id)")
+    boolean existsByNameAndNotId(@Param("name") String name, @Param("id") long id);
+
+    @Query("Select exists (Select 1 from Product p where p.slug = :slug)")
+    boolean existsBySlug(String slug);
+
+    @Query("SELECT EXISTS (SELECT 1 FROM Product p WHERE p.slug = :slug AND p.id <> :id)")
+    boolean existsBySlugAndNotId(@Param("slug") String slug, @Param("id") long id);
+
     @Transactional
     @Modifying
     @Query("Update Product p set p.status = :status where p.id = :id ")
@@ -59,9 +75,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Query("delete from Product p where p.id = :id ")
     void deleteById(@Param("id") long id);
-
-    @Query("SELECT EXISTS (SELECT 1 FROM Product p WHERE p.name = :name AND p.id <> :id)")
-    boolean existsByNameAndNotId(@Param("name") String name, @Param("id") long id);
 
     @Query("Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail) from Product p where p.status = 'PUBLISHED' ")
     List<ProductBasicResponse> getProductPublishedToLoadIntoElastic();
@@ -74,7 +87,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("Select new vn.graybee.response.publics.products.ProductPriceResponse(p.id, p.finalPrice) from Product p where p.id = :id and p.status = 'PUBLISHED'")
     Optional<ProductPriceResponse> getPriceById(@Param("id") long id);
 
-    @Query("Select new vn.graybee.modules.product.dto.response.FavoriteProductResponse(p.id, p.price, p.finalPrice, p.name, p.thumbnail) from Product p where p.id = :productId and p.status = 'PUBLISHED'")
+    @Query("Select new vn.graybee.modules.account.dto.response.FavoriteProductResponse(p.id, p.price, p.finalPrice, p.name, p.thumbnail) from Product p where p.id = :productId and p.status = 'PUBLISHED'")
     Optional<FavoriteProductResponse> findProductFavouriteById(Long productId);
 
     @Query("Select new vn.graybee.modules.product.dto.response.InventoryProductDto(p.id, p.name, p.status) from Product p where p.id = :productId")
@@ -87,5 +100,23 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             where p.slug = :slug
             """)
     Optional<ProductDetailDto> findProductDetailDtoBySlug(String slug);
+
+    @Query("""
+            Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail)
+            from Product p
+            where p.status = 'PUBLISHED'
+            """)
+    List<ProductBasicResponse> findAllProductPublished();
+
+    @Query("""
+            Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail)
+            from Product p
+            join Category c on c.id = p.categoryId
+            where p.status in ('PUBLISHED', 'COMING_SOON') and c.slug = :categorySlug
+            """)
+    List<ProductBasicResponse> findProductByCategorySlug(@Param("categorySlug") String categorySlug);
+
+    @Query("Select p.categoryId from Product p where p.id = :id")
+    Optional<Long> getCategoryIdById(long id);
 
 }

@@ -26,7 +26,7 @@ public interface AttributeRepository extends JpaRepository<Attribute, Long> {
     @Query("Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeDto(a, null) from Attribute a")
     List<AttributeDto> findAllAttributeDto();
 
-    @Query("Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto(a.id, a.name, a.isRequired, a.inputType, a.options, a.isActive) from Attribute a join CategoryAttribute ca on a.id = ca.attributeId where a.isActive = true and ca.categoryId = :categoryId")
+    @Query("Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto(a.id, a.name, a.label, a.isRequired, a.inputType, a.options) from Attribute a join CategoryAttribute ca on a.id = ca.attributeId where ca.categoryId = :categoryId")
     List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryId(@Param("categoryId") long categoryId);
 
     @Query("Select exists (Select 1 from Attribute a where a.name = :name and a.id <> :id)")
@@ -39,5 +39,22 @@ public interface AttributeRepository extends JpaRepository<Attribute, Long> {
     @Modifying
     @Query("Update Attribute a set a.isActive = not a.isActive where a.id = :id")
     void toggleActiveById(long id);
+
+    @Query("Select a.isRequired from Attribute a where a.id = :id ")
+    Optional<Boolean> getRequiredById(long id);
+
+    @Transactional
+    @Modifying
+    @Query("Update Attribute a set a.isRequired = not a.isRequired where a.id = :id")
+    void toggleRequiredById(long id);
+
+    @Query("""
+            Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto(a.id, a.name, a.label, a.isRequired, a.inputType, a.options) 
+            from Attribute a 
+            join CategoryAttribute ca on a.id = ca.attributeId
+            join Category c on c.id = ca.categoryId
+            where c.name = :categoryName
+            """)
+    List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryName(String categoryName);
 
 }

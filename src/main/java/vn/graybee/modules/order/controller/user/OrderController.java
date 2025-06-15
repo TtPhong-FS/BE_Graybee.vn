@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
+import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.order.dto.request.OrderCreateRequest;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
@@ -42,10 +43,15 @@ public class OrderController {
         return ResponseEntity.ok(orderService.createOrder(request, account, sessionId));
     }
 
-    @PutMapping("/{id}/cancel")
+    @PutMapping("/cancel/{id}")
     public ResponseEntity<BasicMessageResponse<CancelOrderResponse>> cancelOrderById(
             @PathVariable("id") long id) {
-        return ResponseEntity.ok(orderService.cancelOrderById(id));
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        orderService.cancelOrderById(id),
+                        "Huỷ đơn hàng thành công"
+                )
+        );
     }
 
     @GetMapping("/orders-history/{status}")

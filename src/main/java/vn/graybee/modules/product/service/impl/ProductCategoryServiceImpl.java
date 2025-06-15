@@ -35,35 +35,22 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     private final MessageSourceUtil messageSourceUtil;
 
-
-    @Override
-    public List<ProductBasicResponse> findProductByCategorySlug(String categorySlug) {
-
-        categoryService.checkExistsBySlug(categorySlug);
-
-        return productCategoryRepository.findProductByCategorySlug(categorySlug);
-    }
-
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void createProductCategory(Long productId, String categoryName, String brand, List<String> tags) {
-        List<String> allCategories = combineCategoryAndBrandAndTags(categoryName, brand, tags);
+    public void createProductCategoryByTags(Long productId, List<String> tags) {
 
-        List<CategorySummaryDto> categorySummaryDtos = categoryService.findCategorySummaryDtoByNames(allCategories);
+        List<CategorySummaryDto> categorySummaryDtos = categoryService.findCategorySummaryDtoByNames(tags);
 
         Map<String, CategorySummaryDto> nameToDtoMap = categorySummaryDtos.stream()
                 .collect(Collectors.toMap(dto -> dto.getName().trim(), Function.identity()));
 
-        checkCategoryExistsAndThrow(nameToDtoMap, categoryName.trim(), brand.trim(), tags);
+        checkCategoryExistsAndThrow(nameToDtoMap, tags);
 
         List<ProductCategory> productCategories = new ArrayList<>();
-        for (CategorySummaryDto cat : categorySummaryDtos) {
+        for (CategorySummaryDto tag : categorySummaryDtos) {
             ProductCategory productCategory = new ProductCategory();
             productCategory.setProductId(productId);
-            productCategory.setCategoryId(cat.getId());
-            productCategory.setPrimary(
-                    cat.getName().equalsIgnoreCase(categoryName.trim())
-            );
+            productCategory.setTagId(tag.getId());
 
             productCategories.add(productCategory);
         }
@@ -73,16 +60,14 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void updateProductCategory(Long productId, String brand, List<String> tags) {
+    public void updateProductCategoryByTags(Long productId, List<String> tags) {
 
-        List<String> allCategories = combineCategoryAndBrandAndTags(null, brand, tags);
-
-        List<CategorySummaryDto> categorySummaryDtos = categoryService.findCategorySummaryDtoByNames(allCategories);
+        List<CategorySummaryDto> categorySummaryDtos = categoryService.findCategorySummaryDtoByNames(tags);
 
         Map<String, CategorySummaryDto> nameToDtoMap = categorySummaryDtos.stream()
                 .collect(Collectors.toMap(dto -> dto.getName().toLowerCase().trim(), Function.identity()));
 
-        checkCategoryExistsAndThrow(nameToDtoMap, null, brand.trim(), tags);
+        checkCategoryExistsAndThrow(nameToDtoMap, tags);
 
         syncProductCategories(productId, new HashSet<>(nameToDtoMap.values().stream().map(CategorySummaryDto::getId).collect(Collectors.toSet())));
     }
@@ -93,11 +78,17 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.primary.category.not.found", new Object[]{productId})));
     }
 
+    @Override
+    public List<ProductBasicResponse> findProductByTagSlug(String tagSlug) {
+        categoryService.checkExistsBySlug(tagSlug);
+        return productCategoryRepository.findProductByTagSlug(tagSlug);
+    }
+
     private void syncProductCategories(Long productId, Set<Long> newCategoryIds) {
         List<ProductCategory> currentRelations = productCategoryRepository.findAllByProductId(productId);
 
         Set<Long> existingCategoryIds = currentRelations.stream()
-                .map(ProductCategory::getCategoryId)
+                .map(ProductCategory::getTagId)
                 .collect(Collectors.toSet());
 
         Set<Long> categoryIdsAdd = new HashSet<>(newCategoryIds);
@@ -112,11 +103,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
         if (!categoryIdsAdd.isEmpty()) {
             List<ProductCategory> newRelations = categoryIdsAdd.stream()
-                    .map(categoryId -> {
+                    .map(tagId -> {
                         ProductCategory pc = new ProductCategory();
                         pc.setProductId(productId);
-                        pc.setCategoryId(categoryId);
-                        pc.setPrimary(false);
+                        pc.setTagId(tagId);
                         return pc;
                     })
                     .collect(Collectors.toList());
@@ -126,35 +116,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     private void checkCategoryExistsAndThrow(Map<String, CategorySummaryDto> nameToDtoMap,
-                                             String categoryName,
-                                             String brand,
                                              List<String> tags) {
 
         Map<String, String> errorMessages = new LinkedHashMap<>();
-
-        // Check categoryName
-        if (categoryName != null && !categoryName.isEmpty()) {
-            CategorySummaryDto dto = nameToDtoMap.get(categoryName);
-            if (dto == null) {
-                errorMessages.put(Constants.Product.categoryName,
-                        messageSourceUtil.get("catalog.category.not.found", new Object[]{categoryName}));
-            } else if (dto.getType() != CategoryType.CATEGORY) {
-                errorMessages.put(Constants.Product.categoryName,
-                        messageSourceUtil.get("catalog.category.invalid.type", new Object[]{categoryName, "CATEGORY"}));
-            }
-        }
-
-        // Check brand
-        if (brand != null && !brand.isEmpty()) {
-            CategorySummaryDto dto = nameToDtoMap.get(brand);
-            if (dto == null) {
-                errorMessages.put(Constants.Product.brandName,
-                        messageSourceUtil.get("catalog.category.not.found", new Object[]{brand}));
-            } else if (dto.getType() != CategoryType.BRAND) {
-                errorMessages.put(Constants.Product.brandName,
-                        messageSourceUtil.get("catalog.category.invalid.type", new Object[]{brand, "BRAND"}));
-            }
-        }
 
         // Check tags
         if (tags != null && !tags.isEmpty()) {
@@ -178,32 +142,13 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
             if (!invalidTypeTags.isEmpty()) {
                 errorMessages.put(Constants.Product.tagNames,
-                        messageSourceUtil.get("catalog.category.invalid.type", new Object[]{String.join(", ", invalidTypeTags), "TAG"}));
+                        messageSourceUtil.get("catalog.category.invalid.type", new Object[]{String.join(", ", invalidTypeTags), CategoryType.TAG}));
             }
         }
 
         if (!errorMessages.isEmpty()) {
             throw new MultipleException(errorMessages);
         }
-    }
-
-
-    private List<String> combineCategoryAndBrandAndTags(String categoryName, String brand, List<String> tags) {
-        List<String> allCategories = new ArrayList<>();
-
-        if (categoryName != null && !categoryName.isEmpty()) {
-            allCategories.add(categoryName.trim());
-        }
-
-        if (brand != null && !brand.isEmpty()) {
-            allCategories.add(brand.trim());
-        }
-
-        if (tags != null && !tags.isEmpty()) {
-            allCategories.addAll(tags.stream().map(String::trim).toList());
-        }
-
-        return allCategories;
     }
 
 }

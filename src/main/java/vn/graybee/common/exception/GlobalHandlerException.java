@@ -52,7 +52,7 @@ public class GlobalHandlerException {
         Map<String, String> errorMap = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(
                 error -> {
-                    String message = messageSource.get(error.getDefaultMessage());
+                    String message = error.getDefaultMessage();
                     errorMap.put(error.getField(), message);
                 }
         );
@@ -62,6 +62,16 @@ public class GlobalHandlerException {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BusinessCustomException.class)
     public ResponseEntity<Map<String, String>> handlerBusinessException(BusinessCustomException ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put(ex.getField(), ex.getMessage());
+        return ResponseEntity
+                .badRequest()
+                .body(errorMap);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(CustomServerException.class)
+    public ResponseEntity<Map<String, String>> handlerBusinessException(CustomServerException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put(ex.getField(), ex.getMessage());
         return ResponseEntity

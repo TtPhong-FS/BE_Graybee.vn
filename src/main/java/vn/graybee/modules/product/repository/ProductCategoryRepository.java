@@ -19,20 +19,20 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
             Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail)
             from Product p
             join ProductCategory pc on p.id = pc.productId
-            join Category c on c.id = pc.categoryId
+            join Category c on c.id = pc.tagId
             where p.status in ('PUBLISHED', 'COMING_SOON') and c.slug = :categorySlug
             """)
-    List<ProductBasicResponse> findProductByCategorySlug(@Param("categorySlug") String categorySlug);
+    List<ProductBasicResponse> findProductByTagSlug(@Param("categorySlug") String categorySlug);
 
     @Query("Select pc from ProductCategory pc where pc.productId = :productId")
     List<ProductCategory> findAllByProductId(@Param("productId") long productId);
 
     @Transactional
     @Modifying
-    @Query("Delete from ProductCategory pc where pc.productId = :productId and pc.categoryId in :categoryIds")
+    @Query("Delete from ProductCategory pc where pc.productId = :productId and pc.tagId in :categoryIds")
     void deleteByProductIdAndCategoryIdIn(Long productId, Set<Long> categoryIds);
 
-    @Query("Select new vn.graybee.modules.catalog.dto.response.CategoryBasicDto(c.id, c.name) from ProductCategory pc join Category c on pc.categoryId = c.id where pc.productId = :productId and pc.isPrimary = true ")
+    @Query("Select new vn.graybee.modules.catalog.dto.response.CategoryBasicDto(c.id, c.name) from Product p join Category c on p.categoryId = c.id where p.id = :productId")
     Optional<CategoryBasicDto> findCategoryBasicDtoByProductId(@Param("productId") long productId);
 
 }

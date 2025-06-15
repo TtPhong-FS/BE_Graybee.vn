@@ -1,7 +1,15 @@
 package vn.graybee.modules.product.dto.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import vn.graybee.modules.product.enums.ProductStatus;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class InventoryProductDto {
 
     private Long productId;
@@ -10,37 +18,5 @@ public class InventoryProductDto {
 
     private ProductStatus productStatus;
 
-    public InventoryProductDto() {
-    }
-
-    public InventoryProductDto(Long productId, String productName, ProductStatus productStatus) {
-        this.productId = productId;
-        this.productName = productName;
-        this.productStatus = productStatus;
-    }
-
-    public ProductStatus getProductStatus() {
-        return productStatus;
-    }
-
-    public void setProductStatus(ProductStatus productStatus) {
-        this.productStatus = productStatus;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
 
 }

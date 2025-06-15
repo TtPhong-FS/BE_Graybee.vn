@@ -11,7 +11,7 @@ public interface OrderService {
 
     BasicMessageResponse<?> createOrder(OrderCreateRequest request, Long accountId, String sessionId);
 
-    BasicMessageResponse<CancelOrderResponse> cancelOrderById(long orderId);
+    CancelOrderResponse cancelOrderById(long orderId);
 
     BasicMessageResponse<List<OrderHistoryResponse>> getOrderHistoryByAccountId(Long accountId, String status);
 

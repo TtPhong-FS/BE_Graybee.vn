@@ -1,7 +1,7 @@
-package vn.graybee.modules.product.service;
+package vn.graybee.modules.account.service;
 
 import vn.graybee.common.dto.BasicMessageResponse;
-import vn.graybee.modules.product.dto.response.FavoriteProductResponse;
+import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
 
 import java.util.List;
 

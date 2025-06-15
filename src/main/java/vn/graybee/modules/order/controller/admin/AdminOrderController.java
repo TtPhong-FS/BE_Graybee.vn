@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.dto.MessageResponse;
+import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.order.dto.response.admin.AdminOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.ConfirmOrderResponse;
@@ -28,12 +29,22 @@ public class AdminOrderController {
 
     @PutMapping("/confirm/{id}")
     public ResponseEntity<BasicMessageResponse<ConfirmOrderResponse>> confirmOrderById(@PathVariable("id") long id) {
-        return ResponseEntity.ok(adminOrderService.confirmOrderById(id));
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        adminOrderService.confirmOrderById(id),
+                        "Xác nhận đơn hàng thành công!"
+                )
+        );
     }
 
     @PutMapping("/cancel/{id}")
     public ResponseEntity<BasicMessageResponse<CancelOrderResponse>> cancelOrderById(@PathVariable("id") long id) {
-        return ResponseEntity.ok(adminOrderService.cancelOrderById(id));
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        adminOrderService.cancelOrderById(id),
+                        "Huỷ đơn hàng thành công!"
+                )
+        );
     }
 
     @GetMapping
@@ -44,7 +55,17 @@ public class AdminOrderController {
             @RequestParam(defaultValue = "desc") String order
     ) {
 
-        return ResponseEntity.ok(adminOrderService.getOrderListForDashboard(page, size, sortBy, order));
+        List<AdminOrderResponse> orderResponses = adminOrderService.getOrderListForDashboard(page, size, sortBy, order);
+        final String message = orderResponses.isEmpty() ? "Hiện tại không có đơn hàng nào trong hệ thống" : "Lấy tất cả đơn hàng thành công";
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        orderResponses
+                        ,
+                        message
+                        ,
+                        null, null
+                )
+        );
     }
 
 }

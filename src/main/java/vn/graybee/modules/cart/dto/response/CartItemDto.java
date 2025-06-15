@@ -20,6 +20,6 @@ public class CartItemDto {
 
     private int quantity;
 
-    private BigDecimal total;
+    private BigDecimal totalAmount;
 
 }

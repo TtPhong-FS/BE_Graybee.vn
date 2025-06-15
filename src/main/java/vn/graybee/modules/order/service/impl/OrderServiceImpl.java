@@ -120,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
 //
 //        });
 
-        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), response);
+        return new BasicMessageResponse<>(200, "", response);
     }
 
     @Override
@@ -166,10 +166,7 @@ public class OrderServiceImpl implements OrderService {
             order.setAccountId(null);
         }
 
-        order.setConfirmed(false);
-        order.setCancelled(false);
         order.setNote(request.getNote());
-        order.setDiscountId(null); // Assuming discount handling is not implemented yet
 
         List<OrderDetail> orderDetails = orderDetailService.createOrderDetail(order.getId(), cartItems);
 
@@ -178,7 +175,6 @@ public class OrderServiceImpl implements OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         order.setTotalAmount(totalAmount);
 
-        order.setIssueInvoices(request.isIssueInvoices());
         order.setStatus(OrderStatus.PENDING);
 
         order = orderRepository.save(order);
@@ -202,28 +198,26 @@ public class OrderServiceImpl implements OrderService {
 
         cartService.updateCartTotal(cartId);
 
-        return new BasicMessageResponse<>(201, messageSourceUtil.get(""), cartItemIds);
+        return new BasicMessageResponse<>(201, "", cartItemIds);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<CancelOrderResponse> cancelOrderById(long orderId) {
+    public CancelOrderResponse cancelOrderById(long orderId) {
 
         if (!orderRepository.checkExistsById(orderId)) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get(""));
+            throw new BusinessCustomException(Constants.Common.global, "Đơn hàng không tồn tại");
         }
 
-        OrderStatus status = orderRepository.findStatusById(orderId);
+        OrderStatus currentStatus = orderRepository.findStatusById(orderId);
 
-        if (status.equals(OrderStatus.PENDING) || status.equals(OrderStatus.CONFIRMED) || status.equals(OrderStatus.PROCESSING)) {
-            orderRepository.cancelOrderById(orderId);
+        if (currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.CONFIRMED || currentStatus == OrderStatus.PROCESSING) {
+            orderRepository.updateStatusByIdAndStatus(orderId, OrderStatus.CANCELLED);
         } else {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get(""));
+            throw new BusinessCustomException(Constants.Common.global, "Không thể huỷ, đơn hàng đã được giao cho vận chuyển.");
         }
 
-        CancelOrderResponse response = new CancelOrderResponse(orderId, true, OrderStatus.CANCELLED);
-
-        return new BasicMessageResponse<>(200, messageSourceUtil.get(""), response);
+        return new CancelOrderResponse(orderId, OrderStatus.CANCELLED);
     }
 
 }

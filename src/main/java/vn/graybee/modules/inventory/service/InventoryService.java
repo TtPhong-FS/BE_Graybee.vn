@@ -1,31 +1,29 @@
 package vn.graybee.modules.inventory.service;
 
-import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.modules.inventory.dto.request.InventoryRequest;
+import vn.graybee.modules.inventory.dto.response.InventoryIdQuantity;
 import vn.graybee.response.admin.products.InventoryResponse;
 
 import java.util.List;
 
 public interface InventoryService {
 
-    BasicMessageResponse<InventoryResponse> createInventory(InventoryRequest request);
+    InventoryResponse createInventory(InventoryRequest request);
 
-    BasicMessageResponse<List<InventoryResponse>> getInventoryListForDashboard();
+    List<InventoryResponse> getInventoryListForDashboard();
 
-    BasicMessageResponse<Integer> deleteInventory(int id);
+    Long deleteInventoryByProductId(long productId);
 
-    BasicMessageResponse<InventoryResponse> updateInventory(int id, InventoryRequest request);
+    InventoryIdQuantity updateQuantityByProductId(long productId, int quantity);
 
-    void validateStockAvailable(Long productId, int requestedQuantity);
+    void validateQuantityAvailable(long productId, int requestedQuantity);
 
-    int getAvailableStock(Long productId);
+    int getAvailableQuantity(long productId);
 
-    void decreaseStock(Long productId, int quantity);
+    void decreaseQuantity(long productId, int quantity);
 
-    void increaseStock(Long productId, int quantity);
+    void increaseQuantity(long productId, int quantity);
 
-    void saveInventoryByProductId(Long productId, boolean stock, int quantity);
-
-    void updateInventoryByProductId(Long productId, boolean stock, int quantity);
+    void saveInventoryByProductId(long productId, int quantity);
 
 }

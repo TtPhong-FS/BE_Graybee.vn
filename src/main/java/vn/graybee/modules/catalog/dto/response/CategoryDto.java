@@ -26,7 +26,7 @@ public class CategoryDto {
 
     private String name;
 
-    private CategoryType type;
+    private CategoryType categoryType;
 
     private boolean active;
 
@@ -41,7 +41,7 @@ public class CategoryDto {
         this.slug = category.getSlug();
         this.parentId = category.getParentId();
         this.name = category.getName();
-        this.type = category.getType();
+        this.categoryType = category.getCategoryType();
         this.active = category.isActive();
         this.createdAt = category.getCreatedAt();
         this.updatedAt = category.getUpdatedAt();

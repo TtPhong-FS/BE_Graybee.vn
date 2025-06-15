@@ -27,13 +27,7 @@ public class ProductDetailDto {
 
     private String conditions;
 
-    private float weight;
-
-    private String color;
-
     private String thumbnail;
-
-    private List<String> images;
 
     private BigDecimal price;
 
@@ -45,7 +39,7 @@ public class ProductDetailDto {
 
     private List<ReviewCommentDto> reviews;
 
-    private List<AttributeDisplayDto> details;
+    private List<AttributeDisplayDto> specifications;
 
     public ProductDetailDto(Product product, String description) {
         this.productId = product.getId();
@@ -53,8 +47,6 @@ public class ProductDetailDto {
         this.slug = product.getSlug();
         this.warranty = product.getWarranty();
         this.conditions = product.getConditions();
-        this.weight = product.getWeight();
-        this.color = product.getColor();
         this.thumbnail = product.getThumbnail();
         this.price = product.getPrice();
         this.finalPrice = product.getFinalPrice();

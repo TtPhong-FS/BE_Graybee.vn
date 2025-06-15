@@ -10,6 +10,7 @@ import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.service.ProductCategoryService;
+import vn.graybee.modules.product.service.ProductService;
 
 import java.util.List;
 
@@ -20,10 +21,19 @@ public class CollectionController {
 
     private final ProductCategoryService productCategoryService;
 
-    @GetMapping("/{categorySlug}")
-    public ResponseEntity<BasicMessageResponse<List<ProductBasicResponse>>> findByCategory(@PathVariable("categorySlug") String categorySlug) {
+    private final ProductService productService;
+
+    @GetMapping("/tags/{tagSlug}")
+    public ResponseEntity<BasicMessageResponse<List<ProductBasicResponse>>> findByTagSlug(@PathVariable("tagSlug") String tagSlug) {
         return ResponseEntity.ok(
-                MessageBuilder.ok(productCategoryService.findProductByCategorySlug(categorySlug), null)
+                MessageBuilder.ok(productCategoryService.findProductByTagSlug(tagSlug), null)
+        );
+    }
+
+    @GetMapping("/categories/{categorySlug}")
+    public ResponseEntity<BasicMessageResponse<List<ProductBasicResponse>>> findByCategorySlug(@PathVariable("categorySlug") String categorySlug) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(productService.findProductByCategorySlug(categorySlug), null)
         );
     }
 

@@ -8,11 +8,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import vn.graybee.common.model.BaseModel;
 import vn.graybee.modules.order.enums.OrderStatus;
 
 import java.math.BigDecimal;
 
+@Setter
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "orders")
 public class Order extends BaseModel {
@@ -21,14 +27,14 @@ public class Order extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String code;
+
     @Column(name = "account_id")
     private Long accountId;
 
-    @Column(name = "session_id", length = 50)
+    @Column(name = "session_id", length = 20)
     private String sessionId;
-
-    @Column(name = "discount_id")
-    private Integer discountId;
 
     @Column(length = 200)
     private String note;
@@ -36,100 +42,9 @@ public class Order extends BaseModel {
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
-    @Column(name = "issue_invoices")
-    private boolean issueInvoices;
-
-    @Column(name = "is_confirmed")
-    private boolean isConfirmed;
-
-    @Column(name = "is_cancelled")
-    private boolean isCancelled;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
 
-    public Order() {
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public boolean isCancelled() {
-        return isCancelled;
-    }
-
-    public void setCancelled(boolean cancelled) {
-        isCancelled = cancelled;
-    }
-
-    public boolean isConfirmed() {
-        return isConfirmed;
-    }
-
-    public void setConfirmed(boolean confirmed) {
-        isConfirmed = confirmed;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
-
-    public Integer getDiscountId() {
-        return discountId;
-    }
-
-    public void setDiscountId(Integer discountId) {
-        this.discountId = discountId;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public boolean isIssueInvoices() {
-        return issueInvoices;
-    }
-
-    public void setIssueInvoices(boolean issueInvoices) {
-        this.issueInvoices = issueInvoices;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
 
 }

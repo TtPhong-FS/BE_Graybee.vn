@@ -16,7 +16,9 @@ import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdActiveResponse;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdAllCategoryIdName;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryId;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryIdName;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdRequiredResponse;
 import vn.graybee.modules.catalog.enums.InputType;
 import vn.graybee.modules.catalog.model.Attribute;
 import vn.graybee.modules.catalog.repository.AttributeRepository;
@@ -106,7 +108,7 @@ public class AttributeServiceImpl implements AttributeService {
 
         attribute.setName(convertName(request.getName()));
         attribute.setLabel(TextUtils.capitalizeEachWord(request.getLabel()));
-        attribute.setUnit(request.getUnit().toUpperCase());
+        attribute.setUnit(request.getUnit() != null && !request.getUnit().isEmpty() ? request.getUnit().toUpperCase() : null);
         attribute.setInputType(getInputType(request.getInputType()));
         attribute.setRequired(request.isRequired());
         attribute.setActive(request.isActive());
@@ -114,9 +116,9 @@ public class AttributeServiceImpl implements AttributeService {
 
         attribute = attributeRepository.save(attribute);
 
-        categoryAttributeService.updateCategoryAttribute(request.getCategoryNames(), attribute.getId());
-
         List<CategoryIdNameDto> categories = categoryService.getCategoryIdNameDtos(request.getCategoryNames());
+
+        categoryAttributeService.updateCategoryAttribute(categories, request.getCategoryNames(), attribute.getId());
 
         return toDto(attribute, categories);
     }
@@ -172,6 +174,11 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     @Override
+    public List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryName(String categoryName) {
+        return attributeRepository.findAllAttributeBasicDtoByCategoryName(categoryName);
+    }
+
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public AttributeIdActiveResponse setShowOrHideById(long id) {
         Boolean active = attributeRepository.getActiveById(id)
@@ -194,7 +201,31 @@ public class AttributeServiceImpl implements AttributeService {
         checkExistsById(id);
 
         List<CategoryIdNameDto> categories = categoryService.getCategoryIdNameDtos(categoryNames);
+
+        categoryAttributeService.updateCategoryAttribute(categories, categoryNames, id);
+
         return new AttributeIdAllCategoryIdName(id, categories);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public AttributeIdCategoryId removeCategoryByCategoryIdAndId(long id, long categoryId) {
+        checkExistsById(id);
+
+        categoryAttributeService.deleteCategoryAttribute(categoryId, id);
+
+        return new AttributeIdCategoryId(id, categoryId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public AttributeIdRequiredResponse toggleRequiredById(long id) {
+        Boolean required = attributeRepository.getRequiredById(id)
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.attribute.not.found")));
+
+        attributeRepository.toggleRequiredById(id);
+
+        return new AttributeIdRequiredResponse(id, !required);
     }
 
 }

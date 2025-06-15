@@ -28,6 +28,12 @@ public class Product extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
+
+    @Column(name = "brand_id", nullable = false)
+    private Long brandId;
+
     @Column(unique = true, nullable = false, length = 200)
     private String slug;
 
@@ -40,11 +46,6 @@ public class Product extends BaseModel {
     @Column(name = "warranty", nullable = false)
     private int warranty;
 
-    private float weight;
-
-    @Column(name = "dimension", length = 50)
-    private String dimension;
-
     private BigDecimal price;
 
     @Column(name = "discount_percent")
@@ -52,9 +53,6 @@ public class Product extends BaseModel {
 
     @Column(name = "final_price")
     private BigDecimal finalPrice;
-
-    @Column(length = 35)
-    private String color;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

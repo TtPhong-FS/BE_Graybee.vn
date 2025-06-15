@@ -10,9 +10,8 @@ import lombok.Setter;
 public class PermissionRequest {
 
     @NotBlank(message = "Tên quyền không thể trống")
-    @Size(max = 50, message = "Độ dài tối đa không vượt quá 50 ký tự")
+    @Size(max = 100, message = "Độ dài tối đa không vượt quá 100 ký tự")
     private String name;
-
 
     @Size(max = 150, message = "Độ dài tối đa không vượt quá 150 ký tự")
     private String description;

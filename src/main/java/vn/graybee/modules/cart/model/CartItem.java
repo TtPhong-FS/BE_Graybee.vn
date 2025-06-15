@@ -31,7 +31,8 @@ public class CartItem {
 
     private int quantity;
 
-    private BigDecimal total;
+    @Column(name = "total_amount")
+    private BigDecimal totalAmount;
 
     public BigDecimal calculateTotal(BigDecimal price, int quantity) {
         return price.multiply(BigDecimal.valueOf(quantity));

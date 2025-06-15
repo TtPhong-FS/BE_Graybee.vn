@@ -10,10 +10,6 @@ public interface ProductClassifyViewService {
 
     ProductClassifyView updateProductClassifyViewByProductId(Long productId, String productName, String productSlug, String brandName, List<String> tagNames);
 
-    void removeCategoryByCategoryName(String categoryName);
-
-    void removeBrandByBrandName(String brandName);
-
     void removeTagByTagName(String tagName);
 
     ProductClassifyView findByProductId(long productId);

@@ -1,12 +1,13 @@
-package vn.graybee.modules.product.service.impl;
+package vn.graybee.modules.account.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageSourceUtil;
-import vn.graybee.modules.product.dto.response.FavoriteProductResponse;
-import vn.graybee.modules.product.model.Favourite;
-import vn.graybee.modules.product.repository.FavouriteRepository;
-import vn.graybee.modules.product.service.FavouriteService;
+import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
+import vn.graybee.modules.account.model.Favorite;
+import vn.graybee.modules.account.repository.FavouriteRepository;
+import vn.graybee.modules.account.service.FavouriteService;
 import vn.graybee.modules.product.service.ProductService;
 
 import java.util.List;
@@ -32,13 +33,14 @@ public class FavouriteServiceImpl implements FavouriteService {
         List<FavoriteProductResponse> favoriteProducts = favouriteRepository.findAllFavoriteProductByAccountId(accountId);
 
         final String message = favoriteProducts.isEmpty()
-                ? messageSourceUtil.get("product.favourite.list.empty")
-                : messageSourceUtil.get("product.favourite.success_find_all");
+                ? messageSourceUtil.get("account.favorite.list.empty")
+                : messageSourceUtil.get("account.favorite.success_find_all");
 
         return new BasicMessageResponse<>(200, message, favoriteProducts);
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<FavoriteProductResponse> addFavoriteProduct(Long accountId, Long productId) {
 
         boolean isFavorite = false;
@@ -54,16 +56,16 @@ public class FavouriteServiceImpl implements FavouriteService {
 
         if (isFavorite) {
             favouriteRepository.deleteByAccountIdAndProductId(accountId, productId);
-            return new BasicMessageResponse<>(200, messageSourceUtil.get("product.favourite.remove.success"), null);
+            return new BasicMessageResponse<>(200, messageSourceUtil.get("account.favorite.remove.success"), null);
         }
 
-        Favourite favourite = new Favourite();
+        Favorite favourite = new Favorite();
         favourite.setAccountId(accountId);
         favourite.setProductId(productId);
 
         favouriteRepository.save(favourite);
 
-        return new BasicMessageResponse<>(201, messageSourceUtil.get("product.favourite.add.success"), productService.getProductFavouriteById(productId));
+        return new BasicMessageResponse<>(201, messageSourceUtil.get("account.favorite.success.add"), productService.getProductFavouriteById(productId));
     }
 
 }

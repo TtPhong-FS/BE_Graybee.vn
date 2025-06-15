@@ -14,16 +14,19 @@ import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.common.utils.SlugUtil;
 import vn.graybee.common.utils.TextUtils;
+import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicValueDto;
+import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.catalog.service.CategoryService;
+import vn.graybee.modules.inventory.service.InventoryService;
 import vn.graybee.modules.product.dto.request.ProductRequest;
 import vn.graybee.modules.product.dto.request.ProductUpdateRequest;
+import vn.graybee.modules.product.dto.request.ValidationProductRequest;
 import vn.graybee.modules.product.dto.response.InventoryProductDto;
 import vn.graybee.modules.product.dto.response.ProductResponse;
 import vn.graybee.modules.product.dto.response.ProductUpdateDto;
-import vn.graybee.modules.product.dto.response.ProductWithClassifyDto;
 import vn.graybee.modules.product.enums.ProductStatus;
 import vn.graybee.modules.product.model.Product;
-import vn.graybee.modules.product.model.ProductClassifyView;
 import vn.graybee.modules.product.repository.ProductRepository;
 import vn.graybee.modules.product.service.AdminProductService;
 import vn.graybee.modules.product.service.ProductAttributeValueService;
@@ -32,7 +35,6 @@ import vn.graybee.modules.product.service.ProductClassifyViewService;
 import vn.graybee.modules.product.service.ProductDescriptionService;
 import vn.graybee.modules.product.service.ProductDocumentService;
 import vn.graybee.modules.product.service.ProductImageService;
-import vn.graybee.modules.product.service.ProductInventoryHelperService;
 import vn.graybee.modules.product.service.RedisProductService;
 import vn.graybee.response.admin.products.ProductStatusResponse;
 
@@ -40,6 +42,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -51,7 +54,6 @@ public class AdminProductServiceImpl implements AdminProductService {
             ProductStatus.DRAFT,
             ProductStatus.REMOVED,
             ProductStatus.COMING_SOON,
-            ProductStatus.DELETED,
             ProductStatus.PENDING
     );
 
@@ -60,6 +62,8 @@ public class AdminProductServiceImpl implements AdminProductService {
             ProductStatus.COMING_SOON,
             ProductStatus.PENDING
     );
+
+    private final InventoryService inventoryService;
 
     private final MessageSourceUtil messageSourceUtil;
 
@@ -71,8 +75,6 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     private final ProductCategoryService productCategoryService;
 
-    private final ProductInventoryHelperService productInventoryHelperService;
-
     private final ProductAttributeValueService productAttributeValueService;
 
     private final ProductRepository productRepository;
@@ -83,7 +85,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     private final ProductClassifyViewService productClassifyViewService;
 
-    public AdminProductServiceImpl(MessageSourceUtil messageSourceUtil, ProductDocumentService productDocumentService, ProductDescriptionService productDescriptionService, ProductImageService productImageService, @Lazy ProductInventoryHelperService productInventoryHelperService, ProductRepository productRepository, CategoryService categoryService, RedisProductService redisProductService, ProductCategoryService productCategoryService, ProductClassifyViewService productClassifyViewService, ProductAttributeValueService productAttributeValueService) {
+    public AdminProductServiceImpl(MessageSourceUtil messageSourceUtil, ProductDocumentService productDocumentService, ProductDescriptionService productDescriptionService, ProductImageService productImageService, ProductRepository productRepository, CategoryService categoryService, RedisProductService redisProductService, ProductCategoryService productCategoryService, ProductClassifyViewService productClassifyViewService, ProductAttributeValueService productAttributeValueService, @Lazy InventoryService inventoryService) {
         this.messageSourceUtil = messageSourceUtil;
         this.productAttributeValueService = productAttributeValueService;
         this.productClassifyViewService = productClassifyViewService;
@@ -91,20 +93,19 @@ public class AdminProductServiceImpl implements AdminProductService {
         this.productDocumentService = productDocumentService;
         this.productDescriptionService = productDescriptionService;
         this.productImageService = productImageService;
-        this.productInventoryHelperService = productInventoryHelperService;
         this.productRepository = productRepository;
         this.categoryService = categoryService;
         this.redisProductService = redisProductService;
+        this.inventoryService = inventoryService;
     }
 
-    public ProductResponse getProductResponse(Product product) {
+    public ProductResponse getProductResponse(Product product, String categoryName, String brandName, List<String> tagNames) {
         return new ProductResponse(
-                product
+                product,
+                categoryName,
+                brandName,
+                tagNames
         );
-    }
-
-    private ProductWithClassifyDto getProductWithClassifyDto(Product product, ProductClassifyView classifyView) {
-        return new ProductWithClassifyDto(product, classifyView);
     }
 
     private BigDecimal calculateFinalPrice(BigDecimal price, int discount) {
@@ -120,17 +121,50 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
     }
 
+
+    private void checkExistsByName(String name) {
+
+        if (productRepository.existsByName(name)) {
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("product.name_exists", new Object[]{name}));
+        }
+    }
+
+    private void checkExistsBySlug(String slug) {
+        if (slug == null || slug.isEmpty()) return;
+        if (productRepository.existsBySlug(slug)) {
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("product.name_exists", new Object[]{slug}));
+        }
+    }
+
+    private void checkExistsByNameNotId(String name, long id) {
+        if (productRepository.existsByNameAndNotId(name, id)) {
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("product.name_exists", new Object[]{name}));
+        }
+    }
+
+    private void checkExistsBySlugNotId(String slug, long id) {
+        if (slug == null || slug.isEmpty()) return;
+        if (productRepository.existsBySlugAndNotId(slug, id)) {
+            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("product.name_exists", new Object[]{slug}));
+        }
+    }
+
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public ProductWithClassifyDto createProduct(ProductRequest request) {
+    public ProductResponse createProduct(ProductRequest request) {
 
         ProductStatus status = ProductStatus.getStatus(request.getStatus(), messageSourceUtil);
 
-        if (productRepository.existsByName(request.getName())) {
-            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("product.name_exists", new Object[]{request.getName()}));
-        }
+        CategorySummaryDto category = categoryService.checkType(request.getCategoryName(), CategoryType.CATEGORY);
+
+        CategorySummaryDto brand = categoryService.checkType(request.getBrandName(), CategoryType.BRAND);
+
+        checkExistsByName(request.getName());
+        checkExistsBySlug(request.getSlug());
 
         Product product = new Product();
+        product.setCategoryId(category.getId());
+        product.setBrandId(brand.getId());
 
         if (request.getSlug() != null && !request.getSlug().isEmpty()) {
             product.setSlug(SlugUtil.toSlug(request.getSlug()));
@@ -139,47 +173,47 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
 
         product.setStatus(status);
-        product.setName(TextUtils.capitalizeEachWord(request.getName()));
+        product.setName(TextUtils.capitalizeEachWord(request.getName().trim()));
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
         product.setFinalPrice(product.calculateFinalPrice(request.getPrice(), request.getDiscountPercent()));
         product.setConditions(request.getConditions().toUpperCase());
-        product.setDimension(request.getDimension());
-        product.setWeight(request.getWeight());
-        product.setColor(request.getColor());
         product.setWarranty(request.getWarranty());
         product.setThumbnail(request.getImages() != null && !request.getImages().isEmpty() ? request.getImages().get(0) : null);
 
         product = productRepository.save(product);
 
-        productCategoryService.createProductCategory(product.getId(), request.getCategoryName(), request.getBrandName(), request.getTagNames());
+        productCategoryService.createProductCategoryByTags(product.getId(), request.getTagNames());
+
+        productImageService.saveProductImages(product.getId(), request.getImages());
 
 //        Create Detail information for Product
-        productAttributeValueService.createProductAttributeValue(product.getId(), request.getCategoryName(), request.getAttributes());
-
-        ProductClassifyView productClassifyView = productClassifyViewService.createProductClassifyView(product.getId(), product.getName(), product.getSlug(), request.getCategoryName(), request.getBrandName(), request.getTagNames());
+        productAttributeValueService.createProductAttributeValue(product.getId(), product.getCategoryId(), request.getCategoryName(), request.getSpecifications());
 
         productDescriptionService.saveProductDescription(product.getId(), request.getDescription());
 
-        productInventoryHelperService.saveInventoryByProductId(product.getId(), request.isStock(), request.getQuantity());
+        inventoryService.saveInventoryByProductId(product.getId(), request.getQuantity());
 
 //        redisProductService.deleteProductListPattern(request.getCategoryName());
 
-        return getProductWithClassifyDto(product, productClassifyView);
+        return getProductResponse(product, category.getName(), brand.getName(), request.getTagNames());
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public ProductWithClassifyDto updateProduct(long id, ProductUpdateRequest request) {
+    public ProductResponse updateProduct(long id, ProductUpdateRequest request) {
 
         ProductStatus status = ProductStatus.getStatus(request.getStatus(), messageSourceUtil);
+
+        CategorySummaryDto brand = categoryService.checkType(request.getBrandName(), CategoryType.BRAND);
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists")));
 
-        if (!product.getName().equals(request.getName()) && productRepository.existsByNameAndNotId(request.getName(), product.getId())) {
-            throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("product.name_exists", new Object[]{request.getName()}));
-        }
+        checkExistsByNameNotId(request.getName(), product.getId());
+        checkExistsBySlugNotId(request.getSlug(), product.getId());
+
+        String categoryName = categoryService.findNameById(product.getCategoryId());
 
         if (request.getSlug() != null && !request.getSlug().isEmpty()) {
             product.setSlug(SlugUtil.toSlug(request.getSlug()));
@@ -187,36 +221,26 @@ public class AdminProductServiceImpl implements AdminProductService {
             product.setSlug(SlugUtil.toSlug(request.getName()));
         }
 
+        product.setBrandId(brand.getId());
         product.setName(TextUtils.capitalizeEachWord(request.getName()));
         product.setWarranty(request.getWarranty());
-        product.setWeight(request.getWeight());
-        product.setDimension(request.getDimension());
-
-        if (product.getThumbnail() == null || product.getThumbnail().isEmpty()) {
-            product.setThumbnail(request.getImages() != null && !request.getImages().isEmpty() ? request.getImages().get(0) : null);
-        }
-
+        product.setThumbnail(request.getThumbnail());
         product.setStatus(status);
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
         product.setFinalPrice(product.calculateFinalPrice(request.getPrice(), request.getDiscountPercent()));
-        product.setColor(request.getColor());
-
         product.setUpdatedAt(LocalDateTime.now());
 
         product = productRepository.save(product);
 
-        productCategoryService.updateProductCategory(product.getId(), request.getBrandName(), request.getTagNames());
+        productCategoryService.updateProductCategoryByTags(product.getId(), request.getTagNames());
 
-        productAttributeValueService.updateProductAttributeValue(product.getId(), request.getAttributes());
-
-        ProductClassifyView productClassifyView = productClassifyViewService.updateProductClassifyViewByProductId(product.getId(), product.getName(), product.getSlug(), request.getBrandName(), request.getTagNames());
+        productAttributeValueService.updateProductAttributeValue(product.getId(), request.getSpecifications());
 
         productDescriptionService.updateProductDescription(product.getId(), request.getDescription());
+        inventoryService.saveInventoryByProductId(product.getId(), request.getQuantity());
 
-        productInventoryHelperService.updateInventoryByProductId(product.getId(), request.isStock(), request.getQuantity());
-
-        return getProductWithClassifyDto(product, productClassifyView);
+        return getProductResponse(product, categoryName, brand.getName(), request.getTagNames());
     }
 
 
@@ -224,7 +248,7 @@ public class AdminProductServiceImpl implements AdminProductService {
     @Transactional(rollbackFor = RuntimeException.class)
     public Long deleteProductById(long id) {
 
-        int leftQuantity = productInventoryHelperService.getAvailableStock(id);
+        int leftQuantity = inventoryService.getAvailableQuantity(id);
 
         if (leftQuantity > 0) {
             throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.left_quantity", new Object[]{leftQuantity}));
@@ -254,7 +278,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        Page<ProductResponse> productPage = productRepository.fetchProducts(
+        Page<ProductResponse> productPage = productRepository.getAllProductResponse(
                 statusEnum,
                 pageRequest);
 
@@ -264,23 +288,25 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         SortInfo sortInfo = new SortInfo(sortBy, order);
 
-        String message = productPage.getContent().isEmpty() ? messageSourceUtil.get("") : messageSourceUtil.get("s");
-
 
         return productPage;
     }
 
     @Override
-    public ProductUpdateDto getById(long productId) {
+    public ProductUpdateDto getProductUpdateDtoById(long productId) {
 
-        ProductUpdateDto response = productRepository.findProductUpdateDtoById(productId)
+        ProductUpdateDto productUpdateDto = productRepository.findProductUpdateDtoById(productId)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found")));
 
-        List<String> images = productImageService.getProductImages(response.getId());
+        List<String> images = productImageService.getProductImages(productUpdateDto.getId());
 
-        response.setImages(images);
+        Optional<Long> categoryId = productRepository.getCategoryIdById(productId);
 
-        return response;
+        List<AttributeBasicValueDto> attributeBasicValueDtos = productAttributeValueService.getAllAttributeValueByCategoryAndProduct(categoryId.get(), productUpdateDto.getId());
+        productUpdateDto.setImages(images);
+        productUpdateDto.setSpecifications(attributeBasicValueDtos);
+
+        return productUpdateDto;
     }
 
 
@@ -303,10 +329,6 @@ public class AdminProductServiceImpl implements AdminProductService {
             return null;
         }
 
-        if (currentStatus == ProductStatus.REMOVED && newStatus == ProductStatus.DELETED) {
-            return updateStatus(id, newStatus, messageSourceUtil.get("product.success_delete"));
-        }
-
         if (currentStatus == ProductStatus.REMOVED) {
             throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.in_trash"));
         }
@@ -324,13 +346,36 @@ public class AdminProductServiceImpl implements AdminProductService {
             throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.pending_to_published"));
         }
 
-        throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.status.invalid", new Object[]{newStatus.getCode()}));
+        return updateStatus(id, newStatus, messageSourceUtil.get("product.success.update.status"));
+
     }
 
     @Override
     public InventoryProductDto getProductBasicDtoById(long productId) {
         return productRepository.findProductBasicDtoById(productId)
                 .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists")));
+    }
+
+    @Override
+    public void checkBeforeCreate(Long id, ValidationProductRequest request) {
+        ProductStatus.getStatus(request.getStatus(), messageSourceUtil);
+
+        categoryService.checkType(request.getCategoryName(), CategoryType.CATEGORY);
+        categoryService.checkType(request.getBrandName(), CategoryType.BRAND);
+
+
+        if (id == null) {
+            checkExistsByName(request.getName());
+            checkExistsBySlug(request.getSlug());
+
+        }
+
+
+        if (id != null) {
+            checkExistsByNameNotId(request.getName(), id);
+            checkExistsBySlugNotId(request.getSlug(), id);
+        }
+
     }
 
 

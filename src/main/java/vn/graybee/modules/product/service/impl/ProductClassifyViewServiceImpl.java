@@ -53,18 +53,6 @@ public class ProductClassifyViewServiceImpl implements ProductClassifyViewServic
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void removeCategoryByCategoryName(String categoryName) {
-        productClassifyViewRepository.nullifyCategory(categoryName);
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void removeBrandByBrandName(String brandName) {
-        productClassifyViewRepository.nullifyBrand(brandName);
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
     public void removeTagByTagName(String tagName) {
         try {
             String jsonTag = new ObjectMapper().writeValueAsString(List.of(tagName));
@@ -76,7 +64,6 @@ public class ProductClassifyViewServiceImpl implements ProductClassifyViewServic
                     productClassifyViewRepository.save(pcv);
                 }
             }
-
         } catch (JsonProcessingException e) {
             throw new BusinessCustomException(Constants.Common.global, e.getMessage());
         }
