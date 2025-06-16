@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.inventory.dto.request.InventoryRequest;
+import vn.graybee.modules.inventory.dto.response.InventoryForUpdateResponse;
 import vn.graybee.modules.inventory.dto.response.InventoryIdQuantity;
 import vn.graybee.modules.inventory.service.InventoryService;
 import vn.graybee.response.admin.products.InventoryResponse;
@@ -55,6 +55,20 @@ public class AdminInventoryController {
         );
     }
 
+
+    @GetMapping("/for-update/{productId}")
+    public ResponseEntity<BasicMessageResponse<InventoryForUpdateResponse>> getInventoryForUpdateByProductId(
+            @PathVariable long productId
+    ) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        inventoryService.getInventoryForUpdate(productId)
+                        , null
+
+                )
+        );
+    }
+
     @PutMapping("/quantity/{id}/{quantity}")
     public ResponseEntity<BasicMessageResponse<InventoryIdQuantity>> updateQuantityByProductId(@PathVariable("id") long id, @PathVariable int quantity) {
         return ResponseEntity.ok(
@@ -65,11 +79,11 @@ public class AdminInventoryController {
         );
     }
 
-    @DeleteMapping
-    public ResponseEntity<BasicMessageResponse<Long>> delete(@RequestParam("id") int id) {
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<BasicMessageResponse<Long>> deleteInventoryByProductId(@PathVariable("productId") long productId) {
         return ResponseEntity.ok(
                 MessageBuilder.ok(
-                        inventoryService.deleteInventoryByProductId(id),
+                        inventoryService.deleteInventoryByProductId(productId),
                         "Xoá sản phẩm khỏi kho thành công"
                 )
         );

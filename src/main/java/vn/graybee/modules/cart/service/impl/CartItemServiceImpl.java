@@ -39,7 +39,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public CartItemDto addItemToCart(Integer cartId, long productId) {
+    public CartItemDto addItemToCart(Long cartId, long productId) {
 
         ProductBasicResponse product = productService.getProductBasicInfoForCart(productId);
 
@@ -68,7 +68,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public CartItemDto decreaseItemQuantity(Integer cartId, long productId) {
+    public CartItemDto decreaseItemQuantity(Long cartId, long productId) {
         CartItem cartItem = cartItemRepository.findByProductIdAndCartId(productId, cartId)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.item.not.found")));
 
@@ -90,7 +90,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public Integer removeItemFromCart(Integer cartId, Integer cartItemId) {
+    public Long removeItemFromCart(Long cartId, Long cartItemId) {
 
         if (!cartItemRepository.existsById(cartItemId)) {
             throw new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.item.not.found"));
@@ -102,7 +102,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public List<CartItemDto> getCartItemsByCartId(Integer cartId) {
+    public List<CartItemDto> getCartItemsByCartId(Long cartId) {
         List<CartItem> cartItems = cartItemRepository.findAllByCartId(cartId);
 
         if (cartItems.isEmpty()) {
@@ -125,18 +125,18 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public List<CartItem> getCartItemByIdsAndCartId(List<Integer> cartItemIds, Integer cartId) {
+    public List<CartItem> getCartItemByIdsAndCartId(List<Long> cartItemIds, Long cartId) {
         return cartItemRepository.findByIdsAndCartId(cartItemIds, cartId);
     }
 
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public void clearCartItems(Integer cartId) {
+    public void clearCartItems(Long cartId) {
         cartItemRepository.deleteAllByCartId(cartId);
     }
 
     @Override
-    public BigDecimal getCartItemTotals(Integer cartId) {
+    public BigDecimal getCartItemTotals(Long cartId) {
         List<BigDecimal> itemTotals = cartItemRepository.findAllTotalByCartId(cartId);
         return itemTotals
                 .stream()
@@ -144,7 +144,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public List<Integer> clearCartItemsByIds(List<Integer> cartItemIds, Integer cartId) {
+    public List<Long> clearCartItemsByIds(List<Long> cartItemIds, Long cartId) {
         List<CartItem> cartItems = cartItemRepository.findByIdsAndCartId(cartItemIds, cartId);
         cartItemRepository.deleteAll(cartItems);
 

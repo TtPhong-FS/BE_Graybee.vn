@@ -1,5 +1,6 @@
 package vn.graybee.modules.account.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class ProfileResponse {
 
     private String avatarUrl;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
     private Gender gender;

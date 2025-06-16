@@ -28,6 +28,7 @@ import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.dto.response.ProfileResponse;
 import vn.graybee.modules.account.model.Account;
 import vn.graybee.modules.account.service.AccountService;
+import vn.graybee.modules.account.service.CustomerService;
 import vn.graybee.modules.account.service.ProfileService;
 import vn.graybee.modules.cart.service.CartService;
 import vn.graybee.modules.order.service.OrderService;
@@ -49,6 +50,8 @@ public class AuthServiceImpl implements AuthService {
     private final MessageSourceUtil messageSourceUtil;
 
     private final JwtService jwtService;
+
+    private final CustomerService customerService;
 
     private final MailService mailService;
 
@@ -76,6 +79,8 @@ public class AuthServiceImpl implements AuthService {
         Account account = accountService.saveAccount(request);
 
         ProfileResponse profile = profileService.saveProfileByAccountId(account.getId(), request);
+
+        customerService.saveCustomerByAccount(account.getId());
 
         cartService.syncGuestCartToAccount(account.getId(), sessionId);
 

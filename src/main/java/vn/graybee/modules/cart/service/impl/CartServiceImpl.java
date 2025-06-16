@@ -31,6 +31,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public CartItemDto findOrCreateCartAfterAddItem(Long accountId, String sessionId, long productId) {
         if (accountId == null && sessionId == null) {
             throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.bad_request"));
@@ -54,7 +55,11 @@ public class CartServiceImpl implements CartService {
             cartRepository.save(cart);
         }
 
-        return cartItemService.addItemToCart(cart.getId(), productId);
+        CartItemDto cartItemDto = cartItemService.addItemToCart(cart.getId(), productId);
+
+        cartRepository.updateCartTotal(cart.getId(), cart.getTotalAmount().add(cartItemDto.getTotalAmount()));
+
+        return cartItemDto;
     }
 
     @Override
@@ -83,13 +88,15 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void updateCartTotal(Integer cartId) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void updateCartTotal(Long cartId) {
         BigDecimal totalAmount = cartItemService.getCartItemTotals(cartId);
         cartRepository.updateCartTotal(cartId, totalAmount);
     }
 
     @Override
-    public void clearCartItems(Integer cartId) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void clearCartItems(Long cartId) {
         checkExistsById(cartId);
         cartItemService.clearCartItems(cartId);
         cartRepository.updateCartTotal(cartId, BigDecimal.ZERO);
@@ -97,12 +104,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Integer getCartIdByAccountIdOrSessionId(Long accountId, String sessionId) {
+    public Long getCartIdByAccountIdOrSessionId(Long accountId, String sessionId) {
         return cartRepository.findIdByAccountIdOrSessionId(accountId, sessionId)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found")));
     }
 
-    private void checkExistsById(Integer cartId) {
+    private void checkExistsById(Long cartId) {
         if (!cartRepository.existsById(cartId)) {
             throw new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found"));
         }

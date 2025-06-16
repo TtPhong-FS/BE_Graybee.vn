@@ -57,4 +57,9 @@ public interface AttributeRepository extends JpaRepository<Attribute, Long> {
             """)
     List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryName(String categoryName);
 
+    @Transactional
+    @Modifying
+    @Query("Update Attribute a set a.inputType = :type where a.id = :id")
+    void updateInputTypeByIdAndType(long id, String type);
+
 }

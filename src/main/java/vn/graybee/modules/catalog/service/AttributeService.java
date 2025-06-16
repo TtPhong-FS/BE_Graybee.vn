@@ -6,6 +6,7 @@ import vn.graybee.modules.catalog.dto.response.attribute.AttributeDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdActiveResponse;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdAllCategoryIdName;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryId;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdInputType;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdRequiredResponse;
 
 import java.util.List;
@@ -33,5 +34,7 @@ public interface AttributeService {
     AttributeIdCategoryId removeCategoryByCategoryIdAndId(long id, long categoryId);
 
     AttributeIdRequiredResponse toggleRequiredById(long id);
+
+    AttributeIdInputType updateInputTypeById(long id, String inputType);
 
 }

@@ -8,20 +8,20 @@ import java.util.List;
 
 public interface CartItemService {
 
-    CartItemDto addItemToCart(Integer cartId, long productId);
+    CartItemDto addItemToCart(Long cartId, long productId);
 
-    CartItemDto decreaseItemQuantity(Integer cartId, long productId);
+    CartItemDto decreaseItemQuantity(Long cartId, long productId);
 
-    Integer removeItemFromCart(Integer cartId, Integer cartItemId);
+    Long removeItemFromCart(Long cartId, Long cartItemId);
 
-    List<CartItemDto> getCartItemsByCartId(Integer cartId);
+    List<CartItemDto> getCartItemsByCartId(Long cartId);
 
-    List<CartItem> getCartItemByIdsAndCartId(List<Integer> cartItemIds, Integer cartId);
+    List<CartItem> getCartItemByIdsAndCartId(List<Long> cartItemIds, Long cartId);
 
-    void clearCartItems(Integer cartId);
+    void clearCartItems(Long cartId);
 
-    BigDecimal getCartItemTotals(Integer cartId);
+    BigDecimal getCartItemTotals(Long cartId);
 
-    List<Integer> clearCartItemsByIds(List<Integer> cartItemIds, Integer cartId);
+    List<Long> clearCartItemsByIds(List<Long> cartItemIds, Long cartId);
 
 }

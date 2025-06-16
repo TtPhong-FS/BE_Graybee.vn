@@ -11,6 +11,7 @@ public enum DeliveryStatus {
     SHIPPING,
     DELIVERED,
     FAILED,
+    COMPLETED,
     RETURNED;
 
     public static DeliveryStatus fromString(String status, MessageSourceUtil messageSourceUtil) {

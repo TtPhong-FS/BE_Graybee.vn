@@ -4,4 +4,6 @@ public interface CustomerService {
 
     Long getIdByAccountId(Long accountId);
 
+    void saveCustomerByAccount(long accountId);
+
 }

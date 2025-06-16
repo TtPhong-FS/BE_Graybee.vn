@@ -42,7 +42,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void checkExistsByPhone(String phone) {
         if (profileRepository.checkExistsPhone(phone)) {
-            throw new BusinessCustomException(Constants.Common.phone, messageSourceUtil.get("account.profile.phone.exists"));
+            throw new BusinessCustomException(Constants.Auth.phone, messageSourceUtil.get("account.profile.phone.exists"));
         }
     }
 

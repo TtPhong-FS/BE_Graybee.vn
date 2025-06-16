@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CartItemDto {
 
-    private Integer cartItemId;
+    private Long cartItemId;
 
     private ProductBasicResponse product;
 

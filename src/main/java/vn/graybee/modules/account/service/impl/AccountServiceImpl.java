@@ -71,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void checkExistsByEmail(String email) {
         if (accountRepository.existsByEmail(email)) {
-            throw new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("account.email.exists"));
+            throw new BusinessCustomException(Constants.Auth.email, messageSourceUtil.get("account.email.exists"));
         }
     }
 

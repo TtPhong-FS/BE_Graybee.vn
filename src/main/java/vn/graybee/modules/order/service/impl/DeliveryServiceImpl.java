@@ -6,9 +6,9 @@ import vn.graybee.common.Constants;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.AddressUtil;
 import vn.graybee.common.utils.MessageSourceUtil;
-import vn.graybee.modules.account.dto.request.AddressCreateRequest;
-import vn.graybee.modules.account.dto.response.AddressResponse;
-import vn.graybee.modules.order.dto.request.DeliveryCreateRequest;
+import vn.graybee.modules.account.model.Address;
+import vn.graybee.modules.order.dto.request.CustomerInfoRequest;
+import vn.graybee.modules.order.dto.request.ShippingInfoRequest;
 import vn.graybee.modules.order.dto.response.admin.delivery.DeliveryIdStatusResponse;
 import vn.graybee.modules.order.enums.DeliveryStatus;
 import vn.graybee.modules.order.enums.DeliveryType;
@@ -19,6 +19,7 @@ import vn.graybee.modules.order.service.DeliveryService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -31,64 +32,6 @@ public class DeliveryServiceImpl implements DeliveryService {
     public DeliveryServiceImpl(MessageSourceUtil messageSourceUtil, DeliveryRepository deliveryRepository) {
         this.messageSourceUtil = messageSourceUtil;
         this.deliveryRepository = deliveryRepository;
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public Delivery createDeliveryForUser(Long orderId, AddressResponse address, DeliveryCreateRequest request) {
-        ShippingMethod shippingMethod = ShippingMethod.fromString(request.getShippingMethod(), messageSourceUtil);
-        DeliveryType deliveryType = DeliveryType.fromString(request.getDeliveryType(), messageSourceUtil);
-
-        int extraDays = new Random().nextInt(10) + 2;
-
-        Delivery delivery = new Delivery();
-        delivery.setOrderId(orderId);
-        delivery.setRecipientName(address.getRecipientName());
-        delivery.setRecipientPhone(address.getPhone());
-
-        delivery.setDeliveryType(deliveryType);
-
-        if (deliveryType.equals(DeliveryType.STORE_PICKUP)) {
-            delivery.setStatus(DeliveryStatus.DELIVERED);
-        } else {
-            delivery.setStatus(DeliveryStatus.PENDING);
-        }
-        delivery.setShippingAddress(
-                AddressUtil.formatFullAddress(address.getStreet(), address.getCommune(), address.getDistrict(), address.getCity())
-        );
-        delivery.setShippingMethod(shippingMethod);
-        delivery.setEstimatedDeliveryDate(LocalDate.now().plusDays(extraDays));
-
-        return deliveryRepository.save(delivery);
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public Delivery createDeliveryForGuest(Long orderId, AddressCreateRequest addressCreateRequest, DeliveryCreateRequest request) {
-        ShippingMethod shippingMethod = ShippingMethod.fromString(request.getShippingMethod(), messageSourceUtil);
-        DeliveryType deliveryType = DeliveryType.fromString(request.getDeliveryType(), messageSourceUtil);
-
-        int extraDays = new Random().nextInt(10) + 2;
-
-        Delivery delivery = new Delivery();
-        delivery.setOrderId(orderId);
-        delivery.setRecipientName(addressCreateRequest.getRecipientName());
-        delivery.setRecipientPhone(addressCreateRequest.getPhone());
-
-        delivery.setDeliveryType(deliveryType);
-
-        if (deliveryType.equals(DeliveryType.STORE_PICKUP)) {
-            delivery.setStatus(DeliveryStatus.DELIVERED);
-        } else {
-            delivery.setStatus(DeliveryStatus.PENDING);
-        }
-        delivery.setShippingAddress(
-                AddressUtil.formatFullAddress(addressCreateRequest.getStreet(), addressCreateRequest.getCommune(), addressCreateRequest.getDistrict(), addressCreateRequest.getCity())
-        );
-        delivery.setShippingMethod(shippingMethod);
-        delivery.setEstimatedDeliveryDate(LocalDate.now().plusDays(extraDays));
-
-        return deliveryRepository.save(delivery);
     }
 
     @Override
@@ -110,5 +53,60 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         return new DeliveryIdStatusResponse(id, deliveryStatus);
     }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void createDeliveryForCustomer(Long id, ShippingInfoRequest shippingInfo, Address address) {
+
+        ShippingMethod shippingMethod = ShippingMethod.fromString(shippingInfo.getDeliveryMethod(), messageSourceUtil);
+        DeliveryType deliveryType = DeliveryType.fromString(shippingInfo.getDeliveryType(), messageSourceUtil);
+
+
+        Delivery delivery = new Delivery();
+        delivery.setRecipientPhone(address.getPhone());
+        delivery.setRecipientName(address.getRecipientName());
+        delivery.setShippingAddress(AddressUtil.formatFullAddress(address.getStreet(), address.getCommune(), address.getDistrict(), address.getCity()));
+        delivery.setDeliveryType(deliveryType);
+        delivery.setShippingMethod(shippingMethod);
+
+        if (Objects.equals(shippingInfo.getDeliveryType(), DeliveryType.STORE_PICKUP.name())) {
+            delivery.setStatus(DeliveryStatus.COMPLETED);
+        } else {
+            delivery.setStatus(DeliveryStatus.PENDING);
+        }
+
+        int extraDays = new Random().nextInt(10) + 2;
+        delivery.setEstimatedDeliveryDate(LocalDate.now().plusDays(extraDays));
+
+        deliveryRepository.save(delivery);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void createDeliveryForGuest(Long id, CustomerInfoRequest customerInfo, ShippingInfoRequest shippingInfo) {
+
+        ShippingMethod shippingMethod = ShippingMethod.fromString(shippingInfo.getDeliveryMethod(), messageSourceUtil);
+        DeliveryType deliveryType = DeliveryType.fromString(shippingInfo.getDeliveryType(), messageSourceUtil);
+
+
+        Delivery delivery = new Delivery();
+        delivery.setRecipientPhone(customerInfo.getRecipientPhone());
+        delivery.setRecipientName(customerInfo.getRecipientName());
+        delivery.setShippingAddress(AddressUtil.formatFullAddress(shippingInfo.getStreetAddress(), shippingInfo.getCommune(), shippingInfo.getDistrict(), shippingInfo.getCity()));
+        delivery.setDeliveryType(deliveryType);
+        delivery.setShippingMethod(shippingMethod);
+
+        if (Objects.equals(shippingInfo.getDeliveryType(), DeliveryType.STORE_PICKUP.name())) {
+            delivery.setStatus(DeliveryStatus.COMPLETED);
+        } else {
+            delivery.setStatus(DeliveryStatus.PENDING);
+        }
+
+        int extraDays = new Random().nextInt(10) + 2;
+        delivery.setEstimatedDeliveryDate(LocalDate.now().plusDays(extraDays));
+
+        deliveryRepository.save(delivery);
+    }
+
 
 }

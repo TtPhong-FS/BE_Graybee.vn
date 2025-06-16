@@ -25,7 +25,7 @@ public class ProfileController {
         this.profileService = profileService;
     }
 
-    @GetMapping("/profile")
+    @GetMapping
     public ResponseEntity<BasicMessageResponse<ProfileResponse>> getProfileByUserUid(@AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = userDetail.user().getId();
         return ResponseEntity.ok(
@@ -36,7 +36,7 @@ public class ProfileController {
         );
     }
 
-    @PutMapping("/profile/update")
+    @PutMapping("/update")
     public ResponseEntity<BasicMessageResponse<ProfileResponse>> updateProfile(
             @RequestBody @Valid UpdateProfileRequest request,
             @AuthenticationPrincipal UserDetail userDetail

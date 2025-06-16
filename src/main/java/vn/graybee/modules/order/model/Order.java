@@ -39,6 +39,9 @@ public class Order extends BaseModel {
     @Column(length = 200)
     private String note;
 
+    @Column(length = 200)
+    private String email;
+
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
 

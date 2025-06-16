@@ -5,9 +5,9 @@ import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
 
 public enum ShippingMethod {
-    STANDARD_SHIPPING,
-    ECONOMY_SHIPPING,
-    FAST_DELIVERY;
+    STANDARD,
+    ECONOMY,
+    FAST;
 
     public static ShippingMethod fromString(String method, MessageSourceUtil messageSourceUtil) {
         try {

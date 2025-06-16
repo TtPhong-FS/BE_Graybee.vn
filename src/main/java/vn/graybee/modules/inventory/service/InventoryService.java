@@ -1,6 +1,7 @@
 package vn.graybee.modules.inventory.service;
 
 import vn.graybee.modules.inventory.dto.request.InventoryRequest;
+import vn.graybee.modules.inventory.dto.response.InventoryForUpdateResponse;
 import vn.graybee.modules.inventory.dto.response.InventoryIdQuantity;
 import vn.graybee.response.admin.products.InventoryResponse;
 
@@ -25,5 +26,7 @@ public interface InventoryService {
     void increaseQuantity(long productId, int quantity);
 
     void saveInventoryByProductId(long productId, int quantity);
+
+    InventoryForUpdateResponse getInventoryForUpdate(long productId);
 
 }

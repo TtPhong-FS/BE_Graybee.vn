@@ -12,10 +12,10 @@ public interface CartService {
 
     List<CartItemDto> findCartByAccountIdOrSessionId(Long accountId, String sessionId);
 
-    void updateCartTotal(Integer cartId);
+    void updateCartTotal(Long cartId);
 
-    void clearCartItems(Integer cartId);
+    void clearCartItems(Long cartId);
 
-    Integer getCartIdByAccountIdOrSessionId(Long accountId, String sessionId);
+    Long getCartIdByAccountIdOrSessionId(Long accountId, String sessionId);
 
 }

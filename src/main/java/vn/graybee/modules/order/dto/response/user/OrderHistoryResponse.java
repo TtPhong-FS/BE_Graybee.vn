@@ -1,111 +1,49 @@
 package vn.graybee.modules.order.dto.response.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import vn.graybee.modules.order.enums.DeliveryType;
 import vn.graybee.modules.order.enums.OrderStatus;
 import vn.graybee.modules.order.enums.PaymentMethod;
+import vn.graybee.modules.order.enums.PaymentStatus;
+import vn.graybee.modules.order.enums.ShippingMethod;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 
+@NoArgsConstructor
+@Setter
+@Getter
 public class OrderHistoryResponse {
 
-    private long orderId;
+    private String code;
 
     private OrderStatus status;
 
     private BigDecimal totalAmount;
 
-    private int totalQuantity;
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDate;
-
-    private List<OrderDetailProductDto> orderDetails;
 
     private DeliveryType deliveryType;
 
     private PaymentMethod paymentMethod;
 
-    public OrderHistoryResponse() {
-    }
+    private PaymentStatus paymentStatus;
 
-    public OrderHistoryResponse(long orderId, OrderStatus status, BigDecimal totalAmount, int totalQuantity, LocalDateTime orderDate, List<OrderDetailProductDto> orderDetails, DeliveryType deliveryType, PaymentMethod paymentMethod) {
-        this.orderId = orderId;
+    private ShippingMethod shippingMethod;
+
+    public OrderHistoryResponse(String code, OrderStatus status, BigDecimal totalAmount, LocalDateTime orderDate, DeliveryType deliveryType, PaymentMethod paymentMethod, PaymentStatus paymentStatus, ShippingMethod shippingMethod) {
+        this.code = code;
         this.status = status;
         this.totalAmount = totalAmount;
-        this.totalQuantity = totalQuantity;
         this.orderDate = orderDate;
-        this.orderDetails = orderDetails;
         this.deliveryType = deliveryType;
         this.paymentMethod = paymentMethod;
-    }
-
-    public long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(long orderId) {
-        this.orderId = orderId;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public int getTotalQuantity() {
-        return totalQuantity;
-    }
-
-    public void setTotalQuantity(int totalQuantity) {
-        this.totalQuantity = totalQuantity;
-    }
-
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
-
-
-    public List<OrderDetailProductDto> getOrderDetails() {
-        return orderDetails != null ? orderDetails : Collections.emptyList();
-    }
-
-    public void setOrderDetails(List<OrderDetailProductDto> orderDetails) {
-        this.orderDetails = orderDetails;
-    }
-
-    public DeliveryType getDeliveryType() {
-        return deliveryType;
-    }
-
-    public void setDeliveryType(DeliveryType deliveryType) {
-        this.deliveryType = deliveryType;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
+        this.shippingMethod = shippingMethod;
     }
 
 }

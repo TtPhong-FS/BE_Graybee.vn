@@ -21,10 +21,10 @@ public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "cart_id")
-    private Integer cartId;
+    private Long cartId;
 
     @Column(name = "product_id")
     private Long productId;

@@ -4,6 +4,9 @@ import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.modules.account.dto.request.AddressCreateRequest;
 import vn.graybee.modules.account.dto.response.AddressResponse;
 import vn.graybee.modules.account.dto.response.DefaultAddressDto;
+import vn.graybee.modules.account.model.Address;
+import vn.graybee.modules.order.dto.request.CustomerInfoRequest;
+import vn.graybee.modules.order.dto.request.ShippingInfoRequest;
 
 import java.util.List;
 
@@ -19,6 +22,6 @@ public interface AddressService {
 
     BasicMessageResponse<DefaultAddressDto> setDefaultAddress(Long customerId, Integer addressId);
 
-    AddressResponse getAddressDefaultByIdAndCustomerId(Long customerId, Integer addressId);
+    Address getAddressByIdAndCustomerId(Long customerId, Long addressId, CustomerInfoRequest customerInfoRequest, ShippingInfoRequest shippingInfoRequest);
 
 }

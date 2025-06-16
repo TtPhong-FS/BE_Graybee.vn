@@ -18,6 +18,7 @@ import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdActiveRespon
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdAllCategoryIdName;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryId;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryIdName;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdInputType;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdRequiredResponse;
 import vn.graybee.modules.catalog.enums.InputType;
 import vn.graybee.modules.catalog.model.Attribute;
@@ -226,6 +227,18 @@ public class AttributeServiceImpl implements AttributeService {
         attributeRepository.toggleRequiredById(id);
 
         return new AttributeIdRequiredResponse(id, !required);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public AttributeIdInputType updateInputTypeById(long id, String inputType) {
+        checkExistsById(id);
+
+        String type = getInputType(inputType);
+
+        attributeRepository.updateInputTypeByIdAndType(id, type);
+
+        return new AttributeIdInputType(id, type);
     }
 
 }

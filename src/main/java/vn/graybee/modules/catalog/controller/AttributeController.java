@@ -20,6 +20,7 @@ import vn.graybee.modules.catalog.dto.response.attribute.AttributeDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdActiveResponse;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdAllCategoryIdName;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdCategoryId;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdInputType;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeIdRequiredResponse;
 import vn.graybee.modules.catalog.service.AttributeService;
 
@@ -109,6 +110,19 @@ public class AttributeController {
         return ResponseEntity.ok(
                 new BasicMessageResponse<>(200, messageSourceUtil.get("catalog.attribute.success.update", new Object[]{attributeDto.getName()}), attributeDto)
         );
+    }
+
+    @PutMapping("/input-type/{id}/{inputType}")
+    public ResponseEntity<BasicMessageResponse<AttributeIdInputType>> updateInputTypeById(
+            @PathVariable("id") Long id,
+            @PathVariable("inputType") String inputType
+    ) {
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        attributeService.updateInputTypeById(id, inputType),
+                        messageSourceUtil.get("catalog.attribute.success.update.input-type")
+                ));
     }
 
     @PutMapping("/active/{id}")

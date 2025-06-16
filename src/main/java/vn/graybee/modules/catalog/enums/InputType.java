@@ -18,7 +18,6 @@ public enum InputType {
         } catch (RuntimeException e) {
             throw new BusinessCustomException(Constants.Attribute.inputType, messageSourceUtil.get("catalog.attribute.inputType.invalid", new Object[]{type}));
         }
-
     }
 
 }

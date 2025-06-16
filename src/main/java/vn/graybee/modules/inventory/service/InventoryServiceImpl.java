@@ -7,6 +7,7 @@ import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.inventory.dto.request.InventoryRequest;
+import vn.graybee.modules.inventory.dto.response.InventoryForUpdateResponse;
 import vn.graybee.modules.inventory.dto.response.InventoryIdQuantity;
 import vn.graybee.modules.inventory.model.Inventory;
 import vn.graybee.modules.inventory.repository.InventoryRepository;
@@ -69,10 +70,10 @@ public class InventoryServiceImpl implements InventoryService {
     public Long deleteInventoryByProductId(long productId) {
 
         InventoryQuantityResponse inventory = inventoryRepository.checkExistsById(productId)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("common.not-found", new Object[]{messageSourceUtil.get("inventory.name")})));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("inventory.not.found")));
 
         if (inventory.getQuantity() > 0) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.cannot-delete-when-has-quantity"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.cannot.delete.when.has.quantity"));
         }
 
         inventoryRepository.deleteById(inventory.getProductId());
@@ -97,7 +98,7 @@ public class InventoryServiceImpl implements InventoryService {
         Integer availableQuantity = inventoryRepository.getAvailableQuantityByProductId(productId);
 
         if (availableQuantity < requestedQuantity) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.not-enough-Quantity"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.not.enough.quantity"));
         }
     }
 
@@ -114,7 +115,7 @@ public class InventoryServiceImpl implements InventoryService {
         int updated = inventoryRepository.decreaseQuantity(productId, quantity);
 
         if (updated == 0) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.not-enough-Quantity"));
+            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.not.enough.quantity"));
         }
     }
 
@@ -140,6 +141,13 @@ public class InventoryServiceImpl implements InventoryService {
         inventory.setQuantity(quantity);
 
         inventoryRepository.save(inventory);
+    }
+
+    @Override
+    public InventoryForUpdateResponse getInventoryForUpdate(long productId) {
+        Inventory inventory = inventoryRepository.findByProductId(productId)
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, "Không tìm thấy sản phẩm trong kho"));
+        return new InventoryForUpdateResponse(inventory.getProductId(), inventory.getQuantity());
     }
 
     private void checkExistsByProductId(long productId) {

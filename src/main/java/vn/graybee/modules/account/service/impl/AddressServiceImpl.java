@@ -1,10 +1,10 @@
 package vn.graybee.modules.account.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.exception.BusinessCustomException;
-import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.common.utils.TextUtils;
 import vn.graybee.modules.account.dto.request.AddressCreateRequest;
@@ -13,6 +13,8 @@ import vn.graybee.modules.account.dto.response.DefaultAddressDto;
 import vn.graybee.modules.account.model.Address;
 import vn.graybee.modules.account.repository.AddressRepository;
 import vn.graybee.modules.account.service.AddressService;
+import vn.graybee.modules.order.dto.request.CustomerInfoRequest;
+import vn.graybee.modules.order.dto.request.ShippingInfoRequest;
 
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<Integer> deleteAddressByIdAndCustomerId(Long customerId, Integer addressId) {
 
         checkExistsById(addressId);
@@ -56,6 +59,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<AddressResponse> createAddress(Long customerId, AddressCreateRequest request) {
 
         Address address = new Address();
@@ -85,6 +89,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<AddressResponse> updateAddress(Long customerId, Integer addressId, AddressCreateRequest request) {
 
         Address updateAddress = addressRepository.findByIdAndCustomerId(customerId, addressId)
@@ -110,6 +115,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public BasicMessageResponse<DefaultAddressDto> setDefaultAddress(Long customerId, Integer addressId) {
         checkExistsById(addressId);
 
@@ -119,10 +125,26 @@ public class AddressServiceImpl implements AddressService {
                 new DefaultAddressDto(addressId, true));
     }
 
+
     @Override
-    public AddressResponse getAddressDefaultByIdAndCustomerId(Long customerId, Integer addressId) {
-        return addressRepository.findAddressDefaultByIdAndCustomerId(customerId, addressId)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("account.customer.address.not-found")));
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Address getAddressByIdAndCustomerId(Long customerId, Long addressId, CustomerInfoRequest customerInfoRequest, ShippingInfoRequest shippingInfoRequest) {
+        Address address = addressRepository.findAddressByIdAndCustomerId(customerId, addressId)
+                .orElseGet(Address::new);
+
+        boolean isNewAddress = address.getId() == null;
+        if (isNewAddress) {
+            address.setRecipientName(customerInfoRequest.getRecipientName());
+            address.setPhone(customerInfoRequest.getRecipientPhone());
+            address.setCity(shippingInfoRequest.getCity());
+            address.setDistrict(shippingInfoRequest.getDistrict());
+            address.setCommune(shippingInfoRequest.getCommune());
+            address.setStreet(shippingInfoRequest.getStreetAddress());
+            address.setDefault(true);
+
+            addressRepository.save(address);
+        }
+        return address;
     }
 
 }

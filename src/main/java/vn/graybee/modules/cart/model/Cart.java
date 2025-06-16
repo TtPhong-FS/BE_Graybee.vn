@@ -22,7 +22,7 @@ public class Cart extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "account_id", unique = true)
     private Long accountId;

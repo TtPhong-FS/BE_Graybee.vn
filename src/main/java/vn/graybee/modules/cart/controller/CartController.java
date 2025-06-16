@@ -77,7 +77,7 @@ public class CartController {
             accountId = userDetail.user().getId();
         }
 
-        Integer cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
+        Long cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
 
         return ResponseEntity.ok(
                 MessageBuilder.ok(cartItemService.decreaseItemQuantity(cartId, productId), null)
@@ -85,8 +85,8 @@ public class CartController {
     }
 
     @DeleteMapping("/{cartItemId}")
-    public ResponseEntity<BasicMessageResponse<Integer>> deleteItemToCart(
-            @PathVariable("cartItemId") Integer cartItemId,
+    public ResponseEntity<BasicMessageResponse<Long>> deleteItemToCart(
+            @PathVariable("cartItemId") Long cartItemId,
             @CookieValue(value = "sessionId", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = null;
@@ -94,7 +94,7 @@ public class CartController {
             accountId = userDetail.user().getId();
         }
 
-        Integer cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
+        Long cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
 
         return ResponseEntity.ok(
                 MessageBuilder.ok(cartItemService.removeItemFromCart(cartId, cartItemId),
@@ -111,7 +111,7 @@ public class CartController {
             accountId = userDetail.user().getId();
         }
 
-        Integer cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
+        Long cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
 
         cartService.clearCartItems(cartId);
 

@@ -13,16 +13,18 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, Long
 
     @Transactional
     @Modifying
-    @Query("Delete from ProductImage pi join Product p on pi.productId = p.id where pi.productId = :productId and pi.imageUrl NOT IN :imageUrls")
-    void deleteByProductIdAndImageUrlNotIn(@Param("productId") long productId, @Param("imageUrls") List<String> imageUrls);
+    @Query("Delete from ProductImage pi join Product p on pi.productId = p.id where pi.productId = :productId and pi.imageUrl IN :imageUrls")
+    void deleteByProductIdAndImageUrlIn(@Param("productId") long productId, @Param("imageUrls") List<String> imageUrls);
 
-    @Query("Select pi.imageUrl from ProductImage pi join Product p on pi.productId = p.id where pi.productId = :productId ORDER BY pi.id ASC")
-    List<String> findImageUrlsByProductId(@Param("productId") long productId);
-
+    @Transactional
+    @Modifying
+    @Query("Delete from ProductImage pi where pi.productId = :productId")
+    void deleteByProductId(@Param("productId") long productId);
+    
     @Query("Select pi.imageUrl from ProductImage pi where pi.productId = :productId")
     List<String> findAllImageUrlsByProductId(@Param("productId") Long productId);
 
-    @Query("Select pi from ProductImage pi where pi.productId = :id")
-    List<ProductImage> findAllProductImageByProductId(Long id);
+    @Query("Select pi from ProductImage pi where pi.productId = :productId")
+    List<ProductImage> findAllProductImageByProductId(Long productId);
 
 }
