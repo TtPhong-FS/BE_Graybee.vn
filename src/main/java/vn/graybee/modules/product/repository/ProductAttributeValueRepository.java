@@ -22,11 +22,11 @@ public interface ProductAttributeValueRepository extends JpaRepository<ProductAt
     List<AttributeDisplayDto> findAttributeDisplayDtosByProductId(long productId);
 
     @Query("""
-            Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicValueDto(a.id, a.name, pav.value, a.label, a.isRequired, a.inputType, a.options)
-            from ProductAttributeValue pav
-            join Attribute a on pav.attributeId = a.id
-            join CategoryAttribute ca on ca.attributeId = a.id
-            where pav.productId = :productId and ca.categoryId = :categoryId
+            Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicValueDto(a.id, a.name, pa.value, a.label, a.isRequired, a.inputType, a.options)
+            from CategoryAttribute ca
+            join Attribute a on ca.attributeId = a.id
+            left join ProductAttributeValue pa on pa.attributeId = a.id and pa.productId = :productId
+            where ca.categoryId = :categoryId
             """)
     List<AttributeBasicValueDto> AllAttributeValueByCategoryAndProductId(long categoryId, long productId);
 

@@ -5,11 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import vn.graybee.common.Constants;
 import vn.graybee.common.dto.PaginationInfo;
-import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDisplayDto;
+import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.comment.dto.response.ReviewCommentDto;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.dto.response.ProductDetailDto;
@@ -22,7 +22,7 @@ import vn.graybee.modules.product.service.RedisProductService;
 import vn.graybee.modules.product.service.ReviewCommentSerivce;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -108,13 +108,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductPriceResponse getPriceById(long id) {
         return productRepository.getPriceById(id)
-                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("")));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, "Sản phẩm không tồn tại hoặc đã ngừng kinh doanh"));
     }
 
     @Override
     public ProductBasicResponse getProductBasicInfoForCart(long id) {
         return productRepository.findBasicInfoForCart(id)
-                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("")));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, "Sản phẩm không tồn tại hoặc đã ngừng kinh doanh"));
     }
 
     @Override
@@ -133,7 +133,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public BigDecimal getProductPriceById(long id) {
+    public Double getProductPriceById(long id) {
         return productRepository.findFinalPriceById(id)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found.or.out_of_business")));
     }
@@ -147,6 +147,44 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductBasicResponse> getAllProductPublished() {
         return productRepository.findAllProductPublished();
+    }
+
+    @Override
+    public void checkExistsById(long id) {
+        if (!productRepository.checkExistsById(id)) {
+            throw new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found.or.out_of_business"));
+        }
+    }
+
+    @Override
+    public long getIdBySlug(String productSlug) {
+        return productRepository.findIdBySlug(productSlug).orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found.or.out_of_business")));
+    }
+
+    @Override
+    public List<ProductBasicResponse> getProductByCategory(String category) {
+        return productRepository.findByCategoryName(category);
+    }
+
+    @Override
+    public List<ProductBasicResponse> findProductByBrandSlug(String brandSlug) {
+        return productRepository.findProductByBrandSlug(brandSlug);
+    }
+
+    @Override
+    public List<ProductBasicResponse> findProductByCategorySlugAndCategoryType(String slug, String type) {
+
+        CategoryType categoryType = CategoryType.getType(type, messageSourceUtil);
+        List<ProductBasicResponse> productBasicResponses = new ArrayList<>();
+
+        productBasicResponses = switch (categoryType) {
+            case CATEGORY -> productRepository.findProductByCategorySlug(slug);
+            case BRAND -> productRepository.findProductByBrandSlug(slug);
+            case TAG -> productCategoryService.findProductByTagSlug(slug);
+            default -> productBasicResponses;
+        };
+
+        return productBasicResponses;
     }
 
 }

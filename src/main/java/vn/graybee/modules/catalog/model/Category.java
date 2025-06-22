@@ -28,8 +28,9 @@ public class Category extends BaseModel {
     @Column(nullable = false, length = 100, unique = true)
     private String name;
 
-    @Column(length = 100, unique = true)
+    @Column(length = 100)
     private String slug;
+
 
     @Column(name = "parent_id")
     private Long parentId;

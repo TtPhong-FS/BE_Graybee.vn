@@ -7,7 +7,6 @@ import vn.graybee.modules.catalog.dto.response.attribute.AttributeDisplayDto;
 import vn.graybee.modules.comment.dto.response.ReviewCommentDto;
 import vn.graybee.modules.product.model.Product;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Setter
@@ -29,9 +28,9 @@ public class ProductDetailDto {
 
     private String thumbnail;
 
-    private BigDecimal price;
+    private double price;
 
-    private BigDecimal finalPrice;
+    private double finalPrice;
 
     private int discountPercent;
 

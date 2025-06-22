@@ -1,14 +1,9 @@
 package vn.graybee.modules.product.service.impl;
 
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
-import vn.graybee.common.dto.PaginationInfo;
-import vn.graybee.common.dto.SortInfo;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
@@ -16,13 +11,16 @@ import vn.graybee.common.utils.SlugUtil;
 import vn.graybee.common.utils.TextUtils;
 import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicValueDto;
+import vn.graybee.modules.catalog.dto.response.attribute.AttributeDisplayDto;
 import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.catalog.service.CategoryService;
+import vn.graybee.modules.comment.dto.response.ReviewCommentDto;
 import vn.graybee.modules.inventory.service.InventoryService;
 import vn.graybee.modules.product.dto.request.ProductRequest;
 import vn.graybee.modules.product.dto.request.ProductUpdateRequest;
 import vn.graybee.modules.product.dto.request.ValidationProductRequest;
 import vn.graybee.modules.product.dto.response.InventoryProductDto;
+import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.modules.product.dto.response.ProductResponse;
 import vn.graybee.modules.product.dto.response.ProductUpdateDto;
 import vn.graybee.modules.product.enums.ProductStatus;
@@ -36,6 +34,7 @@ import vn.graybee.modules.product.service.ProductDescriptionService;
 import vn.graybee.modules.product.service.ProductDocumentService;
 import vn.graybee.modules.product.service.ProductImageService;
 import vn.graybee.modules.product.service.RedisProductService;
+import vn.graybee.modules.product.service.ReviewCommentSerivce;
 import vn.graybee.response.admin.products.ProductStatusResponse;
 
 import java.math.BigDecimal;
@@ -81,11 +80,13 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     private final CategoryService categoryService;
 
+    private final ReviewCommentSerivce reviewCommentSerivce;
+
     private final RedisProductService redisProductService;
 
     private final ProductClassifyViewService productClassifyViewService;
 
-    public AdminProductServiceImpl(MessageSourceUtil messageSourceUtil, ProductDocumentService productDocumentService, ProductDescriptionService productDescriptionService, ProductImageService productImageService, ProductRepository productRepository, CategoryService categoryService, RedisProductService redisProductService, ProductCategoryService productCategoryService, ProductClassifyViewService productClassifyViewService, ProductAttributeValueService productAttributeValueService, @Lazy InventoryService inventoryService) {
+    public AdminProductServiceImpl(MessageSourceUtil messageSourceUtil, ProductDocumentService productDocumentService, ProductDescriptionService productDescriptionService, ProductImageService productImageService, ProductRepository productRepository, CategoryService categoryService, RedisProductService redisProductService, ProductCategoryService productCategoryService, ProductClassifyViewService productClassifyViewService, ProductAttributeValueService productAttributeValueService, @Lazy InventoryService inventoryService, ReviewCommentSerivce reviewCommentSerivce) {
         this.messageSourceUtil = messageSourceUtil;
         this.productAttributeValueService = productAttributeValueService;
         this.productClassifyViewService = productClassifyViewService;
@@ -97,6 +98,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         this.categoryService = categoryService;
         this.redisProductService = redisProductService;
         this.inventoryService = inventoryService;
+        this.reviewCommentSerivce = reviewCommentSerivce;
     }
 
     public ProductResponse getProductResponse(Product product, String categoryName, String brandName, List<String> tagNames) {
@@ -224,7 +226,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         product.setBrandId(brand.getId());
         product.setName(TextUtils.capitalizeEachWord(request.getName()));
         product.setWarranty(request.getWarranty());
-        product.setThumbnail(request.getThumbnail());
+        product.setThumbnail(request.getImages() != null && !request.getImages().isEmpty() ? request.getImages().get(0) : null);
         product.setStatus(status);
         product.setPrice(request.getPrice());
         product.setDiscountPercent(request.getDiscountPercent());
@@ -234,6 +236,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         product = productRepository.save(product);
 
         productCategoryService.updateProductCategoryByTags(product.getId(), request.getTagNames());
+        productImageService.saveProductImages(product.getId(), request.getImages());
 
         productAttributeValueService.updateProductAttributeValue(product.getId(), request.getSpecifications());
 
@@ -261,35 +264,8 @@ public class AdminProductServiceImpl implements AdminProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAllProductDtoForDashboard(String status, String category, String manufacturer, int page, int size, String sortBy, String order) {
-
-        ProductStatus statusEnum = null;
-
-
-        if (status != null && !status.isEmpty() && !"all".equals(status)) {
-            statusEnum = ProductStatus.getStatus(status, messageSourceUtil);
-        }
-
-
-        String categoryName = category.equals("all") ? null : category;
-        String manufacturerName = manufacturer.equals("all") ? null : manufacturer;
-
-        Sort sort = order.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-
-        Page<ProductResponse> productPage = productRepository.getAllProductResponse(
-                statusEnum,
-                pageRequest);
-
-        PaginationInfo paginationInfo = new PaginationInfo(
-
-        );
-
-        SortInfo sortInfo = new SortInfo(sortBy, order);
-
-
-        return productPage;
+    public List<ProductResponse> getAllProductDtoForDashboard() {
+        return productRepository.getAllProductResponse();
     }
 
     @Override
@@ -375,6 +351,23 @@ public class AdminProductServiceImpl implements AdminProductService {
             checkExistsByNameNotId(request.getName(), id);
             checkExistsBySlugNotId(request.getSlug(), id);
         }
+
+    }
+
+    @Override
+    public ProductDetailDto getProductDetailById(long id) {
+
+        ProductDetailDto productDetailDto = productRepository.findProductDetailDtoById(id)
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.not.found")));
+
+        List<AttributeDisplayDto> attributeDisplayDtos = productAttributeValueService.getAttributeDisplayDtosByProductId(productDetailDto.getProductId());
+
+        List<ReviewCommentDto> reviewCommentDtos = reviewCommentSerivce.getReviewCommentDtosByProductId(productDetailDto.getProductId());
+
+
+        productDetailDto.setReviews(reviewCommentDtos);
+        productDetailDto.setSpecifications(attributeDisplayDtos);
+        return productDetailDto;
 
     }
 

@@ -19,6 +19,8 @@ public class SidebarDto {
 
     private String name;
 
+    private String type;
+
     private List<SidebarDto> children = new ArrayList<>();
 
 

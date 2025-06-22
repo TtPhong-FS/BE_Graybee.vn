@@ -41,7 +41,7 @@ public class FavouriteServiceImpl implements FavouriteService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public BasicMessageResponse<FavoriteProductResponse> addFavoriteProduct(Long accountId, Long productId) {
+    public BasicMessageResponse<?> addFavoriteProduct(Long accountId, Long productId) {
 
         boolean isFavorite = false;
 
@@ -56,7 +56,7 @@ public class FavouriteServiceImpl implements FavouriteService {
 
         if (isFavorite) {
             favouriteRepository.deleteByAccountIdAndProductId(accountId, productId);
-            return new BasicMessageResponse<>(200, messageSourceUtil.get("account.favorite.remove.success"), null);
+            return new BasicMessageResponse<>(200, messageSourceUtil.get("account.favorite.remove.success"), productId);
         }
 
         Favorite favourite = new Favorite();

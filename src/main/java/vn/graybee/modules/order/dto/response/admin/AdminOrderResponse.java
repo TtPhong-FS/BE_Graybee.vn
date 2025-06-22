@@ -9,7 +9,6 @@ import vn.graybee.modules.order.enums.DeliveryType;
 import vn.graybee.modules.order.enums.OrderStatus;
 import vn.graybee.modules.order.enums.PaymentStatus;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Setter
@@ -20,13 +19,11 @@ public class AdminOrderResponse {
 
     private long orderId;
 
-    private BigDecimal total;
+    private double total;
 
     private String recipientName;
 
     private String recipientPhone;
-
-    private String avatarUrl;
 
     private PaymentStatus paymentStatus;
 

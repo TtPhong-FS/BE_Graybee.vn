@@ -62,10 +62,9 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDenied))
                 .authorizeHttpRequests(
                         endpoint -> endpoint
-                                .requestMatchers(apiProperties.getAdminApi().getBase() + "/**").permitAll()
+                                .requestMatchers(apiProperties.getAdminApi().getBase() + "/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                                 .requestMatchers(apiProperties.getPrivateApi().getAccount() + "/**").authenticated()
                                 .requestMatchers(apiProperties.getPublicApi().getBase() + "/**").permitAll()
-                                .requestMatchers("/ws/**").permitAll()
                                 .anyRequest().permitAll()
                 )
                 .userDetailsService(userDetailService)

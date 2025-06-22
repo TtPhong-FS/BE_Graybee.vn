@@ -21,10 +21,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("Delete from Category c where c.id = :id")
     void deleteById(@Param("id") Long id);
 
-    @Query("SELECT EXISTS (SELECT 1 FROM Category c WHERE c.name = :name AND c.id <> :id)")
+    @Query("SELECT EXISTS (SELECT 1 FROM Category c WHERE LOWER(c.name) = LOWER(:name) AND c.id <> :id)")
     boolean existsByNameAndNotId(@Param("name") String name, @Param("id") Long id);
 
-    @Query("SELECT EXISTS (SELECT 1 FROM Category c WHERE c.name = :name)")
+    @Query("SELECT EXISTS (SELECT 1 FROM Category c WHERE LOWER(c.name) = LOWER(:name))")
     boolean existsByName(@Param("name") String name);
 
     @Query("Select c.id from Category c where c.name = :name")
@@ -36,7 +36,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("Select new vn.graybee.modules.catalog.dto.response.CategorySummaryDto(c.id, c.name, c.categoryType) from Category c where c.name = :name or c.id = :id")
     Optional<CategorySummaryDto> findCategorySummaryDtoByNameOrId(@Param("name") String name, @Param("id") Long id);
 
-    @Query("Select new vn.graybee.modules.catalog.dto.response.CategorySlugWithParentId(c.id, c.slug, c.name, c.parentId) from Category c where c.isActive = true ")
+    @Query("Select new vn.graybee.modules.catalog.dto.response.CategorySlugWithParentId(c.id, c.slug, c.name, c.categoryType, c.parentId) from Category c where c.isActive = true ")
     List<CategorySlugWithParentId> findCategoryTreeDto();
 
     @Query("SELECT EXISTS (SELECT 1 FROM Category c WHERE c.slug = :slug)")

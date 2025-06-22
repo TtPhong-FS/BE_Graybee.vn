@@ -16,6 +16,9 @@ public class CategoryRequest {
     @Size(max = 100, message = "catalog.validation.category.slug.name.size")
     private String slug;
 
+    @Size(max = 200, message = "Ảnh danh mục quá dài")
+    private String thumbnail;
+
     @NotBlank(message = "catalog.validation.category.type.not.blank")
     private String categoryType;
 

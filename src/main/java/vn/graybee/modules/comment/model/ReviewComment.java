@@ -32,7 +32,7 @@ public class ReviewComment {
     @Column(length = 500)
     private String comment;
 
-    private float rating;
+    private int rating;
 
     @Column(name = "published_at")
     private LocalDateTime publishedAt;

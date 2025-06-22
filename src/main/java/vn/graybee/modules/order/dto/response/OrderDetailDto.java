@@ -1,57 +1,33 @@
 package vn.graybee.modules.order.dto.response;
 
-import java.math.BigDecimal;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import vn.graybee.modules.order.enums.OrderStatus;
 
+import java.util.List;
+
+@Setter
+@Getter
+@NoArgsConstructor
 public class OrderDetailDto {
 
-    private Long productId;
+    private String orderCode;
 
-    private int totalQuantity;
+    private List<OrderItemDto> orderItems;
 
-    private BigDecimal priceAtTime;
+    private OrderStatus status;
 
-    private BigDecimal subtotal;
+    private double totalAmount;
 
-    public OrderDetailDto() {
-    }
+    private DeliveryDto delivery;
 
-    public OrderDetailDto(Long productId, int totalQuantity, BigDecimal priceAtTime, BigDecimal subtotal) {
-        this.productId = productId;
-        this.totalQuantity = totalQuantity;
-        this.priceAtTime = priceAtTime;
-        this.subtotal = subtotal;
-    }
+    private PaymentDto payment;
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
-    public int getTotalQuantity() {
-        return totalQuantity;
-    }
-
-    public void setTotalQuantity(int totalQuantity) {
-        this.totalQuantity = totalQuantity;
-    }
-
-    public BigDecimal getPriceAtTime() {
-        return priceAtTime;
-    }
-
-    public void setPriceAtTime(BigDecimal priceAtTime) {
-        this.priceAtTime = priceAtTime;
-    }
-
-    public BigDecimal getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
+    public OrderDetailDto(String orderCode, OrderStatus status, double totalAmount) {
+        this.orderCode = orderCode;
+        this.status = status;
+        this.totalAmount = totalAmount;
     }
 
 }

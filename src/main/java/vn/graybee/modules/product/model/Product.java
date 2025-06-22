@@ -14,9 +14,6 @@ import lombok.Setter;
 import vn.graybee.common.model.BaseModel;
 import vn.graybee.modules.product.enums.ProductStatus;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -46,13 +43,13 @@ public class Product extends BaseModel {
     @Column(name = "warranty", nullable = false)
     private int warranty;
 
-    private BigDecimal price;
+    private double price;
 
     @Column(name = "discount_percent")
     private int discountPercent;
 
     @Column(name = "final_price")
-    private BigDecimal finalPrice;
+    private double finalPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -61,13 +58,8 @@ public class Product extends BaseModel {
     @Column(length = 250)
     private String thumbnail;
 
-    public BigDecimal calculateFinalPrice(BigDecimal price, int discountPercent) {
-        if (price.compareTo(BigDecimal.ZERO) > 0) {
-            return price.subtract(
-                    price.multiply(BigDecimal.valueOf(discountPercent)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
-            );
-        }
-        return price;
+    public double calculateFinalPrice(double price, int discountPercent) {
+        return (price * discountPercent) / 100;
     }
 
 }

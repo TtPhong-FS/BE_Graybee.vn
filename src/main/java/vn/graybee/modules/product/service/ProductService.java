@@ -5,7 +5,6 @@ import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductService {
@@ -18,10 +17,20 @@ public interface ProductService {
 
     ProductDetailDto findProductDetailBySlug(String slug);
 
-    BigDecimal getProductPriceById(long id);
+    Double getProductPriceById(long id);
 
     FavoriteProductResponse getProductFavouriteById(Long productId);
 
     List<ProductBasicResponse> getAllProductPublished();
+
+    void checkExistsById(long id);
+
+    long getIdBySlug(String productSlug);
+
+    List<ProductBasicResponse> getProductByCategory(String category);
+
+    List<ProductBasicResponse> findProductByBrandSlug(String brandSlug);
+
+    List<ProductBasicResponse> findProductByCategorySlugAndCategoryType(String slug, String type);
 
 }

@@ -13,7 +13,6 @@ import vn.graybee.modules.cart.service.CartItemService;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.service.ProductService;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +50,7 @@ public class CartItemServiceImpl implements CartItemService {
             cartItem = existingCartItem.get();
             int newQuantity = cartItem.getQuantity() + 1;
             cartItem.setQuantity(newQuantity);
-            cartItem.setTotalAmount(cartItem.getTotalAmount().add(cartItem.calculateTotal(product.getFinalPrice(), 1)));
+            cartItem.setTotalAmount(cartItem.getTotalAmount() + (cartItem.calculateTotal(product.getFinalPrice(), 1)));
         } else {
             cartItem = new CartItem();
             cartItem.setCartId(cartId);
@@ -81,7 +80,7 @@ public class CartItemServiceImpl implements CartItemService {
             return null;
         } else {
             cartItem.setQuantity(remainingQuantity);
-            cartItem.setTotalAmount(cartItem.getTotalAmount().add(cartItem.calculateTotal(product.getFinalPrice(), 1)));
+            cartItem.setTotalAmount(cartItem.getTotalAmount() + (cartItem.calculateTotal(product.getFinalPrice(), 1)));
             cartItem = cartItemRepository.save(cartItem);
         }
 
@@ -129,18 +128,20 @@ public class CartItemServiceImpl implements CartItemService {
         return cartItemRepository.findByIdsAndCartId(cartItemIds, cartId);
     }
 
-    @Transactional(rollbackFor = RuntimeException.class)
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void clearCartItems(Long cartId) {
         cartItemRepository.deleteAllByCartId(cartId);
     }
 
     @Override
-    public BigDecimal getCartItemTotals(Long cartId) {
-        List<BigDecimal> itemTotals = cartItemRepository.findAllTotalByCartId(cartId);
+    public double getCartItemTotals(Long cartId) {
+        List<Double> itemTotals = cartItemRepository.findAllTotalByCartId(cartId);
         return itemTotals
                 .stream()
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .mapToDouble(Double::doubleValue)
+                .sum();
+
     }
 
     @Override
@@ -151,6 +152,22 @@ public class CartItemServiceImpl implements CartItemService {
         return cartItems.stream()
                 .map(CartItem::getId)
                 .toList();
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public CartItemDto updateItemQuantity(long cartItemId, int quantity) {
+
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, "Sản phẩm không tồn tại trong giỏ hàng"));
+
+        ProductBasicResponse product = productService.getProductBasicInfoForCart(cartItem.getProductId());
+
+        cartItem.setQuantity(quantity);
+        cartItem.setTotalAmount(cartItem.calculateTotal(product.getFinalPrice(), quantity));
+
+        cartItem = cartItemRepository.save(cartItem);
+
+        return convertToCartItemDto(cartItem, product);
     }
 
 }

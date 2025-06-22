@@ -1,5 +1,6 @@
 package vn.graybee.modules.comment.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,13 +14,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReviewCommentDto {
 
+    private int id;
+
+    private long productId;
+
+    private String uid;
+
     private String poster;
 
-    private float rating;
+    private int rating;
 
     private String comment;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime publishedAt;
-
 
 }

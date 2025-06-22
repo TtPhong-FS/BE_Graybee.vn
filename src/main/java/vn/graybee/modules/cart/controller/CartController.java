@@ -84,6 +84,35 @@ public class CartController {
         );
     }
 
+    @PutMapping("/quantity/{cartItemId}/{quantity}")
+    public ResponseEntity<BasicMessageResponse<?>> updateItemQuantity(
+            @PathVariable int quantity,
+            @PathVariable long cartItemId,
+            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @AuthenticationPrincipal UserDetail userDetail) {
+
+        Long accountId = null;
+        if (userDetail != null && userDetail.user().getId() != null) {
+            accountId = userDetail.user().getId();
+        }
+
+        Long cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
+
+        if (quantity == 0) {
+            cartItemService.removeItemFromCart(cartId, cartItemId);
+            return ResponseEntity.ok(
+                    MessageBuilder.ok(
+                            cartItemId, "Sản phẩm đã được xoá khỏi giỏ hàng"
+                    ));
+        }
+
+        CartItemDto cartItemDto = cartItemService.updateItemQuantity(cartItemId, quantity);
+        cartService.updateCartTotal(cartId);
+        return ResponseEntity.ok(
+                MessageBuilder.ok(cartItemDto, "Cập nhật số lượng thành công")
+        );
+    }
+
     @DeleteMapping("/{cartItemId}")
     public ResponseEntity<BasicMessageResponse<Long>> deleteItemToCart(
             @PathVariable("cartItemId") Long cartItemId,

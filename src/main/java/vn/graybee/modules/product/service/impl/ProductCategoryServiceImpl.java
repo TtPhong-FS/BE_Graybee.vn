@@ -84,6 +84,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         return productCategoryRepository.findProductByTagSlug(tagSlug);
     }
 
+
     private void syncProductCategories(Long productId, Set<Long> newCategoryIds) {
         List<ProductCategory> currentRelations = productCategoryRepository.findAllByProductId(productId);
 

@@ -10,7 +10,6 @@ import vn.graybee.modules.order.enums.PaymentMethod;
 import vn.graybee.modules.order.enums.PaymentStatus;
 import vn.graybee.modules.order.enums.ShippingMethod;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -22,7 +21,7 @@ public class OrderHistoryResponse {
 
     private OrderStatus status;
 
-    private BigDecimal totalAmount;
+    private double totalAmount;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDate;
@@ -35,7 +34,7 @@ public class OrderHistoryResponse {
 
     private ShippingMethod shippingMethod;
 
-    public OrderHistoryResponse(String code, OrderStatus status, BigDecimal totalAmount, LocalDateTime orderDate, DeliveryType deliveryType, PaymentMethod paymentMethod, PaymentStatus paymentStatus, ShippingMethod shippingMethod) {
+    public OrderHistoryResponse(String code, OrderStatus status, double totalAmount, LocalDateTime orderDate, DeliveryType deliveryType, PaymentMethod paymentMethod, PaymentStatus paymentStatus, ShippingMethod shippingMethod) {
         this.code = code;
         this.status = status;
         this.totalAmount = totalAmount;

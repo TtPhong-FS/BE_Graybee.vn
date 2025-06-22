@@ -54,6 +54,7 @@ public class AddressController {
         return ResponseEntity.ok(addressService.getAllAddressesByCustomerId(customerId));
     }
 
+
     @DeleteMapping("/{addressId}")
     public ResponseEntity<BasicMessageResponse<Integer>> deleteAddressByIdAndCustomerId(
             @PathVariable("addressId") Integer addressId,
@@ -75,7 +76,7 @@ public class AddressController {
         return ResponseEntity.ok(addressService.updateAddress(customerId, addressId, request));
     }
 
-    @PutMapping("/default-address/{addressId}")
+    @PutMapping("/default/{addressId}")
     public ResponseEntity<BasicMessageResponse<DefaultAddressDto>> setDefaultAddress(
             @PathVariable("addressId") Integer addressId,
             @AuthenticationPrincipal UserDetail userDetail) {

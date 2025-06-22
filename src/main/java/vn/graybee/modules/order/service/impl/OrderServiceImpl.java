@@ -1,5 +1,6 @@
 package vn.graybee.modules.order.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
@@ -13,7 +14,12 @@ import vn.graybee.modules.account.service.CustomerService;
 import vn.graybee.modules.cart.model.CartItem;
 import vn.graybee.modules.cart.service.CartItemService;
 import vn.graybee.modules.cart.service.CartService;
+import vn.graybee.modules.dashboard.dto.OrderTotalResponse;
 import vn.graybee.modules.order.dto.request.OrderCreateRequest;
+import vn.graybee.modules.order.dto.response.DeliveryDto;
+import vn.graybee.modules.order.dto.response.OrderDetailDto;
+import vn.graybee.modules.order.dto.response.OrderItemDto;
+import vn.graybee.modules.order.dto.response.PaymentDto;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.user.OrderHistoryResponse;
 import vn.graybee.modules.order.enums.OrderStatus;
@@ -25,9 +31,9 @@ import vn.graybee.modules.order.service.OrderDetailService;
 import vn.graybee.modules.order.service.OrderService;
 import vn.graybee.modules.order.service.PaymentService;
 
-import java.math.BigDecimal;
 import java.util.List;
 
+@AllArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -49,17 +55,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final CustomerService customerService;
 
-    public OrderServiceImpl(MessageSourceUtil messageSourceUtil, OrderRepository orderRepository, DeliveryService deliveryService, OrderDetailService orderDetailService, PaymentService paymentService, AddressService addressService, CartItemService cartItemService, CartService cartService, CustomerService customerService) {
-        this.messageSourceUtil = messageSourceUtil;
-        this.orderRepository = orderRepository;
-        this.deliveryService = deliveryService;
-        this.orderDetailService = orderDetailService;
-        this.paymentService = paymentService;
-        this.addressService = addressService;
-        this.cartItemService = cartItemService;
-        this.cartService = cartService;
-        this.customerService = customerService;
-    }
 
     @Override
     public List<OrderHistoryResponse> getOrderHistoryByAccountId(Long accountId) {
@@ -75,6 +70,11 @@ public class OrderServiceImpl implements OrderService {
 
         if (!orderIds.isEmpty()) {
             orderRepository.transformOrdersToAccountByIds(accountId, orderIds);
+
+            OrderTotalResponse orderTotalResponse = orderRepository.countByAccountId(accountId);
+
+            customerService.updateTotalOrdersByAccountId(accountId, orderTotalResponse.getCount());
+            customerService.updateTotalSpentByAccountId(accountId, orderTotalResponse.getTotalAmount());
         }
 
     }
@@ -85,9 +85,51 @@ public class OrderServiceImpl implements OrderService {
         long id = orderRepository.findIdByCode(code)
                 .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, "Không tìm thấy đơn hàng trong hệ thống"));
 
+        OrderStatus orderStatus = orderRepository.findStatusByCode(code);
+
+        if (orderStatus == OrderStatus.COMPLETED) {
+            throw new BusinessCustomException(Constants.Common.global, "Đơn hàng đã hoàn thành, không thể huỷ.");
+        }
+
+        if (orderStatus == OrderStatus.RETURNED) {
+            throw new BusinessCustomException(Constants.Common.global, "Đơn hàng đang được trả lại, không thể huỷ.");
+        }
+
+        if (orderStatus == OrderStatus.CANCELLED) {
+            throw new BusinessCustomException(Constants.Common.global, "Đơn hàng đã được huỷ, không thể huỷ lần nữa.");
+        }
+
+        if (orderStatus == OrderStatus.PROCESSING) {
+            throw new BusinessCustomException(Constants.Common.global, "Đơn hàng đang được chuẩn bị để giao đến bạn, không thể huỷ.");
+        }
+
         cancelOrderById(id);
 
+        orderDetailService.increaseQuantityByOrderId(id);
+
         return new CancelOrderResponse(id, OrderStatus.CANCELLED);
+    }
+
+    @Override
+    public OrderDetailDto getOrderDetailByCodeAndAccountId(String code, long accountId) {
+
+
+        long orderId = orderRepository.findIdByCode(code)
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, "Không tìm thấy đơn hàng trong hệ thống"));
+
+        OrderDetailDto orderDetailDto = orderRepository.findOrderDetailByCodeAndAccountId(code, accountId);
+
+        List<OrderItemDto> orderItemDtos = orderDetailService.findItemByOrderId(orderId);
+
+        DeliveryDto deliveryDto = deliveryService.findDeliveryDtoByOrderId(orderId);
+        PaymentDto paymentDto = paymentService.findPaymentDtoByOrderId(orderId);
+
+
+        orderDetailDto.setOrderItems(orderItemDtos);
+        orderDetailDto.setDelivery(deliveryDto);
+        orderDetailDto.setPayment(paymentDto);
+
+        return orderDetailDto;
     }
 
     @Override
@@ -122,14 +164,14 @@ public class OrderServiceImpl implements OrderService {
             order.setAccountId(accountId);
             order.setSessionId(null);
         }
-        order.setTotalAmount(BigDecimal.ZERO);
+        order.setTotalAmount(0);
         order = orderRepository.save(order);
 
         List<OrderDetail> orderDetails = orderDetailService.createOrderDetail(order.getId(), cartItems);
 
-        BigDecimal totalAmount = orderDetails.stream()
-                .map(OrderDetail::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        double totalAmount = orderDetails.stream()
+                .mapToDouble(OrderDetail::getSubtotal)
+                .sum();
 
         order.setTotalAmount(totalAmount);
         order = orderRepository.save(order);
@@ -138,6 +180,8 @@ public class OrderServiceImpl implements OrderService {
 
         if (request.getAddressId() != null && accountId != null) {
             Long customerId = customerService.getIdByAccountId(accountId);
+            customerService.updateTotalSpentByAccountId(customerId, order.getTotalAmount());
+            customerService.updateTotalOrdersByAccountId(customerId, 1);
             Address address = addressService.getAddressByIdAndCustomerId(customerId, request.getAddressId(), request.getCustomerInfo(), request.getShippingInfo());
             deliveryService.createDeliveryForCustomer(order.getId(), request.getShippingInfo(), address);
         } else {
@@ -165,6 +209,9 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new BusinessCustomException(Constants.Common.global, "Không thể huỷ, đơn hàng đã được giao cho vận chuyển.");
         }
+
+        orderDetailService.increaseQuantityByOrderId(orderId);
+
 
         return new CancelOrderResponse(orderId, OrderStatus.CANCELLED);
     }

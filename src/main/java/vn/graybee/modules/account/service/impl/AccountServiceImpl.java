@@ -37,12 +37,16 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void updatePasswordById(Long id, String password) {
         accountRepository.updatePasswordById(id, password);
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Account saveAccount(CustomerRegisterRequest request) {
+        checkExistsByEmail(request.getEmail());
+
 
         String uid = CodeGenerator.generateCode(10, CodeGenerator.DIGITS);
 
@@ -79,6 +83,11 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(rollbackFor = RuntimeException.class)
     public void updateLastLoginAt(long id) {
         accountRepository.updateLastLoginAt(id);
+    }
+
+    @Override
+    public String getUidById(long id) {
+        return accountRepository.findUidById(id).orElseThrow(() -> new CustomNotFoundException(Constants.Common.root, messageSourceUtil.get("account.not.found")));
     }
 
 }

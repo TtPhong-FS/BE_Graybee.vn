@@ -5,12 +5,12 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.cart.model.CartItem;
 import vn.graybee.modules.inventory.service.InventoryService;
+import vn.graybee.modules.order.dto.response.OrderItemDto;
 import vn.graybee.modules.order.model.OrderDetail;
 import vn.graybee.modules.order.repository.OrderDetailRepository;
 import vn.graybee.modules.order.service.OrderDetailService;
 import vn.graybee.modules.product.service.ProductService;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +40,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
             inventoryService.validateQuantityAvailable(cartItem.getProductId(), cartItem.getQuantity());
 
-            BigDecimal priceAtTime = productService.getProductPriceById(cartItem.getProductId());
-            BigDecimal subtotal = calculateSubtotal(priceAtTime, cartItem.getQuantity());
+            double priceAtTime = productService.getProductPriceById(cartItem.getProductId());
+            double subtotal = calculateSubtotal(priceAtTime, cartItem.getQuantity());
 
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrderId(orderId);
@@ -58,8 +58,30 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return orderDetailRepository.saveAll(orderDetails);
     }
 
-    private BigDecimal calculateSubtotal(BigDecimal price, int quantity) {
-        return price.multiply(BigDecimal.valueOf(quantity));
+    @Override
+    public List<OrderDetail> findByOrderId(long orderId) {
+        return orderDetailRepository.findAllByOrderId(orderId);
+    }
+
+    @Override
+    public void increaseQuantityByOrderId(long orderId) {
+        List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderId(orderId);
+
+
+        for (OrderDetail orderDetail : orderDetails) {
+            inventoryService.increaseQuantity(orderDetail.getProductId(), orderDetail.getQuantity());
+        }
+
+    }
+
+    @Override
+    public List<OrderItemDto> findItemByOrderId(long orderId) {
+        return orderDetailRepository.findItemByOrderId(orderId);
+    }
+
+
+    private double calculateSubtotal(double price, int quantity) {
+        return price * quantity;
     }
 
 }

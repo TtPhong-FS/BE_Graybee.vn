@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
-import vn.graybee.modules.account.dto.request.UpdateProfileRequest;
+import vn.graybee.modules.account.dto.request.ProfileRequest;
 import vn.graybee.modules.account.dto.response.ProfileResponse;
 import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.account.service.ProfileService;
@@ -38,13 +38,13 @@ public class ProfileController {
 
     @PutMapping("/update")
     public ResponseEntity<BasicMessageResponse<ProfileResponse>> updateProfile(
-            @RequestBody @Valid UpdateProfileRequest request,
+            @RequestBody @Valid ProfileRequest request,
             @AuthenticationPrincipal UserDetail userDetail
     ) {
         Long accountId = userDetail.user().getId();
         return ResponseEntity.ok(
                 MessageBuilder.ok(profileService.updateByAccountId(request, accountId),
-                        null)
+                        "Cập nhật thông tin thành công")
         );
     }
 

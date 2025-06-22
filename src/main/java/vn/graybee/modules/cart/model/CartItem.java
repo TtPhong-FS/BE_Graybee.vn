@@ -10,8 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -32,10 +30,10 @@ public class CartItem {
     private int quantity;
 
     @Column(name = "total_amount")
-    private BigDecimal totalAmount;
+    private double totalAmount;
 
-    public BigDecimal calculateTotal(BigDecimal price, int quantity) {
-        return price.multiply(BigDecimal.valueOf(quantity));
+    public double calculateTotal(double price, int quantity) {
+        return price * quantity;
     }
 
 }

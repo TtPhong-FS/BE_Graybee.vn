@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public interface AttributeRepository extends JpaRepository<Attribute, Long> {
 
-    @Query("Select exists (Select 1 from Attribute a where a.name = :name)")
+    @Query("SELECT EXISTS (SELECT 1 FROM Attribute a WHERE LOWER(a.name) = LOWER(:name))")
     boolean existsByName(@Param("name") String name);
 
     @Query("Select exists (Select 1 from Attribute a where a.id = :id)")
@@ -29,7 +29,7 @@ public interface AttributeRepository extends JpaRepository<Attribute, Long> {
     @Query("Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto(a.id, a.name, a.label, a.isRequired, a.inputType, a.options) from Attribute a join CategoryAttribute ca on a.id = ca.attributeId where ca.categoryId = :categoryId")
     List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryId(@Param("categoryId") long categoryId);
 
-    @Query("Select exists (Select 1 from Attribute a where a.name = :name and a.id <> :id)")
+    @Query("Select exists (Select 1 from Attribute a where LOWER(a.name) = LOWER(:name) and a.id <> :id)")
     boolean checkExistsByNameNotId(@Param("name") String name, @Param("id") long id);
 
     @Query("Select a.isActive from Attribute a where a.id = :id ")

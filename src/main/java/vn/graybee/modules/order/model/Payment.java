@@ -15,8 +15,6 @@ import vn.graybee.common.model.BaseModel;
 import vn.graybee.modules.order.enums.PaymentMethod;
 import vn.graybee.modules.order.enums.PaymentStatus;
 
-import java.math.BigDecimal;
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -32,7 +30,7 @@ public class Payment extends BaseModel {
     private Long orderId;
 
     @Column(name = "total_amount")
-    private BigDecimal totalAmount;
+    private double totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "payment_method")

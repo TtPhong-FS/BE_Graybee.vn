@@ -9,6 +9,7 @@ import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.model.Address;
 import vn.graybee.modules.order.dto.request.CustomerInfoRequest;
 import vn.graybee.modules.order.dto.request.ShippingInfoRequest;
+import vn.graybee.modules.order.dto.response.DeliveryDto;
 import vn.graybee.modules.order.dto.response.admin.delivery.DeliveryIdStatusResponse;
 import vn.graybee.modules.order.enums.DeliveryStatus;
 import vn.graybee.modules.order.enums.DeliveryType;
@@ -90,6 +91,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 
         Delivery delivery = new Delivery();
+        delivery.setOrderId(id);
         delivery.setRecipientPhone(customerInfo.getRecipientPhone());
         delivery.setRecipientName(customerInfo.getRecipientName());
         delivery.setShippingAddress(AddressUtil.formatFullAddress(shippingInfo.getStreetAddress(), shippingInfo.getCommune(), shippingInfo.getDistrict(), shippingInfo.getCity()));
@@ -106,6 +108,16 @@ public class DeliveryServiceImpl implements DeliveryService {
         delivery.setEstimatedDeliveryDate(LocalDate.now().plusDays(extraDays));
 
         deliveryRepository.save(delivery);
+    }
+
+    @Override
+    public DeliveryDto findDeliveryDtoByOrderId(long orderId) {
+        Delivery delivery = deliveryRepository.findDeliveryByOrderId(orderId).orElse(null);
+
+        if (delivery != null) {
+            return new DeliveryDto(delivery);
+        }
+        return null;
     }
 
 

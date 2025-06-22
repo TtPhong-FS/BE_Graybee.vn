@@ -26,10 +26,10 @@ public interface CategoryAttributeRepository extends JpaRepository<CategoryAttri
     void deleteByCategoryIdAndAttributeId(long categoryId, long attributeId);
 
     @Query("""
-            Select new vn.graybee.modules.catalog.dto.response.CategoryIdNameDto(c.id, c.name) 
+            Select new vn.graybee.modules.catalog.dto.response.CategoryIdNameDto(ca.categoryId, c.name) 
             from CategoryAttribute ca 
             join Category c on ca.categoryId = c.id 
-            where ca.attributeId = attributeId
+            where ca.attributeId = :attributeId
             """)
     List<CategoryIdNameDto> getAllCategoryIdNameByAttributeId(long attributeId);
 

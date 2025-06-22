@@ -20,4 +20,6 @@ public interface AccountService {
 
     void updateLastLoginAt(long id);
 
+    String getUidById(long id);
+
 }

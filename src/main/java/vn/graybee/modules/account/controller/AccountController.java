@@ -14,6 +14,7 @@ import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
 import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.account.service.FavouriteService;
+import vn.graybee.modules.order.dto.response.OrderDetailDto;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.user.OrderHistoryResponse;
 import vn.graybee.modules.order.service.OrderService;
@@ -55,6 +56,23 @@ public class AccountController {
                 MessageBuilder.ok(
                         orders,
                         msg
+                )
+        );
+    }
+
+    @GetMapping("/orders/detail/{code}")
+    public ResponseEntity<BasicMessageResponse<OrderDetailDto>> getOrderDetailByCode(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable("code") String code
+    ) {
+        Long accountId = userDetail.user().getId();
+
+        OrderDetailDto orderDetailDto = orderService.getOrderDetailByCodeAndAccountId(code, accountId);
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        orderDetailDto,
+                        null
                 )
         );
     }

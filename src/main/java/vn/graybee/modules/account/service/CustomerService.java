@@ -6,4 +6,8 @@ public interface CustomerService {
 
     void saveCustomerByAccount(long accountId);
 
+    void updateTotalSpentByAccountId(long accountId, double totalAmount);
+
+    void updateTotalOrdersByAccountId(long accountId, long orders);
+
 }

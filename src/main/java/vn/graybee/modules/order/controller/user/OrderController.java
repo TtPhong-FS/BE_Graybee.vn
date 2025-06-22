@@ -34,7 +34,6 @@ public class OrderController {
             account = userDetail.user().getId();
         }
 
-
         return ResponseEntity.ok(
                 MessageBuilder.ok(
                         orderService.createOrder(request, account, sessionId),
@@ -42,6 +41,5 @@ public class OrderController {
                 )
         );
     }
-
 
 }

@@ -1,25 +1,19 @@
 package vn.graybee.modules.order.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
-import vn.graybee.common.dto.PaginationInfo;
-import vn.graybee.common.dto.SortInfo;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.order.dto.response.admin.AdminOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.ConfirmOrderResponse;
-import vn.graybee.modules.order.enums.DeliveryType;
+import vn.graybee.modules.order.dto.response.admin.OrderStatusResponse;
 import vn.graybee.modules.order.enums.OrderStatus;
-import vn.graybee.modules.order.enums.PaymentStatus;
 import vn.graybee.modules.order.repository.OrderRepository;
 import vn.graybee.modules.order.service.AdminOrderService;
+import vn.graybee.modules.order.service.OrderDetailService;
 
 import java.util.List;
 
@@ -30,6 +24,8 @@ public class AdminOrderServiceImpl implements AdminOrderService {
     private final OrderRepository orderRepository;
 
     private final MessageSourceUtil messageSourceUtil;
+
+    private final OrderDetailService orderDetailService;
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
@@ -59,6 +55,27 @@ public class AdminOrderServiceImpl implements AdminOrderService {
     }
 
     @Override
+    public Long deleteOrderById(long id) {
+        checkExistsById(id);
+
+        orderRepository.deleteById(id);
+
+        return id;
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public OrderStatusResponse updateStatusOrderById(long id, String status) {
+        checkExistsById(id);
+
+        OrderStatus orderStatus = OrderStatus.fromString(status, messageSourceUtil);
+
+        orderRepository.updateStatusByIdAndStatus(id, orderStatus);
+
+        return new OrderStatusResponse(id, status);
+    }
+
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public CancelOrderResponse cancelOrderById(long orderId) {
 
@@ -72,38 +89,16 @@ public class AdminOrderServiceImpl implements AdminOrderService {
             throw new BusinessCustomException(Constants.Common.global, "Không thể huỷ, đơn hàng đã được giao cho vận chuyển.");
         }
 
+        orderDetailService.increaseQuantityByOrderId(orderId);
+
         return new CancelOrderResponse(orderId, OrderStatus.CANCELLED);
     }
 
 
     @Override
-    public List<AdminOrderResponse> getOrderListForDashboard(int page, int size, String sortBy, String order) {
+    public List<AdminOrderResponse> getOrderListForDashboard() {
+        return orderRepository.fetchAll();
 
-        Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<AdminOrderResponse> orderPage = orderRepository.fetchAll(pageable);
-
-        PaginationInfo paginationInfo = new PaginationInfo(
-                orderPage.getNumber(),
-                orderPage.getTotalPages(),
-                orderPage.getTotalElements(),
-                orderPage.getSize()
-        );
-
-        SortInfo sortInfo = new SortInfo(sortBy, order);
-
-        for (AdminOrderResponse re : orderPage.getContent()) {
-            if (re.getPaymentStatus() == null) {
-                re.setPaymentStatus(PaymentStatus.UNPAID);
-            }
-            if (re.getDeliveryType() == null) {
-                re.setDeliveryType(DeliveryType.HOME_DELIVERY);
-            }
-        }
-
-        return orderPage.getContent();
     }
 
 

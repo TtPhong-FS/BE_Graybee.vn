@@ -2,7 +2,6 @@ package vn.graybee.modules.product.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,17 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
-import vn.graybee.common.dto.MessageResponse;
-import vn.graybee.common.dto.PaginationInfo;
-import vn.graybee.common.dto.SortInfo;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.product.dto.request.ProductRequest;
 import vn.graybee.modules.product.dto.request.ProductUpdateRequest;
 import vn.graybee.modules.product.dto.request.ValidationProductRequest;
+import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.modules.product.dto.response.ProductResponse;
 import vn.graybee.modules.product.dto.response.ProductUpdateDto;
 import vn.graybee.modules.product.service.AdminProductService;
@@ -94,27 +90,21 @@ public class AdminProductController {
         );
     }
 
-    @GetMapping
-    public ResponseEntity<MessageResponse<List<ProductResponse>>> getAllProductDtoForDashboard(
-            @RequestParam(value = "status", defaultValue = "all") String status,
-            @RequestParam(value = "category", defaultValue = "all") String category,
-            @RequestParam(value = "manufacturer", defaultValue = "all") String manufacturer,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
-            @RequestParam(value = "order", defaultValue = "desc") String order
-    ) {
-        Page<ProductResponse> productResponsePage = adminProductService.getAllProductDtoForDashboard(status, category, manufacturer, page, size, sortBy, order);
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<BasicMessageResponse<ProductDetailDto>> getProductDetailById(@PathVariable("id") long id) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(adminProductService.getProductDetailById(id), null)
+        );
+    }
 
-        final String message = productResponsePage.getContent().isEmpty() ? messageSourceUtil.get("product.empty.list") : messageSourceUtil.get("product.success.fetch.list");
+    @GetMapping
+    public ResponseEntity<BasicMessageResponse<List<ProductResponse>>> getAllProductDtoForDashboard() {
+        List<ProductResponse> productResponsePage = adminProductService.getAllProductDtoForDashboard();
+
+        final String message = productResponsePage.isEmpty() ? messageSourceUtil.get("product.empty.list") : messageSourceUtil.get("product.success.fetch.list");
 
         return ResponseEntity.ok(
-                MessageBuilder.ok(productResponsePage.getContent(), message, new PaginationInfo(
-                        productResponsePage.getNumber(),
-                        productResponsePage.getTotalPages(),
-                        productResponsePage.getTotalElements(),
-                        productResponsePage.getSize()
-                ), new SortInfo(sortBy, order))
+                MessageBuilder.ok(productResponsePage, message)
         );
     }
 
@@ -133,7 +123,7 @@ public class AdminProductController {
                 MessageBuilder.ok(
                         products
                         ,
-                        "Index thành công cho " + products + "sản phẩm"
+                        "Index thành công cho " + products + " sản phẩm"
                 )
         );
     }

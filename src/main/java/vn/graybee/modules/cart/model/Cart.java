@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.graybee.common.model.BaseModel;
 
-import java.math.BigDecimal;
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -31,7 +29,7 @@ public class Cart extends BaseModel {
     private String sessionId;
 
     @Column(name = "total_amount")
-    private BigDecimal totalAmount;
+    private double totalAmount;
 
 
 }

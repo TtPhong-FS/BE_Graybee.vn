@@ -9,6 +9,6 @@ public interface FavouriteService {
 
     BasicMessageResponse<List<FavoriteProductResponse>> getFavoriteProductByUserUid(Long accountId);
 
-    BasicMessageResponse<FavoriteProductResponse> addFavoriteProduct(Long accountId, Long productId);
+    BasicMessageResponse<?> addFavoriteProduct(Long accountId, Long productId);
 
 }

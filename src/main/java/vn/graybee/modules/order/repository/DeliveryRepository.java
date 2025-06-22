@@ -10,6 +10,7 @@ import vn.graybee.modules.order.enums.DeliveryStatus;
 import vn.graybee.modules.order.model.Delivery;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
@@ -23,5 +24,9 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     @Modifying
     @Query("Update Delivery d set d.status = :deliveryStatus where d.id = :id")
     void updateStatusByIdAndStatus(long id, DeliveryStatus deliveryStatus);
+
+
+    @Query("Select d from Delivery d where d.orderId = :orderId ")
+    Optional<Delivery> findDeliveryByOrderId(long orderId);
 
 }

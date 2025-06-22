@@ -52,7 +52,7 @@ public class RedisProductServiceImpl implements RedisProductService {
     public void cacheListProductBasicBySortedSet(List<ProductBasicResponse> products, String categoryName, String sortBy, long timeout, TimeUnit unit) {
         String key = generateKeyCategory(categoryName, sortBy);
         for (ProductBasicResponse product : products) {
-            double score = product.getFinalPrice().doubleValue();
+            double score = product.getFinalPrice();
             redisTemplate.opsForZSet().add(key, product, score);
         }
         redisTemplate.expire(key, timeout, unit);

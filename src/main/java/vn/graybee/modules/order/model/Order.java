@@ -14,8 +14,6 @@ import lombok.Setter;
 import vn.graybee.common.model.BaseModel;
 import vn.graybee.modules.order.enums.OrderStatus;
 
-import java.math.BigDecimal;
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -43,7 +41,7 @@ public class Order extends BaseModel {
     private String email;
 
     @Column(name = "total_amount")
-    private BigDecimal totalAmount;
+    private double totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

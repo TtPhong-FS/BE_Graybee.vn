@@ -1,35 +1,19 @@
 package vn.graybee.modules.order.dto.response.user;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import vn.graybee.modules.order.enums.PaymentMethod;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderPaymentMethodDto {
 
     private long orderId;
 
     private PaymentMethod paymentMethod;
-
-    public OrderPaymentMethodDto(long orderId, PaymentMethod paymentMethod) {
-        this.orderId = orderId;
-        this.paymentMethod = paymentMethod;
-    }
-
-    public OrderPaymentMethodDto() {
-    }
-
-    public long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(long orderId) {
-        this.orderId = orderId;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
 
 }

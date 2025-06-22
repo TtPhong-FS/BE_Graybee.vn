@@ -13,7 +13,10 @@ import vn.graybee.modules.permission.model.Permission;
 import vn.graybee.modules.permission.repository.PermissionRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -79,6 +82,21 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public PermissionForUpdateResponse findPermissionForUpdateById(int id) {
         return permissionRepository.findPermissionForUpdateById(id).orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, "Quyền không tồn tại"));
+    }
+
+    @Override
+    public List<Permission> checkExistsByNames(List<String> names) {
+        List<Permission> permissions = permissionRepository.findAllByNames(names);
+
+        Set<String> foundNamesLower = permissions.stream().map(p -> p.getName().trim().toLowerCase()).collect(Collectors.toSet());
+        Set<String> notFoundNames = new HashSet<>(names);
+        notFoundNames.removeAll(foundNamesLower);
+
+        if (!notFoundNames.isEmpty()) {
+            throw new CustomNotFoundException(Constants.Account.permissionNames, "Quyền " + String.join(",", notFoundNames) + " không tồn tại");
+        }
+
+        return permissions;
     }
 
 

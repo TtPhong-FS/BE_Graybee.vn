@@ -22,16 +22,15 @@ public class Profile {
     @Column(name = "account_id", nullable = false)
     private Long accountId;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
     private String phone;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
-
+    @Column(nullable = false)
     private Date birthday;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 

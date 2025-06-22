@@ -18,4 +18,6 @@ public interface PermissionService {
 
     PermissionForUpdateResponse findPermissionForUpdateById(int id);
 
+    List<Permission> checkExistsByNames(List<String> permissions);
+
 }

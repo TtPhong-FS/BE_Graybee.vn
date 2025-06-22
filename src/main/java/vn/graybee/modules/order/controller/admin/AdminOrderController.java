@@ -1,11 +1,11 @@
 package vn.graybee.modules.order.controller.admin;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.dto.MessageResponse;
@@ -13,6 +13,7 @@ import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.order.dto.response.admin.AdminOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.ConfirmOrderResponse;
+import vn.graybee.modules.order.dto.response.admin.OrderStatusResponse;
 import vn.graybee.modules.order.service.AdminOrderService;
 
 import java.util.List;
@@ -37,6 +38,17 @@ public class AdminOrderController {
         );
     }
 
+    @PutMapping("/status/{id}/{status}")
+    public ResponseEntity<BasicMessageResponse<OrderStatusResponse>> updateStatusById(@PathVariable("id") long id, @PathVariable("status") String status) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        adminOrderService.updateStatusOrderById(id, status),
+                        "Cập nhật trạng thái đơn hàng thành công"
+                )
+        );
+    }
+
+
     @PutMapping("/cancel/{id}")
     public ResponseEntity<BasicMessageResponse<CancelOrderResponse>> cancelOrderById(@PathVariable("id") long id) {
         return ResponseEntity.ok(
@@ -48,14 +60,9 @@ public class AdminOrderController {
     }
 
     @GetMapping
-    public ResponseEntity<MessageResponse<List<AdminOrderResponse>>> getOrderListForDashboard(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "30") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String order
-    ) {
+    public ResponseEntity<MessageResponse<List<AdminOrderResponse>>> getOrderListForDashboard() {
 
-        List<AdminOrderResponse> orderResponses = adminOrderService.getOrderListForDashboard(page, size, sortBy, order);
+        List<AdminOrderResponse> orderResponses = adminOrderService.getOrderListForDashboard();
         final String message = orderResponses.isEmpty() ? "Hiện tại không có đơn hàng nào trong hệ thống" : "Lấy tất cả đơn hàng thành công";
         return ResponseEntity.ok(
                 MessageBuilder.ok(
@@ -67,5 +74,17 @@ public class AdminOrderController {
                 )
         );
     }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Long>> deleteOrderById(@PathVariable("id") long id) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        adminOrderService.deleteOrderById(id),
+                        "Xoá đơn hàng thành công"
+                )
+        );
+    }
+
 
 }

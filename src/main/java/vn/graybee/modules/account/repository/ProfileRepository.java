@@ -5,11 +5,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.graybee.modules.account.model.Profile;
 
+import java.util.Optional;
+
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     @Query("Select exists (Select 1 from Profile p where p.phone = :phone)")
     boolean checkExistsPhone(@Param("phone") String phone);
 
-    Profile findByAccountId(@Param("accountId") Long accountId);
+    Optional<Profile> findByAccountId(@Param("accountId") Long accountId);
 
 }

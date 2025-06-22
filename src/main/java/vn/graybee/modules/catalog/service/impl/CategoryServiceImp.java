@@ -21,7 +21,6 @@ import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.catalog.model.Category;
 import vn.graybee.modules.catalog.repository.CategoryRepository;
 import vn.graybee.modules.catalog.service.CategoryService;
-import vn.graybee.modules.product.service.ProductClassifyViewService;
 import vn.graybee.modules.product.service.RedisProductService;
 
 import java.time.LocalDateTime;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +44,6 @@ public class CategoryServiceImp implements CategoryService {
 
     private final RedisProductService redisProductService;
 
-    private final ProductClassifyViewService productClassifyViewService;
 
     private CategoryType getCategoryType(String type) {
         return CategoryType.getType(type, messageSourceUtil);
@@ -58,7 +55,7 @@ public class CategoryServiceImp implements CategoryService {
     public Category createCategory(CategoryRequest request) {
         CategoryType type = getCategoryType(request.getCategoryType());
 
-        if (categoryRepository.existsByName(request.getName())) {
+        if (categoryRepository.existsByName(request.getName().trim())) {
             throw new BusinessCustomException(Constants.Common.name, messageSourceUtil.get("catalog.category.name.exists", new Object[]{request.getName()}));
         }
 
@@ -84,16 +81,10 @@ public class CategoryServiceImp implements CategoryService {
     @Transactional(rollbackFor = RuntimeException.class)
     public Long deleteById(Long id) {
 
-        CategorySummaryDto categorySummaryDto = categoryRepository.findCategorySummaryDtoByNameOrId(null, id)
+        categoryRepository.findCategorySummaryDtoByNameOrId(null, id)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found")));
 
         categoryRepository.deleteById(id);
-
-        CategoryType type = categorySummaryDto.getType();
-
-        if (Objects.requireNonNull(type) == CategoryType.TAG) {
-            productClassifyViewService.removeTagByTagName(categorySummaryDto.getName());
-        }
 
         return id;
     }
@@ -191,13 +182,13 @@ public class CategoryServiceImp implements CategoryService {
         Map<Long, SidebarDto> categoryMap = new HashMap<>();
 
         for (CategorySlugWithParentId category : categorySlugWithParentIds) {
-            categoryMap.put(category.getId(), new SidebarDto(category.getSlug(), category.getName(), new ArrayList<>()));
+            categoryMap.put(category.getId(), new SidebarDto(category.getSlug(), category.getName(), category.getType().name().toLowerCase(), new ArrayList<>()));
         }
 
         List<SidebarDto> roots = new ArrayList<>();
 
         for (CategorySlugWithParentId category : categorySlugWithParentIds) {
-            if (category.getParentId() == null) {
+            if (category.getParentId() == null && category.getType() == CategoryType.CATEGORY) {
                 roots.add(categoryMap.get(category.getId()));
             } else {
                 SidebarDto parentCategory = categoryMap.get(category.getParentId());

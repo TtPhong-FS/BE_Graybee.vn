@@ -79,6 +79,7 @@ api:
   adminApi:
     base: /api/v1/admin
     auth: ${api.adminApi.base}/auth
+    accounts: ${api.adminApi.base}/accounts
     products: ${api.adminApi.base}/products
     categories: ${api.adminApi.base}/categories
     attributes: ${api.adminApi.base}/attributes

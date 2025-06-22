@@ -12,6 +12,7 @@ import vn.graybee.auth.dto.response.AccountAuthDto;
 import vn.graybee.auth.dto.response.AuthDto;
 import vn.graybee.auth.dto.response.LoginResponse;
 import vn.graybee.auth.dto.response.RegisterResponse;
+import vn.graybee.auth.exception.AuthException;
 import vn.graybee.auth.model.ForgotPassword;
 import vn.graybee.auth.record.MailBody;
 import vn.graybee.auth.record.ResetPassword;
@@ -73,19 +74,15 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessCustomException(Constants.Auth.password, messageSourceUtil.get("auth.password.not_match"));
         }
 
-        accountService.checkExistsByEmail(request.getEmail());
-        profileService.checkExistsByPhone(request.getPhone());
-
         Account account = accountService.saveAccount(request);
 
-        ProfileResponse profile = profileService.saveProfileByAccountId(account.getId(), request);
+        ProfileResponse profile = profileService.saveProfileByAccountId(account.getId(), request.getProfile());
 
         customerService.saveCustomerByAccount(account.getId());
 
         cartService.syncGuestCartToAccount(account.getId(), sessionId);
 
         orderService.transformOrdersToAccountBySessionId(account.getId(), sessionId);
-
         String token = jwtService.generateToken(account.getUid(), account.getRole());
         redisAuthService.saveToken(account.getUid(), token, 1440, TimeUnit.MINUTES);
 
@@ -99,6 +96,10 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse Login(LoginRequest request) {
 
         AccountAuthDto auth = accountService.getAccountAuthDtoByEmail(request.getEmail());
+
+        if (!auth.isActive()) {
+            throw new AuthException(Constants.Common.root, messageSourceUtil.get("auth.account_locked"));
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), auth.getPassword())) {
             throw new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("auth.invalid_credentials"));

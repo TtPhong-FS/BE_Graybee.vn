@@ -44,4 +44,16 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(customer);
     }
 
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void updateTotalSpentByAccountId(long accountId, double totalAmount) {
+        customerRepository.updateTotalSpent(accountId, totalAmount);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void updateTotalOrdersByAccountId(long accountId, long orders) {
+        customerRepository.updateTotalOrders(accountId, orders);
+    }
+
 }

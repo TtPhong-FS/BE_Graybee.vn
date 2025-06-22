@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.modules.permission.dto.response.PermissionForUpdateResponse;
 import vn.graybee.modules.permission.model.Permission;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PermissionRepository extends JpaRepository<Permission, Integer> {
@@ -29,5 +30,8 @@ public interface PermissionRepository extends JpaRepository<Permission, Integer>
             where p.id = :id
             """)
     Optional<PermissionForUpdateResponse> findPermissionForUpdateById(int id);
+
+    @Query("Select p from Permission p where p.name in :permissions")
+    List<Permission> findAllByNames(List<String> permissions);
 
 }

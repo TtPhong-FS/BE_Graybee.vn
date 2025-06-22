@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.modules.cart.model.Cart;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart, Long> {
@@ -21,7 +20,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE Cart c SET c.totalAmount = :totalAmount WHERE c.id = :id")
-    void updateCartTotal(@Param("id") long id, @Param("totalAmount") BigDecimal totalAmount);
+    void updateCartTotal(@Param("id") long id, @Param("totalAmount") double totalAmount);
 
     @Query("SELECT c.id FROM Cart c WHERE c.accountId = :accountId OR c.sessionId = :sessionId")
     Optional<Long> findIdByAccountIdOrSessionId(@Param("accountId") Long accountId, @Param("sessionId") String sessionId);

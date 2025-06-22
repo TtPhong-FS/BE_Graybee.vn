@@ -10,8 +10,6 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.math.BigDecimal;
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -27,10 +25,10 @@ public class ProductDocument {
 
     private String slug;
 
-    private BigDecimal price;
+    private double price;
 
     @Column(name = "final_price")
-    private BigDecimal finalPrice;
+    private double finalPrice;
 
     @Field(type = FieldType.Text)
     private String thumbnail;

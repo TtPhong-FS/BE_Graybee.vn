@@ -20,4 +20,6 @@ public class AccountAuthDto {
 
     private String password;
 
+    private boolean isActive;
+
 }

@@ -18,8 +18,6 @@ public class ProfileResponse {
 
     private String phone;
 
-    private String avatarUrl;
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
@@ -28,7 +26,6 @@ public class ProfileResponse {
     public ProfileResponse(Profile profile) {
         this.fullName = profile.getFullName();
         this.phone = profile.getPhone();
-        this.avatarUrl = profile.getAvatarUrl();
         this.birthday = profile.getBirthday();
         this.gender = profile.getGender();
     }

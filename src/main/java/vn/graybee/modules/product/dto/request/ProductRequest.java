@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +46,7 @@ public class ProductRequest {
     @NotNull(message = "product.validation.price.not.null")
     @PositiveOrZero(message = "product.validation.price.not.negative")
     @DecimalMax(value = "100000000.0", message = "product.validation.price.max")
-    private BigDecimal price;
+    private double price;
 
     @NotNull(message = "product.validation.discountPercent.not.null")
     @PositiveOrZero(message = "product.validation.discountPercent.not.negative")

@@ -3,6 +3,22 @@ package vn.graybee.common;
 public class Constants {
 
 
+    public static class Account {
+
+
+        public static final String permissionNames = "permissionNames";
+
+        public static final String profile_phone = "profile.phone";
+
+        public static final String profile_fullName = "profile.fullName";
+
+        public static final String profile_gender = "profile.gender";
+
+        public static final String profile_birthday = "profile.birthday";
+
+
+    }
+
     public static class Category {
 
 
@@ -69,6 +85,8 @@ public class Constants {
         public static final String gender = "gender";
 
         public static final String status = "status";
+
+        public static final String role = "role";
 
     }
 

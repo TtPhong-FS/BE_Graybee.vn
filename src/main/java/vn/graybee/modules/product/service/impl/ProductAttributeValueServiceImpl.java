@@ -96,7 +96,7 @@ public class ProductAttributeValueServiceImpl implements ProductAttributeValueSe
                 pav.setAttributeId(attributeId);
             }
 
-            pav.setValue(value);
+            pav.setValue(value != null && !value.isEmpty() ? value.trim() : value);
             valuesToSave.add(pav);
         }
 

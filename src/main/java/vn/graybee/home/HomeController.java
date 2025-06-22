@@ -28,6 +28,7 @@ public class HomeController {
                 MessageBuilder.ok(categoryService.getSidebar(), null)
         );
     }
+
 //
 //    @GetMapping("/carousel")
 //    public ResponseEntity<BasicMessageResponse<List<ProductBasicResponse>>> findAllProductBasics() {

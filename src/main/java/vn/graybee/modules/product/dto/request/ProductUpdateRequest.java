@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ public class ProductUpdateRequest {
     @NotNull(message = "product.validation.price.not.null")
     @PositiveOrZero(message = "product.validation.price.not.negative")
     @DecimalMax(value = "100000000.0", message = "product.validation.price.max")
-    private BigDecimal price;
+    private double price;
 
     @NotNull(message = "product.validation.discountPercent.not.null")
     @PositiveOrZero(message = "product.validation.discountPercent.not.negative")
@@ -55,9 +54,7 @@ public class ProductUpdateRequest {
 
     private String description;
 
-    @Size(max = 255, message = "Đường dẫn ảnh quá dài")
-    @NotBlank(message = "Ảnh bìa không được để trống")
-    private String thumbnail;
+    private List<String> images;
 
     @NotNull(message = "Thông tin chi tiết sản phẩm không được để trống")
     private Map<String, String> specifications;

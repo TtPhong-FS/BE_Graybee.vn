@@ -1,33 +1,19 @@
 package vn.graybee.modules.order.dto.response.user;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderTotalQuantityDto {
 
     private long orderId;
 
-    private Integer totalQuantity;
+    private long totalQuantity;
 
-    public OrderTotalQuantityDto() {
-    }
-
-    public OrderTotalQuantityDto(Long orderId, Number totalQuantity) {
-        this.orderId = orderId;
-        this.totalQuantity = totalQuantity != null ? totalQuantity.intValue() : 0;
-    }
-
-    public long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(long orderId) {
-        this.orderId = orderId;
-    }
-
-    public Integer getTotalQuantity() {
-        return totalQuantity;
-    }
-
-    public void setTotalQuantity(Integer totalQuantity) {
-        this.totalQuantity = totalQuantity;
-    }
 
 }

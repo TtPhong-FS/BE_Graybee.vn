@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 @Setter
 @Getter
@@ -20,9 +19,9 @@ public class ProductBasicResponse implements Serializable {
 
     private String slug;
 
-    private BigDecimal price;
+    private double price;
 
-    private BigDecimal finalPrice;
+    private double finalPrice;
 
     private String thumbnail;
 

@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 
-import java.math.BigDecimal;
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -20,6 +18,6 @@ public class CartItemDto {
 
     private int quantity;
 
-    private BigDecimal totalAmount;
+    private double totalAmount;
 
 }

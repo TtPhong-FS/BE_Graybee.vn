@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.modules.cart.model.CartItem;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +24,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     Optional<CartItem> findByCartIdAndProductId(@Param("cartId") long cartId, @Param("productId") long productId);
 
     @Query("SELECT COALESCE(SUM(c.totalAmount), 0) FROM CartItem c WHERE c.cartId = :cartId")
-    BigDecimal sumTotalByCartId(@Param("cartId") long cartId);
+    Double sumTotalByCartId(@Param("cartId") long cartId);
 
     @Query("SELECT c.id FROM CartItem c WHERE c.id = :id")
     Optional<Long> checkExistsById(@Param("id") long id);
@@ -54,7 +53,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     Optional<Long> findByIdAndCartId(@Param("cartId") Long cartId, @Param("id") Long id);
 
     @Query("SELECT c.totalAmount FROM CartItem c WHERE c.cartId = :cartId")
-    List<BigDecimal> findAllTotalByCartId(Long cartId);
+    List<Double> findAllTotalByCartId(Long cartId);
 
     @Query("Select exists (Select 1 from CartItem ci where ci.id = :id)")
     boolean existsById(@Param("id") Long id);

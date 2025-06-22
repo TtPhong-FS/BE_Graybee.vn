@@ -1,6 +1,7 @@
 package vn.graybee.modules.order.service;
 
 import vn.graybee.modules.order.dto.request.OrderCreateRequest;
+import vn.graybee.modules.order.dto.response.OrderDetailDto;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.user.OrderHistoryResponse;
 
@@ -17,5 +18,7 @@ public interface OrderService {
     void transformOrdersToAccountBySessionId(Long accountId, String sessionId);
 
     CancelOrderResponse cancelOrderByCode(String code);
+
+    OrderDetailDto getOrderDetailByCodeAndAccountId(String code, long accountId);
 
 }

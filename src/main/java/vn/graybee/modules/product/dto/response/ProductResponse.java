@@ -7,7 +7,6 @@ import lombok.Setter;
 import vn.graybee.modules.product.enums.ProductStatus;
 import vn.graybee.modules.product.model.Product;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,11 +29,11 @@ public class ProductResponse {
 
     private int warranty;
 
-    private BigDecimal price;
+    private double price;
 
     private int discountPercent;
 
-    private BigDecimal finalPrice;
+    private double finalPrice;
 
     private String thumbnail;
 

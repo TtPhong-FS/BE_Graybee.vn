@@ -7,7 +7,6 @@ import vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicValueDto;
 import vn.graybee.modules.product.enums.ProductStatus;
 import vn.graybee.modules.product.model.Product;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @NoArgsConstructor
@@ -29,11 +28,11 @@ public class ProductUpdateDto {
 
     private int warranty;
 
-    private BigDecimal price;
+    private double price;
 
     private int discountPercent;
 
-    private BigDecimal finalPrice;
+    private double finalPrice;
 
     private List<String> images;
 

@@ -12,7 +12,6 @@ import vn.graybee.modules.cart.repository.CartRepository;
 import vn.graybee.modules.cart.service.CartItemService;
 import vn.graybee.modules.cart.service.CartService;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -50,14 +49,14 @@ public class CartServiceImpl implements CartService {
                 cart.setSessionId(sessionId);
                 cart.setAccountId(null);
             }
-            cart.setTotalAmount(BigDecimal.ZERO);
+            cart.setTotalAmount(0);
 
             cartRepository.save(cart);
         }
 
         CartItemDto cartItemDto = cartItemService.addItemToCart(cart.getId(), productId);
 
-        cartRepository.updateCartTotal(cart.getId(), cart.getTotalAmount().add(cartItemDto.getTotalAmount()));
+        cartRepository.updateCartTotal(cart.getId(), cart.getTotalAmount() + (cartItemDto.getTotalAmount()));
 
         return cartItemDto;
     }
@@ -74,7 +73,7 @@ public class CartServiceImpl implements CartService {
 
         cart.setAccountId(accountId);
         cart.setSessionId(null);
-        cart.setTotalAmount(BigDecimal.ZERO);
+        cart.setTotalAmount(0);
 
         cartRepository.save(cart);
     }
@@ -90,7 +89,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void updateCartTotal(Long cartId) {
-        BigDecimal totalAmount = cartItemService.getCartItemTotals(cartId);
+        double totalAmount = cartItemService.getCartItemTotals(cartId);
         cartRepository.updateCartTotal(cartId, totalAmount);
     }
 
@@ -99,7 +98,7 @@ public class CartServiceImpl implements CartService {
     public void clearCartItems(Long cartId) {
         checkExistsById(cartId);
         cartItemService.clearCartItems(cartId);
-        cartRepository.updateCartTotal(cartId, BigDecimal.ZERO);
+        cartRepository.updateCartTotal(cartId, 0);
 
     }
 
