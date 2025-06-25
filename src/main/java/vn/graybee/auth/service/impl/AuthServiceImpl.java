@@ -12,6 +12,7 @@ import vn.graybee.auth.dto.response.AccountAuthDto;
 import vn.graybee.auth.dto.response.AuthDto;
 import vn.graybee.auth.dto.response.LoginResponse;
 import vn.graybee.auth.dto.response.RegisterResponse;
+import vn.graybee.auth.enums.Role;
 import vn.graybee.auth.exception.AuthException;
 import vn.graybee.auth.model.ForgotPassword;
 import vn.graybee.auth.record.MailBody;
@@ -96,6 +97,46 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse Login(LoginRequest request) {
 
         AccountAuthDto auth = accountService.getAccountAuthDtoByEmail(request.getEmail());
+
+        if (!auth.isActive()) {
+            throw new AuthException(Constants.Common.root, messageSourceUtil.get("auth.account_locked"));
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), auth.getPassword())) {
+            throw new BusinessCustomException(Constants.Common.root, messageSourceUtil.get("auth.invalid_credentials"));
+        }
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        auth.getUid(), request.getPassword()
+                )
+        );
+
+        String token = jwtService.generateToken(auth.getUid(), auth.getRole());
+
+        ProfileResponse profileResponse = profileService.findByAccountId(auth.getId());
+
+        AuthDto authDto = new AuthDto(token);
+
+        redisAuthService.saveToken(auth.getUid(), token, 1440, TimeUnit.MINUTES);
+
+        accountService.updateLastLoginAt(auth.getId());
+
+        return new LoginResponse(
+                authDto,
+                profileResponse
+        );
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public LoginResponse LoginDashboard(LoginRequest request) {
+
+        AccountAuthDto auth = accountService.getAccountAuthDtoByEmail(request.getEmail());
+
+        if (auth.getRole() == Role.CUSTOMER) {
+            throw new BusinessCustomException(Constants.Common.root, "Bạn không có quyền để đăng nhập vào hệ thống quản trị");
+        }
 
         if (!auth.isActive()) {
             throw new AuthException(Constants.Common.root, messageSourceUtil.get("auth.account_locked"));

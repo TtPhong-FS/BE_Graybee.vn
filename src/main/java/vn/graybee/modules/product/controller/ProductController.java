@@ -50,16 +50,5 @@ public class ProductController {
                 )
         );
     }
-
-
-    @GetMapping("/categories/{category}")
-    public ResponseEntity<BasicMessageResponse<List<ProductBasicResponse>>> getProductByCategory(
-            @PathVariable String category
-    ) {
-        return ResponseEntity.ok(
-                MessageBuilder.ok(productService.getProductByCategory(category), null)
-        );
-    }
-
-
+    
 }

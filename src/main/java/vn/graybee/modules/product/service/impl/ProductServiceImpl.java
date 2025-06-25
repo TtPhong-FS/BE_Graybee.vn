@@ -2,6 +2,9 @@ package vn.graybee.modules.product.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vn.graybee.common.Constants;
 import vn.graybee.common.dto.PaginationInfo;
@@ -22,7 +25,7 @@ import vn.graybee.modules.product.service.RedisProductService;
 import vn.graybee.modules.product.service.ReviewCommentSerivce;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
@@ -60,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductBasicResponse> findProductByCategorySlug(String categorySlug) {
-        return productRepository.findProductByCategorySlug(categorySlug);
+        return null;
 //        List<ProductBasicResponse> cachedProducts = redisProductService.getCachedListProductBasicBySortedSet(categoryName, sortBy, page, size, true);
 //
 //        if (cachedProducts != null && !cachedProducts.isEmpty()) {
@@ -162,29 +165,39 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductBasicResponse> getProductByCategory(String category) {
-        return productRepository.findByCategoryName(category);
-    }
+    public Page<ProductBasicResponse> getProductByCategory(String category, int page, int size, String sortBy, String order) {
 
-    @Override
-    public List<ProductBasicResponse> findProductByBrandSlug(String brandSlug) {
-        return productRepository.findProductByBrandSlug(brandSlug);
+        Sort sort = order.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.findByCategoryName(category, pageable);
     }
 
     @Override
     public List<ProductBasicResponse> findProductByCategorySlugAndCategoryType(String slug, String type) {
 
         CategoryType categoryType = CategoryType.getType(type, messageSourceUtil);
-        List<ProductBasicResponse> productBasicResponses = new ArrayList<>();
 
-        productBasicResponses = switch (categoryType) {
+        return switch (categoryType) {
             case CATEGORY -> productRepository.findProductByCategorySlug(slug);
             case BRAND -> productRepository.findProductByBrandSlug(slug);
             case TAG -> productCategoryService.findProductByTagSlug(slug);
-            default -> productBasicResponses;
+            default -> Collections.emptyList();
         };
 
-        return productBasicResponses;
+    }
+
+    @Override
+    public List<ProductBasicResponse> carouselTopTenProductBestSellByCategory(String category) {
+
+        Sort sort = Sort.by("updatedAt").descending();
+
+        Pageable pageable = PageRequest.of(0, 10, sort);
+
+        Page<ProductBasicResponse> productBasicResponses = productRepository.findTopTenProductByCategory(category, pageable);
+
+        return productBasicResponses.getContent();
     }
 
 }

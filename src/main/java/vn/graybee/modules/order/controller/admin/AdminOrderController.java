@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.dto.MessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
+import vn.graybee.modules.order.dto.response.OrderDetailDto;
 import vn.graybee.modules.order.dto.response.admin.AdminOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.ConfirmOrderResponse;
@@ -82,6 +83,20 @@ public class AdminOrderController {
                 MessageBuilder.ok(
                         adminOrderService.deleteOrderById(id),
                         "Xoá đơn hàng thành công"
+                )
+        );
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<BasicMessageResponse<OrderDetailDto>> getOrderDetailByCode(
+            @PathVariable long id
+    ) {
+        OrderDetailDto orderDetailDto = adminOrderService.getOrderDetailById(id);
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        orderDetailDto,
+                        null
                 )
         );
     }

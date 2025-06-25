@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderItemDto {
 
+    private long orderDetailId;
+
     private int quantity;
 
     private double subtotal;
@@ -22,7 +24,6 @@ public class OrderItemDto {
     private String productName;
 
     private String slug;
-
 
     private String thumbnail;
 

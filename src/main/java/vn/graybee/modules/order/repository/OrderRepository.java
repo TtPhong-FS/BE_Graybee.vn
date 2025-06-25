@@ -101,4 +101,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             """)
     OrderDetailDto findOrderDetailByCodeAndAccountId(String code, long accountId);
 
+    @Query("""
+            Select new vn.graybee.modules.order.dto.response.OrderDetailDto(o.code, o.status, o.totalAmount)
+            from Order o
+            where o.id = :id
+            """)
+    OrderDetailDto findOrderDetailByOrderId(long id);
+
 }

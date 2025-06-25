@@ -6,6 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
 import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
+import vn.graybee.modules.order.dto.response.DeliveryDto;
+import vn.graybee.modules.order.dto.response.OrderDetailDto;
+import vn.graybee.modules.order.dto.response.OrderItemDto;
+import vn.graybee.modules.order.dto.response.PaymentDto;
 import vn.graybee.modules.order.dto.response.admin.AdminOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.ConfirmOrderResponse;
@@ -13,7 +17,9 @@ import vn.graybee.modules.order.dto.response.admin.OrderStatusResponse;
 import vn.graybee.modules.order.enums.OrderStatus;
 import vn.graybee.modules.order.repository.OrderRepository;
 import vn.graybee.modules.order.service.AdminOrderService;
+import vn.graybee.modules.order.service.DeliveryService;
 import vn.graybee.modules.order.service.OrderDetailService;
+import vn.graybee.modules.order.service.PaymentService;
 
 import java.util.List;
 
@@ -26,6 +32,10 @@ public class AdminOrderServiceImpl implements AdminOrderService {
     private final MessageSourceUtil messageSourceUtil;
 
     private final OrderDetailService orderDetailService;
+
+    private final DeliveryService deliveryService;
+
+    private final PaymentService paymentService;
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
@@ -73,6 +83,26 @@ public class AdminOrderServiceImpl implements AdminOrderService {
         orderRepository.updateStatusByIdAndStatus(id, orderStatus);
 
         return new OrderStatusResponse(id, status);
+    }
+
+    @Override
+    public OrderDetailDto getOrderDetailById(long id) {
+
+        checkExistsById(id);
+
+        OrderDetailDto orderDetailDto = orderRepository.findOrderDetailByOrderId(id);
+
+        List<OrderItemDto> orderItemDtos = orderDetailService.findItemByOrderId(id);
+
+        DeliveryDto deliveryDto = deliveryService.findDeliveryDtoByOrderId(id);
+        PaymentDto paymentDto = paymentService.findPaymentDtoByOrderId(id);
+
+
+        orderDetailDto.setOrderItems(orderItemDtos);
+        orderDetailDto.setDelivery(deliveryDto);
+        orderDetailDto.setPayment(paymentDto);
+
+        return orderDetailDto;
     }
 
     @Override

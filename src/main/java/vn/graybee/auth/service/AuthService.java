@@ -13,6 +13,8 @@ public interface AuthService {
 
     LoginResponse Login(LoginRequest request);
 
+    LoginResponse LoginDashboard(LoginRequest request);
+
     BasicMessageResponse<String> verifyEmail(String email);
 
     BasicMessageResponse<String> verifyOtp(Integer otp, String email);

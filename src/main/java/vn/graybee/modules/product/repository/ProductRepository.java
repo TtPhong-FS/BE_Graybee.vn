@@ -1,5 +1,6 @@
 package vn.graybee.modules.product.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -152,7 +153,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             join Category c on c.id = p.categoryId
             where c.name LIKE %:category% and p.status = 'PUBLISHED'
             """)
-    List<ProductBasicResponse> findByCategoryName(String category);
+    Page<ProductBasicResponse> findByCategoryName(String category, Pageable pageable);
+
+    @Query("""
+            Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail)
+            from Product p
+            join Category c on c.id = p.categoryId
+            where c.name LIKE %:category% and p.status = 'PUBLISHED'
+            """)
+    Page<ProductBasicResponse> findTopTenProductByCategory(String category, Pageable pageable);
 
     @Query("""
             Select new vn.graybee.modules.product.dto.response.ProductDetailDto(p, pd.description)

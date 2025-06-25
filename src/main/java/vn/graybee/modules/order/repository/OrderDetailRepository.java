@@ -35,7 +35,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     List<ProductBasicResponse> findProductsExistByOrderCode(String orderCode);
 
     @Query("""
-            Select new vn.graybee.modules.order.dto.response.OrderItemDto(od.quantity, od.subtotal,od.priceAtTime, p.id, p.name, p.slug, p.thumbnail)
+            Select new vn.graybee.modules.order.dto.response.OrderItemDto(od.id, od.quantity, od.subtotal,od.priceAtTime, p.id, p.name, p.slug, p.thumbnail)
             from OrderDetail od
             join Product p on p.id = od.productId
             where od.orderId = :orderId

@@ -1,5 +1,6 @@
 package vn.graybee.modules.order.service;
 
+import vn.graybee.modules.order.dto.response.OrderDetailDto;
 import vn.graybee.modules.order.dto.response.admin.AdminOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.admin.ConfirmOrderResponse;
@@ -20,5 +21,7 @@ public interface AdminOrderService {
     Long deleteOrderById(long id);
 
     OrderStatusResponse updateStatusOrderById(long id, String status);
+
+    OrderDetailDto getOrderDetailById(long id);
 
 }

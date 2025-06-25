@@ -45,6 +45,16 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/dashboard/login")
+    public ResponseEntity<BasicMessageResponse<LoginResponse>> LoginDashboard(@RequestBody @Valid LoginRequest request) {
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        authService.LoginDashboard(request),
+                        messageSourceUtil.get("auth.success.login")
+                )
+        );
+    }
+
     @PostMapping("/forgot-password/verify-email/{email}")
     public ResponseEntity<BasicMessageResponse<String>> verifyEmail(@PathVariable("email") String email) {
         return ResponseEntity.ok(authService.verifyEmail(email));

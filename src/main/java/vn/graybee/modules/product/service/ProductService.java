@@ -1,5 +1,6 @@
 package vn.graybee.modules.product.service;
 
+import org.springframework.data.domain.Page;
 import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.dto.response.ProductDetailDto;
@@ -27,10 +28,10 @@ public interface ProductService {
 
     long getIdBySlug(String productSlug);
 
-    List<ProductBasicResponse> getProductByCategory(String category);
-
-    List<ProductBasicResponse> findProductByBrandSlug(String brandSlug);
+    Page<ProductBasicResponse> getProductByCategory(String category, int page, int size, String sortBy, String order);
 
     List<ProductBasicResponse> findProductByCategorySlugAndCategoryType(String slug, String type);
+
+    List<ProductBasicResponse> carouselTopTenProductBestSellByCategory(String category);
 
 }
