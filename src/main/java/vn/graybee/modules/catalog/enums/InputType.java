@@ -8,6 +8,7 @@ public enum InputType {
     text,
     number,
     select,
+    checkbox,
     textarea,
     multiple_select,
     editor;

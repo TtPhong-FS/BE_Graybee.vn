@@ -4,6 +4,7 @@ import vn.graybee.modules.catalog.dto.request.CategoryRequest;
 import vn.graybee.modules.catalog.dto.response.CategoryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryIdActiveResponse;
 import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
+import vn.graybee.modules.catalog.dto.response.CategoryNameSlug;
 import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryUpdateDto;
 import vn.graybee.modules.catalog.dto.response.SidebarDto;
@@ -41,5 +42,9 @@ public interface CategoryService {
     CategorySummaryDto findCategorySummaryDtoByName(String name, String prefix);
 
     CategorySummaryDto checkType(String name, CategoryType type);
+
+    CategoryType findTypeBySlug(String slug);
+
+    CategoryNameSlug findCategoryNameAndSlugByName(String name);
 
 }

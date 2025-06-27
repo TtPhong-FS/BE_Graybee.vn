@@ -13,6 +13,7 @@ import vn.graybee.modules.catalog.dto.request.CategoryRequest;
 import vn.graybee.modules.catalog.dto.response.CategoryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryIdActiveResponse;
 import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
+import vn.graybee.modules.catalog.dto.response.CategoryNameSlug;
 import vn.graybee.modules.catalog.dto.response.CategorySlugWithParentId;
 import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryUpdateDto;
@@ -284,6 +285,18 @@ public class CategoryServiceImp implements CategoryService {
 
         }
         return category;
+    }
+
+    @Override
+    public CategoryType findTypeBySlug(String slug) {
+        return categoryRepository.findTypeBySlug(slug)
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found", new Object[]{slug})));
+    }
+
+    @Override
+    public CategoryNameSlug findCategoryNameAndSlugByName(String name) {
+        return categoryRepository.findCategoryNameSlugByName(name).orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found", new Object[]{name})));
+
     }
 
 }

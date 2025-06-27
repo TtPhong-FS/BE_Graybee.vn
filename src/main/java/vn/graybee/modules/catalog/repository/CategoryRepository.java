@@ -6,9 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.modules.catalog.dto.response.CategoryIdNameDto;
+import vn.graybee.modules.catalog.dto.response.CategoryNameSlug;
 import vn.graybee.modules.catalog.dto.response.CategorySlugWithParentId;
 import vn.graybee.modules.catalog.dto.response.CategorySummaryDto;
 import vn.graybee.modules.catalog.dto.response.CategoryUpdateDto;
+import vn.graybee.modules.catalog.enums.CategoryType;
 import vn.graybee.modules.catalog.model.Category;
 
 import java.util.List;
@@ -58,5 +60,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query("Select c.name from Category c where c.id = :id")
     Optional<String> findNameById(long id);
+
+    @Query("Select c.categoryType from Category c where c.slug = :slug")
+    Optional<CategoryType> findTypeBySlug(String slug);
+
+    @Query("Select new vn.graybee.modules.catalog.dto.response.CategoryNameSlug(c.name, c.slug) from Category c where c.name = :name")
+    Optional<CategoryNameSlug> findCategoryNameSlugByName(String name);
 
 }

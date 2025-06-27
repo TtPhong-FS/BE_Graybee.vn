@@ -1,6 +1,8 @@
 package vn.graybee.modules.product.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
@@ -79,9 +81,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public List<ProductBasicResponse> findProductByTagSlug(String tagSlug) {
+    public Page<ProductBasicResponse> findProductByTagSlug(String tagSlug, Pageable pageable) {
         categoryService.checkExistsBySlug(tagSlug);
-        return productCategoryRepository.findProductByTagSlug(tagSlug);
+        return productCategoryRepository.findProductByTagSlug(tagSlug, pageable);
     }
 
 

@@ -11,9 +11,12 @@ import vn.graybee.common.dto.PaginationInfo;
 import vn.graybee.common.exception.CustomNotFoundException;
 import vn.graybee.common.utils.MessageSourceUtil;
 import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
+import vn.graybee.modules.catalog.dto.response.CategoryNameSlug;
 import vn.graybee.modules.catalog.dto.response.attribute.AttributeDisplayDto;
 import vn.graybee.modules.catalog.enums.CategoryType;
+import vn.graybee.modules.catalog.service.CategoryService;
 import vn.graybee.modules.comment.dto.response.ReviewCommentDto;
+import vn.graybee.modules.product.dto.response.CategoryWithProducts;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.modules.product.repository.ProductRepository;
@@ -25,7 +28,6 @@ import vn.graybee.modules.product.service.RedisProductService;
 import vn.graybee.modules.product.service.ReviewCommentSerivce;
 import vn.graybee.response.publics.products.ProductPriceResponse;
 
-import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
@@ -50,6 +52,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final RedisProductService redisProductService;
 
+    private final CategoryService categoryService;
 
     public PaginationInfo getPagination(Page<ProductBasicResponse> page) {
         return new PaginationInfo(
@@ -175,29 +178,42 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductBasicResponse> findProductByCategorySlugAndCategoryType(String slug, String type) {
+    public Page<ProductBasicResponse> findProductByCategorySlugAndCategoryType(String slug, int page, String sortBy, String order) {
 
-        CategoryType categoryType = CategoryType.getType(type, messageSourceUtil);
+        CategoryType categoryType = categoryService.findTypeBySlug(slug);
+
+        Sort sort = order.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, 15, sort);
 
         return switch (categoryType) {
-            case CATEGORY -> productRepository.findProductByCategorySlug(slug);
-            case BRAND -> productRepository.findProductByBrandSlug(slug);
-            case TAG -> productCategoryService.findProductByTagSlug(slug);
-            default -> Collections.emptyList();
+            case CATEGORY -> productRepository.findProductByCategorySlug(slug, pageable);
+            case BRAND -> productRepository.findProductByBrandSlug(slug, pageable);
+            case TAG -> productCategoryService.findProductByTagSlug(slug, pageable);
+            default -> Page.empty();
         };
 
     }
 
     @Override
-    public List<ProductBasicResponse> carouselTopTenProductBestSellByCategory(String category) {
+    public CategoryWithProducts carouselTopTenProductBestSellByCategory(String category) {
 
         Sort sort = Sort.by("updatedAt").descending();
 
         Pageable pageable = PageRequest.of(0, 10, sort);
 
+        CategoryNameSlug categoryNameSlug = categoryService.findCategoryNameAndSlugByName(category);
+
+        CategoryWithProducts categoryWithProducts = new CategoryWithProducts();
+        categoryWithProducts.setCategoryName(categoryNameSlug.getName());
+        categoryWithProducts.setCategorySlug(categoryNameSlug.getSlug());
+
+
         Page<ProductBasicResponse> productBasicResponses = productRepository.findTopTenProductByCategory(category, pageable);
 
-        return productBasicResponses.getContent();
+        categoryWithProducts.setProducts(productBasicResponses.getContent());
+
+        return categoryWithProducts;
     }
 
 }

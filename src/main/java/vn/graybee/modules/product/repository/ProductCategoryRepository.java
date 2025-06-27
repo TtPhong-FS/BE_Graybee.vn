@@ -1,5 +1,7 @@
 package vn.graybee.modules.product.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,7 +24,7 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
             join Category c on c.id = pc.tagId
             where p.status in ('PUBLISHED', 'COMING_SOON') and c.slug = :categorySlug
             """)
-    List<ProductBasicResponse> findProductByTagSlug(@Param("categorySlug") String categorySlug);
+    Page<ProductBasicResponse> findProductByTagSlug(@Param("categorySlug") String categorySlug, Pageable pageable);
 
     @Query("Select pc from ProductCategory pc where pc.productId = :productId")
     List<ProductCategory> findAllByProductId(@Param("productId") long productId);

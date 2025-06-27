@@ -2,6 +2,7 @@ package vn.graybee.modules.product.service;
 
 import org.springframework.data.domain.Page;
 import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
+import vn.graybee.modules.product.dto.response.CategoryWithProducts;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 import vn.graybee.modules.product.dto.response.ProductDetailDto;
 import vn.graybee.response.publics.products.ProductPriceResponse;
@@ -30,8 +31,8 @@ public interface ProductService {
 
     Page<ProductBasicResponse> getProductByCategory(String category, int page, int size, String sortBy, String order);
 
-    List<ProductBasicResponse> findProductByCategorySlugAndCategoryType(String slug, String type);
+    Page<ProductBasicResponse> findProductByCategorySlugAndCategoryType(String slug, int page, String sortBy, String order);
 
-    List<ProductBasicResponse> carouselTopTenProductBestSellByCategory(String category);
+    CategoryWithProducts carouselTopTenProductBestSellByCategory(String category);
 
 }

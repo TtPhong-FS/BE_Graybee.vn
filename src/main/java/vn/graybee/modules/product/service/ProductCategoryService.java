@@ -1,5 +1,7 @@
 package vn.graybee.modules.product.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import vn.graybee.modules.catalog.dto.response.CategoryBasicDto;
 import vn.graybee.modules.product.dto.response.ProductBasicResponse;
 
@@ -13,6 +15,6 @@ public interface ProductCategoryService {
 
     CategoryBasicDto findCategoryBasicDtoByProductId(long productId);
 
-    List<ProductBasicResponse> findProductByTagSlug(String tagSlug);
+    Page<ProductBasicResponse> findProductByTagSlug(String tagSlug, Pageable pageable);
 
 }

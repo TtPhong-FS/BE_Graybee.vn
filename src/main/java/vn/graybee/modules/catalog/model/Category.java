@@ -31,7 +31,6 @@ public class Category extends BaseModel {
     @Column(length = 100)
     private String slug;
 
-
     @Column(name = "parent_id")
     private Long parentId;
 

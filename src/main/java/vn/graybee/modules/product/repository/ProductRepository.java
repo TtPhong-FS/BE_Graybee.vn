@@ -129,17 +129,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail)
             from Product p
             join Category c on c.id = p.categoryId
-            where p.status in ('PUBLISHED', 'COMING_SOON') and c.slug = :categorySlug
+            where p.status in ('PUBLISHED', 'COMING_SOON') and c.slug LIKE %:categorySlug%
             """)
-    List<ProductBasicResponse> findProductByCategorySlug(@Param("categorySlug") String categorySlug);
+    Page<ProductBasicResponse> findProductByCategorySlug(@Param("categorySlug") String categorySlug, Pageable pageable);
 
     @Query("""
             Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail)
             from Product p
             join Category c on c.id = p.brandId
-            where p.status in ('PUBLISHED', 'COMING_SOON') and c.slug = :categorySlug
+            where p.status in ('PUBLISHED', 'COMING_SOON') and c.slug LIKE %:categorySlug%
             """)
-    List<ProductBasicResponse> findProductByBrandSlug(@Param("categorySlug") String categorySlug);
+    Page<ProductBasicResponse> findProductByBrandSlug(@Param("categorySlug") String categorySlug, Pageable pageable);
 
     @Query("Select p.categoryId from Product p where p.id = :id")
     Optional<Long> getCategoryIdById(long id);

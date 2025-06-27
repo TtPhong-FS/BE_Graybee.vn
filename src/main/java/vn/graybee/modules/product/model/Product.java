@@ -59,7 +59,7 @@ public class Product extends BaseModel {
     private String thumbnail;
 
     public double calculateFinalPrice(double price, int discountPercent) {
-        return (price * discountPercent) / 100;
+        return price - (price * discountPercent / 100);
     }
 
 }
