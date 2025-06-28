@@ -33,24 +33,24 @@ services:
       - graybee
 
   # MySQL
-  mysql:
-    image: mysql:8.0.40
-    container_name: mysql
-    restart: always
-    ports:
-      - "3306:3306"
-    volumes:
-      - ecommerce_graybee_mysql_volume:/var/lib/mysql
-      - ./db-init:/docker-entrypoint-initdb.d
-    env_file:
-      - .env
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-    networks:
-      - graybee
+#  mysql:
+#    image: mysql:8.0.40
+#    container_name: mysql
+#    restart: always
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - ecommerce_graybee_mysql_volume:/var/lib/mysql
+#      - ./db-init:/docker-entrypoint-initdb.d
+#    env_file:
+#      - .env
+#    healthcheck:
+#      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+#      interval: 15s
+#      timeout: 5s
+#      retries: 3
+#    networks:
+#      - graybee
 
   elasticsearch:
     container_name: elasticsearch
@@ -98,7 +98,7 @@ services:
       - "8080:8080"
       - "5005:5005"
     environment:
-      - MYSQL_HOST=${MYSQL_HOST_DOCKER}
+#      - MYSQL_HOST=${MYSQL_HOST_DOCKER}
       - REDIS_HOST=${REDIS_HOST_DOCKER}
       - ELS_HOST=${ELS_HOST_DOCKER}
     env_file:
@@ -106,8 +106,8 @@ services:
     networks:
       - graybee
     depends_on:
-      mysql:
-        condition: service_healthy
+#      mysql:
+#        condition: service_healthy
       redis:
         condition: service_healthy
       elasticsearch:
@@ -121,8 +121,8 @@ volumes:
     external: true
   ecommerce_graybee_redisInsight_volume:
     external: true
-  ecommerce_graybee_mysql_volume:
-    external: true
+#  ecommerce_graybee_mysql_volume:
+#    external: true
   ecommerce_graybee_elasticsearch_volume:
     external: true
 

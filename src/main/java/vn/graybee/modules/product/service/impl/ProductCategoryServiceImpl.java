@@ -41,6 +41,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Transactional(rollbackFor = RuntimeException.class)
     public void createProductCategoryByTags(Long productId, List<String> tags) {
 
+        if(tags == null || tags.isEmpty()){
+            return;
+        }
+
         List<CategorySummaryDto> categorySummaryDtos = categoryService.findCategorySummaryDtoByNames(tags);
 
         Map<String, CategorySummaryDto> nameToDtoMap = categorySummaryDtos.stream()
@@ -63,7 +67,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void updateProductCategoryByTags(Long productId, List<String> tags) {
-
+        if(tags == null || tags.isEmpty()){
+            return;
+        }
         List<CategorySummaryDto> categorySummaryDtos = categoryService.findCategorySummaryDtoByNames(tags);
 
         Map<String, CategorySummaryDto> nameToDtoMap = categorySummaryDtos.stream()
@@ -84,6 +90,11 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public Page<ProductBasicResponse> findProductByTagSlug(String tagSlug, Pageable pageable) {
         categoryService.checkExistsBySlug(tagSlug);
         return productCategoryRepository.findProductByTagSlug(tagSlug, pageable);
+    }
+
+    @Override
+    public List<String> findTagNamesByProductId(long productId) {
+        return productCategoryRepository.findTagNamesByProductId(productId);
     }
 
 
@@ -122,19 +133,18 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                                              List<String> tags) {
 
         Map<String, String> errorMessages = new LinkedHashMap<>();
-
         // Check tags
         if (tags != null && !tags.isEmpty()) {
+        List<String> lowerName = tags.stream().map(n -> n.trim().toLowerCase()).toList();
             List<String> notFoundTags = new ArrayList<>();
             List<String> invalidTypeTags = new ArrayList<>();
 
-            for (String tag : tags) {
-                String key = tag.trim();
-                CategorySummaryDto dto = nameToDtoMap.get(key);
+            for (String tag : lowerName) {
+                CategorySummaryDto dto = nameToDtoMap.get(tag);
                 if (dto == null) {
-                    notFoundTags.add(key);
+                    notFoundTags.add(tag);
                 } else if (dto.getType() != CategoryType.TAG) {
-                    invalidTypeTags.add(key);
+                    invalidTypeTags.add(tag);
                 }
             }
 

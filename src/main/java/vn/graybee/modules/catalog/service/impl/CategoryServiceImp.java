@@ -288,6 +288,30 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    public void checkType(List<String> names, CategoryType type) {
+
+        List<CategorySummaryDto> tags = findCategorySummaryDtoByNames(names);
+
+        Set<String> tagName = tags.stream().map(c -> c.getName().trim().toLowerCase()).collect(Collectors.toSet());
+
+        Set<String> lowerNames = names.stream().map(n -> n.trim().toLowerCase()).collect(Collectors.toSet());
+        Set<String> notFound = new HashSet<>(tagName);
+        notFound.removeAll(lowerNames);
+
+        if(!notFound.isEmpty()){
+            throw new CustomNotFoundException(Constants.Product.tagNames, messageSourceUtil.get("catalog.category.not.found", new Object[]{String.join(", ", notFound)}));
+        }
+
+        List<String> notTypeTag = tags.stream().filter(c -> c.getType() != CategoryType.TAG).map(CategorySummaryDto::getName).toList();
+
+        if(!notTypeTag.isEmpty()){
+            throw new BusinessCustomException(Constants.Product.tagNames, "Thẻ phân loại "+ notTypeTag + " phải thuộc loại 'TAG'");
+        }
+
+        System.out.println(notTypeTag);
+    }
+
+    @Override
     public CategoryType findTypeBySlug(String slug) {
         return categoryRepository.findTypeBySlug(slug)
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("catalog.category.not.found", new Object[]{slug})));
