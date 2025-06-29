@@ -163,7 +163,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>ecommerce-graybee-server</finalName>
+        <finalName>techstore-server</finalName>
     </build>
 
 </project>

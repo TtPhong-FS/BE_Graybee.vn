@@ -1,5 +1,6 @@
 package vn.graybee.auth.security;
 
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import vn.graybee.auth.config.OriginProperties;
 import vn.graybee.auth.custom.CustomAccessDenied;
 import vn.graybee.auth.custom.CustomAuthenticationEndpoint;
 import vn.graybee.auth.filter.JwtFilter;
@@ -26,10 +28,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@AllArgsConstructor
 @EnableMethodSecurity
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final OriginProperties originProperties;
 
     private final JwtFilter jwtFilter;
 
@@ -41,13 +46,6 @@ public class SecurityConfig {
 
     private final CustomAuthenticationEndpoint customAuthenticationEndpoint;
 
-    public SecurityConfig(JwtFilter jwtFilter, ApiProperties apiProperties, UserDetailService userDetailService, CustomAccessDenied customAccessDenied, CustomAuthenticationEndpoint customAuthenticationEndpoint) {
-        this.jwtFilter = jwtFilter;
-        this.apiProperties = apiProperties;
-        this.userDetailService = userDetailService;
-        this.customAccessDenied = customAccessDenied;
-        this.customAuthenticationEndpoint = customAuthenticationEndpoint;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -76,8 +74,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:3100"
+                originProperties.getTechstore(),
+                originProperties.getTechstoreDashboard()
         ));
         cors.setAllowCredentials(true);
         cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
@@ -86,7 +84,7 @@ public class SecurityConfig {
         cors.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", cors);
+        source.registerCorsConfiguration("/api/**", cors);
 
         return source;
     }
