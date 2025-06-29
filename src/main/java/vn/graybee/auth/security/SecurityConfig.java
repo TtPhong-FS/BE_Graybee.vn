@@ -25,7 +25,6 @@ import vn.graybee.common.config.ApiProperties;
 import vn.graybee.modules.account.security.UserDetailService;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
@@ -72,15 +71,18 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        System.out.println("Configuring CORS for: " + originProperties.getTechstore() + " and " + originProperties.getTechstoreDashboard());
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(List.of(
                 originProperties.getTechstore(),
-                originProperties.getTechstoreDashboard()
+                originProperties.getTechstoreDashboard(),
+                "http://localhost:3000",
+                "http://localhost:3100"
         ));
         cors.setAllowCredentials(true);
         cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
-        cors.setExposedHeaders(Collections.singletonList("Authorization"));
+        cors.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
         cors.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

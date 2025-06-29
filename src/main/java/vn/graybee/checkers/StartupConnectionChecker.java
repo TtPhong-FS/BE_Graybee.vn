@@ -1,9 +1,6 @@
 package vn.graybee.checkers;
 
 import lombok.AllArgsConstructor;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -24,14 +21,10 @@ public class StartupConnectionChecker implements ApplicationListener<Application
 
     private final DataSource mysqlConnect;
 
-    private final RestClient elasticConnect;
-
-
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         checkMysqlConnect();
         checkRedisConnect();
-        checkElasticConnect();
     }
 
     public void checkMysqlConnect() {
@@ -58,17 +51,5 @@ public class StartupConnectionChecker implements ApplicationListener<Application
         }
     }
 
-    public void checkElasticConnect() {
-        try {
-            Response con = elasticConnect.performRequest(new Request("GET", "/"));
-            if (con.getStatusLine().getStatusCode() == 200) {
-                System.out.println(message_success + "ElasticSearch");
-            } else {
-                System.out.println("Unexpected ElasticSearch status");
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException("ElasticSearch error: " + e.getMessage());
-        }
-    }
 
 }

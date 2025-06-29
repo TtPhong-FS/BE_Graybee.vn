@@ -5,7 +5,13 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,25 +35,52 @@ public class DBConfig {
 
     @Bean
     public ElasticsearchClient elasticsearchClient() {
-        String elasticHost = System.getenv("ELS_HOST");
-        if (elasticHost == null) {
-            elasticHost = "localhost";
+        String host = System.getenv("ELS_HOST");
+        String username = System.getenv("ELS_USERNAME");
+        String password = System.getenv("ELS_PASSWORD");
+
+        if (host == null) {
+            host = "http://localhost:9200"; // fallback cho local
         }
-        RestClient restClient = RestClient.builder(
-                new HttpHost(elasticHost, 9200)
-        ).build();
+
+        if (username == null || username.isBlank()) {
+            username = "";
+        }
+
+        if (password == null || password.isBlank()) {
+            password = "";
+        }
+        System.out.println("ELASTIC_HOST: " + host);
+
+        // Setup Basic Auth
+        final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials(username, password)
+        );
+
+        RestClientBuilder builder = RestClient.builder(HttpHost.create(host))
+                .setHttpClientConfigCallback(httpClientBuilder ->
+                        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+                );
+
+        // Optional: Test connection
+        try (RestClient testClient = builder.build()) {
+            Response response = testClient.performRequest(new Request("GET", "/"));
+            System.out.println("Elasticsearch Status: " + response.getStatusLine().getStatusCode());
+        } catch (Exception e) {
+            System.err.println("Failed to connect to Elasticsearch: " + e.getMessage());
+        }
+
+        RestClient restClient = builder.build();
 
         ElasticsearchTransport transport = new RestClientTransport(
-                restClient, new JacksonJsonpMapper()
+                restClient,
+                new JacksonJsonpMapper()
         );
 
         return new ElasticsearchClient(transport);
     }
 
-//     .setDefaultHeaders(
-//                new Header[]{
-//        new BasicHeader(HttpHeaders.AUTHORIZATION,
-//                "Basic " + Base64.getEncoder().encodeToString("elastic:admin123".getBytes()))
-//    }
-//        )
+
 }

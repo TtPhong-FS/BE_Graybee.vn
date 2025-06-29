@@ -34,9 +34,10 @@ spring:
     elasticsearch:
       repositories:
         enabled: false
-      uris: http://${ELS_HOST}:9200
-  #      username: elastic
-  #      password: admin123
+      host: ${ELS_HOST}
+      username: ${ELS_USERNAME}
+      password: ${ELS_PASSWORD}
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -51,7 +52,7 @@ spring:
 
 server:
   address: 0.0.0.0
-  port: 8080
+  port: ${PORT:8080}
 
 servlet:
   multipart:
