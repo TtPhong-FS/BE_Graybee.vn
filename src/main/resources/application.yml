@@ -4,7 +4,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=true&serverTimezone=Asia/Ho_Chi_Minh
+    url: ${MYSQL_SOURCE}${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=true&serverTimezone=Asia/Ho_Chi_Minh
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
   jpa:
@@ -100,3 +100,7 @@ jwt:
   customerExpiration: ${CUSTOMER_EXPIRATION}
   header: ${HEADER}
   prefix: ${PREFIX}
+
+origin:
+  techstore: ${TECHSTORE}
+  techstoreDashboard: ${TECHSTORE_DASHBOARD}
