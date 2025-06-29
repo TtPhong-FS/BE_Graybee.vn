@@ -37,6 +37,9 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
     @Query("Select new vn.graybee.modules.catalog.dto.response.CategoryBasicDto(c.id, c.name) from Product p join Category c on p.categoryId = c.id where p.id = :productId")
     Optional<CategoryBasicDto> findCategoryBasicDtoByProductId(@Param("productId") long productId);
 
+    @Query("Select c.name from ProductCategory pc join Category c on pc.tagId = c.id where pc.productId = :productId")
+    List<String> findTagNamesByProductId(long productId);
+
 //    @Query("""
 //            Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail)
 //            from Product p

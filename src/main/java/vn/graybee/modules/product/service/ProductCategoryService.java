@@ -17,4 +17,5 @@ public interface ProductCategoryService {
 
     Page<ProductBasicResponse> findProductByTagSlug(String tagSlug, Pageable pageable);
 
+    List<String> findTagNamesByProductId(long productId);
 }

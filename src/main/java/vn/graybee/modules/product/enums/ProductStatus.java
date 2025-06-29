@@ -10,8 +10,8 @@ public enum ProductStatus {
     DRAFT("DRAFT", "Nháp"),
     INACTIVE("INACTIVE", "Ngừng kinh doanh"),
     OUT_OF_STOCK("OUT_OF_STOCK", "Hết hàng"),
-    REMOVED("REMOVED", "Xoá tạm thời"),
-    PUBLISHED("PUBLISHED", "Đã xuất bản"),
+    REMOVED("REMOVED", "Lưu trữ"),
+    PUBLISHED("PUBLISHED", "Đã đăng"),
     PENDING("PENDING", "Chờ duyệt"),
     COMING_SOON("COMING_SOON", "Sắp ra mắt");
 

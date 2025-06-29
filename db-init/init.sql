@@ -1,502 +1,502 @@
-SET GLOBAL host_cache_size = 0;
-
-CREATE DATABASE IF NOT EXISTS graybee;
-
-use graybee;
-
-CREATE TABLE regex_patterns(
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL unique,
-    pattern VARCHAR(200) NOT NULL
-);
-
-INSERT INTO regex_patterns (name, pattern) VALUES
-('cpu', 'i[3579](-|\\s)?\\d{4,5}[A-Za-z]*|ryzen\\s?\\d{3,5}[0-9a-zA-Z]*'),
-('motherboard', '[A-Z]+\\d{3,4}[A-Za-z,a-z]*'),
-('vga', '[Rr][Tt][Xx] \\d{4}|[Gg][Tt][Xx] \\d{3,4}|[Rr][Xx] \\d{3,4}|[Gg][Tt] \\d{3,4}'),
-('ram', '\\d+GB'),
-('ssd', '\\d+GB'),
-('storage', '\\d+GB');
-
-CREATE TABLE categories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(35) NOT NULL UNIQUE,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'INACTIVE',
-    product_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE manufacturers (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(35) NOT NULL UNIQUE,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'INACTIVE',
-	product_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE subcategories(
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(35) NOT NULL UNIQUE,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'INACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE category_classifications (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT NOT NULL,
-    subcategory_id INT DEFAULT NULL,
-    manufacturer_id INT DEFAULT NULL,
-    status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    UNIQUE (category_id, subcategory_id),
-    UNIQUE (category_id, manufacturer_id),
-
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
-    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
-    FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id) ON DELETE CASCADE
-);
-
-CREATE TABLE categories_manufacturers (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT NOT NULL,
-    manufacturer_id INT NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
-    FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id) ON DELETE CASCADE,
-	UNIQUE (category_id, manufacturer_id)
-);
-
-CREATE TABLE categories_subcategories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT NOT NULL,
-    subcategory_id INT NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
-    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
-    UNIQUE (category_id, subcategory_id)
-);--
-
-CREATE TABLE tags(
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL UNIQUE
-);
-
-create table subcategories_tags(
-	id INT  PRIMARY KEY AUTO_INCREMENT,
-    subcategory_id INT  NOT NULL,
-    tag_id INT  NOT NULL,
-    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE,
-    UNIQUE (subcategory_id, tag_id)
-);
-
-create table product_sequence(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	category_code VARCHAR(25) NOT NULL,
-    yearmonth VARCHAR(10) NOT NULL,
-    last_number INT NOT NULL
-);
-
-CREATE TABLE products (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(id),
-    manufacturer_id INT NOT NULL,
-    FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id),
-	code VARCHAR(100) NOT NULL unique,
-    name VARCHAR(200) NOT NULL UNIQUE,
-    conditions ENUM('NEW', 'OLD') DEFAULT 'NEW',
-    warranty TINYINT NOT NULL,
-    weight FLOAT DEFAULT 0,
-    dimension VARCHAR(50) DEFAULT NULL,
-    price DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (price >= 0.00),
-    discount_percent TINYINT DEFAULT 0 check (discount_percent >=0),
-    final_price DECIMAL(10,2) NOT NULL DEFAULT 0.00 check (final_price >=0.00),
-    color VARCHAR(35) DEFAULT NULL,
-    thumbnail VARCHAR(250) DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    status ENUM('INACTIVE', 'PUBLISHED', 'OUT_OF_STOCK', 'DELETED','REMOVED', 'PENDING', 'DRAFT', 'COMING_SOON') DEFAULT 'DRAFT'
-);
-
-CREATE TABLE product_classification (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id BIGINT NOT NULL,
-    subcategory_id INT DEFAULT NULL,
-    tag_id INT DEFAULT NULL,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'INACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE (product_id, tag_id),
-    UNIQUE (product_id, subcategory_id),
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
-);
-
-CREATE TABLE pc_detail (
-    product_id BIGINT PRIMARY KEY NOT NULL,
-	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    main_board VARCHAR(100) NOT NULL,
-    cpu VARCHAR(100) NOT NULL,
-    ram VARCHAR(100) NOT NULL,
-    vga VARCHAR(100) NOT NULL,
-    hdd VARCHAR(50) DEFAULT NULL,
-    ssd VARCHAR(100) NOT NULL,
-    psu VARCHAR(100) NOT NULL,
-    case_name VARCHAR(100) DEFAULT NULL,
-    cooling VARCHAR(100) DEFAULT NULL,
-    io_ports TEXT DEFAULT NULL,
-    os VARCHAR(50) DEFAULT NULL,
-    connectivity VARCHAR(100) DEFAULT NULL
-);
-
-CREATE TABLE laptop_detail (
-    product_id BIGINT PRIMARY KEY NOT NULL,
-	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    cpu VARCHAR(200) NOT NULL,
-    ram VARCHAR(200)NOT NULL,
-    ssd VARCHAR(100) NOT NULL,
-    graphics_card VARCHAR(100) NOT NULL,
-    monitor VARCHAR(255) NOT NULL,
-    io_ports TEXT DEFAULT NULL,
-    keyboard VARCHAR(100) DEFAULT NULL,
-    audio VARCHAR(100) DEFAULT NULL,
-    lan VARCHAR(50) DEFAULT NULL,
-    wifi VARCHAR(100) DEFAULT NULL ,
-    bluetooth VARCHAR(50) DEFAULT NULL,
-    webcam VARCHAR(100) DEFAULT NULL,
-    os VARCHAR(100) DEFAULT NULL,
-    battery INT NOT NULL,
-    material VARCHAR(100) DEFAULT NULL,
-    accessory VARCHAR(100) DEFAULT NULL
-);
-
-CREATE TABLE cpu_detail (
-    product_id BIGINT PRIMARY KEY NOT NULL,
-	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-
-    socket VARCHAR(100) NOT NULL,
-    generation SMALLINT NOT NULL,
-    series VARCHAR(100) NOT NULL,
-    cpu VARCHAR(100) NOT NULL,
-    motherboard_series VARCHAR(100) NOT NULL,
-    multiplier SMALLINT NOT NULL,
-    number_of_streams SMALLINT NOT NULL,
-    p_core_maximum FLOAT NOT NULL,
-    p_core_base FLOAT NOT NULL,
-    e_core_maximum FLOAT NOT NULL,
-    e_core_base FLOAT NOT NULL,
-    consumption FLOAT NOT NULL,
-    caching VARCHAR(100) DEFAULT NULL,
-    support_memory_maximum VARCHAR(100) DEFAULT NULL,
-    memory_type VARCHAR(50) DEFAULT NULL,
-    integrated_graphics BOOLEAN DEFAULT FALSE,
-    pci_edition VARCHAR(50) DEFAULT NULL,
-    number_of_pci SMALLINT DEFAULT NULL
-
-);
-
-
-
-create table product_statistics(
-	id INT  primary key auto_increment,
-	product_id BIGINT  NOT NULL UNIQUE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-	view_count INT DEFAULT 0,
-    purchase_count INT DEFAULT 0,
-    has_promotion BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE carousel_group (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) unique,
-    type VARCHAR(35) NOT NULL,
-    category_name VARCHAR(35) DEFAULT NULL,
-    active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE carousel_items (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    carousel_group_id INT  NOT NULL,
-    product_id BIGINT  NOT NULL,
-    position INT DEFAULT 0,
-    active BOOLEAN DEFAULT TRUE,
-	FOREIGN KEY (carousel_group_id) REFERENCES carousel_group(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    unique(carousel_group_id, product_id)
-);
-
-create table products_tags(
-	id INT  PRIMARY KEY AUTO_INCREMENT,
-    product_id BIGINT  NOT NULL,
-    tag_id INT  NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE,
-    UNIQUE (product_id, tag_id)
-);
-
-create table products_subcategories(
-	id INT  PRIMARY KEY AUTO_INCREMENT,
-    product_id BIGINT  NOT NULL,
-    subcategory_id INT  NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
-    UNIQUE (product_id, subcategory_id)
-);
-
-create table product_descriptions(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id BIGINT NOT NULL UNIQUE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-	description TEXT DEFAULT NULL
-);
-
-CREATE TABLE product_images (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id BIGINT NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    image_url VARCHAR(500) DEFAULT NULL
-);
-
-create table promotions(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(150) NOT NULL,
-    price_value decimal(10,2) DEFAULT 0.00 check(price_value >= 0.00),
-    quantity TINYINT DEFAULT 1
-);
-
-create table inventories(
-	id INT primary key auto_increment,
-    product_id BIGINT NOT NULL unique,
-	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE cascade,
-    quantity INT NOT NULL DEFAULT 0,
-    is_stock BOOLEAN generated always as (quantity > 0) STORED,
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE roles(
- 	id tinyint primary key auto_increment,
-	name VARCHAR(20) NOT NULL unique,
-	user_count INT UNSIGNED DEFAULT 0,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED') DEFAULT 'ACTIVE',
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
- );
-
- insert INTO roles (name, status) values
- ('ADMIN', 'ACTIVE'),
- ('MANAGE', 'ACTIVE'),
- ('CUSTOMER', 'ACTIVE');
-
- CREATE TABLE permissions (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL UNIQUE,
-    description VARCHAR(150) DEFAULT NULL,
-    user_count INT UNSIGNED DEFAULT 0,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED') DEFAULT 'ACTIVE',
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    uid INT NOT NULL unique,
-    role_id tinyINT DEFAULT NULL,
-    FOREIGN KEY (role_id) REFERENCES roles(id) on delete set NULL,
-	username  VARCHAR(12) UNIQUE NOT NULL,
-    fullname VARCHAR(100) DEFAULT NULL,
-    phone_number VARCHAR(12) UNIQUE NOT NULL,
-	email VARCHAR(50) UNIQUE DEFAULT NULL,
-    password VARCHAR(250) NOT NULL,
-    date_of_birth DATE DEFAULT NULL,
-    gender ENUM('MALE', 'FEMALE') DEFAULT NULL,
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	is_active BOOLEAN DEFAULT FALSE,
-	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'OFFLINE', 'ONLINE', 'BANNED', 'PENDING') DEFAULT 'PENDING'
-);
-
-create table forgot_password(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	user_id INT NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES users(id) on delete cascade,
-    otp INT NOT NULL,
-    expiration DATETIME DEFAULT current_timestamp
-);
-
-CREATE TABLE roles_permissions (
-	id INT primary key auto_increment,
-    role_id tinyINT NOT NULL,
-    permission_id INT NOT NULL,
-    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
-    FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE,
-    unique (role_id, permission_id)
-);
-
-CREATE TABLE users_permissions (
-	id INT  primary key auto_increment,
-    user_id INT  NOT NULL,
-    permission_id INT NOT NULL,
-    unique (user_id, permission_id),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
-);
-
-insert INTo users(uid, role_id, username, phone_number,email, password, is_active) values
-(111111, NULL, 'root', '0393150468','nam71441@gmail.com', '$2a$10$dDueXbJn4pbEDPZGscnwaOj6HzdMEy1iVS/Xvz.MHTBgHtcUeko5C', true),
-(222222, 1, 'admin', '0357378318', 'phongtt004@gmail.com', '$2a$10$Vn4kM2jV5xhcQroKmNa.5.twSU29XPUFjjrxUKQP/5gjUnvfxSs/m', true);
-
-create table favourites(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	user_uid INT NOT NULL,
-	product_id BIGINT NOT NULL,
-	FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
-	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    unique (user_uid, product_id)
-);
-
-create table address(
-	id INT primary key auto_increment,
-	user_uid INT DEFAULT NULL,
-    session_id VARCHAR(50) DEFAULT NULL,
-    fullname VARCHAR(50) NOT NULL,
-    phone_number VARCHAR(12) NOT NULL,
-    city VARCHAR(50) NOT NULL,
-    district VARCHAR(100) NOT NULL,
-    commune VARCHAR(50) NOT NULL,
-    street_address VARCHAR(150) NOT NULL,
-    is_DEFAULT BOOLEAN DEFAULT FALSE,
-	FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE
-);
-
-create table review_comments (
-	id INT primary key auto_increment,
-    product_id BIGINT  NOT NULL,
-    user_id INT  NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-	comment VARCHAR(500) DEFAULT NULL,
-    rating float DEFAULT 0 check (rating <=5),
-    published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE discounts (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(50) NOT NULL UNIQUE,
-    discount_value DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (discount_value >= 0.00),
-    discount_type ENUM('PERCENT', 'FIXED') DEFAULT 'FIXED',
-    description VARCHAR(100) DEFAULT NULL,
-    expiration TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('ACTIVE', 'INACTIVE', 'COMING_SOON', 'EXPIRES') DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE orders (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_uid INT DEFAULT NULL,
-	session_id VARCHAR(50) DEFAULT NULL,
-    FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
-    is_guest BOOLEAN DEFAULT FALSE,
-    address_id INT  DEFAULT NULL,
-    FOREIGN KEY (address_id) REFERENCES address(id) ON DELETE SET NULL,
-    NOTe VARCHAR(200) DEFAULT NULL,
-    discount_id INT  DEFAULT NULL,
-	FOREIGN KEY (discount_id) REFERENCES discounts(id) ON DELETE SET NULL,
-    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (total_amount >= 0.00),
-    issue_invoices BOOLEAN DEFAULT FALSE,
-    status ENUM('PENDING', 'CONFIRMED', 'PROCESSING', 'CANCELLED', 'RETURNED', 'COMPLETED') NOT NULL DEFAULT 'PENDING',
-    is_confirmed boolean DEFAULT false,
-    is_cancelled boolean DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE order_details(
-	id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    order_id BIGINT NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id) on delete cascade,
-    product_id BIGINT NOT NULL,
-    unique (product_id, order_id),
-    FOREIGN KEY (product_id) REFERENCES products(id) on delete cascade,
-    price_at_time DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (price_at_time >= 0.00),
-    quantity INT DEFAULT 0 CHECK (quantity > 0),
-    subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (subtotal >= 0.00)
-);
-
-create table carts(
-	id INT primary key AUTO_INCREMENT,
-    user_uid INT DEFAULT NULL,
-	FOREIGN KEY (user_uid) REFERENCES users(uid) on delete set NULL,
-    session_id VARCHAR(50) DEFAULT NULL,
-    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (total_amount >= 0.00),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-create table cart_items(
-	id INT primary key AUTO_INCREMENT,
-    cart_id INT NOT NULL,
-    product_id BIGINT NOT NULL,
-	quantity INT DEFAULT 0,
-    total DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (total >= 0.00),
-	FOREIGN KEY (cart_id) REFERENCES carts(id) on delete cascade,
-	FOREIGN KEY (product_id) REFERENCES products(id) on delete cascade
-);
-
-CREATE TABLE payments (
-    id INT  PRIMARY KEY AUTO_INCREMENT,
-    order_id BIGINT  NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    payment_method ENUM('COD', 'BANKING', 'MOMO', 'VNPAY', 'ZALOPAY') DEFAULT 'COD',
-    payment_status ENUM('UNPAID', 'PENDING', 'FAILED', 'REFUNDED', 'PAID') DEFAULT 'UNPAID',
-    transaction_id VARCHAR(20) UNIQUE DEFAULT NULL,
-    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (total_amount >= 0.00),
-    currency_code CHAR(3) DEFAULT 'VND',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE deliveries (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    order_id BIGINT NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    tracking_number VARCHAR(20) UNIQUE DEFAULT NULL,
-    shipping_method ENUM('STANDARD_SHIPPING', 'ECONOMY_SHIPPING', 'FAST_DELIVERY') DEFAULT 'STANDARD_SHIPPING',
-    delivery_type ENUM('HOME_DELIVERY', 'STORE_PICKUP') NOT NULL DEFAULT 'HOME_DELIVERY',
-    delivery_status ENUM('PENDING', 'SHIPPING', 'DELIVERED', 'FAILED', 'RETURNED') DEFAULT 'PENDING',
-    shipping_address VARCHAR(200) NOT NULL,
-    estimated_delivery_date DATE NOT NULL,
-	order_date DATE NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- create table visit_logs(
--- 	id BIGINT primary key auto_increment,
---     user_id INT DEFAULT NULL,
---     session_id VARCHAR(30) DEFAULT NULL,
---     user_agent TEXT,
---     ip_address VARCHAR(50) DEFAULT NULL,
---     visited_url VARCHAR(200) DEFAULT NULL,
---     product_id BIGINT UNSIGNED NOT NULL,
---     category_id INT UNSIGNED NOT NULL,
---     visited_at TIMESTAMP DEFAULT current_timestamp
+--SET GLOBAL host_cache_size = 0;
+--
+--CREATE DATABASE IF NOT EXISTS graybee;
+--
+--use graybee;
+--
+--CREATE TABLE regex_patterns(
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(50) NOT NULL unique,
+--    pattern VARCHAR(200) NOT NULL
+--);
+--
+--INSERT INTO regex_patterns (name, pattern) VALUES
+--('cpu', 'i[3579](-|\\s)?\\d{4,5}[A-Za-z]*|ryzen\\s?\\d{3,5}[0-9a-zA-Z]*'),
+--('motherboard', '[A-Z]+\\d{3,4}[A-Za-z,a-z]*'),
+--('vga', '[Rr][Tt][Xx] \\d{4}|[Gg][Tt][Xx] \\d{3,4}|[Rr][Xx] \\d{3,4}|[Gg][Tt] \\d{3,4}'),
+--('ram', '\\d+GB'),
+--('ssd', '\\d+GB'),
+--('storage', '\\d+GB');
+--
+--CREATE TABLE categories (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(35) NOT NULL UNIQUE,
+--	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'INACTIVE',
+--    product_count INT DEFAULT 0,
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE manufacturers (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(35) NOT NULL UNIQUE,
+--	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'INACTIVE',
+--	product_count INT DEFAULT 0,
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE subcategories(
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(35) NOT NULL UNIQUE,
+--	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'INACTIVE',
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE category_classifications (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    category_id INT NOT NULL,
+--    subcategory_id INT DEFAULT NULL,
+--    manufacturer_id INT DEFAULT NULL,
+--    status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'ACTIVE',
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--
+--    UNIQUE (category_id, subcategory_id),
+--    UNIQUE (category_id, manufacturer_id),
+--
+--    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+--    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
+--    FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id) ON DELETE CASCADE
+--);
+--
+--CREATE TABLE categories_manufacturers (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    category_id INT NOT NULL,
+--    manufacturer_id INT NOT NULL,
+--    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+--    FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id) ON DELETE CASCADE,
+--	UNIQUE (category_id, manufacturer_id)
+--);
+--
+--CREATE TABLE categories_subcategories (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    category_id INT NOT NULL,
+--    subcategory_id INT NOT NULL,
+--    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+--    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
+--    UNIQUE (category_id, subcategory_id)
+--);--
+--
+--CREATE TABLE tags(
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(100) NOT NULL UNIQUE
+--);
+--
+--create table subcategories_tags(
+--	id INT  PRIMARY KEY AUTO_INCREMENT,
+--    subcategory_id INT  NOT NULL,
+--    tag_id INT  NOT NULL,
+--    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
+--    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE,
+--    UNIQUE (subcategory_id, tag_id)
+--);
+--
+--create table product_sequence(
+--	id INT PRIMARY KEY AUTO_INCREMENT,
+--	category_code VARCHAR(25) NOT NULL,
+--    yearmonth VARCHAR(10) NOT NULL,
+--    last_number INT NOT NULL
+--);
+--
+--CREATE TABLE products (
+--    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+--    category_id INT NOT NULL,
+--    FOREIGN KEY (category_id) REFERENCES categories(id),
+--    manufacturer_id INT NOT NULL,
+--    FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id),
+--	code VARCHAR(100) NOT NULL unique,
+--    name VARCHAR(200) NOT NULL UNIQUE,
+--    conditions ENUM('NEW', 'OLD') DEFAULT 'NEW',
+--    warranty TINYINT NOT NULL,
+--    weight FLOAT DEFAULT 0,
+--    dimension VARCHAR(50) DEFAULT NULL,
+--    price DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (price >= 0.00),
+--    discount_percent TINYINT DEFAULT 0 check (discount_percent >=0),
+--    final_price DECIMAL(10,2) NOT NULL DEFAULT 0.00 check (final_price >=0.00),
+--    color VARCHAR(35) DEFAULT NULL,
+--    thumbnail VARCHAR(250) DEFAULT NULL,
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--    status ENUM('INACTIVE', 'PUBLISHED', 'OUT_OF_STOCK', 'DELETED','REMOVED', 'PENDING', 'DRAFT', 'COMING_SOON') DEFAULT 'DRAFT'
+--);
+--
+--CREATE TABLE product_classification (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    product_id BIGINT NOT NULL,
+--    subcategory_id INT DEFAULT NULL,
+--    tag_id INT DEFAULT NULL,
+--	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'REMOVED') DEFAULT 'INACTIVE',
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--    UNIQUE (product_id, tag_id),
+--    UNIQUE (product_id, subcategory_id),
+--    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
+--    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+--);
+--
+--CREATE TABLE pc_detail (
+--    product_id BIGINT PRIMARY KEY NOT NULL,
+--	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--    main_board VARCHAR(100) NOT NULL,
+--    cpu VARCHAR(100) NOT NULL,
+--    ram VARCHAR(100) NOT NULL,
+--    vga VARCHAR(100) NOT NULL,
+--    hdd VARCHAR(50) DEFAULT NULL,
+--    ssd VARCHAR(100) NOT NULL,
+--    psu VARCHAR(100) NOT NULL,
+--    case_name VARCHAR(100) DEFAULT NULL,
+--    cooling VARCHAR(100) DEFAULT NULL,
+--    io_ports TEXT DEFAULT NULL,
+--    os VARCHAR(50) DEFAULT NULL,
+--    connectivity VARCHAR(100) DEFAULT NULL
+--);
+--
+--CREATE TABLE laptop_detail (
+--    product_id BIGINT PRIMARY KEY NOT NULL,
+--	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--    cpu VARCHAR(200) NOT NULL,
+--    ram VARCHAR(200)NOT NULL,
+--    ssd VARCHAR(100) NOT NULL,
+--    graphics_card VARCHAR(100) NOT NULL,
+--    monitor VARCHAR(255) NOT NULL,
+--    io_ports TEXT DEFAULT NULL,
+--    keyboard VARCHAR(100) DEFAULT NULL,
+--    audio VARCHAR(100) DEFAULT NULL,
+--    lan VARCHAR(50) DEFAULT NULL,
+--    wifi VARCHAR(100) DEFAULT NULL ,
+--    bluetooth VARCHAR(50) DEFAULT NULL,
+--    webcam VARCHAR(100) DEFAULT NULL,
+--    os VARCHAR(100) DEFAULT NULL,
+--    battery INT NOT NULL,
+--    material VARCHAR(100) DEFAULT NULL,
+--    accessory VARCHAR(100) DEFAULT NULL
+--);
+--
+--CREATE TABLE cpu_detail (
+--    product_id BIGINT PRIMARY KEY NOT NULL,
+--	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--
+--    socket VARCHAR(100) NOT NULL,
+--    generation SMALLINT NOT NULL,
+--    series VARCHAR(100) NOT NULL,
+--    cpu VARCHAR(100) NOT NULL,
+--    motherboard_series VARCHAR(100) NOT NULL,
+--    multiplier SMALLINT NOT NULL,
+--    number_of_streams SMALLINT NOT NULL,
+--    p_core_maximum FLOAT NOT NULL,
+--    p_core_base FLOAT NOT NULL,
+--    e_core_maximum FLOAT NOT NULL,
+--    e_core_base FLOAT NOT NULL,
+--    consumption FLOAT NOT NULL,
+--    caching VARCHAR(100) DEFAULT NULL,
+--    support_memory_maximum VARCHAR(100) DEFAULT NULL,
+--    memory_type VARCHAR(50) DEFAULT NULL,
+--    integrated_graphics BOOLEAN DEFAULT FALSE,
+--    pci_edition VARCHAR(50) DEFAULT NULL,
+--    number_of_pci SMALLINT DEFAULT NULL
+--
+--);
+--
+--
+--
+--create table product_statistics(
+--	id INT  primary key auto_increment,
+--	product_id BIGINT  NOT NULL UNIQUE,
+--    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--	view_count INT DEFAULT 0,
+--    purchase_count INT DEFAULT 0,
+--    has_promotion BOOLEAN DEFAULT FALSE,
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE carousel_group (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(50) unique,
+--    type VARCHAR(35) NOT NULL,
+--    category_name VARCHAR(35) DEFAULT NULL,
+--    active BOOLEAN DEFAULT true,
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE carousel_items (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    carousel_group_id INT  NOT NULL,
+--    product_id BIGINT  NOT NULL,
+--    position INT DEFAULT 0,
+--    active BOOLEAN DEFAULT TRUE,
+--	FOREIGN KEY (carousel_group_id) REFERENCES carousel_group(id) ON DELETE CASCADE,
+--    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--    unique(carousel_group_id, product_id)
+--);
+--
+--create table products_tags(
+--	id INT  PRIMARY KEY AUTO_INCREMENT,
+--    product_id BIGINT  NOT NULL,
+--    tag_id INT  NOT NULL,
+--    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE,
+--    UNIQUE (product_id, tag_id)
+--);
+--
+--create table products_subcategories(
+--	id INT  PRIMARY KEY AUTO_INCREMENT,
+--    product_id BIGINT  NOT NULL,
+--    subcategory_id INT  NOT NULL,
+--    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE CASCADE,
+--    UNIQUE (product_id, subcategory_id)
+--);
+--
+--create table product_descriptions(
+--	id INT PRIMARY KEY AUTO_INCREMENT,
+--    product_id BIGINT NOT NULL UNIQUE,
+--    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--	description TEXT DEFAULT NULL
+--);
+--
+--CREATE TABLE product_images (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    product_id BIGINT NOT NULL,
+--    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--    image_url VARCHAR(500) DEFAULT NULL
+--);
+--
+--create table promotions(
+--	id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(150) NOT NULL,
+--    price_value decimal(10,2) DEFAULT 0.00 check(price_value >= 0.00),
+--    quantity TINYINT DEFAULT 1
+--);
+--
+--create table inventories(
+--	id INT primary key auto_increment,
+--    product_id BIGINT NOT NULL unique,
+--	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE cascade,
+--    quantity INT NOT NULL DEFAULT 0,
+--    is_stock BOOLEAN generated always as (quantity > 0) STORED,
+--	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE roles(
+-- 	id tinyint primary key auto_increment,
+--	name VARCHAR(20) NOT NULL unique,
+--	user_count INT UNSIGNED DEFAULT 0,
+--	status ENUM('ACTIVE', 'INACTIVE', 'DELETED') DEFAULT 'ACTIVE',
+--	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 -- );
-
--- CREATE TABLE product_stats (
---     product_id BIGINT UNSIGNED PRIMARY KEY,
---     view_count INT UNSIGNED DEFAULT 0,
---     sold_count INT UNSIGNED DEFAULT 0,
---     last_viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
---     last_sold_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
--- );
+--
+-- insert INTO roles (name, status) values
+-- ('ADMIN', 'ACTIVE'),
+-- ('MANAGE', 'ACTIVE'),
+-- ('CUSTOMER', 'ACTIVE');
+--
+-- CREATE TABLE permissions (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(50) NOT NULL UNIQUE,
+--    description VARCHAR(150) DEFAULT NULL,
+--    user_count INT UNSIGNED DEFAULT 0,
+--	status ENUM('ACTIVE', 'INACTIVE', 'DELETED') DEFAULT 'ACTIVE',
+--	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE users (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    uid INT NOT NULL unique,
+--    role_id tinyINT DEFAULT NULL,
+--    FOREIGN KEY (role_id) REFERENCES roles(id) on delete set NULL,
+--	username  VARCHAR(12) UNIQUE NOT NULL,
+--    fullname VARCHAR(100) DEFAULT NULL,
+--    phone_number VARCHAR(12) UNIQUE NOT NULL,
+--	email VARCHAR(50) UNIQUE DEFAULT NULL,
+--    password VARCHAR(250) NOT NULL,
+--    date_of_birth DATE DEFAULT NULL,
+--    gender ENUM('MALE', 'FEMALE') DEFAULT NULL,
+--	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--	is_active BOOLEAN DEFAULT FALSE,
+--	status ENUM('ACTIVE', 'INACTIVE', 'DELETED', 'OFFLINE', 'ONLINE', 'BANNED', 'PENDING') DEFAULT 'PENDING'
+--);
+--
+--create table forgot_password(
+--	id INT PRIMARY KEY AUTO_INCREMENT,
+--	user_id INT NOT NULL,
+--	FOREIGN KEY (user_id) REFERENCES users(id) on delete cascade,
+--    otp INT NOT NULL,
+--    expiration DATETIME DEFAULT current_timestamp
+--);
+--
+--CREATE TABLE roles_permissions (
+--	id INT primary key auto_increment,
+--    role_id tinyINT NOT NULL,
+--    permission_id INT NOT NULL,
+--    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+--    FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE,
+--    unique (role_id, permission_id)
+--);
+--
+--CREATE TABLE users_permissions (
+--	id INT  primary key auto_increment,
+--    user_id INT  NOT NULL,
+--    permission_id INT NOT NULL,
+--    unique (user_id, permission_id),
+--    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+--    FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
+--);
+--
+--insert INTo users(uid, role_id, username, phone_number,email, password, is_active) values
+--(111111, NULL, 'root', '0393150468','nam71441@gmail.com', '$2a$10$dDueXbJn4pbEDPZGscnwaOj6HzdMEy1iVS/Xvz.MHTBgHtcUeko5C', true),
+--(222222, 1, 'admin', '0357378318', 'phongtt004@gmail.com', '$2a$10$Vn4kM2jV5xhcQroKmNa.5.twSU29XPUFjjrxUKQP/5gjUnvfxSs/m', true);
+--
+--create table favourites(
+--	id INT PRIMARY KEY AUTO_INCREMENT,
+--	user_uid INT NOT NULL,
+--	product_id BIGINT NOT NULL,
+--	FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
+--	FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--    unique (user_uid, product_id)
+--);
+--
+--create table address(
+--	id INT primary key auto_increment,
+--	user_uid INT DEFAULT NULL,
+--    session_id VARCHAR(50) DEFAULT NULL,
+--    fullname VARCHAR(50) NOT NULL,
+--    phone_number VARCHAR(12) NOT NULL,
+--    city VARCHAR(50) NOT NULL,
+--    district VARCHAR(100) NOT NULL,
+--    commune VARCHAR(50) NOT NULL,
+--    street_address VARCHAR(150) NOT NULL,
+--    is_DEFAULT BOOLEAN DEFAULT FALSE,
+--	FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE
+--);
+--
+--create table review_comments (
+--	id INT primary key auto_increment,
+--    product_id BIGINT  NOT NULL,
+--    user_id INT  NOT NULL,
+--    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+--    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+--	comment VARCHAR(500) DEFAULT NULL,
+--    rating float DEFAULT 0 check (rating <=5),
+--    published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE discounts (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    code VARCHAR(50) NOT NULL UNIQUE,
+--    discount_value DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (discount_value >= 0.00),
+--    discount_type ENUM('PERCENT', 'FIXED') DEFAULT 'FIXED',
+--    description VARCHAR(100) DEFAULT NULL,
+--    expiration TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    status ENUM('ACTIVE', 'INACTIVE', 'COMING_SOON', 'EXPIRES') DEFAULT 'ACTIVE',
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE orders (
+--    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+--    user_uid INT DEFAULT NULL,
+--	session_id VARCHAR(50) DEFAULT NULL,
+--    FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
+--    is_guest BOOLEAN DEFAULT FALSE,
+--    address_id INT  DEFAULT NULL,
+--    FOREIGN KEY (address_id) REFERENCES address(id) ON DELETE SET NULL,
+--    NOTe VARCHAR(200) DEFAULT NULL,
+--    discount_id INT  DEFAULT NULL,
+--	FOREIGN KEY (discount_id) REFERENCES discounts(id) ON DELETE SET NULL,
+--    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (total_amount >= 0.00),
+--    issue_invoices BOOLEAN DEFAULT FALSE,
+--    status ENUM('PENDING', 'CONFIRMED', 'PROCESSING', 'CANCELLED', 'RETURNED', 'COMPLETED') NOT NULL DEFAULT 'PENDING',
+--    is_confirmed boolean DEFAULT false,
+--    is_cancelled boolean DEFAULT false,
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE order_details(
+--	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+--    order_id BIGINT NOT NULL,
+--    FOREIGN KEY (order_id) REFERENCES orders(id) on delete cascade,
+--    product_id BIGINT NOT NULL,
+--    unique (product_id, order_id),
+--    FOREIGN KEY (product_id) REFERENCES products(id) on delete cascade,
+--    price_at_time DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (price_at_time >= 0.00),
+--    quantity INT DEFAULT 0 CHECK (quantity > 0),
+--    subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (subtotal >= 0.00)
+--);
+--
+--create table carts(
+--	id INT primary key AUTO_INCREMENT,
+--    user_uid INT DEFAULT NULL,
+--	FOREIGN KEY (user_uid) REFERENCES users(uid) on delete set NULL,
+--    session_id VARCHAR(50) DEFAULT NULL,
+--    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (total_amount >= 0.00),
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--create table cart_items(
+--	id INT primary key AUTO_INCREMENT,
+--    cart_id INT NOT NULL,
+--    product_id BIGINT NOT NULL,
+--	quantity INT DEFAULT 0,
+--    total DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (total >= 0.00),
+--	FOREIGN KEY (cart_id) REFERENCES carts(id) on delete cascade,
+--	FOREIGN KEY (product_id) REFERENCES products(id) on delete cascade
+--);
+--
+--CREATE TABLE payments (
+--    id INT  PRIMARY KEY AUTO_INCREMENT,
+--    order_id BIGINT  NOT NULL,
+--    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+--    payment_method ENUM('COD', 'BANKING', 'MOMO', 'VNPAY', 'ZALOPAY') DEFAULT 'COD',
+--    payment_status ENUM('UNPAID', 'PENDING', 'FAILED', 'REFUNDED', 'PAID') DEFAULT 'UNPAID',
+--    transaction_id VARCHAR(20) UNIQUE DEFAULT NULL,
+--    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (total_amount >= 0.00),
+--    currency_code CHAR(3) DEFAULT 'VND',
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+--CREATE TABLE deliveries (
+--    id INT PRIMARY KEY AUTO_INCREMENT,
+--    order_id BIGINT NOT NULL,
+--    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+--    tracking_number VARCHAR(20) UNIQUE DEFAULT NULL,
+--    shipping_method ENUM('STANDARD_SHIPPING', 'ECONOMY_SHIPPING', 'FAST_DELIVERY') DEFAULT 'STANDARD_SHIPPING',
+--    delivery_type ENUM('HOME_DELIVERY', 'STORE_PICKUP') NOT NULL DEFAULT 'HOME_DELIVERY',
+--    delivery_status ENUM('PENDING', 'SHIPPING', 'DELIVERED', 'FAILED', 'RETURNED') DEFAULT 'PENDING',
+--    shipping_address VARCHAR(200) NOT NULL,
+--    estimated_delivery_date DATE NOT NULL,
+--	order_date DATE NOT NULL,
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+--);
+--
+---- create table visit_logs(
+---- 	id BIGINT primary key auto_increment,
+----     user_id INT DEFAULT NULL,
+----     session_id VARCHAR(30) DEFAULT NULL,
+----     user_agent TEXT,
+----     ip_address VARCHAR(50) DEFAULT NULL,
+----     visited_url VARCHAR(200) DEFAULT NULL,
+----     product_id BIGINT UNSIGNED NOT NULL,
+----     category_id INT UNSIGNED NOT NULL,
+----     visited_at TIMESTAMP DEFAULT current_timestamp
+---- );
+--
+---- CREATE TABLE product_stats (
+----     product_id BIGINT UNSIGNED PRIMARY KEY,
+----     view_count INT UNSIGNED DEFAULT 0,
+----     sold_count INT UNSIGNED DEFAULT 0,
+----     last_viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+----     last_sold_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+----     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+---- );

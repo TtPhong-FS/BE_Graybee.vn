@@ -43,6 +43,8 @@ public interface CategoryService {
 
     CategorySummaryDto checkType(String name, CategoryType type);
 
+    void checkType(List<String> name, CategoryType type);
+
     CategoryType findTypeBySlug(String slug);
 
     CategoryNameSlug findCategoryNameAndSlugByName(String name);

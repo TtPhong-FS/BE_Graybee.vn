@@ -278,9 +278,12 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         Optional<Long> categoryId = productRepository.getCategoryIdById(productId);
 
+        List<String> tagNames = productCategoryService.findTagNamesByProductId(productId);
+
         List<AttributeBasicValueDto> attributeBasicValueDtos = productAttributeValueService.getAllAttributeValueByCategoryAndProduct(categoryId.get(), productUpdateDto.getId());
         productUpdateDto.setImages(images);
         productUpdateDto.setSpecifications(attributeBasicValueDtos);
+        productUpdateDto.setTagNames(tagNames);
 
         return productUpdateDto;
     }
@@ -336,10 +339,6 @@ public class AdminProductServiceImpl implements AdminProductService {
     public void checkBeforeCreate(Long id, ValidationProductRequest request) {
         ProductStatus.getStatus(request.getStatus(), messageSourceUtil);
 
-        categoryService.checkType(request.getCategoryName(), CategoryType.CATEGORY);
-        categoryService.checkType(request.getBrandName(), CategoryType.BRAND);
-
-
         if (id == null) {
             checkExistsByName(request.getName());
             checkExistsBySlug(request.getSlug());
@@ -351,6 +350,11 @@ public class AdminProductServiceImpl implements AdminProductService {
             checkExistsByNameNotId(request.getName(), id);
             checkExistsBySlugNotId(request.getSlug(), id);
         }
+
+        categoryService.checkType(request.getCategoryName(), CategoryType.CATEGORY);
+        categoryService.checkType(request.getBrandName(), CategoryType.BRAND);
+        categoryService.checkType(request.getTagNames(), CategoryType.TAG);
+
 
     }
 

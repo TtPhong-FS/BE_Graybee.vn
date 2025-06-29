@@ -5,7 +5,7 @@ services:
     container_name: redis
     restart: always
     volumes:
-      - ecommerce_techstore_redis_volume:/data
+      - ecommerce_graybee_redis_volume:/data
     ports:
       - "6379:6379"
     healthcheck:
@@ -17,7 +17,7 @@ services:
       - .env
     command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
     networks:
-      - techstore
+      - graybee
   redis_insight:
     image: redislabs/redisinsight:1.14.0
     container_name: redisInsight
@@ -25,12 +25,12 @@ services:
     ports:
       - "5000:8001"
     volumes:
-      - ecommerce_techstore_redisInsight_volume:/db
+      - ecommerce_graybee_redisInsight_volume:/db
     depends_on:
       redis:
         condition: service_healthy
     networks:
-      - techstore
+      - graybee
 
   # MySQL
   mysql:
@@ -40,7 +40,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ecommerce_techstore_mysql_volume:/var/lib/mysql
+      - ecommerce_graybee_mysql_volume:/var/lib/mysql
       - ./db-init:/docker-entrypoint-initdb.d
     env_file:
       - .env
@@ -50,7 +50,7 @@ services:
       timeout: 5s
       retries: 3
     networks:
-      - techstore
+      - graybee
 
   elasticsearch:
     container_name: elasticsearch
@@ -60,7 +60,7 @@ services:
       - "9200:9200"
       - "9300:9300"
     volumes:
-      - ecommerce_techstore_elasticsearch_volume:/usr/share/elasticsearch/data
+      - ecommerce_graybee_elasticsearch_volume:/usr/share/elasticsearch/data
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -70,7 +70,7 @@ services:
       timeout: 5s
       retries: 3
     networks:
-      - techstore
+      - graybee
 
   kibana:
     container_name: kibana
@@ -84,15 +84,15 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     networks:
-      - techstore
+      - graybee
 
   # Spring Boot App
-  techstore:
+  graybee:
     build:
       context: .
       dockerfile: dockerfile
-    image: techstore-server
-    container_name: techstore-server
+    image: ecommerce_graybee_server
+    container_name: ecommerce_graybee_server
     restart: always
     ports:
       - "8080:8080"
@@ -104,7 +104,7 @@ services:
     env_file:
       - .env
     networks:
-      - techstore
+      - graybee
     depends_on:
       mysql:
         condition: service_healthy
@@ -113,17 +113,17 @@ services:
       elasticsearch:
         condition: service_healthy
 networks:
-  techstore:
+  graybee:
     driver: bridge
     external: true
 volumes:
-  ecommerce_techstore_redis_volume:
+  ecommerce_graybee_redis_volume:
     external: true
-  ecommerce_techstore_redisInsight_volume:
+  ecommerce_graybee_redisInsight_volume:
     external: true
-  ecommerce_techstore_mysql_volume:
+  ecommerce_graybee_mysql_volume:
     external: true
-  ecommerce_techstore_elasticsearch_volume:
+  ecommerce_graybee_elasticsearch_volume:
     external: true
 
 
