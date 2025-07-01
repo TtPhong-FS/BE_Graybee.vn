@@ -11,25 +11,25 @@ import java.util.List;
 @Getter
 public class ValidationProductRequest {
 
-    @NotBlank(message = "product.validation.name.not.blank")
-    @Size(min = 5, max = 200, message = "product.validation.name.size")
+    @NotBlank(message = "{product.validation.name.not.blank}")
+    @Size(min = 5, max = 200, message = "{product.validation.name.size}")
     private String name;
 
-    @Size(max = 200, message = "product.validation.slug.max")
+    @Size(max = 200, message = "{product.validation.slug.max}")
     private String slug;
 
-    @NotBlank(message = "product.validation.categoryName.not.blank")
-    @Size(max = 50, message = "product.validation.categoryName.size")
+    @NotBlank(message = "{product.validation.categoryName.not.blank}")
+    @Size(max = 50, message = "{product.validation.categoryName.size}")
     private String categoryName;
 
-    @NotBlank(message = "product.validation.brandName.not.blank")
-    @Size(max = 50, message = "product.validation.brandName.size")
+    @NotBlank(message = "{product.validation.brandName.not.blank}")
+    @Size(max = 50, message = "{product.validation.brandName.size}")
     private String brandName;
 
     @Size(max = 100)
-    private List<@Size(max = 100, message = "product.validation.tagName.size") String> tagNames;
+    private List<@Size(max = 100, message = "{product.validation.tagName.size}") String> tagNames;
 
-    @NotBlank(message = "product.validation.status.not.blank")
+    @NotBlank(message = "{product.validation.status.not.blank}")
     private String status;
 
 }

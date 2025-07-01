@@ -78,7 +78,7 @@ public class CartController {
         }
 
         Long cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
-
+        cartService.updateCartTotal(cartId);
         return ResponseEntity.ok(
                 MessageBuilder.ok(cartItemService.decreaseItemQuantity(cartId, productId), null)
         );
@@ -124,6 +124,8 @@ public class CartController {
         }
 
         Long cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
+
+        cartService.updateCartTotal(cartId);
 
         return ResponseEntity.ok(
                 MessageBuilder.ok(cartItemService.removeItemFromCart(cartId, cartItemId),

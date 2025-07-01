@@ -24,4 +24,6 @@ public interface AddressService {
 
     Address getAddressByIdAndCustomerId(Long customerId, Long addressId, CustomerInfoRequest customerInfoRequest, ShippingInfoRequest shippingInfoRequest);
 
+    AddressResponse getAddressForUpdateById(long addressId);
+
 }

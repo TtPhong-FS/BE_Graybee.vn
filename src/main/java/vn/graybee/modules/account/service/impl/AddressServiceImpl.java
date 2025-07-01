@@ -147,4 +147,10 @@ public class AddressServiceImpl implements AddressService {
         return address;
     }
 
+    @Override
+    public AddressResponse getAddressForUpdateById(long addressId) {
+        return addressRepository.findAddressResponseById(addressId)
+                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("account.customer.address.not-found")));
+    }
+
 }

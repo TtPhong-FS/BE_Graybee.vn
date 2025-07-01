@@ -95,10 +95,8 @@ api:
     favorites: ${api.privateApi.account}/favorites
 
 jwt:
-  adminSecretKey: ${ADMIN_SECRET_KEY}
-  adminExpiration: ${ADMIN_EXPIRATION}
-  customerSecretKey: ${CUSTOMER_SECRET_KEY}
-  customerExpiration: ${CUSTOMER_EXPIRATION}
+  secretKey: ${SECRET_KEY}
+  expiration: ${EXPIRATION}
   header: ${HEADER}
   prefix: ${PREFIX}
 

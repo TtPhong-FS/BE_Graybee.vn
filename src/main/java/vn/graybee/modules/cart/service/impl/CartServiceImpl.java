@@ -12,6 +12,7 @@ import vn.graybee.modules.cart.repository.CartRepository;
 import vn.graybee.modules.cart.service.CartItemService;
 import vn.graybee.modules.cart.service.CartService;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -33,11 +34,18 @@ public class CartServiceImpl implements CartService {
     @Transactional(rollbackFor = RuntimeException.class)
     public CartItemDto findOrCreateCartAfterAddItem(Long accountId, String sessionId, long productId) {
         if (accountId == null && sessionId == null) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.bad_request"));
+            throw new BusinessCustomException(Constants.Common.global, "Hãy tải lại trang để được cấp Session mới trước khi thêm giỏ hàng");
         }
 
-        Cart cart = cartRepository.findByAccountIdAndSessionId(accountId, sessionId)
-                .orElseGet(Cart::new);
+        Cart cart;
+
+        if (accountId != null) {
+            cart = cartRepository.findByAccountIdAndSessionId(accountId, null)
+                    .orElseGet(Cart::new);
+        } else {
+            cart = cartRepository.findByAccountIdAndSessionId(null, sessionId)
+                    .orElseGet(Cart::new);
+        }
 
         boolean isNewCart = cart.getId() == null;
 
@@ -65,7 +73,7 @@ public class CartServiceImpl implements CartService {
     @Transactional(rollbackFor = RuntimeException.class)
     public void syncGuestCartToAccount(Long accountId, String sessionId) {
         if (accountId == null && sessionId == null) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("common.bad_request"));
+            throw new BusinessCustomException(Constants.Common.global, "Hãy tải lại trang để được cấp Session mới trước khi thêm giỏ hàng");
         }
 
         Cart cart = cartRepository.findBySessionId(sessionId)
@@ -75,13 +83,40 @@ public class CartServiceImpl implements CartService {
         cart.setSessionId(null);
         cart.setTotalAmount(0);
 
-        cartRepository.save(cart);
+        cart = cartRepository.save(cart);
+
+        updateCartTotal(cart.getId());
     }
 
     @Override
     public List<CartItemDto> findCartByAccountIdOrSessionId(Long accountId, String sessionId) {
-        Cart cart = cartRepository.findByAccountIdAndSessionId(accountId, sessionId)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found")));
+
+        Cart cart;
+
+        if (accountId != null) {
+            cart = cartRepository.findByAccountIdAndSessionId(accountId, null)
+                    .orElseGet(Cart::new);
+        } else {
+            cart = cartRepository.findByAccountIdAndSessionId(null, sessionId)
+                    .orElseGet(Cart::new);
+        }
+
+        boolean isNewCart = cart.getId() == null;
+
+        if (isNewCart) {
+            if (accountId != null) {
+                cart.setAccountId(accountId);
+                cart.setSessionId(null);
+            } else {
+                cart.setSessionId(sessionId);
+                cart.setAccountId(null);
+            }
+            cart.setTotalAmount(0);
+
+            cartRepository.save(cart);
+
+            return Collections.emptyList();
+        }
 
         return cartItemService.getCartItemsByCartId(cart.getId());
     }
@@ -104,8 +139,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Long getCartIdByAccountIdOrSessionId(Long accountId, String sessionId) {
-        return cartRepository.findIdByAccountIdOrSessionId(accountId, sessionId)
-                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found")));
+        if (accountId != null) {
+            return cartRepository.findIdByAccountIdOrSessionId(accountId, null)
+                    .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found")));
+        } else {
+            return cartRepository.findIdByAccountIdOrSessionId(null, sessionId)
+                    .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found")));
+        }
     }
 
     private void checkExistsById(Long cartId) {

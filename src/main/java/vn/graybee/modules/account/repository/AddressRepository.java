@@ -43,11 +43,17 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
 
     @Query("Select a from Address a where a.id = :id and a.customerId = :customerId")
     Optional<Address> findByIdAndCustomerId(@Param("customerId") Long customerId, @Param("id") long id);
-    
+
     @Query("Select new vn.graybee.modules.account.dto.response.AddressResponse(a) from Address a where a.id = :id and a.customerId = :customerId and a.isDefault = true")
     Optional<AddressResponse> findAddressDefaultByIdAndCustomerId(@Param("customerId") Long customerId, @Param("id") long id);
 
     @Query("Select a from Address a where a.customerId = :customerId and a.id = :addressId")
     Optional<Address> findAddressByIdAndCustomerId(Long customerId, Long addressId);
+
+    @Query("""
+            Select new vn.graybee.modules.account.dto.response.AddressResponse(a)
+            from Address a where a.id = :addressId
+            """)
+    Optional<AddressResponse> findAddressResponseById(long addressId);
 
 }

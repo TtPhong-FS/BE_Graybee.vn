@@ -23,7 +23,7 @@ public class JwtService {
     public JwtService(
             JwtProperties jwtProperties
     ) {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getAdminSecretKey());
+        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
         this.jwtProperties = jwtProperties;
 
@@ -34,6 +34,7 @@ public class JwtService {
     }
 
     public String generateToken(String uid, Role role) {
+
         long now = System.currentTimeMillis();
         return Jwts
                 .builder()
@@ -41,7 +42,7 @@ public class JwtService {
                 .claim("role", role)
                 .subject(uid)
                 .issuedAt(new Date(now))
-                .expiration(new Date(now + jwtProperties.getAdminExpiration()))
+                .expiration(new Date(now + jwtProperties.getExpiration()))
                 .signWith(getKey())
                 .compact();
 
