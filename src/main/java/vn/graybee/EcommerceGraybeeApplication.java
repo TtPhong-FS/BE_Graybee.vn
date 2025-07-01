@@ -19,8 +19,7 @@ public class EcommerceGraybeeApplication {
 
         SpringApplication.run(EcommerceGraybeeApplication.class, args);
 
-        logger.info("version:0.0.2");
+        logger.info("version:0.0.3");
     }
-
 
 }
