@@ -13,13 +13,15 @@ import org.springframework.scheduling.annotation.EnableAsync;
 })
 public class EcommerceGraybeeApplication {
 
+    static String version = System.getenv("VERSION");
+
     static Logger logger = LoggerFactory.getLogger(EcommerceGraybeeApplication.class);
 
     public static void main(String[] args) {
 
         SpringApplication.run(EcommerceGraybeeApplication.class, args);
 
-        logger.info("version:0.0.3");
+        logger.info(version);
     }
 
 }

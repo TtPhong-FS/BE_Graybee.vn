@@ -12,6 +12,8 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +21,13 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import vn.graybee.checkers.StartupConnectionChecker;
 
 @EnableCaching
 @Configuration
 public class DBConfig {
+
+    static final Logger logger = LoggerFactory.getLogger(DBConfig.class);
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connect) {
@@ -50,8 +55,6 @@ public class DBConfig {
         if (password == null || password.isBlank()) {
             password = "";
         }
-        System.out.println("ELASTIC_HOST: " + host);
-
         // Setup Basic Auth
         final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(
@@ -67,9 +70,9 @@ public class DBConfig {
         // Optional: Test connection
         try (RestClient testClient = builder.build()) {
             Response response = testClient.performRequest(new Request("GET", "/"));
-            System.out.println("Elasticsearch Status: " + response.getStatusLine().getStatusCode());
+            logger.info("Elasticsearch Status: {}", response.getStatusLine().getStatusCode());
         } catch (Exception e) {
-            System.err.println("Failed to connect to Elasticsearch: " + e.getMessage());
+            logger.warn("Failed to connect to Elasticsearch: {}", e.getMessage());
         }
 
         RestClient restClient = builder.build();

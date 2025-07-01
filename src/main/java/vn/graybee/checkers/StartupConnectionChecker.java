@@ -1,6 +1,8 @@
 package vn.graybee.checkers;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -15,6 +17,7 @@ import java.sql.SQLException;
 @Component
 public class StartupConnectionChecker implements ApplicationListener<ApplicationReadyEvent> {
 
+    static final Logger logger = LoggerFactory.getLogger(StartupConnectionChecker.class);
     private static final String message_success = "Successfully connect to ";
 
     private final RedisConnectionFactory redisConnect;
@@ -31,11 +34,11 @@ public class StartupConnectionChecker implements ApplicationListener<Application
         try {
             Connection con = mysqlConnect.getConnection();
             if (!con.isValid(2)) {
-                throw new SQLException("Invalid Mysql Connect");
+                logger.warn("Mysql connect was closed");
             }
-            System.out.println(message_success + "Mysql");
+            logger.info(message_success + "Mysql");
         } catch (SQLException e) {
-            throw new IllegalStateException("Mysql error: " + e.getMessage());
+            logger.warn("Mysql error: {}", e.getMessage());
         }
     }
 
@@ -43,11 +46,11 @@ public class StartupConnectionChecker implements ApplicationListener<Application
         try {
             RedisConnection con = redisConnect.getConnection();
             if (con.isClosed()) {
-                System.out.println("Redis closed");
+                logger.info("Redis connect was closed");
             }
-            System.out.println(message_success + "Redis");
+            logger.info(message_success + "Redis");
         } catch (Exception e) {
-            throw new IllegalStateException("Redis error: " + e.getMessage());
+            logger.warn("Redis error: {}", e.getMessage());
         }
     }
 

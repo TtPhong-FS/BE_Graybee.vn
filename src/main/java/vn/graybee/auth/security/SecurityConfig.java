@@ -71,7 +71,6 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        System.out.println("Configuring CORS for: " + originProperties.getTechstore() + " and " + originProperties.getTechstoreDashboard());
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(List.of(
                 originProperties.getTechstore(),
