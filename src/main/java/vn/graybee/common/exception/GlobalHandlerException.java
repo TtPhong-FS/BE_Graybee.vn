@@ -1,14 +1,20 @@
 package vn.graybee.common.exception;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import jakarta.persistence.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.CannotCreateTransactionException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -21,6 +27,8 @@ import vn.graybee.auth.exception.AuthException;
 import vn.graybee.common.utils.DatetimeFormatted;
 import vn.graybee.common.utils.MessageSourceUtil;
 
+import java.net.ConnectException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,7 +104,17 @@ public class GlobalHandlerException {
         return problemDetail;
     }
 
+
     @ExceptionHandler({
+            DataAccessException.class,
+            CannotGetJdbcConnectionException.class,
+            DataAccessResourceFailureException.class,
+            CannotCreateTransactionException.class,
+            JpaSystemException.class,
+            TransactionSystemException.class,
+            PersistenceException.class,
+            SQLException.class,
+            ConnectException.class,
             CannotCreateTransactionException.class,
             RedisConnectionFailureException.class,
             ElasticsearchException.class,
@@ -111,6 +129,7 @@ public class GlobalHandlerException {
         problemDetail.setTitle(messageSource.get("common.error.503.title"));
         return problemDetail;
     }
+
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ProblemDetail handleNotFound(NoHandlerFoundException ex) {

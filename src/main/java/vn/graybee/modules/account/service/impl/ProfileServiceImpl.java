@@ -37,6 +37,10 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public ProfileResponse updateByAccountId(ProfileRequest request, Long accountId) {
+
+        checkExistsByPhone(request.getPhone());
+
+
         Profile profile = profileRepository.findByAccountId(accountId).orElseGet(Profile::new);
         Gender gender = Gender.fromString(request.getGender(), messageSourceUtil);
 

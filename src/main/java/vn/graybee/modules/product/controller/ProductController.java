@@ -34,7 +34,7 @@ public class ProductController {
     }
 
     @GetMapping("/detail/{slug}")
-    public ResponseEntity<BasicMessageResponse<ProductDetailDto>> findProductDetailBySlug(
+    public ResponseEntity<BasicMessageResponse<ProductDetailDto>> getProductDetailBySlug(
             @PathVariable("slug") String slug
     ) {
         return ResponseEntity.ok(
@@ -43,12 +43,12 @@ public class ProductController {
     }
 
     @GetMapping("/search/{keyword}")
-    public ResponseEntity<BasicMessageResponse<List<ProductDocument>>> search(@PathVariable("keyword") String keyword) {
+    public ResponseEntity<BasicMessageResponse<List<ProductDocument>>> searchProducts(@PathVariable("keyword") String keyword) {
         return ResponseEntity.ok(
                 MessageBuilder.ok(
-                        productDocumentService.search(keyword), null
+                        productDocumentService.searchProductsByKeyword(keyword), null
                 )
         );
     }
-    
+
 }

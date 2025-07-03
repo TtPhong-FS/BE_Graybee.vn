@@ -44,4 +44,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("UPDATE Inventory i SET i.quantity = :quantity WHERE i.productId = :productId")
     void updateQuantityByProductId(long productId, int quantity);
 
+    @Query("Select p.name from Inventory i join Product p on i.productId = p.id where i.productId = :productId ")
+    String findProductNameByProductId(long productId);
+
 }

@@ -35,7 +35,7 @@ public class ProductDocumentService {
         this.productRepository = productRepository;
     }
 
-    public List<ProductDocument> search(String keyword) {
+    public List<ProductDocument> searchProductsByKeyword(String keyword) {
         try {
             SearchResponse<ProductDocument> response = elasticsearchClient.search(
                     s -> s.index("products")

@@ -22,10 +22,22 @@ import vn.graybee.modules.order.service.OrderDetailService;
 import vn.graybee.modules.order.service.PaymentService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
 public class AdminOrderServiceImpl implements AdminOrderService {
+
+    static final Map<OrderStatus, Set<OrderStatus>> allowedTransitions = Map.of(
+            OrderStatus.PENDING, Set.of(OrderStatus.CONFIRMED, OrderStatus.CANCELLED),
+            OrderStatus.CONFIRMED, Set.of(OrderStatus.PROCESSING, OrderStatus.CANCELLED),
+            OrderStatus.PROCESSING, Set.of(OrderStatus.DELIVERED),
+            OrderStatus.DELIVERED, Set.of(OrderStatus.RETURNED, OrderStatus.COMPLETED),
+            OrderStatus.RETURNED, Set.of(OrderStatus.PROCESSING, OrderStatus.CANCELLED),
+            OrderStatus.COMPLETED, Set.of(),
+            OrderStatus.CANCELLED, Set.of()
+    );
 
     private final OrderRepository orderRepository;
 
@@ -80,6 +92,12 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
         OrderStatus orderStatus = OrderStatus.fromString(status, messageSourceUtil);
 
+        OrderStatus currentStatus = orderRepository.findStatusById(id);
+
+        if (!allowedTransitions.get(currentStatus).contains(orderStatus)) {
+            throw new BusinessCustomException(Constants.Common.global, "Trạng thái chuyển đổi không hợp lệ");
+        }
+
         orderRepository.updateStatusByIdAndStatus(id, orderStatus);
 
         return new OrderStatusResponse(id, status);
@@ -113,7 +131,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
         OrderStatus currentStatus = orderRepository.findStatusById(orderId);
 
-        if (currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.CONFIRMED || currentStatus == OrderStatus.PROCESSING) {
+        if (currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.CONFIRMED) {
             orderRepository.updateStatusByIdAndStatus(orderId, OrderStatus.CANCELLED);
         } else {
             throw new BusinessCustomException(Constants.Common.global, "Không thể huỷ, đơn hàng đã được giao cho vận chuyển.");

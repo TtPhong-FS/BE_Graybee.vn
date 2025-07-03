@@ -204,7 +204,7 @@ public class OrderServiceImpl implements OrderService {
 
         OrderStatus currentStatus = orderRepository.findStatusById(orderId);
 
-        if (currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.CONFIRMED || currentStatus == OrderStatus.PROCESSING) {
+        if (currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.CONFIRMED) {
             orderRepository.updateStatusByIdAndStatus(orderId, OrderStatus.CANCELLED);
         } else {
             throw new BusinessCustomException(Constants.Common.global, "Không thể huỷ, đơn hàng đã được giao cho vận chuyển.");

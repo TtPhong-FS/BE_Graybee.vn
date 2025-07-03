@@ -95,10 +95,11 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public void validateQuantityAvailable(long productId, int requestedQuantity) {
         checkExistsByProductId(productId);
-        Integer availableQuantity = inventoryRepository.getAvailableQuantityByProductId(productId);
+        String productName = inventoryRepository.findProductNameByProductId(productId);
+        int availableQuantity = getAvailableQuantity(productId);
 
         if (availableQuantity < requestedQuantity) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.not.enough.quantity"));
+            throw new BusinessCustomException(Constants.Common.global, "Sản phẩm " + productName + " hiện không đủ hàng.");
         }
     }
 
@@ -112,10 +113,11 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional(rollbackFor = RuntimeException.class)
     public void decreaseQuantity(long productId, int quantity) {
         checkExistsByProductId(productId);
+        String productName = inventoryRepository.findProductNameByProductId(productId);
         int updated = inventoryRepository.decreaseQuantity(productId, quantity);
 
-        if (updated == 0) {
-            throw new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("inventory.not.enough.quantity"));
+        if (updated < 0) {
+            throw new BusinessCustomException(Constants.Common.global, "Sản phẩm " + productName + " hiện không đủ hàng.");
         }
     }
 

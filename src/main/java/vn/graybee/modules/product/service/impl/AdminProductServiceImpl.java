@@ -210,7 +210,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         CategorySummaryDto brand = categoryService.checkType(request.getBrandName(), CategoryType.BRAND);
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new BusinessCustomException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists")));
+                .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("product.does_not_exists")));
 
         checkExistsByNameNotId(request.getName(), product.getId());
         checkExistsBySlugNotId(request.getSlug(), product.getId());

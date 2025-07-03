@@ -5,8 +5,6 @@ import vn.graybee.common.exception.BusinessCustomException;
 import vn.graybee.common.utils.MessageSourceUtil;
 
 public enum DeliveryStatus {
-
-
     PENDING,
     SHIPPING,
     DELIVERED,

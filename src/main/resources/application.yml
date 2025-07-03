@@ -62,8 +62,6 @@ servlet:
 
 logging:
   level:
-    org.springframework.security: DEBUG
-    org.springframework.security.web.access.ExceptionTranslationFilter: ERROR
     com:
       zaxxer: ERROR
 

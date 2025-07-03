@@ -80,7 +80,7 @@ public class CartController {
         Long cartId = cartService.getCartIdByAccountIdOrSessionId(accountId, sessionId);
         cartService.updateCartTotal(cartId);
         return ResponseEntity.ok(
-                MessageBuilder.ok(cartItemService.decreaseItemQuantity(cartId, productId), null)
+                MessageBuilder.ok(cartItemService.decreaseItemQuantity(cartId, productId), "Cập nhật số lượng thành công")
         );
     }
 
