@@ -38,13 +38,18 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional(rollbackFor = RuntimeException.class)
     public ProfileResponse updateByAccountId(ProfileRequest request, Long accountId) {
 
-        checkExistsByPhone(request.getPhone());
-
 
         Profile profile = profileRepository.findByAccountId(accountId).orElseGet(Profile::new);
+
+        if (profileRepository.checkExistsPhoneNotId(accountId, request.getPhone())) {
+            throw new BusinessCustomException("phone", messageSourceUtil.get("account.profile.phone.exists"));
+        }
+
         Gender gender = Gender.fromString(request.getGender(), messageSourceUtil);
 
-        if (profile.getAccountId() == null) {
+        boolean isExists = profile.getAccountId() == null;
+
+        if (isExists) {
             profile.setAccountId(accountId);
         }
 

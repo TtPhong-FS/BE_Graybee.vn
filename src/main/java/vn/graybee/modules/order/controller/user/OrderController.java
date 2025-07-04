@@ -1,6 +1,7 @@
 package vn.graybee.modules.order.controller.user;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -14,15 +15,12 @@ import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.order.dto.request.OrderCreateRequest;
 import vn.graybee.modules.order.service.OrderService;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("${api.publicApi.orders}")
+@RequestMapping("${api.orders}")
 public class OrderController {
 
     private final OrderService orderService;
-
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     @PostMapping
     public ResponseEntity<BasicMessageResponse<?>> createOrder(

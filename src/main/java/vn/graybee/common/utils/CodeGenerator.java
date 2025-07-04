@@ -12,6 +12,20 @@ public class CodeGenerator {
 
     private static final SecureRandom random = new SecureRandom();
 
+    public static String generateSessionId(int length, int count, String charset) {
+        StringBuilder sessionId = new StringBuilder();
+
+        for (int i = 0; i < count; i++) {
+            if (i > 0) sessionId.append("-");
+            for (int j = 0; j < length; j++) {
+                int index = random.nextInt(charset.length());
+                sessionId.append(charset.charAt(index));
+            }
+        }
+
+        return sessionId.toString();
+    }
+
     public static String generateCode(int length, String charset) {
         StringBuilder sb = new StringBuilder();
 

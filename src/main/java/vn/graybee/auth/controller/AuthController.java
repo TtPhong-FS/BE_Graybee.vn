@@ -21,7 +21,7 @@ import vn.graybee.common.utils.MessageSourceUtil;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("${api.publicApi.auth}")
+@RequestMapping("${api.auth}")
 public class AuthController {
 
     private final AuthService authService;

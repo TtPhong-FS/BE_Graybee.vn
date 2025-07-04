@@ -49,8 +49,8 @@ public class UserDetailService implements UserDetailsService {
         }
 
 
-        List<String> permissions = getPermissions(user.getId());
-        user.setPermissions(permissions);
+//        List<String> permissions = getPermissions(user.getId());
+//        user.setPermissions(permissions);
 
         return new UserDetail(user);
 

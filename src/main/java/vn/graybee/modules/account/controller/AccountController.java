@@ -25,6 +25,11 @@ import vn.graybee.modules.account.service.AddressService;
 import vn.graybee.modules.account.service.CustomerService;
 import vn.graybee.modules.account.service.FavouriteService;
 import vn.graybee.modules.account.service.ProfileService;
+import vn.graybee.modules.comment.dto.request.ReviewRequest;
+import vn.graybee.modules.comment.dto.response.CommentRating;
+import vn.graybee.modules.comment.dto.response.ReviewCommentDto;
+import vn.graybee.modules.comment.dto.response.ReviewIdProductId;
+import vn.graybee.modules.comment.service.ReviewService;
 import vn.graybee.modules.order.dto.response.OrderDetailDto;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.user.OrderHistoryResponse;
@@ -33,7 +38,7 @@ import vn.graybee.modules.order.service.OrderService;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("${api.privateApi.account}")
+@RequestMapping("${api.account}")
 @RestController
 public class AccountController {
 
@@ -46,6 +51,67 @@ public class AccountController {
     private final CustomerService customerService;
 
     private final ProfileService profileService;
+
+    private final ReviewService reviewService;
+
+    @PostMapping("/reviews/{productSlug}")
+    public ResponseEntity<BasicMessageResponse<ReviewCommentDto>> reviewProduct(
+            @RequestBody ReviewRequest request,
+            @PathVariable String productSlug,
+            @AuthenticationPrincipal UserDetail userDetail
+    ) {
+        Long accountId = userDetail.user().getId();
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        reviewService.reviewProduct(accountId, productSlug, request),
+                        "Đánh giá sản phẩm thành công"
+                )
+        );
+    }
+
+    @PutMapping("/reviews/{id}")
+    public ResponseEntity<BasicMessageResponse<ReviewCommentDto>> editReviewProduct(
+            @RequestBody ReviewRequest request,
+            @PathVariable("id") int id,
+            @AuthenticationPrincipal UserDetail userDetail
+    ) {
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        reviewService.editReviewProduct(id, request),
+                        "Cập nhật đánh giá sản phẩm thành công"
+                )
+        );
+    }
+
+    @DeleteMapping("/reviews/{id}")
+    public ResponseEntity<BasicMessageResponse<ReviewIdProductId>> deleteReviewProduct(
+            @PathVariable int id,
+            @AuthenticationPrincipal UserDetail userDetail
+    ) {
+
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        reviewService.deleteReviewProduct(id),
+                        "Xoá đánh giá thành công"
+                )
+        );
+    }
+
+    @GetMapping("/reviews/for-update/{id}")
+    public ResponseEntity<BasicMessageResponse<CommentRating>> getReviewCommentForUpdate(
+            @PathVariable int id,
+            @AuthenticationPrincipal UserDetail userDetail
+    ) {
+        Long accountId = userDetail.user().getId();
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        reviewService.getReviewCommentForUpdate(id, accountId),
+                        null
+                )
+        );
+    }
+
 
     @GetMapping("/profile")
     public ResponseEntity<BasicMessageResponse<ProfileResponse>> getProfileByUserUid(@AuthenticationPrincipal UserDetail userDetail) {

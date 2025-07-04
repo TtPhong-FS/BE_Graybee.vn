@@ -28,7 +28,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("${api.adminApi.products}")
+@RequestMapping("${api.admin.products}")
 public class AdminProductController {
 
 

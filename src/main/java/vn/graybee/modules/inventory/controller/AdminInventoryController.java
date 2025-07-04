@@ -21,7 +21,7 @@ import vn.graybee.response.admin.products.InventoryResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.adminApi.inventories}")
+@RequestMapping("${api.admin.inventories}")
 public class AdminInventoryController {
 
     private final InventoryService inventoryService;

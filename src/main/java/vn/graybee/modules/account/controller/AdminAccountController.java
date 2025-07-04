@@ -23,7 +23,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("${api.adminApi.accounts}")
+@RequestMapping("${api.admin.accounts}")
 public class AdminAccountController {
 
     private final AdminAccountService adminAccountService;

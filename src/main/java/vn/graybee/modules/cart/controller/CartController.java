@@ -23,7 +23,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("${api.publicApi.carts}")
+@RequestMapping("${api.carts}")
 public class CartController {
 
     private final CartService cartService;

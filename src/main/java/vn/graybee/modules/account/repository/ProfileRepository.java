@@ -14,4 +14,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     Optional<Profile> findByAccountId(@Param("accountId") Long accountId);
 
+    @Query("Select exists (Select 1 from Profile p where p.phone = :phone and p.accountId <> :accountId)")
+    boolean checkExistsPhoneNotId(Long accountId, String phone);
+
 }

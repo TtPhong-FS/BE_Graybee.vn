@@ -15,7 +15,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1/admin/orders/payments")
+@RequestMapping("${api.admin.payments}")
 public class AdminPaymentController {
 
     private final PaymentService paymentService;

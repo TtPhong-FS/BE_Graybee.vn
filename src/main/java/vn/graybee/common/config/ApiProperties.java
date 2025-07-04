@@ -1,66 +1,61 @@
 package vn.graybee.common.config;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 
+@Setter
 @Getter
 @Component
 @ConfigurationProperties(prefix = "api")
 public class ApiProperties {
 
-    private PublicApi publicApi;
+    public Admin admin;
 
-    private AdminApi adminApi;
+    public String home;
 
-    private PrivateApi privateApi;
+    public String products;
+
+    public String collections;
+
+    public String carts;
+
+    public String account;
+
+    public String auth;
+
+    public String orders;
 
 
+    @Setter
     @Getter
-    public static class PublicApi {
+    public static class Admin {
 
-        private String base;
-
-        private String home;
-
-        private String auth;
-
-        private String carts;
-
-        private String products;
-
-    }
-
-    @Getter
-    public static class AdminApi {
-
-        private String base;
-
-        private String auth;
-
-        private String products;
+        private String basePath;
 
         private String categories;
 
         private String attributes;
 
+        private String products;
+
         private String orders;
 
         private String inventories;
 
-    }
+        private String permissions;
 
-    @Getter
-    public static class PrivateApi {
+        private String users;
 
-        private String account;
+        private String customers;
 
-        private String profile;
+        private String imageKit;
 
-        private String address;
+        private String deliveries;
 
-        private String favorites;
+        private String payments;
 
     }
 

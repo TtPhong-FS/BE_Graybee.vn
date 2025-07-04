@@ -20,7 +20,7 @@ import vn.graybee.modules.order.service.AdminOrderService;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.adminApi.orders}")
+@RequestMapping("${api.admin.orders}")
 public class AdminOrderController {
 
     private final AdminOrderService adminOrderService;

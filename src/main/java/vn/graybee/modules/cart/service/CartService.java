@@ -18,4 +18,6 @@ public interface CartService {
 
     Long getCartIdByAccountIdOrSessionId(Long accountId, String sessionId);
 
+    void removeCartNotUse();
+
 }

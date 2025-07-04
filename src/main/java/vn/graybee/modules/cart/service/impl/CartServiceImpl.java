@@ -1,5 +1,6 @@
 package vn.graybee.modules.cart.service.impl;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.graybee.common.Constants;
@@ -12,6 +13,7 @@ import vn.graybee.modules.cart.repository.CartRepository;
 import vn.graybee.modules.cart.service.CartItemService;
 import vn.graybee.modules.cart.service.CartService;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -89,6 +91,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public List<CartItemDto> findCartByAccountIdOrSessionId(Long accountId, String sessionId) {
 
         Cart cart;
@@ -96,9 +99,11 @@ public class CartServiceImpl implements CartService {
         if (accountId != null) {
             cart = cartRepository.findByAccountIdAndSessionId(accountId, null)
                     .orElseGet(Cart::new);
-        } else {
+        } else if (sessionId != null) {
             cart = cartRepository.findByAccountIdAndSessionId(null, sessionId)
                     .orElseGet(Cart::new);
+        } else {
+            return Collections.emptyList();
         }
 
         boolean isNewCart = cart.getId() == null;
@@ -146,6 +151,33 @@ public class CartServiceImpl implements CartService {
             return cartRepository.findIdByAccountIdOrSessionId(null, sessionId)
                     .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("cart.not.found")));
         }
+    }
+
+    @Scheduled(cron = "0 0 0 ? * SUN")
+    @Override
+    public void removeCartNotUse() {
+        List<Cart> carts = cartRepository.findAll();
+
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+
+        List<Cart> forRemove = carts
+                .stream()
+                .filter(c -> c.getAccountId() == null && c.getCreatedAt() != null && c.getCreatedAt().isBefore(sevenDaysAgo))
+                .toList();
+
+        cartRepository.deleteAllInBatch(forRemove);
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void removeCartGarbage() {
+        List<Cart> carts = cartRepository.findAll();
+
+        List<Cart> forRemove = carts
+                .stream()
+                .filter(c -> c.getAccountId() == null && c.getSessionId() == null)
+                .toList();
+
+        cartRepository.deleteAllInBatch(forRemove);
     }
 
     private void checkExistsById(Long cartId) {

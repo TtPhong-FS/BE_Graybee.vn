@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("${api.adminApi.imageKit}")
+@RequestMapping("${api.admin.image-kit}")
 public class ImagekitController {
 
     private final String privateKey = "private_470TGMpAKSBKA9F/d/Onck5xPVE=";

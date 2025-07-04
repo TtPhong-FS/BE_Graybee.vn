@@ -66,31 +66,29 @@ logging:
       zaxxer: ERROR
 
 api:
-  publicApi:
-    base: /api/v1/public
-    home: ${api.publicApi.base}/home
-    auth: ${api.publicApi.base}/auth
-    carts: ${api.publicApi.base}/carts
-    collections: ${api.publicApi.base}/collections
-    products: ${api.publicApi.base}/products
-    orders: ${api.publicApi.base}/orders
-    search: ${api.publicApi.base}/search
-  adminApi:
-    base: /api/v1/admin
-    auth: ${api.adminApi.base}/auth
-    accounts: ${api.adminApi.base}/accounts
-    products: ${api.adminApi.base}/products
-    categories: ${api.adminApi.base}/categories
-    attributes: ${api.adminApi.base}/attributes
-    orders: ${api.adminApi.base}/orders
-    inventories: ${api.adminApi.base}/inventories
-    permissions: ${api.adminApi.base}/permissions
-    imageKit: ${api.adminApi.base}/image-kit
-  privateApi:
-    account: /api/v1/account
-    profile: ${api.privateApi.account}/profile
-    address: ${api.privateApi.account}/addresses
-    favorites: ${api.privateApi.account}/favorites
+  version: v1
+  base-path: /api/${api.version}
+  admin:
+    base-path: ${api.base-path}/admin
+    dashboard: ${api.admin.base-path}/dashboard
+    categories: ${api.admin.base-path}/categories
+    attributes: ${api.admin.base-path}/attributes
+    products: ${api.admin.base-path}/products
+    inventories: ${api.admin.base-path}/inventories
+    permissions: ${api.admin.base-path}/permissions
+    orders: ${api.admin.base-path}/orders
+    deliveries: ${api.admin.base-path}/deliveries
+    payments: ${api.admin.base-path}/payments
+    accounts: ${api.admin.base-path}/accounts
+    customers: ${api.admin.base-path}/customers
+    image-kit: ${api.admin.base-path}/image-kit
+  home: ${api.base-path}/home
+  products: ${api.base-path}/products
+  collections: ${api.base-path}/collections
+  carts: ${api.base-path}/carts
+  auth: ${api.base-path}/auth
+  orders: ${api.base-path}/orders
+  account: ${api.base-path}/account
 
 jwt:
   secretKey: ${SECRET_KEY}

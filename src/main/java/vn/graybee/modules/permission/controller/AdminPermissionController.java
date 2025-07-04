@@ -20,7 +20,7 @@ import vn.graybee.modules.permission.service.PermissionService;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.adminApi.permissions}")
+@RequestMapping("${api.admin.permissions}")
 public class AdminPermissionController {
 
     private final PermissionService permissionService;

@@ -11,7 +11,7 @@ public enum Gender {
         try {
             return Gender.valueOf(gender.toUpperCase());
         } catch (RuntimeException e) {
-            throw new BusinessCustomException(Constants.Common.gender, messageSourceUtil.get("account.gender.in_valid"));
+            throw new BusinessCustomException(Constants.Common.gender, messageSourceUtil.get("account.gender.in_valid", new Object[]{gender}));
         }
     }
 }

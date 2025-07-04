@@ -28,7 +28,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("${api.adminApi.attributes}")
+@RequestMapping("${api.admin.attributes}")
 public class AttributeController {
 
     private final AttributeService attributeService;
