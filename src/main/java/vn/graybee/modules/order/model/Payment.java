@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.graybee.common.model.BaseModel;
 import vn.graybee.modules.order.enums.PaymentMethod;
@@ -17,7 +16,6 @@ import vn.graybee.modules.order.enums.PaymentStatus;
 
 @Setter
 @Getter
-@NoArgsConstructor
 @Entity
 @Table(name = "payments")
 public class Payment extends BaseModel {

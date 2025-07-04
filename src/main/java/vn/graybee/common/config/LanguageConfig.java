@@ -33,7 +33,6 @@ public class LanguageConfig {
     @Bean
     public LocaleResolver localeResolver() {
         AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
-        System.out.println(resolver);
         resolver.setDefaultLocale(new Locale("vi"));
         return resolver;
     }

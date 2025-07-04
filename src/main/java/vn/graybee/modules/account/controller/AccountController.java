@@ -1,7 +1,7 @@
 package vn.graybee.modules.account.controller;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.account.dto.request.AddressCreateRequest;
+import vn.graybee.modules.account.dto.request.ProfileRequest;
 import vn.graybee.modules.account.dto.response.AddressResponse;
 import vn.graybee.modules.account.dto.response.DefaultAddressDto;
 import vn.graybee.modules.account.dto.response.FavoriteProductResponse;
+import vn.graybee.modules.account.dto.response.ProfileResponse;
 import vn.graybee.modules.account.security.UserDetail;
 import vn.graybee.modules.account.service.AddressService;
 import vn.graybee.modules.account.service.CustomerService;
 import vn.graybee.modules.account.service.FavouriteService;
+import vn.graybee.modules.account.service.ProfileService;
 import vn.graybee.modules.order.dto.response.OrderDetailDto;
 import vn.graybee.modules.order.dto.response.admin.CancelOrderResponse;
 import vn.graybee.modules.order.dto.response.user.OrderHistoryResponse;
@@ -29,9 +32,9 @@ import vn.graybee.modules.order.service.OrderService;
 
 import java.util.List;
 
-@AllArgsConstructor
-@RestController
+@RequiredArgsConstructor
 @RequestMapping("${api.privateApi.account}")
+@RestController
 public class AccountController {
 
     private final FavouriteService favouriteService;
@@ -41,6 +44,31 @@ public class AccountController {
     private final AddressService addressService;
 
     private final CustomerService customerService;
+
+    private final ProfileService profileService;
+
+    @GetMapping("/profile")
+    public ResponseEntity<BasicMessageResponse<ProfileResponse>> getProfileByUserUid(@AuthenticationPrincipal UserDetail userDetail) {
+        Long accountId = userDetail.user().getId();
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        profileService.findByAccountId(accountId),
+                        null
+                )
+        );
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<BasicMessageResponse<ProfileResponse>> updateProfile(
+            @RequestBody @Valid ProfileRequest request,
+            @AuthenticationPrincipal UserDetail userDetail
+    ) {
+        Long accountId = userDetail.user().getId();
+        return ResponseEntity.ok(
+                MessageBuilder.ok(profileService.updateByAccountId(request, accountId),
+                        "Cập nhật thông tin thành công")
+        );
+    }
 
 
     @GetMapping("/favourites")

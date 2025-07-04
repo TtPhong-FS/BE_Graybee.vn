@@ -1,6 +1,6 @@
 package vn.graybee.checkers;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,11 +13,12 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class StartupConnectionChecker implements ApplicationListener<ApplicationReadyEvent> {
 
     static final Logger logger = LoggerFactory.getLogger(StartupConnectionChecker.class);
+
     private static final String message_success = "Successfully connect to ";
 
     private final RedisConnectionFactory redisConnect;
