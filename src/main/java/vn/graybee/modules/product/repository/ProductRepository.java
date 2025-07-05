@@ -159,7 +159,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Select new vn.graybee.modules.product.dto.response.ProductBasicResponse(p.id, p.name, p.slug, p.price, p.finalPrice, p.thumbnail)
             from Product p
             join Category c on c.id = p.categoryId
-            where c.name LIKE %:category% and p.status = 'PUBLISHED'
+            where c.name LIKE :category% and p.status = 'PUBLISHED'
             """)
     Page<ProductBasicResponse> findTopTenProductByCategory(String category, Pageable pageable);
 

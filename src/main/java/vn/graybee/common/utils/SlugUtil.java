@@ -17,4 +17,13 @@ public class SlugUtil {
         return slug.toLowerCase();
     }
 
+    public static String toSlugFy(String input) {
+        if (input == null) return null;
+        String noWhitespace = WHITESPACE.matcher(input).replaceAll("_");
+        String normalized = Normalizer.normalize(noWhitespace, Normalizer.Form.NFD);
+
+        String slug = NON_LATIN.matcher(normalized).replaceAll("");
+        return slug.toLowerCase();
+    }
+
 }
