@@ -3,12 +3,12 @@ package vn.graybee.modules.cart.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
@@ -34,7 +34,7 @@ public class CartController {
 
     @GetMapping
     public ResponseEntity<BasicMessageResponse<List<CartItemDto>>> getAllCartByAccountIdOrSessionId(
-            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @RequestHeader(value = "x-session-id", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail
     ) {
         Long accountId = null;
@@ -52,7 +52,7 @@ public class CartController {
     @PostMapping("/products/{productId}")
     public ResponseEntity<BasicMessageResponse<CartItemDto>> addItemToCart(
             @PathVariable long productId,
-            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @RequestHeader(value = "x-session-id", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = null;
         if (userDetail != null && userDetail.user().getId() != null) {
@@ -70,7 +70,7 @@ public class CartController {
     @PutMapping("/decrease/{productId}")
     public ResponseEntity<BasicMessageResponse<CartItemDto>> decreaseQuantityToCartItem(
             @PathVariable long productId,
-            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @RequestHeader(value = "x-session-id", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = null;
         if (userDetail != null && userDetail.user().getId() != null) {
@@ -88,7 +88,7 @@ public class CartController {
     public ResponseEntity<BasicMessageResponse<?>> updateItemQuantity(
             @PathVariable int quantity,
             @PathVariable long cartItemId,
-            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @RequestHeader(value = "x-session-id", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
 
         Long accountId = null;
@@ -116,7 +116,7 @@ public class CartController {
     @DeleteMapping("/{cartItemId}")
     public ResponseEntity<BasicMessageResponse<Long>> deleteItemToCart(
             @PathVariable("cartItemId") Long cartItemId,
-            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @RequestHeader(value = "x-session-id", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = null;
         if (userDetail != null && userDetail.user().getId() != null) {
@@ -135,7 +135,7 @@ public class CartController {
 
     @DeleteMapping("/clear-items")
     public ResponseEntity<BasicMessageResponse<?>> clearItemsToCart(
-            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @RequestHeader(value = "x-session-id", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
         Long accountId = null;
         if (userDetail != null && userDetail.user().getId() != null) {

@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.graybee.common.dto.BasicMessageResponse;
@@ -25,7 +25,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<BasicMessageResponse<?>> createOrder(
             @RequestBody @Valid OrderCreateRequest request,
-            @CookieValue(value = "sessionId", required = false) String sessionId,
+            @RequestHeader(value = "x-session-id", required = false) String sessionId,
             @AuthenticationPrincipal UserDetail userDetail) {
         Long account = null;
         if (userDetail != null && userDetail.user().getUid() != null) {

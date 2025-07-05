@@ -24,7 +24,7 @@ import vn.graybee.auth.filter.JwtFilter;
 import vn.graybee.common.config.ApiProperties;
 import vn.graybee.modules.account.security.UserDetailService;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
@@ -84,9 +84,9 @@ public class SecurityConfig {
                 "http://localhost:3100"
         ));
         cors.setAllowCredentials(true);
-        cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+        cors.setAllowedHeaders(Collections.singletonList("*"));
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
-        cors.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+        cors.setExposedHeaders(List.of("Authorization"));
         cors.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

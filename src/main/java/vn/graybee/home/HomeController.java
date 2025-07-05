@@ -1,10 +1,7 @@
 package vn.graybee.home;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +23,6 @@ import vn.graybee.modules.product.model.ProductDocument;
 import vn.graybee.modules.product.service.ProductDocumentService;
 import vn.graybee.modules.product.service.ProductService;
 
-import java.time.Duration;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -40,7 +36,6 @@ public class HomeController {
 
     private final ProductDocumentService productDocumentService;
 
-
     @GetMapping("/sidebar")
     public ResponseEntity<BasicMessageResponse<List<SidebarDto>>> getSidebar() {
         return ResponseEntity.ok(
@@ -49,18 +44,9 @@ public class HomeController {
     }
 
     @GetMapping("/session")
-    public ResponseEntity<BasicMessageResponse<String>> setSession(HttpServletResponse response) {
+    public ResponseEntity<BasicMessageResponse<String>> setSession() {
         String sessionId = CodeGenerator.generateSessionId(5, 4, CodeGenerator.ALPHANUMERIC);
 
-        ResponseCookie cookie = ResponseCookie.from("sessionId", sessionId)
-                .httpOnly(false)
-                .secure(true)
-                .sameSite("None")
-                .path("/")
-                .maxAge(Duration.ofDays(7))
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ResponseEntity.ok(
                 MessageBuilder.ok(sessionId, null)
         );

@@ -36,7 +36,7 @@ public class CartServiceImpl implements CartService {
     @Transactional(rollbackFor = RuntimeException.class)
     public CartItemDto findOrCreateCartAfterAddItem(Long accountId, String sessionId, long productId) {
         if (accountId == null && sessionId == null) {
-            throw new BusinessCustomException(Constants.Common.global, "Hãy tải lại trang để được cấp Session mới trước khi thêm giỏ hàng");
+            throw new BusinessCustomException(Constants.Common.global, "Missing session ID");
         }
 
         Cart cart;
@@ -75,7 +75,7 @@ public class CartServiceImpl implements CartService {
     @Transactional(rollbackFor = RuntimeException.class)
     public void syncGuestCartToAccount(Long accountId, String sessionId) {
         if (accountId == null && sessionId == null) {
-            throw new BusinessCustomException(Constants.Common.global, "Hãy tải lại trang để được cấp Session mới trước khi thêm giỏ hàng");
+            throw new BusinessCustomException(Constants.Common.global, "Missing session ID");
         }
 
         Cart cart = cartRepository.findBySessionId(sessionId)
