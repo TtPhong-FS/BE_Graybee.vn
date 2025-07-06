@@ -29,17 +29,20 @@ public class RedisAuthService {
         redisTemplate.expire(tokenKey, timeout, unit);
     }
 
-    public boolean isValidToken(String accountUid, String token) {
+    public boolean isLogout(String accountUid) {
         String key = TOKEN_USER_KEY + accountUid;
 
         String status = (String) redisTemplate.opsForHash().get(key, "status_logout");
+
+        return "true".equals(status != null ? status : "false");
+    }
+
+    public boolean isExists(String accountUid, String token) {
+        String key = TOKEN_USER_KEY + accountUid;
+
         Object storedToken = redisTemplate.opsForHash().get(key, "token");
 
-        if (storedToken == null || !storedToken.equals(token)) {
-            return false;
-        }
-        boolean isLoggedOut = "true".equals(status != null ? status : "false");
-        return !isLoggedOut;
+        return storedToken != null && storedToken.equals(token);
     }
 
     public void updateStatusToken(String accountUid) {

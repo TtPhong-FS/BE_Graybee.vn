@@ -1,6 +1,8 @@
 package vn.graybee.home;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +32,8 @@ import java.util.List;
 @RequestMapping("${api.home}")
 public class HomeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+
     private final CategoryService categoryService;
 
     private final ProductService productService;
@@ -47,6 +51,7 @@ public class HomeController {
     public ResponseEntity<BasicMessageResponse<String>> setSession() {
         String sessionId = CodeGenerator.generateSessionId(5, 4, CodeGenerator.ALPHANUMERIC);
 
+        logger.info("Session created: {}", sessionId);
         return ResponseEntity.ok(
                 MessageBuilder.ok(sessionId, null)
         );

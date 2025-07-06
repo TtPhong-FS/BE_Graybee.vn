@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -20,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import vn.graybee.auth.config.OriginProperties;
 import vn.graybee.auth.custom.CustomAccessDenied;
 import vn.graybee.auth.custom.CustomAuthenticationEndpoint;
+import vn.graybee.auth.custom.CustomLogoutHandler;
 import vn.graybee.auth.filter.JwtFilter;
 import vn.graybee.common.config.ApiProperties;
 import vn.graybee.modules.account.security.UserDetailService;
@@ -43,6 +45,8 @@ public class SecurityConfig {
 
     private final CustomAccessDenied customAccessDenied;
 
+    private final CustomLogoutHandler customLogoutHandler;
+
     private final CustomAuthenticationEndpoint customAuthenticationEndpoint;
 
 
@@ -53,7 +57,6 @@ public class SecurityConfig {
                         cors -> cors.configurationSource(corsConfigurationSource())
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(customAuthenticationEndpoint)
                         .accessDeniedHandler(customAccessDenied))
@@ -71,6 +74,14 @@ public class SecurityConfig {
                 )
                 .userDetailsService(userDetailService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(
+                        l -> l.logoutUrl(apiProperties.getAuth() + "/logout")
+                                .addLogoutHandler(customLogoutHandler)
+                                .logoutSuccessHandler(
+                                        ((request, response, authentication) -> SecurityContextHolder.clearContext())
+                                )
+                )
                 .build();
     }
 

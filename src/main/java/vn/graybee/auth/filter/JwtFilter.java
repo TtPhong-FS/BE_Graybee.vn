@@ -1,13 +1,15 @@
 package vn.graybee.auth.filter;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -16,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import vn.graybee.auth.config.JwtProperties;
 import vn.graybee.auth.service.JwtService;
 import vn.graybee.auth.service.RedisAuthService;
+import vn.graybee.common.utils.ProblemDetailUtils;
 import vn.graybee.modules.account.security.UserDetailService;
 
 import java.io.IOException;
@@ -56,30 +59,37 @@ public class JwtFilter extends OncePerRequestFilter {
             String uid = jwtService.extractUsername(token);
 
             if (uid != null && !uid.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
-                if (redisAuthService.isValidToken(uid, token)) {
-                    UserDetails userDetails = userDetailService.loadUserByUsername(uid);
 
-                    if (jwtService.isValid(token, userDetails)) {
-
-                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities()
-                        );
-                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-                    }
+                if (!redisAuthService.isExists(uid, token)) {
+                    ProblemDetailUtils.writeProblemDetail(request, response, HttpStatus.UNAUTHORIZED, "Token không hợp lệ. Vui lòng đăng nhập lại!");
+                    return;
                 }
 
+                if (redisAuthService.isLogout(uid)) {
+                    ProblemDetailUtils.writeProblemDetail(request, response, HttpStatus.UNAUTHORIZED, "Token đã đăng xuất. Không thể sử dụng lại!");
+                    return;
+                }
+
+                UserDetails userDetails = userDetailService.loadUserByUsername(uid);
+
+                if (jwtService.isValid(token, userDetails)) {
+
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+                filterChain.doFilter(request, response);
             }
-            filterChain.doFilter(request, response);
 
-        } catch (AuthenticationException ex) {
-            SecurityContextHolder.clearContext();
-            throw ex;
 
-        } //
-
+        } catch (ExpiredJwtException ex) {
+            ProblemDetailUtils.writeProblemDetail(request, response, HttpStatus.UNAUTHORIZED, "Token đã hết hạn. Vui lòng đăng nhập lại để tiếp tục!");
+        } catch (JwtException ex) {
+            ProblemDetailUtils.writeProblemDetail(request, response, HttpStatus.UNAUTHORIZED, "Token không hợp lệ. Vui lòng kiểm tra hoặc đăng nhập lại!");
+        }
     }
-
 
 }
