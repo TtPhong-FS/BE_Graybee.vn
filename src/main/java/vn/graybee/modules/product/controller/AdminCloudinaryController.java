@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @RestController
-@RequestMapping("/api/v1/admin/cloudinary")
+@RequestMapping("${api.admin.cloudinary}")
 public class AdminCloudinaryController {
 
     @GetMapping("/images")

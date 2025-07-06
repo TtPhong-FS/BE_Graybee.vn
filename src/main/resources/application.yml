@@ -83,6 +83,7 @@ api:
     accounts: ${api.admin.base-path}/accounts
     customers: ${api.admin.base-path}/customers
     image-kit: ${api.admin.base-path}/image-kit
+    cloudinary: ${api.admin.base-path}/cloudinary
   home: ${api.base-path}/home
   products: ${api.base-path}/products
   collections: ${api.base-path}/collections
