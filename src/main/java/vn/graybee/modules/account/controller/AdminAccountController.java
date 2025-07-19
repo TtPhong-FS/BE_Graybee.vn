@@ -3,13 +3,7 @@ package vn.graybee.modules.account.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.graybee.common.dto.BasicMessageResponse;
 import vn.graybee.common.utils.MessageBuilder;
 import vn.graybee.modules.account.dto.request.admin.AccountCreateRequest;
@@ -50,6 +44,15 @@ public class AdminAccountController {
         );
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BasicMessageResponse<Long>> deleteAccountById(@PathVariable long id){
+        return ResponseEntity.ok(
+                MessageBuilder.ok(
+                        adminAccountService.deleteAccountById(id),
+                        "Xoá tài khoản người dùng thành công"
+                )
+        );
+    }
 
     @PutMapping("/active/{id}")
     public ResponseEntity<BasicMessageResponse<AccountIdActiveResponse>> toggleActive(

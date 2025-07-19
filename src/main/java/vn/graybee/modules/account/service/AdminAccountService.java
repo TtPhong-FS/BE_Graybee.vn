@@ -22,4 +22,5 @@ public interface AdminAccountService {
 
     UsernameResponse getUsernameById(long id);
 
+    long deleteAccountById(long id);
 }

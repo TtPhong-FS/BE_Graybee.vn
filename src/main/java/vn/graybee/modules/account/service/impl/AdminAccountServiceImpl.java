@@ -36,7 +36,6 @@ public class AdminAccountServiceImpl implements AdminAccountService {
 
     private final CustomerService customerService;
 
-
     private final MessageSourceUtil messageSourceUtil;
 
     private final BCryptPasswordEncoder passwordEncoder;
@@ -75,7 +74,7 @@ public class AdminAccountServiceImpl implements AdminAccountService {
         Account account = new Account();
 
         account.setEmail(request.getEmail());
-        account.setPassword(request.getPassword());
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
         account.setActive(request.isActive());
         account.setRole(role);
         account.setLastLoginAt(LocalDateTime.now());
@@ -133,6 +132,14 @@ public class AdminAccountServiceImpl implements AdminAccountService {
                 .orElseThrow(() -> new CustomNotFoundException(Constants.Common.global, messageSourceUtil.get("account.not.found")));
 
         return new UsernameResponse(username);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public long deleteAccountById(long id) {
+        checkExistsById(id);
+        accountRepository.deleteById(id);
+        return id;
     }
 
 }

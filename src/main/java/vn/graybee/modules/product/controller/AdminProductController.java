@@ -79,7 +79,7 @@ public class AdminProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<BasicMessageResponse<Long>> deleteProductById(@PathVariable("id") long id) {
         return ResponseEntity.ok(
-                MessageBuilder.ok(adminProductService.deleteProductById(id), messageSourceUtil.get("product.success.delete"))
+                MessageBuilder.ok(adminProductService.deleteProductById(id), messageSourceUtil.get("product.success_delete"))
         );
     }
 

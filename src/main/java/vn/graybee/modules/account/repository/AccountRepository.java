@@ -34,6 +34,11 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("Update Account a set a.email = :username where a.id = :id")
     void changeUsername(@Param("id") Long id, @Param("username") String username);
 
+    @Transactional
+    @Modifying
+    @Query("Delete from Account a where a.id = :id")
+    void deleteById(@Param("id") long id);
+
 
     @Query("Select a.id from Account a where a.email = :email")
     Optional<Long> findIdByEmail(String email);
