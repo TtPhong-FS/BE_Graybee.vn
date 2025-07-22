@@ -19,15 +19,11 @@ public class AttributeDto {
 
     private String label;
 
-    private String unit;
-
     private boolean required;
 
     private boolean active;
 
     private String inputType;
-
-    private List<String> options;
 
     private List<CategoryIdNameDto> categories;
 
@@ -35,11 +31,9 @@ public class AttributeDto {
         this.id = attribute.getId();
         this.name = attribute.getName();
         this.label = attribute.getLabel();
-        this.unit = attribute.getUnit();
         this.required = attribute.isRequired();
         this.active = attribute.isActive();
         this.inputType = attribute.getInputType();
-        this.options = attribute.getOptions();
         this.categories = categories;
     }
 

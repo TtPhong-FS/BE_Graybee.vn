@@ -29,14 +29,8 @@ public class AttributeRequest {
 
     private boolean active;
 
-    private List<String> options;
-
     @NotBlank(message = "{catalog.validation.attribute.inputType.not.blank}")
     @Size(min = 2, max = 30, message = "{catalog.validation.attribute.inputType.size}")
     private String inputType;
-
-    @Size(max = 30, message = "{catalog.validation.attribute.unit.size}")
-    private String unit;
-
 
 }

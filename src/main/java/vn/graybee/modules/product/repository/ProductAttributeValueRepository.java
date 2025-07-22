@@ -22,7 +22,7 @@ public interface ProductAttributeValueRepository extends JpaRepository<ProductAt
     List<AttributeDisplayDto> findAttributeDisplayDtosByProductId(long productId);
 
     @Query("""
-            Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicValueDto(a.id, a.name, pa.value, a.label, a.isRequired, a.inputType, a.options)
+            Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicValueDto(a.id, a.name, pa.value, a.label, a.isRequired, a.inputType)
             from CategoryAttribute ca
             join Attribute a on ca.attributeId = a.id
             left join ProductAttributeValue pa on pa.attributeId = a.id and pa.productId = :productId

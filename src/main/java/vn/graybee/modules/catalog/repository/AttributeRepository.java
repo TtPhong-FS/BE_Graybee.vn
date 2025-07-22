@@ -26,7 +26,7 @@ public interface AttributeRepository extends JpaRepository<Attribute, Long> {
     @Query("Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeDto(a, null) from Attribute a")
     List<AttributeDto> findAllAttributeDto();
 
-    @Query("Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto(a.id, a.name, a.label, a.isRequired, a.inputType, a.options) from Attribute a join CategoryAttribute ca on a.id = ca.attributeId where ca.categoryId = :categoryId")
+    @Query("Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto(a.id, a.name, a.label, a.isRequired, a.inputType) from Attribute a join CategoryAttribute ca on a.id = ca.attributeId where ca.categoryId = :categoryId")
     List<AttributeBasicDto> findAllAttributeBasicDtoByCategoryId(@Param("categoryId") long categoryId);
 
     @Query("Select exists (Select 1 from Attribute a where LOWER(a.name) = LOWER(:name) and a.id <> :id)")
@@ -49,7 +49,7 @@ public interface AttributeRepository extends JpaRepository<Attribute, Long> {
     void toggleRequiredById(long id);
 
     @Query("""
-            Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto(a.id, a.name, a.label, a.isRequired, a.inputType, a.options) 
+            Select new vn.graybee.modules.catalog.dto.response.attribute.AttributeBasicDto(a.id, a.name, a.label, a.isRequired, a.inputType) 
             from Attribute a 
             join CategoryAttribute ca on a.id = ca.attributeId
             join Category c on c.id = ca.categoryId

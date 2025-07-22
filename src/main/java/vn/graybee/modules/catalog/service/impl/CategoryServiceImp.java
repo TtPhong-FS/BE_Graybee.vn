@@ -161,10 +161,10 @@ public class CategoryServiceImp implements CategoryService {
         List<CategoryDto> roots = new ArrayList<>();
         for (Category cat : categories) {
             CategoryDto dto = categoryDtoMap.get(cat.getId());
-            if (cat.getParentId() == null) {
+            if (dto.getParentId() == null) {
                 roots.add(dto);
             } else {
-                CategoryDto parent = categoryDtoMap.get(cat.getParentId());
+                CategoryDto parent = categoryDtoMap.get(dto.getParentId());
                 if (parent != null) {
                     parent.getChildren().add(dto);
                 }
@@ -298,14 +298,14 @@ public class CategoryServiceImp implements CategoryService {
         Set<String> notFound = new HashSet<>(tagName);
         notFound.removeAll(lowerNames);
 
-        if(!notFound.isEmpty()){
+        if (!notFound.isEmpty()) {
             throw new CustomNotFoundException(Constants.Product.tagNames, messageSourceUtil.get("catalog.category.not.found", new Object[]{String.join(", ", notFound)}));
         }
 
         List<String> notTypeTag = tags.stream().filter(c -> c.getType() != CategoryType.TAG).map(CategorySummaryDto::getName).toList();
 
-        if(!notTypeTag.isEmpty()){
-            throw new BusinessCustomException(Constants.Product.tagNames, "Thẻ phân loại "+ notTypeTag + " phải thuộc loại 'TAG'");
+        if (!notTypeTag.isEmpty()) {
+            throw new BusinessCustomException(Constants.Product.tagNames, "Thẻ phân loại " + notTypeTag + " phải thuộc loại 'TAG'");
         }
 
         System.out.println(notTypeTag);

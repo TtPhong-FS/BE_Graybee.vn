@@ -164,14 +164,6 @@ public class ProductAttributeValueServiceImpl implements ProductAttributeValueSe
                     errors.put(fieldPath, "Checkbox attribute '" + attrName + "' must be true or false");
                 }
                 break;
-
-            case "select":
-                List<String> options = attributeBasicDto.getOptions();
-                if (!options.contains(rawValue)) {
-                    errors.put(fieldPath, "Invalid option for '" + attrName + "', allowed values: " + options);
-                }
-                break;
-
             default:
                 break;
         }

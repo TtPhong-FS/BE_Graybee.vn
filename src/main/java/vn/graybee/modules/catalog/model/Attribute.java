@@ -9,10 +9,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.util.List;
 
 @Setter
 @Getter
@@ -30,13 +26,6 @@ public class Attribute {
 
     @Column(length = 100, nullable = false, unique = true)
     private String label;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<String> options;
-
-    @Column(length = 30)
-    private String unit;
 
     @Column(name = "input_type", nullable = false, length = 30)
     private String inputType;

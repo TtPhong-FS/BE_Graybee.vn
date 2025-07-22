@@ -55,11 +55,9 @@ public class AttributeServiceImpl implements AttributeService {
         Attribute attribute = new Attribute();
         attribute.setName(convertName(request.getName()));
         attribute.setLabel(TextUtils.capitalizeEachWord(request.getLabel()));
-        attribute.setUnit(request.getUnit() != null && !request.getUnit().isEmpty() ? request.getUnit().toUpperCase() : null);
         attribute.setInputType(getInputType(request.getInputType()));
         attribute.setRequired(request.isRequired());
         attribute.setActive(request.isActive());
-        attribute.setOptions(request.getOptions());
 
         attribute = attributeRepository.save(attribute);
 
@@ -109,11 +107,9 @@ public class AttributeServiceImpl implements AttributeService {
 
         attribute.setName(convertName(request.getName()));
         attribute.setLabel(TextUtils.capitalizeEachWord(request.getLabel()));
-        attribute.setUnit(request.getUnit() != null && !request.getUnit().isEmpty() ? request.getUnit().toUpperCase() : null);
         attribute.setInputType(getInputType(request.getInputType()));
         attribute.setRequired(request.isRequired());
         attribute.setActive(request.isActive());
-        attribute.setOptions(request.getOptions());
 
         attribute = attributeRepository.save(attribute);
 
